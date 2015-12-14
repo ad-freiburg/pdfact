@@ -1,3 +1,5 @@
 *.class
 *.prefs
 *.jar
+.checkstyle
+.project
