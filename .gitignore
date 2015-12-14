@@ -4,3 +4,5 @@
 .checkstyle
 .project
 *~
+.classpath
+*/target/**
