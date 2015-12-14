@@ -152,7 +152,7 @@
 
   </module>
   <module name="SuppressionFilter">
-    <property name="file" value="${samedir}/checkstyle_suppressions.xml" />
+    <property name="file" value="${config_loc}/checkstyle_suppressions.xml" />
   </module>
 </module>
 
