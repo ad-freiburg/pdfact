@@ -1,20 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>icecite</groupId>
 
+  <groupId>icecite</groupId>
   <artifactId>pdf-engine</artifactId>
   <name>pdf-engine</name>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   
-
   <!-- Define some properties. -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <main.basedir>${project.basedir}</main.basedir>
-    <project.mainClass></project.mainClass>
+    <baseDir>${project.basedir}</baseDir>
+    <mainClass></mainClass>
   </properties>
 
   <!-- Define the sub-modules -->
@@ -78,8 +77,8 @@
         <version>2.17</version>
         <configuration>
           <consoleOutput>true</consoleOutput>
-          <configLocation>${main.basedir}/checkstyle_config.xml</configLocation>
-          <propertiesLocation>${main.basedir}/checkstyle_maven.properties</propertiesLocation>
+          <configLocation>${baseDir}/checkstyle_config.xml</configLocation>
+          <propertiesLocation>${baseDir}/checkstyle_maven.properties</propertiesLocation>
         </configuration>
         <executions>
           <execution>
@@ -104,7 +103,7 @@
           <!-- MainClass in mainfest make a executable jar -->
           <archive>
             <manifest>
-              <mainClass>${project.mainClass}</mainClass>
+              <mainClass>${mainClass}</mainClass>
             </manifest>
           </archive>
         </configuration>

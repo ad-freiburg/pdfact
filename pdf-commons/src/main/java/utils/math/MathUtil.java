@@ -4,7 +4,6 @@ package utils.math;
  * Math util.
  *
  * @author Claudius Korzen
- *
  */
 public class MathUtil {
   
