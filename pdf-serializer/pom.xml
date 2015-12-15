@@ -11,6 +11,10 @@
   <artifactId>pdf-serializer</artifactId>
   <name>pdf-serializer</name>
 
+  <properties>
+    <baseDir>${project.parent.basedir}</baseDir>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>icecite</groupId>
