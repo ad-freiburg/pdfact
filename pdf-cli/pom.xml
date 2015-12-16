@@ -13,7 +13,7 @@
 
   <properties>
     <baseDir>${project.parent.basedir}</baseDir>
-    <project.mainClass>cli.PdfParserCommandLine</project.mainClass>
+    <mainClass>cli.PdfParserCommandLine</mainClass>
   </properties>
 
   <dependencies>

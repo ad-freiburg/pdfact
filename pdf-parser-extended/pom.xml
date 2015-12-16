@@ -13,8 +13,8 @@
   <name>pdf-parser-extended</name>
 
   <properties>
-    <baseDir>${project.parent.basedir}</baseDir>
-    <project.mainClass>main.PdfExtendedParserMain</project.mainClass>
+    <baseDir>${project.parent.baseDir}</baseDir>
+    <mainClass>main.PdfExtendedParserMain</mainClass>
   </properties>
 
   <dependencies>
