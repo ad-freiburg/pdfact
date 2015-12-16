@@ -50,7 +50,7 @@ public class TsvPdfSerializerTest {
     Path path = Paths.get(resourcesPath).resolve("expected1.txt");
     String expected = PathUtils.readPathContentToString(path);
     String actual = new String(stream.toByteArray());
-        
+    
     Assert.assertEquals(expected, actual);
   }
 }

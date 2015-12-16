@@ -1,10 +1,8 @@
-character	a	1	[0.0,0.0,5.0,5.0]	font0	12.0	color0
-character	b	1	[5.0,2.5,7.2,3.7]	font1	10.5	color1
+character	a	[0.0,0.0,5.0,5.0]	font-1	12.0	color-1
+character	b	[5.0,2.5,7.2,3.7]	font-1	10.5	color-2
 figure	1	[0.0,0.0,5.0,5.0]
-shape	1	[5.0,2.5,7.2,3.7]	color2
+shape	1	[5.0,2.5,7.2,3.7]	color-2
 figure	2	[5.0,2.5,7.2,3.7]
-font	font0
-font	font1
-color	color0
-color	color1
-color	color2
+font	font-1	arial	0	0	0
+color	color-1	[0.0, 0.0, 0.0]
+color	color-2	[0.0, 0.0, 0.0]

@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,8 +57,13 @@ public class PdfParserMainTest {
    */
   @Before
   public void setup() throws IOException {
-    // Delete the content in the default output directory.
-    PathUtils.cleanDirectory(Paths.get(defaultOutputDir));
+    Path outputDir = Paths.get(defaultOutputDir);
+    if (!Files.exists(outputDir)) {
+      Files.createDirectories(outputDir);
+    } else {
+      // Delete the content in the default output directory.
+      // PathUtils.cleanDirectory(outputDir);
+    }
   }
 
   // ___________________________________________________________________________

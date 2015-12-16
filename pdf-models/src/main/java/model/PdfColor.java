@@ -16,4 +16,19 @@ public interface PdfColor extends HasPdfDocument, HasId, Serializable {
    * tolerance.
    */
   public boolean isWhite(float tolerance);
+  
+  /**
+   * Returns the value of the red component.
+   */
+  public float getR();
+
+  /**
+   * Returns the value of the green component.
+   */
+  public float getG();
+
+  /**
+   * Returns the value of the blue component.
+   */
+  public float getB();
 }

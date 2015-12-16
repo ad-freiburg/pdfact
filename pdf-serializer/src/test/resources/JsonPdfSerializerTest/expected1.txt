@@ -1,63 +1,104 @@
 {
-  "pages": {
-    "page": {
-      "num": 1, 
-      "characters": {
-        "character": {
-          "rect": [0.0,0.0,5.0,5.0],
-          "color": "color0", 
-          "font": "font0", 
-          "unicode": "a"
-        },
-        "character": {
-          "rect": [5.0,2.5,7.2,3.7],
-          "color": "color1", 
-          "font": "font1", 
-          "unicode": "b"
-        }
+   "pages":[
+      {
+         "characters":[
+            {
+               "minY":0,
+               "color":"color-1",
+               "minX":0,
+               "maxY":5,
+               "maxX":5,
+               "unicode":"a",
+               "fontsize":12,
+               "font":"font-1"
+            },
+            {
+               "minY":2.5,
+               "color":"color-2",
+               "minX":5,
+               "maxY":3.700000047683716,
+               "maxX":7.199999809265137,
+               "unicode":"b",
+               "fontsize":10.5,
+               "font":"font-1"
+            }
+         ],
+         "figures":[
+            {
+               "minY":0,
+               "minX":0,
+               "maxY":5,
+               "maxX":5
+            }
+         ],
+         "shapes":[
+            {
+               "minY":2.5,
+               "color":"color-2",
+               "minX":5,
+               "maxY":3.700000047683716,
+               "maxX":7.199999809265137
+            }
+         ],
+         "words":[
+
+         ],
+         "id":1,
+         "paragraphs":[
+
+         ],
+         "lines":[
+
+         ]
       },
-      "figures": {
-        "figure": {
-          "rect": [0.0,0.0,5.0,5.0]
-        }
-      },
-      "shapes": {
-        "shape": {
-          "rect": [5.0,2.5,7.2,3.7],
-          "color": "color2"
-        }
+      {
+         "characters":[
+
+         ],
+         "figures":[
+            {
+               "minY":2.5,
+               "minX":5,
+               "maxY":3.700000047683716,
+               "maxX":7.199999809265137
+            }
+         ],
+         "shapes":[
+
+         ],
+         "words":[
+
+         ],
+         "id":2,
+         "paragraphs":[
+
+         ],
+         "lines":[
+
+         ]
       }
-    },
-    "page": {
-      "num": 2, 
-      "characters": {
-      },
-      "figures": {
-        "figure": {
-          "rect": [5.0,2.5,7.2,3.7]
-        }
-      },
-      "shapes": {
+   ],
+   "fonts":[
+      {
+         "type3":false,
+         "name":"arial",
+         "id":"font-1",
+         "bold":false,
+         "italic":false
       }
-    }
-  }, 
-  "fonts": {
-    "font": {
-      "id": "font0"
-    },
-    "font": {
-      "id": "font1"
-    }
-  }, 
-  "colors": {
-    "color": {
-      "id": "color0"
-    },
-    "color": {
-      "id": "color1"
-    },
-    "color": {
-      "id": "color2"
-    }
-  }
+   ],
+   "colors":[
+      {
+         "r":0,
+         "b":0,
+         "g":0,
+         "id":"color-1"
+      },
+      {
+         "r":0,
+         "b":0,
+         "g":0,
+         "id":"color-2"
+      }
+   ]
 }

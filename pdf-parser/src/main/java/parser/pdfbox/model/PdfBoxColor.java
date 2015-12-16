@@ -175,4 +175,19 @@ public class PdfBoxColor implements PdfColor {
     }
     return null;
   }
+
+  @Override
+  public float getR() {
+    return this.rgb[0];
+  }
+
+  @Override
+  public float getG() {
+    return this.rgb[1];
+  }
+
+  @Override
+  public float getB() {
+    return this.rgb[2];
+  }
 }
