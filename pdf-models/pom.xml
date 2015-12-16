@@ -13,7 +13,7 @@
   <name>pdf-models</name>
 
   <properties>
-    <baseDir>${project.parent.baseDir}</baseDir>
+    <baseDir>${project.parent.basedir}</baseDir>
   </properties>
 
   <dependencies>

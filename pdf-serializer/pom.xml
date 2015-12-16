@@ -12,7 +12,7 @@
   <name>pdf-serializer</name>
 
   <properties>
-    <baseDir>${project.parent.baseDir}</baseDir>
+    <baseDir>${project.parent.basedir}</baseDir>
   </properties>
 
   <dependencies>
