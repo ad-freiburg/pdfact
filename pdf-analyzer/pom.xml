@@ -1,17 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <parent>
     <groupId>icecite</groupId>
     <artifactId>pdf-engine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../pdf-engine/pom.xml</relativePath>
   </parent>
-  
+
   <artifactId>pdf-analyzer</artifactId>
   <name>pdf-analyzer</name>
-  
+
   <properties>
-    <baseDir>${project.parent.basedir}</baseDir>    
+    <baseDir>${project.parent.basedir}</baseDir>
   </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>de.freiburg.iif</groupId>
+      <artifactId>commons</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>icecite</groupId>
+      <artifactId>pdf-models</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>

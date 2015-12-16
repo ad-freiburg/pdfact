@@ -7,7 +7,7 @@
   <name>pdf-engine</name>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <!-- Define some properties. -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,9 +18,9 @@
 
   <!-- Define the sub-modules -->
   <modules>
-  	<!-- External modules -->
-  	<module>../commons</module>
-  	<!-- Internal modules -->
+    <!-- External modules -->
+    <module>../commons</module>
+    <!-- Internal modules -->
     <module>../pdf-parser</module>
     <module>../pdf-parser-extended</module>
     <module>../pdf-analyzer</module>
@@ -33,16 +33,6 @@
 
   <!-- Define the common dependencies. -->
   <dependencies>
-    <dependency>
-      <groupId>de.freiburg.iif</groupId>
-      <artifactId>commons</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>icecite</groupId>
-      <artifactId>pdf-models</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -127,8 +117,7 @@
     </plugins>
   </build>
 
-  <!-- Get rid of the "Unable to locate Source XRef to link to - DISABLED" 
-    warning -->
+  <!-- Get rid of the "Unable to locate Source XRef to link to - DISABLED" warning -->
   <reporting>
     <plugins>
       <plugin>
