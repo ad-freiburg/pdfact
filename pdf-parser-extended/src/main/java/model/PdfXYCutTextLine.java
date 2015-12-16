@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import de.freiburg.iif.collections.CollectionsUtil;
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.collection.CollectionUtils;
+import de.freiburg.iif.text.StringUtils;
 
 /**
  * Implementation of a PdfTextLine.
@@ -67,7 +67,7 @@ public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
    * Returns the unicode of this text line.
    */
   public String getUnicode() {
-    return CollectionsUtil.join(getWords()); 
+    return CollectionUtils.join(getWords()); 
   }
 
   @Override
@@ -110,7 +110,7 @@ public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
     
-    String indent = StringUtil.repeat(" ", indentLevel * indentLength);
+    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
     
     xml.append(indent);
     xml.append("<");

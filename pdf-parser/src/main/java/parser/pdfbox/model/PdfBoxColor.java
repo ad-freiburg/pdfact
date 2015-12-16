@@ -9,7 +9,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
 import org.json.JSONObject;
 
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 import model.PdfColor;
 import model.PdfDocument;
 
@@ -129,7 +129,7 @@ public class PdfBoxColor implements PdfColor {
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
     
-    String indent = StringUtil.repeat(" ", indentLevel * indentLength);
+    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
         
     xml.append(indent);
     xml.append("<");

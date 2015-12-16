@@ -4,7 +4,7 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
 import org.json.JSONObject;
 
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 
 /**
  * Implementation of a PdfWord.
@@ -72,7 +72,7 @@ public class PdfXYCutWord extends PdfXYCutTextArea implements PdfWord {
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
     
-    String indent = StringUtil.repeat(" ", indentLevel * indentLength);
+    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
     
     xml.append(indent);
     xml.append("<");

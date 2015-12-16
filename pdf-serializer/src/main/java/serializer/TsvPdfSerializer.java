@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.freiburg.iif.collections.CollectionsUtil;
+import de.freiburg.iif.collection.CollectionUtils;
 import model.HasFeature;
 import model.PdfColor;
 import model.PdfDocument;
@@ -57,7 +57,7 @@ public class TsvPdfSerializer implements PdfSerializer {
       lines.add(serialize(color));  
     }
     
-    String serialized = CollectionsUtil.join(lines, "\n");
+    String serialized = CollectionUtils.join(lines, "\n");
     stream.write(serialized.getBytes(StandardCharsets.UTF_8));
   }
   

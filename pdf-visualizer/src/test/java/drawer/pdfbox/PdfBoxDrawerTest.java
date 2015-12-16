@@ -16,7 +16,7 @@ import org.junit.Test;
 import de.freiburg.iif.model.simple.SimpleLine;
 import de.freiburg.iif.model.simple.SimplePoint;
 import de.freiburg.iif.model.simple.SimpleRectangle;
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 
 /**
  * Tests for PdfBoxVisualizerTest.
@@ -54,9 +54,9 @@ public class PdfBoxDrawerTest {
   @BeforeClass
   public static void setup() throws IOException {
     // Clean the output directory.
-    PathsUtil.cleanDirectory(outputDir);
+    PathUtils.cleanDirectory(outputDir);
     // Assert, that the output directory is empty.
-    Assert.assertTrue(PathsUtil.listPaths(outputDir).isEmpty());
+    Assert.assertTrue(PathUtils.listPaths(outputDir).isEmpty());
   }
   
   // ___________________________________________________________________________
@@ -130,7 +130,7 @@ public class PdfBoxDrawerTest {
     Assert.assertTrue(Files.exists(outputFile));
     // Assert that the output is equal to the groundtruth. 
     
-    Assert.assertTrue(PathsUtil.contentEquals(groundTruthFile, outputFile));
+    Assert.assertTrue(PathUtils.contentEquals(groundTruthFile, outputFile));
   }
   
   /**
@@ -163,7 +163,7 @@ public class PdfBoxDrawerTest {
 
     Assert.assertTrue(Files.exists(outputFile));
     // Assert that the output is equal to the groundtruth. 
-    Assert.assertTrue(PathsUtil.contentEquals(groundTruthFile, outputFile));
+    Assert.assertTrue(PathUtils.contentEquals(groundTruthFile, outputFile));
   }
   
   /**

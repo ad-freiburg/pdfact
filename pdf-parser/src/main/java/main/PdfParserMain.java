@@ -20,7 +20,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 import drawer.PdfDrawer;
 import model.PdfDocument;
 import parser.PdfParser;
@@ -243,7 +243,7 @@ public class PdfParserMain {
     }
     
     // Read the pdf files from given input.
-    pdfsToProcess = PathsUtil.listPaths(inputFileOrDirectory, "pdf");
+    pdfsToProcess = PathUtils.listPaths(inputFileOrDirectory, "pdf");
     
     if (pdfsToProcess == null || pdfsToProcess.isEmpty()) {
       throw new IllegalArgumentException("No pdf files found.");

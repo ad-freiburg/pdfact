@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 import mock.Mocks;
 
 /**
@@ -49,7 +49,7 @@ public class JsonPdfSerializerTest {
     
     Path path = Paths.get(resourcesPath).resolve("expected1.txt");
     // Whitespaces and indentation doesn't matter in json, so remove it.
-    String expected = PathsUtil.readPathToString(path).replaceAll("\\s+", "");
+    String expected = PathUtils.readPathContentToString(path).replaceAll("\\s+", "");
     String actual = new String(stream.toByteArray()).replaceAll("\\s+", "");
     
     Assert.assertEquals(expected, actual);

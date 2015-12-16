@@ -1,6 +1,6 @@
 package rules;
 
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfParagraph;
@@ -29,7 +29,7 @@ public class AnalyzeRules {
     }
     
     String text = paragraph.getUnicode().toLowerCase();
-    text = StringUtil.removeWhitespaces(text);
+    text = StringUtils.removeWhitespaces(text);
 
     float paragraphFontsize = paragraph.getFontsize();
     float documentFontsize = document.getFontsize();

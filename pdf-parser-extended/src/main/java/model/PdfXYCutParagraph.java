@@ -8,7 +8,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import de.freiburg.iif.model.HasRectangle;
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 import statistics.TextLineStatistician;
 
 /**
@@ -165,7 +165,7 @@ public class PdfXYCutParagraph extends PdfXYCutTextArea
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
     
-    String indent = StringUtil.repeat(" ", indentLevel * indentLength);
+    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
     
     xml.append(indent);
     xml.append("<");

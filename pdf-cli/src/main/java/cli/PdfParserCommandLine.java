@@ -19,7 +19,7 @@ import org.apache.commons.cli.ParseException;
 
 import analyzer.PdfAnalyzer;
 import analyzer.PlainPdfAnalyzer;
-import de.freiburg.iif.paths.FileAndDirectoryParser;
+import de.freiburg.iif.path.FileAndDirectoryParser;
 import model.PdfDocument;
 import model.PdfFeature;
 import parser.PdfExtendedParser;

@@ -2,7 +2,7 @@ package parser.pdfbox.model;
 
 import java.util.List;
 
-import de.freiburg.iif.collections.CollectionsUtil;
+import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
@@ -78,7 +78,7 @@ public class PdfBoxTextArea extends PdfBoxArea implements PdfTextArea {
   
   @Override
   public String getUnicode() {
-    return CollectionsUtil.join(getCharacters(), "");
+    return CollectionUtils.join(getCharacters(), "");
   }
 
   @Override

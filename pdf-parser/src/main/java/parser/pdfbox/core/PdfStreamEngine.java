@@ -34,7 +34,7 @@ import org.apache.pdfbox.util.Matrix;
 
 import de.freiburg.iif.model.Point;
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 import parser.pdfbox.core.operator.OperatorProcessor;
 import parser.pdfbox.model.PdfBoxDocument;
 import parser.pdfbox.model.PdfBoxFigure;
@@ -775,14 +775,14 @@ public class PdfStreamEngine {
    */
   protected Map<String, FontMetricsWrapper> readAdditionalAFMFiles(
       String path) throws IOException {
-    Map<String, InputStream> files = PathsUtil.readDirectory(path);
+    Map<String, InputStream> files = PathUtils.readDirectory(path);
     Map<String, FontMetricsWrapper> result = new HashMap<>();
     
     for (Entry<String, InputStream> file : files.entrySet()) {
       String name = file.getKey();
       InputStream stream = file.getValue();
       
-      String basename = PathsUtil.getBasename(name);
+      String basename = PathUtils.getBasename(name);
             
       try {
         AFMParser parser = new AFMParser(stream);

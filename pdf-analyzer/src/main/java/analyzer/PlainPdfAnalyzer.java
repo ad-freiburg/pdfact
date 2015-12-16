@@ -2,7 +2,7 @@ package analyzer;
 
 import java.util.List;
 
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 import model.PdfDocument;
 import model.PdfPage;
 import model.PdfParagraph;
@@ -89,8 +89,8 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
    */
   protected void identifyParagraphContext(PdfParagraph paragraph) {
     if (AnalyzeRules.isHeading(paragraph)) {
-      String text = StringUtil.removeWhitespaces(paragraph.getUnicode());
-      currentParagraphContext = StringUtil.getLongestSentencePart(text);
+      String text = StringUtils.removeWhitespaces(paragraph.getUnicode());
+      currentParagraphContext = StringUtils.getLongestSentencePart(text);
     }
     paragraph.setContext(currentParagraphContext);
   }

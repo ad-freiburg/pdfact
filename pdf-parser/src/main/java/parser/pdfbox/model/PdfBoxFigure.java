@@ -3,7 +3,7 @@ package parser.pdfbox.model;
 import org.json.JSONObject;
 
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.text.StringUtils;
 import model.PdfFeature;
 import model.PdfFigure;
 import model.PdfPage;
@@ -60,7 +60,7 @@ public class PdfBoxFigure extends PdfBoxTextArea implements PdfFigure {
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
     
-    String indent = StringUtil.repeat(" ", indentLevel * indentLength);
+    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
             
     xml.append(indent);
     xml.append("<");

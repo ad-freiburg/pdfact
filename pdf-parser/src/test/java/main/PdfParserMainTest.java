@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 import model.PdfDocument;
 import parser.PdfParser;
 import parser.pdfbox.PdfBoxParser;
@@ -57,7 +57,7 @@ public class PdfParserMainTest {
   @Before
   public void setup() throws IOException {
     // Delete the content in the default output directory.
-    PathsUtil.cleanDirectory(Paths.get(defaultOutputDir));
+    PathUtils.cleanDirectory(Paths.get(defaultOutputDir));
   }
 
   // ___________________________________________________________________________
@@ -244,7 +244,7 @@ public class PdfParserMainTest {
 
     Path gtPath = Paths.get(defaultGroundtruthDir);
     Path outputPath = Paths.get(defaultOutputDir);
-    Assert.assertTrue(PathsUtil.directoryContentEquals(gtPath, outputPath));
+    Assert.assertTrue(PathUtils.directoryContentEquals(gtPath, outputPath));
   }
 
   // ___________________________________________________________________________

@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.freiburg.iif.collections.CollectionsUtil;
-import de.freiburg.iif.text.StringUtil;
+import de.freiburg.iif.collection.CollectionUtils;
+import de.freiburg.iif.text.StringUtils;
 import model.HasFeature;
 import model.PdfColor;
 import model.PdfDocument;
@@ -71,7 +71,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     
     lines.add(indent("</document>", --level));
     
-    String serialized = CollectionsUtil.join(lines, System.lineSeparator());
+    String serialized = CollectionUtils.join(lines, System.lineSeparator());
     stream.write(serialized.getBytes(StandardCharsets.UTF_8));
   }
   
@@ -129,7 +129,7 @@ public class XmlPdfSerializer implements PdfSerializer {
    * Indents the given string.
    */
   protected String indent(String string, int level) {
-    String indent = StringUtil.repeat(" ", level * INDENT_LENGTH);
+    String indent = StringUtils.repeat(" ", level * INDENT_LENGTH);
     return indent + string;
   }
 }

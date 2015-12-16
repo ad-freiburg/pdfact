@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import de.freiburg.iif.paths.PathsUtil;
+import de.freiburg.iif.path.PathUtils;
 import mock.Mocks;
 
 /**
@@ -48,7 +48,7 @@ public class TsvPdfSerializerTest {
     stream.close();
     
     Path path = Paths.get(resourcesPath).resolve("expected1.txt");
-    String expected = PathsUtil.readPathToString(path);
+    String expected = PathUtils.readPathContentToString(path);
     String actual = new String(stream.toByteArray());
         
     Assert.assertEquals(expected, actual);
