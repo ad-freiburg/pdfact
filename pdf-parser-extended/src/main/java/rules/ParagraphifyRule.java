@@ -2,6 +2,7 @@ package rules;
 
 import java.util.List;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import model.PdfFont;
@@ -11,7 +12,6 @@ import model.PdfTextLine;
 import model.PdfWord;
 import model.TextLineStatistics;
 import statistics.TextLineStatistician;
-import utils.math.MathUtil;
 
 /**
  * Rules to paragraphs identification.
@@ -109,8 +109,8 @@ public class ParagraphifyRule {
     float lineFontsize = line != null ? line.getFontsize() : 0;
     float prevLineFontsize = prevLine != null ? prevLine.getFontsize() : 0;
   
-    return MathUtil.isLarger(lineFontsize, prevLineFontsize, 0.49f)
-        || MathUtil.isSmaller(lineFontsize, prevLineFontsize, 0.49f);
+    return MathUtils.isLarger(lineFontsize, prevLineFontsize, 0.49f)
+        || MathUtils.isSmaller(lineFontsize, prevLineFontsize, 0.49f);
   }
   
   /**
@@ -123,7 +123,7 @@ public class ParagraphifyRule {
     TextLineStatistics pageLineStatistics = page.getTextLineStatistics();
     float pageLinePitch = pageLineStatistics.getMostCommonLinePitch();
         
-    if (MathUtil.isLarger(pitch, pageLinePitch, pageLinePitch)) {
+    if (MathUtils.isLarger(pitch, pageLinePitch, pageLinePitch)) {
       return true;
     }
     
@@ -133,7 +133,7 @@ public class ParagraphifyRule {
 
       // The line introduces a new paragraph, if the pitch to the previous line
       // is larger than the most common line pitch in the paragraph.
-      if (MathUtil.isLarger(pitch, paragraphPitch, 0.5f * paragraphPitch)) {
+      if (MathUtils.isLarger(pitch, paragraphPitch, 0.5f * paragraphPitch)) {
         return true;
       }
     }
@@ -156,7 +156,7 @@ public class ParagraphifyRule {
     if (prevLine != null
         && !prevLineFont.equals(pageFont)
         && !lastWordFont.equals(firstWordFont)
-        && MathUtil.isSmaller(prevLine.getRectangle().getMaxX(),
+        && MathUtils.isSmaller(prevLine.getRectangle().getMaxX(),
             line.getRectangle().getMaxX(), 5f)
         && paragraph.getTextLines().size() == 1) {
       return true;

@@ -1,10 +1,10 @@
 package rules;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.text.StringUtils;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfParagraph;
-import utils.math.MathUtil;
 
 /**
  * Some assumptions on analyzing a pdf document.
@@ -213,7 +213,7 @@ public class AnalyzeRules {
     float paragraphFontsize = paragraph.getFontsize();
     float docFontsize = document.getTextStatistics().getMostCommonFontsize();
 
-    if (!MathUtil.isEqual(paragraphFontsize, docFontsize, 0.5f)) {
+    if (!MathUtils.isEqual(paragraphFontsize, docFontsize, 0.5f)) {
       return false;
     }
     return true;

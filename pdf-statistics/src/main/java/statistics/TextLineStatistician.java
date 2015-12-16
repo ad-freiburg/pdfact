@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import model.HasTextLineStatistics;
 import model.PdfTextLine;
 import model.PlainTextLineStatistics;
 import model.TextLineStatistics;
-import utils.math.MathUtil;
 
 /**
  * Some statistics about text lines.
@@ -179,6 +179,6 @@ public class TextLineStatistician {
     // float lineMinY = line != null ? line.getRectangle().getMinY() : 0;
     float maxY = rect2.getMaxY();
     
-    return MathUtil.round(minY - maxY, 0);
+    return MathUtils.round(minY - maxY, 0);
   }
 }

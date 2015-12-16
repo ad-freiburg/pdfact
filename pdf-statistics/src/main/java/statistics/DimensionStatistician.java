@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import model.DimensionStatistics;
 import model.HasDimensionStatistics;
 import model.PlainDimensionStatistics;
-import utils.math.MathUtil;
 
 /**
  * Some statistics about the dimensions of an object.
@@ -83,8 +83,8 @@ public class DimensionStatistician {
     Map<Float, Integer> widthFreqs = new HashMap<Float, Integer>();
 
     for (HasRectangle obj : objects) {      
-      float height = MathUtil.round(obj.getRectangle().getHeight(), 1);
-      float width = MathUtil.round(obj.getRectangle().getWidth(), 1);
+      float height = MathUtils.round(obj.getRectangle().getHeight(), 1);
+      float width = MathUtils.round(obj.getRectangle().getWidth(), 1);
       
       // Count the frequencies of heights.
       int count = 0;

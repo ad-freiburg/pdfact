@@ -20,11 +20,6 @@
   <dependencies>
     <dependency>
       <groupId>icecite</groupId>
-      <artifactId>pdf-models</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>icecite</groupId>
       <artifactId>pdf-serializer</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>

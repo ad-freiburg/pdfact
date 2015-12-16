@@ -18,14 +18,15 @@
 
   <!-- Define the sub-modules -->
   <modules>
+  	<!-- External modules -->
+  	<module>../commons</module>
+  	<!-- Internal modules -->
     <module>../pdf-parser</module>
     <module>../pdf-parser-extended</module>
     <module>../pdf-analyzer</module>
     <module>../pdf-serializer</module>
     <module>../pdf-visualizer</module>
     <module>../pdf-models</module>
-    <module>../pdf-commons</module>
-    <!-- <module>../pdf-evaluation</module> -->
     <module>../pdf-statistics</module>
     <module>../pdf-cli</module>
   </modules>
@@ -35,6 +36,11 @@
     <dependency>
       <groupId>de.freiburg.iif</groupId>
       <artifactId>commons</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>icecite</groupId>
+      <artifactId>pdf-models</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>

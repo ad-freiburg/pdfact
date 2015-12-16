@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.freiburg.iif.math.MathUtils;
 import model.HasText;
 import model.HasTextStatistics;
 import model.PdfColor;
 import model.PdfFont;
 import model.PlainTextStatistics;
 import model.TextStatistics;
-import utils.math.MathUtil;
 
 /**
  * Some statistics about the text of an object.
@@ -79,7 +79,7 @@ public class TextStatistician {
     Map<PdfColor, Integer> colorFreqs = new HashMap<PdfColor, Integer>();
 
     for (HasText obj : objs) {
-      float fontsize = MathUtil.round(obj.getFontsize(), 1);
+      float fontsize = MathUtils.round(obj.getFontsize(), 1);
       PdfFont font = obj.getFont();
       PdfColor color = obj.getColor();
 
