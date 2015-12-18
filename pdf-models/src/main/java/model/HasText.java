@@ -11,10 +11,20 @@ public interface HasText extends HasPdfColor, HasPdfFont {
   /**
    * Gets the characters.
    */
-  List<PdfCharacter> getCharacters();
+  public List<PdfCharacter> getTextCharacters();
   
   /**
    * Gets the character in unicode.
    */
-  String getUnicode();
+  public String getUnicode();
+  
+  /**
+   * Returns true, if this characters is an ascii letter.
+   */
+  public boolean isAscii();
+  
+  /**
+   * Returns true, if this characters is a digit.
+   */
+  public boolean isDigit();
 }

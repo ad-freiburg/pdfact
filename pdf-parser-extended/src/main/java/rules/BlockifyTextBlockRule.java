@@ -1,16 +1,19 @@
 package rules;
 
+import java.util.List;
+
+import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import model.PdfArea;
 import model.SweepDirection.HorizontalSweepDirection;
 import model.SweepDirection.VerticalSweepDirection;
 
 /**
- * The rules to blockify a line into several words.
+ * The rules to blockify a "block" into several text lines.
  *
  * @author Claudius Korzen
  */
-public class BlockifyLineRule implements BlockifyRule {
+public class BlockifyTextBlockRule implements BlockifyRule {
   
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
@@ -19,12 +22,22 @@ public class BlockifyLineRule implements BlockifyRule {
   
   @Override
   public float getHorizontalLaneHeight(PdfArea area) {
-    return 0;
+    return 0.1f;
   }
 
   @Override
   public boolean isValidHorizontalLane(PdfArea area, Rectangle lane) {
-    return false;
+    float sumOverlaps = 0;
+      
+    if (area != null) {
+      List<? extends HasRectangle> els = area.getElementsOverlapping(lane);
+      
+      for (HasRectangle el : els) {          
+        sumOverlaps += lane.computeOverlap(el.getRectangle());
+      }
+    }
+    
+    return sumOverlaps / lane.getArea() < 0.0075f;
   }
   
   @Override
@@ -34,11 +47,11 @@ public class BlockifyLineRule implements BlockifyRule {
   
   @Override
   public float getVerticalLaneWidth(PdfArea area) {
-    return 0.5f;
+    return Float.MAX_VALUE;
   }
   
   @Override
   public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {    
-    return area.getElementsOverlappedBy(lane).isEmpty();
+    return false;
   }
 }

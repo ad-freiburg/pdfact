@@ -1,63 +1,53 @@
 package model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
-
 import org.json.JSONObject;
 
-import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.text.StringUtils;
-import statistics.DimensionStatistician;
-import statistics.TextStatistician;
 
 /**
- * Implementation of a PdfWord. o
- * 
+ * Implementation of a PdfParagraph.
+ *
  * @author Claudius Korzen
+ *
  */
-public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
+public class PdfXYCutNonTextParagraph extends PdfXYCutArea 
+    implements PdfNonTextParagraph {  
   /**
-   * Flag that indicates if this word is hyphenized.
+   * The context of this paragraph.
    */
-  protected boolean isHyphenized;
-
+  protected String context;
+  
+  /**
+   * The role of this paragraph.
+   */
+  protected String role;
+  
   /**
    * The default constructor.
    */
-  public PdfXYCutWord(PdfPage page) {
+  public PdfXYCutNonTextParagraph(PdfPage page) {
     super(page);
   }
 
   /**
    * The default constructor.
    */
-  public PdfXYCutWord(PdfPage page, PdfArea area) {
+  public PdfXYCutNonTextParagraph(PdfPage page, PdfArea area) {
     this(page);
-
-    addAnyElements(area.getElements());
-  }
-
-  @Override
-  public boolean isHyphenized() {
-    return this.isHyphenized;
-  }
-
-  @Override
-  public void setIsHyphenized(boolean hyphenized) {
-    this.isHyphenized = hyphenized;
+    
+    setTextLines(area.getTextLines());
   }
 
   @Override
   public PdfFeature getFeature() {
-    return PdfFeature.words;
+    return PdfFeature.paragraphs;
   }
 
   @Override
   public String toTsv() {
     StringBuilder tsv = new StringBuilder();
-
+    
     tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getUnicode().replaceAll("\t", " "));
     tsv.append("\t");
     tsv.append(getPage().getPageNumber());
     tsv.append("\t");
@@ -68,16 +58,24 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     tsv.append(getFontsize());
     tsv.append("\t");
     tsv.append(getColor().getId());
-
+    if (getContext()!= null) {
+      tsv.append("\t");
+      tsv.append(getContext());
+    }
+    if (getRole() != null) {
+      tsv.append("\t");
+      tsv.append(getRole());
+    }
+    
     return tsv.toString();
   }
 
   @Override
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
-
+    
     String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-
+    
     xml.append(indent);
     xml.append("<");
     xml.append(getFeature().getField());
@@ -89,18 +87,21 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     xml.append(" font=\"" + getFont().getId() + "\"");
     xml.append(" fontsize=\"" + getFontsize() + "\"");
     xml.append(" color=\"" + getColor().getId() + "\"");
-    xml.append(">");
-    xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">");
-
+    if (getContext() != null) {
+      xml.append(" context=\"" + getContext() + "\"");
+    }
+    if (getRole() != null) {
+      xml.append(" role=\"" + getRole() + "\"");
+    }
+    xml.append("/>");
+    
     return xml.toString();
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-
-    json.put("unicode", getUnicode());
+    
     json.put("page", getPage().getPageNumber());
     json.put("minX", getRectangle().getMinX());
     json.put("minY", getRectangle().getMinY());
@@ -109,52 +110,39 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     json.put("font", getFont().getId());
     json.put("fontsize", getFontsize());
     json.put("color", getColor().getId());
-
+    if (getContext() != null) {
+      json.put("context", getContext());
+    }
+    if (getRole() != null) {
+      json.put("role", getRole());
+    }
+    
     return json;
   }
 
   @Override
-  public DimensionStatistics computeDimensionStatistics() {
-    return DimensionStatistician.accumulate(getTextCharacters());
+  public void setContext(String context) {
+    this.context = context;
+  }
+
+  @Override
+  public String getContext() {
+    return this.context;
   }
   
   @Override
-  public TextStatistics computeTextStatistics() {    
-    return TextStatistician.accumulate(getTextCharacters());
-  }
-  
-  @Override
-  public String getUnicode() {
-    return CollectionUtils.join(getTextCharacters(), "");
+  public void setRole(String role) {
+    this.role = role;
   }
 
   @Override
-  public boolean isAscii() {
-    for (PdfCharacter character : getTextCharacters()) {
-      for (char chaar : character.getUnicode().toCharArray()) {
-        if (chaar < 32 || chaar > 126) {
-          return false;
-        }
-      }
-    }
-    return true;
+  public String getRole() {
+    return this.role;
   }
 
   @Override
-  public boolean isDigit() {
-    if (getTextCharacters() == null) {
-      return false;
-    }
-
-    if (getTextCharacters().isEmpty()) {
-      return false;
-    }
-
-    for (PdfCharacter character : getTextCharacters()) {
-      if (character.getCodePoint() < '0' || character.getCodePoint() > '9') {
-        return false;
-      }
-    }
-    return true;
+  public void addNonTextElement(PdfElement element) {
+    this.elementsIndex.insert(element);
+    this.nonTextElementsIndex.insert(element);
   }
 }

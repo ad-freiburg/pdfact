@@ -5,6 +5,7 @@ package model;
  *
  * @author Claudius Korzen
  */
-public interface PdfTextElement extends PdfElement, PdfTextArea, HasFeature {
+public interface PdfTextElement extends PdfElement, PdfArea, HasFeature,
+    HasText {
 
 }

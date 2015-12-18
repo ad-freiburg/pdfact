@@ -13,7 +13,7 @@ import model.PdfPage;
  *
  * @author Claudius Korzen
  */
-public class PdfBoxFigure extends PdfBoxTextArea implements PdfFigure {
+public class PdfBoxFigure extends PdfBoxArea implements PdfFigure {
   /**
    * The rectangle of this figure.
    */
@@ -24,6 +24,8 @@ public class PdfBoxFigure extends PdfBoxTextArea implements PdfFigure {
    */
   public PdfBoxFigure(PdfPage page) {
     super(page);
+    
+    addFigure(this);
   }
 
   @Override

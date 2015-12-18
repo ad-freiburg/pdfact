@@ -14,20 +14,23 @@ import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Comparators;
 import model.PdfArea;
 import model.PdfDocument;
+import model.PdfNonTextParagraph;
 import model.PdfPage;
-import model.PdfParagraph;
 import model.PdfTextLine;
+import model.PdfTextParagraph;
 import model.PdfWord;
 import model.PdfXYCutArea;
-import model.PdfXYCutParagraph;
+import model.PdfXYCutNonTextParagraph;
 import model.PdfXYCutTextLine;
+import model.PdfXYCutTextParagraph;
 import model.PdfXYCutWord;
 import model.SweepDirection.HorizontalSweepDirection;
 import model.SweepDirection.VerticalSweepDirection;
-import rules.BlockifyBlockRule;
-import rules.BlockifyLineRule;
-import rules.BlockifyPageRule;
+import rules.BlockifyNonTextPageRule;
 import rules.BlockifyRule;
+import rules.BlockifyTextBlockRule;
+import rules.BlockifyTextLineRule;
+import rules.BlockifyTextPageRule;
 import rules.ParagraphifyRule;
 
 /**
@@ -37,19 +40,25 @@ import rules.ParagraphifyRule;
  */
 public class PdfXYCutParser implements PdfExtendedParser {
   /**
-   * The rule to blockify a page into blocks.
+   * The rule to blockify a page into text blocks.
    */
-  protected BlockifyPageRule blockifyPageRule = new BlockifyPageRule();
+  BlockifyTextPageRule blockifyPageRule = new BlockifyTextPageRule();
 
   /**
-   * The rule to blockify a block into lines.
+   * The rule to blockify a page into non text blocks.
    */
-  protected BlockifyBlockRule blockifyBlockRule = new BlockifyBlockRule();
+  BlockifyNonTextPageRule blockifyNonTextPageRule =
+      new BlockifyNonTextPageRule();
 
   /**
-   * The rule to blockify a line into words.
+   * The rule to blockify a text block into text lines.
    */
-  protected BlockifyLineRule blockifyLineRule = new BlockifyLineRule();
+  BlockifyTextBlockRule blockifyBlockRule = new BlockifyTextBlockRule();
+
+  /**
+   * The rule to blockify a text line into words.
+   */
+  BlockifyTextLineRule blockifyLineRule = new BlockifyTextLineRule();
 
   // ___________________________________________________________________________
 
@@ -63,23 +72,22 @@ public class PdfXYCutParser implements PdfExtendedParser {
       return document;
     }
 
-    // MAYBE: Identify non text blocks.
-
     for (PdfPage page : document.getPages()) {
-      PdfArea characters = new PdfXYCutArea(page, page.getTextCharacters());
+      List<PdfArea> blocks = identifyBlocks(page);
 
-      List<PdfArea> blocks = identifyBlocks(characters);
-      
+      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
+      page.setNonTextParagraphs(nonTextParas);
+
       List<PdfTextLine> lines = identifyLines(page, blocks);
       page.setTextLines(lines);
-      
+
       List<PdfWord> words = identifyWords(page, lines);
       page.setWords(words);
-      
-      List<PdfParagraph> paragraphs = identifyParagraphs(page, lines);
+
+      List<PdfTextParagraph> paragraphs = identifyParagraphs(page, lines);
       page.setParagraphs(paragraphs);
     }
-    
+
     return document;
   }
 
@@ -87,10 +95,20 @@ public class PdfXYCutParser implements PdfExtendedParser {
   // Identification methods.
 
   /**
-   * Identifies text blocks in the given area.
+   * Identifies text blocks from text characters in the given page.
    */
-  protected List<PdfArea> identifyBlocks(PdfArea page) {
-    return blockify(page, this.blockifyPageRule);
+  protected List<PdfArea> identifyBlocks(PdfPage page) {
+    PdfArea area = new PdfXYCutArea(page, page.getTextCharacters());
+    return blockify(area, this.blockifyPageRule);
+  }
+
+  /**
+   * Identifies non text paragraphs from non text elements in the given page.
+   */
+  protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
+    PdfArea area = new PdfXYCutArea(page, page.getNonTextElements());
+    List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
+    return toNonTextParagraphs(page, paraAreas);
   }
 
   /**
@@ -114,21 +132,21 @@ public class PdfXYCutParser implements PdfExtendedParser {
     List<PdfWord> words = new ArrayList<>();
     for (PdfTextLine line : lines) {
       List<PdfArea> wordAreas = blockify(line, this.blockifyLineRule);
-      
+
       // Sort the words and the characters in the words by x-value.
       Collections.sort(wordAreas, new Comparators.MinXComparator());
       for (PdfArea area : wordAreas) {
         Collections.sort(area.getElements(), new Comparators.MinXComparator());
       }
-      
+
       List<PdfXYCutWord> lineWords = toWords(page, wordAreas);
-      
+
       // TODO: Dehyphenize.
       if (!words.isEmpty()) {
         PdfWord lastWord = words.get(words.size() - 1);
-        String lastCharacter = lastWord.getCharacters()
-            .get(lastWord.getCharacters().size() - 1).getUnicode();
-        
+        String lastCharacter = lastWord.getTextCharacters()
+            .get(lastWord.getTextCharacters().size() - 1).getUnicode();
+
         if (lastCharacter != null && !lastCharacter.isEmpty()) {
           char lastChar = lastCharacter.charAt(0);
           if (lastChar == '-') {
@@ -136,7 +154,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
           }
         }
       }
- 
+
       words.addAll(lineWords);
       line.setWords(lineWords);
     }
@@ -146,28 +164,28 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Identifies paragraphs from the given list of text lines.
    */
-  protected List<PdfParagraph> identifyParagraphs(PdfPage page,
+  protected List<PdfTextParagraph> identifyParagraphs(PdfPage page,
       List<PdfTextLine> lines) {
-    List<PdfParagraph> paragraphs = new ArrayList<>();
-    PdfParagraph paragraph = new PdfXYCutParagraph(page);
+    List<PdfTextParagraph> paragraphs = new ArrayList<>();
+    PdfTextParagraph paragraph = new PdfXYCutTextParagraph(page);
 
     for (int i = 0; i < lines.size(); i++) {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
 
-      if (ParagraphifyRule.introducesNewParagraph(page, paragraph, prevLine, 
+      if (ParagraphifyRule.introducesNewParagraph(page, paragraph, prevLine,
           line, nextLine)) {
         paragraphs.add(paragraph);
-        paragraph = new PdfXYCutParagraph(page);
+        paragraph = new PdfXYCutTextParagraph(page);
       }
       paragraph.addTextLine(line);
     }
     paragraphs.add(paragraph);
-    
+
     return paragraphs;
   }
-  
+
   // ___________________________________________________________________________
   // Blockify methods.
 
@@ -401,10 +419,23 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Transforms the given list of page areas to a list of paragraphs.
    */
-  protected List<PdfParagraph> toParagraphs(PdfPage page, List<PdfArea> as) {
-    List<PdfParagraph> result = new ArrayList<>();
-    for (PdfArea a : as) {
-      result.add(new PdfXYCutParagraph(page, a));
+  protected List<PdfTextParagraph> toParagraphs(PdfPage page,
+      List<PdfArea> areas) {
+    List<PdfTextParagraph> result = new ArrayList<>();
+    for (PdfArea a : areas) {
+      result.add(new PdfXYCutTextParagraph(page, a));
+    }
+    return result;
+  }
+
+  /**
+   * Transforms the given list of page areas to a list of non text paragraphs.
+   */
+  protected List<PdfNonTextParagraph> toNonTextParagraphs(PdfPage page,
+      List<PdfArea> areas) {
+    List<PdfNonTextParagraph> result = new ArrayList<>();
+    for (PdfArea area : areas) {
+      result.add(new PdfXYCutNonTextParagraph(page, area));
     }
     return result;
   }

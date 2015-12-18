@@ -9,8 +9,7 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument extends HasDimensionStatistics, 
-    HasTextStatistics {
+public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics {
   /**
    * Returns the list of pages.
    */
@@ -34,6 +33,5 @@ public interface PdfDocument extends HasDimensionStatistics,
   /**
    * Returns the most common fontsize in this document.
    */
-  public float getFontsize();
-  
+  public float getFontsize();  
 }

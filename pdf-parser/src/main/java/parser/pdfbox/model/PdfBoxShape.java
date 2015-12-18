@@ -14,8 +14,7 @@ import model.PdfShape;
  *
  * @author Claudius Korzen
  */
-public class PdfBoxShape extends PdfBoxTextArea 
-    implements PdfShape {    
+public class PdfBoxShape extends PdfBoxArea implements PdfShape {    
   /**
    * The rectangle of this shape.
    */
@@ -31,6 +30,8 @@ public class PdfBoxShape extends PdfBoxTextArea
    */
   public PdfBoxShape(PdfPage page) {
     super(page);
+    
+    addShape(this);
   }
   
   // ___________________________________________________________________________

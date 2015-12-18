@@ -12,25 +12,45 @@ public interface TextStatistics {
   /**
    * Returns the average fontsize.
    */
-  float getAverageFontsize();
-  
+  public float getAverageFontsize();
+
   /**
    * Returns the most common fontsize.
    */
-  float getMostCommonFontsize();
-    
+  public float getMostCommonFontsize();
+
   /**
    * Returns the most common font color.
    */
-  PdfColor getMostCommonFontColor();
-  
+  public PdfColor getMostCommonFontColor();
+
   /**
    * Returns the most common font.
    */
-  PdfFont getMostCommonFont();
-  
+  public PdfFont getMostCommonFont();
+
   /**
    * Returns the fontsize frequencies in a map.
    */
-  Map<Float, Integer> getFontsizeFrequencies();
+  public Map<Float, Integer> getFontsizeFrequencies();
+  
+  /**
+   * Returns the font frequencies in a map.
+   */
+  public Map<PdfFont, Integer> getFontFrequencies();
+  
+  /**
+   * Returns the color frequencies in a map.
+   */
+  public Map<PdfColor, Integer> getColorFrequencies();
+
+  /**
+   * Returns the ascii ratio.
+   */
+  public float getAsciiRatio();
+  
+  /**
+   * Returns the digits ratio.
+   */
+  public float getDigitsRatio();
 }

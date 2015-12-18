@@ -89,6 +89,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   @Override
   public void showFigure(PdfBoxFigure figure) {
     super.showFigure(figure);
+      
     this.page.addFigure(figure);
   }
     

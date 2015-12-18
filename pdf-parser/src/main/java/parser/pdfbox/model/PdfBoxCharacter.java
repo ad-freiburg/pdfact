@@ -2,15 +2,20 @@ package parser.pdfbox.model;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.pdfbox.util.Matrix;
 import org.json.JSONObject;
 
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.text.StringUtils;
+import model.DimensionStatistics;
 import model.PdfCharacter;
 import model.PdfFeature;
 import model.PdfPage;
 import model.TextStatistics;
+import statistics.DimensionStatistician;
 import statistics.TextStatistician;
 
 /**
@@ -18,7 +23,7 @@ import statistics.TextStatistician;
  *
  * @author Claudius Korzen
  */
-public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
+public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   /**
    * The rectangle.
    */
@@ -60,14 +65,14 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
   protected Matrix textRenderingMatrix;
 
   /**
-   * The text statistics about this area.
-   */
-  protected TextStatistics textStatistics;
-
-  /**
    * The orientation.
    */
   protected float orientation = Float.MAX_VALUE;
+
+  /**
+   * This character wrapped in a list.
+   */
+  protected List<PdfCharacter> characterInList;
   
   // ___________________________________________________________________________
   // Constructor.
@@ -78,11 +83,18 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
   public PdfBoxCharacter(PdfPage page, String unicode) {
     super(page);
     this.unicode = unicode;
+    this.characterInList = new ArrayList<>();
+    this.characterInList.add(this);
   }
 
   // ___________________________________________________________________________
   // Getters and setters.
 
+  @Override
+  public List<PdfCharacter> getTextCharacters() {
+    return this.characterInList;
+  }
+  
   @Override
   public Rectangle getRectangle() {
     return this.rectangle;
@@ -181,21 +193,13 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
   }
 
   @Override
-  public TextStatistics getTextStatistics() {
-    if (this.textStatistics == null) {
-      this.textStatistics = TextStatistician.compute(this);
-    }
-    return this.textStatistics;
-  }
-
-  @Override
   public float getOrientation() {
     if (orientation == Float.MAX_VALUE) {
       orientation = computeOrientation();
     }
     return orientation;
   }
-  
+
   /**
    * Computes the orientation of this character.
    */
@@ -217,7 +221,7 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
   @Override
   public String toTsv() {
     StringBuilder tsv = new StringBuilder();
-    
+
     tsv.append(getFeature().getField());
     tsv.append("\t");
     tsv.append(getUnicode().replaceAll("\t", " "));
@@ -231,16 +235,16 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
     tsv.append(getFontsize());
     tsv.append("\t");
     tsv.append(getColor().getId());
-    
+
     return tsv.toString();
   }
 
   @Override
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
-    
+
     String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-    
+
     xml.append(indent);
     xml.append("<");
     xml.append(getFeature().getField());
@@ -254,15 +258,15 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
     xml.append(" color=\"" + getColor().getId() + "\"");
     xml.append(">");
     xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">"); 
-    
+    xml.append("</" + getFeature().getField() + ">");
+
     return xml.toString();
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-       
+
     json.put("unicode", getUnicode());
     json.put("page", getPage().getPageNumber());
     json.put("minX", getRectangle().getMinX());
@@ -272,7 +276,54 @@ public class PdfBoxCharacter extends PdfBoxTextArea implements PdfCharacter {
     json.put("font", getFont().getId());
     json.put("fontsize", getFontsize());
     json.put("color", getColor().getId());
-    
+
     return json;
+  }
+
+  @Override
+  public DimensionStatistics computeDimensionStatistics() {
+    return DimensionStatistician.compute(getTextCharacters());
+  }
+  
+  @Override
+  public TextStatistics computeTextStatistics() {   
+    TextStatistics s = TextStatistician.compute(getTextCharacters());
+        
+    return s;
+  }
+  
+  @Override
+  public int getCodePoint() {
+    return code;
+  }
+
+  @Override
+  public boolean isAscii() {
+    for (PdfCharacter character : getTextCharacters()) {
+      for (char chaar : character.getUnicode().toCharArray()) {
+        if (chaar < 32 || chaar > 126) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isDigit() {
+    if (getTextCharacters() == null) {
+      return false;
+    }
+
+    if (getTextCharacters().isEmpty()) {
+      return false;
+    }
+
+    for (PdfCharacter character : getTextCharacters()) {
+      if (character.getCodePoint() < '0' || character.getCodePoint() > '9') {
+        return false;
+      }
+    }
+    return true;
   }
 }

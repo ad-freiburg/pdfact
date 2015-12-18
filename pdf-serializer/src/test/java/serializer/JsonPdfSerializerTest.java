@@ -24,12 +24,12 @@ public class JsonPdfSerializerTest {
    * The path to the resources dir.
    */
   final String resourcesPath = "src/test/resources/JsonPdfSerializerTest";
-  
+
   /**
    * The serializer under test.
    */
   JsonPdfSerializer serializer;
-      
+
   /**
    * Setup.
    */
@@ -37,7 +37,7 @@ public class JsonPdfSerializerTest {
   public void setup() {
     this.serializer = new JsonPdfSerializer();
   }
-  
+
   /**
    * Test the print() method.
    */
@@ -46,12 +46,16 @@ public class JsonPdfSerializerTest {
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     serializer.serialize(Mocks.mockDocument1(), stream);
     stream.close();
-    
+
     Path path = Paths.get(resourcesPath).resolve("expected1.txt");
+    
+    String expected = PathUtils.readPathContentToString(path);
+    String actual = new String(stream.toByteArray());
+
     // Whitespaces and indentation doesn't matter in json, so remove it.
-    String expected = PathUtils.readPathContentToString(path).replaceAll("\\s+", "");
-    String actual = new String(stream.toByteArray()).replaceAll("\\s+", "");
-            
+    expected = expected.replaceAll("\\s+", "");
+    actual = actual.replaceAll("\\s+", "");
+        
     Assert.assertEquals(expected, actual);
   }
 }

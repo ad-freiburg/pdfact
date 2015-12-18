@@ -5,7 +5,7 @@ import java.util.List;
 import de.freiburg.iif.text.StringUtils;
 import model.PdfDocument;
 import model.PdfPage;
-import model.PdfParagraph;
+import model.PdfTextParagraph;
 import rules.AnalyzeRules;
 
 /**
@@ -62,12 +62,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Analyzes the given paragraphs.
    */
-  protected void analyzeParagraphs(List<PdfParagraph> paragraphs) {
+  protected void analyzeParagraphs(List<PdfTextParagraph> paragraphs) {
     if (paragraphs == null) {
       return;
     }
     
-    for (PdfParagraph paragraph : paragraphs) {
+    for (PdfTextParagraph paragraph : paragraphs) {
       analyzeParagraph(paragraph);
     }
   }
@@ -75,7 +75,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Analyzes the given paragraph.
    */
-  protected void analyzeParagraph(PdfParagraph paragraph) {
+  protected void analyzeParagraph(PdfTextParagraph paragraph) {
     if (paragraph == null) {
       return;
     }
@@ -87,7 +87,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Identify the context of a text paragraph.
    */
-  protected void identifyParagraphContext(PdfParagraph paragraph) {
+  protected void identifyParagraphContext(PdfTextParagraph paragraph) {
     if (AnalyzeRules.isHeading(paragraph)) {
       String text = StringUtils.removeWhitespaces(paragraph.getUnicode());
       currentParagraphContext = StringUtils.getLongestSentencePart(text);
@@ -98,7 +98,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Identify the role of a text paragraph.
    */
-  protected void identifyParagraphRole(PdfParagraph paragraph) {
+  protected void identifyParagraphRole(PdfTextParagraph paragraph) {
     // TODO: Identify the role of a paragraph.
   }
 }

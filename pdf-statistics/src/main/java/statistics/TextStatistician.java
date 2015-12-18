@@ -59,12 +59,20 @@ public class TextStatistician {
   protected static void computeAverageValues(List<? extends HasText> objs,
       PlainTextStatistics statistics) {
 
+    float numObjects = objs.size();
     float sumFontsizes = 0;
+    float sumAscii = 0;
+    float sumDigits = 0;
+
     for (HasText obj : objs) {
       sumFontsizes += obj.getFontsize();
+      sumAscii += obj.isAscii() ? 1 : 0;
+      sumDigits += obj.isDigit() ? 1 : 0;
     }
 
-    statistics.setAvgFontsize(sumFontsizes / (float) objs.size());
+    statistics.setAvgFontsize(sumFontsizes / numObjects);
+    statistics.setAsciiRatio(sumAscii / numObjects);
+    statistics.setDigitsRatio(sumDigits / numObjects);
   }
 
   /**
@@ -89,14 +97,14 @@ public class TextStatistician {
         count = fontsizeFreqs.get(fontsize);
       }
       fontsizeFreqs.put(fontsize, count + 1);
-      
+
       // Count the frequencies of fonts.
       count = 0;
       if (fontFreqs.containsKey(font)) {
         count = fontFreqs.get(font);
       }
       fontFreqs.put(font, count + 1);
-      
+
       // Count the frequencies of colors.
       count = 0;
       if (colorFreqs.containsKey(color)) {
@@ -116,7 +124,7 @@ public class TextStatistician {
     }
     statistics.setMostCommonFontsize(mostCommonFontsize);
     statistics.setFontsizeFrequencies(fontsizeFreqs);
-    
+
     // Compute the most common font.
     maxFrequency = 0;
     PdfFont mostCommonFont = null;
@@ -127,7 +135,8 @@ public class TextStatistician {
       }
     }
     statistics.setMostCommonFont(mostCommonFont);
-    
+    statistics.setFontFrequencies(fontFreqs);
+
     // Compute the most common color.
     maxFrequency = 0;
     PdfColor mostCommonColor = null;
@@ -137,9 +146,10 @@ public class TextStatistician {
         mostCommonColor = entry.getKey();
       }
     }
-    statistics.setMostCommonFontColor(mostCommonColor);
+    statistics.setMostCommonColor(mostCommonColor);
+    statistics.setColorFrequencies(colorFreqs);
   }
-  
+
   // ___________________________________________________________________________
 
   /**
@@ -149,12 +159,20 @@ public class TextStatistician {
       List<? extends HasTextStatistics> objs,
       PlainTextStatistics statistics) {
 
+    float numObjects = objs.size();
     float sumFontsizes = 0;
+    float sumAscii = 0;
+    float sumDigits = 0;
+
     for (HasTextStatistics obj : objs) {
       sumFontsizes += obj.getTextStatistics().getAverageFontsize();
+      sumAscii += obj.getTextStatistics().getAsciiRatio();
+      sumDigits += obj.getTextStatistics().getDigitsRatio();
     }
 
-    statistics.setAvgFontsize(sumFontsizes / (float) objs.size());
+    statistics.setAvgFontsize(sumFontsizes / numObjects);
+    statistics.setAsciiRatio(sumAscii / numObjects);
+    statistics.setDigitsRatio(sumDigits / numObjects);
   }
 
   /**
@@ -163,9 +181,12 @@ public class TextStatistician {
   protected static void accumulateMostCommonValues(
       List<? extends HasTextStatistics> objs, PlainTextStatistics stats) {
     Map<Float, Integer> fontsizeFreqs = new HashMap<Float, Integer>();
+    Map<PdfFont, Integer> fontFreqs = new HashMap<PdfFont, Integer>();
+    Map<PdfColor, Integer> colorFreqs = new HashMap<PdfColor, Integer>();
 
-    for (HasTextStatistics o : objs) {
-      Map<Float, Integer> freq = o.getTextStatistics().getFontsizeFrequencies();
+    for (HasTextStatistics obj : objs) {
+      Map<Float, Integer> freq =
+          obj.getTextStatistics().getFontsizeFrequencies();
       // Accumulate the frequencies.
       for (Entry<Float, Integer> entry : freq.entrySet()) {
         int count = 0;
@@ -175,6 +196,32 @@ public class TextStatistician {
           count = fontsizeFreqs.get(fontsize);
         }
         fontsizeFreqs.put(fontsize, count + fontsizeFreq);
+      }
+
+      Map<PdfFont, Integer> fonts =
+          obj.getTextStatistics().getFontFrequencies();
+      // Accumulate the frequencies.
+      for (Entry<PdfFont, Integer> entry : fonts.entrySet()) {
+        int count = 0;
+        PdfFont font = entry.getKey();
+        int fontFreq = entry.getValue();
+        if (fontFreqs.containsKey(font)) {
+          count = fontFreqs.get(font);
+        }
+        fontFreqs.put(font, count + fontFreq);
+      }
+
+      Map<PdfColor, Integer> colors =
+          obj.getTextStatistics().getColorFrequencies();
+      // Accumulate the frequencies.
+      for (Entry<PdfColor, Integer> entry : colors.entrySet()) {
+        int count = 0;
+        PdfColor color = entry.getKey();
+        int colorFreq = entry.getValue();
+        if (colorFreqs.containsKey(color)) {
+          count = colorFreqs.get(color);
+        }
+        colorFreqs.put(color, count + colorFreq);
       }
     }
 
@@ -188,7 +235,32 @@ public class TextStatistician {
       }
     }
 
+    // Compute the most common font.
+    maxFrequency = 0;
+    PdfFont mostCommonFont = null;
+    for (Entry<PdfFont, Integer> entry : fontFreqs.entrySet()) {
+      if (entry.getValue() > maxFrequency) {
+        maxFrequency = entry.getValue();
+        mostCommonFont = entry.getKey();
+      }
+    }
+
+    // Compute the most common color.
+    maxFrequency = 0;
+    PdfColor mostCommonColor = null;
+    for (Entry<PdfColor, Integer> entry : colorFreqs.entrySet()) {
+      if (entry.getValue() > maxFrequency) {
+        maxFrequency = entry.getValue();
+        mostCommonColor = entry.getKey();
+      }
+    }
+
+    stats.setMostCommonFont(mostCommonFont);
     stats.setMostCommonFontsize(mostCommonFontsize);
+    stats.setMostCommonColor(mostCommonColor);
+
+    stats.setFontFrequencies(fontFreqs);
     stats.setFontsizeFrequencies(fontsizeFreqs);
+    stats.setColorFrequencies(colorFreqs);
   }
 }

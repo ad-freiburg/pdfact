@@ -2,14 +2,15 @@ package model;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONObject;
 
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.text.StringUtils;
+import statistics.DimensionStatistician;
 import statistics.TextLineStatistician;
+import statistics.TextStatistician;
 
 /**
  * Implementation of a PdfParagraph.
@@ -17,24 +18,8 @@ import statistics.TextLineStatistician;
  * @author Claudius Korzen
  *
  */
-public class PdfXYCutParagraph extends PdfXYCutTextArea 
-    implements PdfParagraph {
-
-  /**
-   * The lines in this paragraph.
-   */
-  protected List<PdfTextLine> lines;
-
-  /**
-   * The text line statistics.
-   */
-  protected TextLineStatistics textLineStatistics;
-  
-  /**
-   * Flag to indicate if the text line statistics is outdated.
-   */
-  protected boolean isTextLineStatisticsOutdated;
-  
+public class PdfXYCutTextParagraph extends PdfXYCutArea 
+    implements PdfTextParagraph {  
   /**
    * The context of this paragraph.
    */
@@ -48,33 +33,25 @@ public class PdfXYCutParagraph extends PdfXYCutTextArea
   /**
    * The default constructor.
    */
-  public PdfXYCutParagraph(PdfPage page) {
+  public PdfXYCutTextParagraph(PdfPage page) {
     super(page);
-    this.lines = new ArrayList<>();
   }
 
   /**
    * The default constructor.
    */
-  public PdfXYCutParagraph(PdfPage page, PdfArea area) {
+  public PdfXYCutTextParagraph(PdfPage page, PdfArea area) {
     this(page);
     for (HasRectangle element : area.getElements()) {
       addTextLine((PdfTextLine) element);
     }
   }
 
-  // ___________________________________________________________________________
-
-  @Override
-  public List<PdfTextLine> getTextLines() {
-    return this.lines;
-  }
-
   /**
    * Sets the words in this line.
    */
   public void setTextLines(List<? extends PdfTextLine> lines) {
-    this.lines.clear();
+    this.textLinesIndex.clear();
     for (PdfTextLine line : lines) {
       addTextLine(line);
     }
@@ -84,8 +61,10 @@ public class PdfXYCutParagraph extends PdfXYCutTextArea
    * Adds the given word to this line.
    */
   public void addTextLine(PdfTextLine line) {
-    this.lines.add(line);
-    index(line);
+    this.elementsIndex.insert(line);
+    this.textElementsIndex.insert(line);
+    this.textLinesIndex.insert(line);
+    this.isTextLineStatisticsOutdated = true;
   }
   
   @Override
@@ -108,25 +87,7 @@ public class PdfXYCutParagraph extends PdfXYCutTextArea
     
     return text.toString();
   }
-  
-  /**
-   * Returns the text line statistics.
-   */
-  public TextLineStatistics getTextLineStatistics() {
-    if (this.isDimensionStatisticsOutdated) {
-      computeTextLineStatistics();
-    }
-    return this.textLineStatistics;
-  }
-  
-  /**
-   * Returns the text line statistics.
-   */
-  public void computeTextLineStatistics() {
-    this.textLineStatistics = TextLineStatistician.compute(getTextLines());
-    this.isTextLineStatisticsOutdated = false;
-  }
-  
+   
   @Override
   public PdfFeature getFeature() {
     return PdfFeature.paragraphs;
@@ -232,5 +193,61 @@ public class PdfXYCutParagraph extends PdfXYCutTextArea
   @Override
   public String getRole() {
     return this.role;
+  }
+
+  @Override
+  public PdfTextLine getFirstTextLine() {
+    return !getTextLines().isEmpty() ? getTextLines().get(0) : null;
+  }
+
+  @Override
+  public PdfTextLine getLastTextLine() {
+    return !getTextLines().isEmpty() ? getTextLines().get(
+        getTextLines().size() - 1) : null;
+  }
+  
+  @Override
+  public DimensionStatistics computeDimensionStatistics() {
+    return DimensionStatistician.accumulate(getTextLines());
+  }
+  
+  @Override
+  public TextStatistics computeTextStatistics() {    
+    return TextStatistician.accumulate(getTextLines());
+  }
+  
+  @Override
+  public TextLineStatistics computeTextLineStatistics() {
+    return TextLineStatistician.compute(getTextLines());
+  }
+
+  @Override
+  public boolean isAscii() {
+    for (PdfCharacter character : getTextCharacters()) {
+      for (char chaar : character.getUnicode().toCharArray()) {
+        if (chaar < 32 || chaar > 126) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isDigit() {
+    if (getTextCharacters() == null) {
+      return false;
+    }
+
+    if (getTextCharacters().isEmpty()) {
+      return false;
+    }
+
+    for (PdfCharacter character : getTextCharacters()) {
+      if (character.getCodePoint() < '0' || character.getCodePoint() > '9') {
+        return false;
+      }
+    }
+    return true;
   }
 }

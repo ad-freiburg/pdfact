@@ -14,7 +14,7 @@ import model.SweepDirection.VerticalSweepDirection;
  *
  * @author Claudius Korzen
  */
-public class BlockifyPageRule implements BlockifyRule {
+public class BlockifyTextPageRule implements BlockifyRule {
   /** The sweep direction for the horizontal lane. */
   protected HorizontalSweepDirection horizontalLaneSweepDirection;
   /** The sweep direction for the vertical lane. */
@@ -23,7 +23,7 @@ public class BlockifyPageRule implements BlockifyRule {
   /** 
    * The default constructor. 
    */
-  public BlockifyPageRule() {
+  public BlockifyTextPageRule() {
     this.horizontalLaneSweepDirection = TOP_TO_BOTTOM;
     this.verticalLaneSweepDirection = LEFT_TO_RIGHT;
   }
@@ -31,7 +31,7 @@ public class BlockifyPageRule implements BlockifyRule {
   /**
    * The default constructor.
    */
-  public BlockifyPageRule(HorizontalSweepDirection horizontalSweepDirection, 
+  public BlockifyTextPageRule(HorizontalSweepDirection horizontalSweepDirection,
       VerticalSweepDirection verticalSweepDirection) {
     this.horizontalLaneSweepDirection = horizontalSweepDirection;
     this.verticalLaneSweepDirection = verticalSweepDirection;
@@ -56,7 +56,7 @@ public class BlockifyPageRule implements BlockifyRule {
 
   @Override
   public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {    
-    return area.getElementsOverlappedBy(lane).isEmpty();
+    return area.getElementsOverlapping(lane).isEmpty();
   }
 
   @Override

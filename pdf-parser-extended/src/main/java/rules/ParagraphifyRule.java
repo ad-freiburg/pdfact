@@ -7,7 +7,7 @@ import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import model.PdfFont;
 import model.PdfPage;
-import model.PdfParagraph;
+import model.PdfTextParagraph;
 import model.PdfTextLine;
 import model.PdfWord;
 import model.TextLineStatistics;
@@ -24,7 +24,7 @@ public class ParagraphifyRule {
    * Returns true, if the given parameters introduces a new paragraph.
    */
   public static boolean introducesNewParagraph(PdfPage page,
-      PdfParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
+      PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {
@@ -75,12 +75,12 @@ public class ParagraphifyRule {
     List<? extends HasRectangle> prevAreas = null;
     if (prevLine != null) {
       Rectangle prevRectangle = prevLine.getRectangle();
-      prevAreas = page.getElementsOverlappedBy(prevRectangle);
+      prevAreas = page.getElementsOverlapping(prevRectangle);
 
       List<? extends HasRectangle> areas = null;
       if (line != null) {
         Rectangle rectangle = line.getRectangle();
-        areas = page.getElementsOverlappedBy(rectangle);
+        areas = page.getElementsOverlapping(rectangle);
 
         areas.retainAll(prevAreas);
 
@@ -117,7 +117,7 @@ public class ParagraphifyRule {
    * Analyzes the linepitch and returns true, if the linepitch is too large.
    */
   protected static boolean linepitchIsTooLarge(PdfPage page, 
-      PdfParagraph paragraph, PdfTextLine prevLine, PdfTextLine line) {
+      PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line) {
     
     float pitch = TextLineStatistician.computeLinePitch(prevLine, line);
     TextLineStatistics pageLineStatistics = page.getTextLineStatistics();
@@ -145,7 +145,7 @@ public class ParagraphifyRule {
    * Returns true, if the given line is probably a heading. EXPERIMENTAL.
    */
   protected static boolean isProbablyHeading(PdfPage page, 
-      PdfParagraph paragraph, PdfTextLine prevLine, PdfTextLine line) {
+      PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line) {
     PdfFont pageFont = page.getFont();
     PdfFont prevLineFont = prevLine != null ? prevLine.getFont() : null;
     PdfWord firstWord = line != null ? line.getFirstWord() : null;

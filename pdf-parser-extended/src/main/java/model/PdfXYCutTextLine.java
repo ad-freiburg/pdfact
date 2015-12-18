@@ -2,31 +2,24 @@ package model;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONObject;
 
 import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.text.StringUtils;
+import statistics.DimensionStatistician;
+import statistics.TextStatistician;
 
 /**
  * Implementation of a PdfTextLine.
  *
  * @author Claudius Korzen
  */
-public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
-  /**
-   * The words in this line.
-   */
-  protected List<PdfWord> words;
-
+public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   /**
    * The default constructor.
    */
   public PdfXYCutTextLine(PdfPage page) {
     super(page);
-    this.words = new ArrayList<>();
   }
   
   /**
@@ -34,35 +27,12 @@ public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
    */
   public PdfXYCutTextLine(PdfPage page, PdfArea area) {
     this(page);
-    index(area.getElements());
+    
+    addAnyElements(area.getElements());
   }
 
   // ___________________________________________________________________________
 
-  @Override
-  public List<PdfWord> getWords() {
-    return this.words;
-  }
-
-  /**
-   * Sets the words in this line.
-   */
-  public void setWords(List<? extends PdfWord> words) {
-    this.words.clear();
-    for (PdfWord word : words) {
-      this.words.add(word);
-      index(word.getElements());
-    }
-  }
-
-  /**
-   * Adds the given word to this line.
-   */
-  public void addWord(PdfWord word) {
-    this.words.add(word);
-    index(word);
-  }
-  
   /**
    * Returns the unicode of this text line.
    */
@@ -72,12 +42,12 @@ public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
 
   @Override
   public PdfWord getFirstWord() {
-    return words.size() > 0 ? words.get(0) : null;
+    return getWords().size() > 0 ? getWords().get(0) : null;
   }
 
   @Override
   public PdfWord getLastWord() {
-    return words.size() > 0 ? words.get(words.size() - 1) : null;
+    return getWords().size() > 0 ? getWords().get(getWords().size() - 1) : null;
   }
   
   @Override
@@ -145,5 +115,52 @@ public class PdfXYCutTextLine extends PdfXYCutTextArea implements PdfTextLine {
     json.put("color", getColor().getId());
     
     return json;
+  }
+
+  @Override
+  public DimensionStatistics computeDimensionStatistics() {
+    return DimensionStatistician.accumulate(getTextCharacters());
+  }
+  
+  @Override
+  public TextStatistics computeTextStatistics() {    
+    TextStatistics s = TextStatistician.accumulate(getTextCharacters());
+    
+//    for (PdfCharacter character : getTextCharacters()) {
+//      System.out.println(character.getTextStatistics().getMostCommonFont());
+//    }
+//    System.out.println(s.getMostCommonFont());
+    
+    return s;
+  }
+  
+  @Override
+  public boolean isAscii() {
+    for (PdfCharacter character : getTextCharacters()) {
+      for (char chaar : character.getUnicode().toCharArray()) {
+        if (chaar < 32 || chaar > 126) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isDigit() {
+    if (getTextCharacters() == null) {
+      return false;
+    }
+
+    if (getTextCharacters().isEmpty()) {
+      return false;
+    }
+
+    for (PdfCharacter character : getTextCharacters()) {
+      if (character.getCodePoint() < '0' || character.getCodePoint() > '9') {
+        return false;
+      }
+    }
+    return true;
   }
 }

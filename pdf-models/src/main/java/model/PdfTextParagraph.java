@@ -7,32 +7,43 @@ import java.util.List;
  *
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfTextElement, HasTextLineStatistics {
+public interface PdfTextParagraph extends PdfTextElement,
+    HasTextLineStatistics {
   /**
    * Returns the lines in this paragraph.
    */
   public List<PdfTextLine> getTextLines();
-  
+
+  /**
+   * Returns the first line in this paragraph.
+   */
+  public PdfTextLine getFirstTextLine();
+
+  /**
+   * Returns the last line in this paragraph.
+   */
+  public PdfTextLine getLastTextLine();
+
   /**
    * Adds the given line to this paragraph.
    */
   public void addTextLine(PdfTextLine line);
-  
+
   /**
    * Sets the context of this paragraph.
    */
   public void setContext(String context);
-  
+
   /**
    * Returns the context of this paragraph.
    */
   public String getContext();
-  
+
   /**
    * Sets the role of this paragraph.
    */
   public void setRole(String role);
-  
+
   /**
    * Returns the role of this paragraph.
    */

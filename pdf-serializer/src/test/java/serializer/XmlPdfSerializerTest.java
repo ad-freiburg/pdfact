@@ -49,8 +49,12 @@ public class XmlPdfSerializerTest {
     
     Path path = Paths.get(resourcesPath).resolve("expected1.txt");
     // Whitespaces and indentation doesn't matter in json, so remove it.
-    String expected = PathUtils.readPathContentToString(path).replaceAll("\\s+", "");
-    String actual = new String(stream.toByteArray()).replaceAll("\\s+", "");
+    String expected = PathUtils.readPathContentToString(path);
+    String actual = new String(stream.toByteArray());
+    
+    // Whitespaces and indentation doesn't matter in json, so remove it.
+    expected = expected.replaceAll("\\s+", "");
+    actual = actual.replaceAll("\\s+", "");
     
     Assert.assertEquals(expected, actual);
   }
