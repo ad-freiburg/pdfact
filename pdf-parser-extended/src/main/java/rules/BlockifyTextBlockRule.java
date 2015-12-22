@@ -37,7 +37,8 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       }
     }
     
-    return sumOverlaps / lane.getArea() < 0.0075f;
+    // return sumOverlaps / lane.getArea() < 0.0075f;
+    return sumOverlaps / lane.getArea() < 0.05f;
   }
   
   @Override
