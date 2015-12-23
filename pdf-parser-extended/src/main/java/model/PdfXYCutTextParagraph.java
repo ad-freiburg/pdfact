@@ -250,4 +250,9 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     }
     return true;
   }
+  
+  @Override
+  public String toString() {
+    return getUnicode();
+  }
 }

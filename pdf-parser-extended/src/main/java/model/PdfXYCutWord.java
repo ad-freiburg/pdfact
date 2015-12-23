@@ -157,4 +157,9 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     }
     return true;
   }
+  
+  @Override
+  public String toString() {
+    return getUnicode();
+  }
 }

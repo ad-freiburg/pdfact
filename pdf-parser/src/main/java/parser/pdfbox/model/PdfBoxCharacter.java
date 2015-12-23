@@ -326,4 +326,9 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     }
     return true;
   }
+  
+  @Override
+  public String toString() {
+    return getUnicode();
+  }
 }
