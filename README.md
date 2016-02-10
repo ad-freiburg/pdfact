@@ -2,7 +2,7 @@
 
 ## How to use
 
-### 0. Checkout
+### Checkout
 
 Checkout the project via
 
@@ -16,14 +16,14 @@ If your version of git do not support this flag, you can do:
     git submodule init
     git submodule update
     
-### 1. Build    
+### Build    
 
 Build the project:
     
     cd icecite/pdf-cli
     mvn install
 
-### 2. Extracting text from PDF files
+### Extracting text from PDF files
 
 Extract text from PDF files:
     
@@ -45,4 +45,14 @@ The options are:
     --recursive           Parse the input recursively.
     --visualize           Create visualization of the extracted features.
  
+#### Example
+ 
+If you wish to extract the words and text lines from a PDF file "foo.pdf", to 
+have the result in an XML file and to create a visualization of the extracted 
+features (a pdf where the extracted words and text lines are 
+higlighted in different colors), use this command:
+    
+    java -jar target/pdf-cli-*-jar-with-dependencies.jar --feature words --feature lines --format xml --visualize foo.pdf
+
+
 ... to be continued ...
