@@ -16,6 +16,10 @@ If your version of git do not support this flag, you can do:
     git submodule init
     git submodule update
     
+Once you have checked out the project you can request updates via
+    
+    git pull --recurse-submodules
+    
 ### Build    
 
 Build the project:
