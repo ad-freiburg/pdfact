@@ -113,7 +113,7 @@ public class PdfStreamEngine {
    * @throws IOException
    *           if there is an error on processing the document.
    */
-  public void processFile(Path pdfFile) throws IOException {
+  public void processFile(Path pdfFile) throws IOException {    
     if (pdfFile != null) {
       PDDocument doc = PDDocument.load(pdfFile.toFile());
       PdfBoxDocument textDocument = new PdfBoxDocument(doc);

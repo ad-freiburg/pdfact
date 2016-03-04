@@ -15,4 +15,14 @@ public interface PdfCharacter extends PdfTextElement {
    * Returns the codepoint of this character.
    */
   public int getCodePoint();
+  
+  /**
+   * Returns true, if this character is diacritic.
+   */
+  public boolean isDiacritic();
+  
+  /**
+   * Merges this character with the given diacritic.
+   */
+  public void mergeDiacritic(PdfCharacter diacritic);
 }

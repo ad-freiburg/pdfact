@@ -14,7 +14,7 @@ import statistics.TextStatistician;
  *
  * @author Claudius Korzen
  */
-public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
+public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {  
   /**
    * The default constructor.
    */
@@ -39,7 +39,7 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   public String getUnicode() {
     return CollectionUtils.join(getWords()); 
   }
-
+  
   @Override
   public PdfWord getFirstWord() {
     return getWords().size() > 0 ? getWords().get(0) : null;

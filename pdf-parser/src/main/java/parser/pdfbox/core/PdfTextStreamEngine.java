@@ -158,6 +158,9 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     }
   }
 
+  PdfBoxCharacter prevCharacter = null;
+  PdfBoxCharacter prePrevCharacter = null;
+  
   @Override
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
@@ -213,7 +216,44 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     character.setColor(color);
     character.setExtractionOrderNumber(this.extractionOrderNumber++);
 
-    showPdfTextCharacter(character);
+    // Handle diacritic characters:
+    // In most cases, diacritic characters are represented in its decomposed 
+    // form. For example, "è" may be represented as the two characters "'e" or 
+    // "e'". To merge such characters the base character must be followed by 
+    // the diacritic: "e'" implicitly. To maintain this order, decide to which 
+    // base character a diacritic belongs and merge them together.
+    
+    // To decide to which character the diacritic belongs, we have to wait for
+    // the character after the diacritic, so we check if the previous character
+    // is a diacritic and compare the horizontal overlap between (a) the 
+    // diacritic and the character "in front" of the character 
+    // (prePreviousCharacter) and (b) the diacritic and the character "behind"
+    // the character (the current character).
+    if (prevCharacter != null && prevCharacter.isDiacritic()) {
+      Rectangle prevRectangle = prevCharacter.getRectangle();
+      Rectangle prePrevRectangle = null;
+      if (prePrevCharacter != null) {
+        prePrevRectangle = prePrevCharacter.getRectangle();
+      }
+      
+      // Compare the horizontal overlaps with the diacritic.
+      float overlap1 = prevRectangle.computeHorizontalOverlap(prePrevRectangle);
+      float overlap2 = prevRectangle.computeHorizontalOverlap(boundingBox);
+            
+      if (overlap1 >= overlap2) {
+        prePrevCharacter.mergeDiacritic(prevCharacter);
+      } else {
+        character.mergeDiacritic(prevCharacter);
+      }
+    }
+    
+    // Return the character only if it is no diacritic.
+    if (!character.isDiacritic()) {
+      showPdfTextCharacter(character);
+    }
+    
+    prePrevCharacter = prevCharacter;
+    prevCharacter = character;
   }
 
   @Override

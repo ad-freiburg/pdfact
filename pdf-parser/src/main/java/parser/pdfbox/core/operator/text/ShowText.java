@@ -26,8 +26,8 @@ import parser.pdfbox.core.operator.OperatorProcessor;
  */
 public class ShowText extends OperatorProcessor {
   /** Maps the unicodes of ligatures to its individual characters. */
-  protected static final Map<String, String[]> LIGATURES_MAP;
-
+  protected static final Map<String, String[]> LIGATURES;
+    
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     if (args.size() < 1) {
@@ -60,7 +60,7 @@ public class ShowText extends OperatorProcessor {
       int code = font.readCode(in);
       int codeLength = before - in.available();
       String unicode = font.toUnicode(code);
-
+      
       // Word spacing shall be applied to every occurrence of the single-byte
       // character code 32 in a string when using a simple font or a composite
       // font that defines code 32 as a single-byte code.
@@ -128,44 +128,44 @@ public class ShowText extends OperatorProcessor {
    *         ligature; null otherwise.
    */
   protected String[] resolveLigature(String unicode) {
-    return LIGATURES_MAP.get(unicode);
+    return LIGATURES.get(unicode);
   }
-
+  
   @Override
   public String getName() {
     return "Tj";
   }
   
   static {
-    // Fill the ligatures map.
-    LIGATURES_MAP = new HashMap<String, String[]>();
-    LIGATURES_MAP.put("\u00C6", new String[] { "A", "E" }); // AE
-    LIGATURES_MAP.put("\u00E6", new String[] { "a", "e" }); // ae
-    LIGATURES_MAP.put("\u0152", new String[] { "O", "E" }); // OE
-    LIGATURES_MAP.put("\u0153", new String[] { "o", "e" }); // oe
-    LIGATURES_MAP.put("\u0132", new String[] { "I", "J" }); // IJ
-    LIGATURES_MAP.put("\u0133", new String[] { "i", "j" }); // ij
-    LIGATURES_MAP.put("\u1D6B", new String[] { "u", "e" }); // ue
-    LIGATURES_MAP.put("\uA728", new String[] { "T", "Z" }); // TZ
-    LIGATURES_MAP.put("\uA729", new String[] { "t", "z" }); // tz
-    LIGATURES_MAP.put("\uA732", new String[] { "A", "A" }); // AA
-    LIGATURES_MAP.put("\uA733", new String[] { "a", "a" }); // aa
-    LIGATURES_MAP.put("\uA734", new String[] { "A", "O" }); // AO
-    LIGATURES_MAP.put("\uA735", new String[] { "a", "o" }); // ao
-    LIGATURES_MAP.put("\uA736", new String[] { "A", "U" }); // AU
-    LIGATURES_MAP.put("\uA737", new String[] { "a", "u" }); // au
-    LIGATURES_MAP.put("\uA738", new String[] { "A", "V" }); // AV
-    LIGATURES_MAP.put("\uA739", new String[] { "a", "v" }); // av
-    LIGATURES_MAP.put("\uA73C", new String[] { "A", "Y" }); // AY
-    LIGATURES_MAP.put("\uA73D", new String[] { "a", "y" }); // ay
-    LIGATURES_MAP.put("\uA74E", new String[] { "O", "O" }); // OO
-    LIGATURES_MAP.put("\uA74F", new String[] { "o", "o" }); // oo
-    LIGATURES_MAP.put("\uAB50", new String[] { "u", "i" }); // ui
-    LIGATURES_MAP.put("\uFB00", new String[] { "f", "f" }); // ff
-    LIGATURES_MAP.put("\uFB01", new String[] { "f", "i" }); // fi
-    LIGATURES_MAP.put("\uFB02", new String[] { "f", "l" }); // fl
-    LIGATURES_MAP.put("\uFB03", new String[] { "f", "f", "i" }); // ffi
-    LIGATURES_MAP.put("\uFB04", new String[] { "f", "f", "l" }); // ffl
-    LIGATURES_MAP.put("\uFB06", new String[] { "s", "t" }); // st
+    // Fill the ligatures DIACRITICS.
+    LIGATURES = new HashMap<String, String[]>();
+    LIGATURES.put("\u00C6", new String[] { "A", "E" }); // AE
+    LIGATURES.put("\u00E6", new String[] { "a", "e" }); // ae
+    LIGATURES.put("\u0152", new String[] { "O", "E" }); // OE
+    LIGATURES.put("\u0153", new String[] { "o", "e" }); // oe
+    LIGATURES.put("\u0132", new String[] { "I", "J" }); // IJ
+    LIGATURES.put("\u0133", new String[] { "i", "j" }); // ij
+    LIGATURES.put("\u1D6B", new String[] { "u", "e" }); // ue
+    LIGATURES.put("\uA728", new String[] { "T", "Z" }); // TZ
+    LIGATURES.put("\uA729", new String[] { "t", "z" }); // tz
+    LIGATURES.put("\uA732", new String[] { "A", "A" }); // AA
+    LIGATURES.put("\uA733", new String[] { "a", "a" }); // aa
+    LIGATURES.put("\uA734", new String[] { "A", "O" }); // AO
+    LIGATURES.put("\uA735", new String[] { "a", "o" }); // ao
+    LIGATURES.put("\uA736", new String[] { "A", "U" }); // AU
+    LIGATURES.put("\uA737", new String[] { "a", "u" }); // au
+    LIGATURES.put("\uA738", new String[] { "A", "V" }); // AV
+    LIGATURES.put("\uA739", new String[] { "a", "v" }); // av
+    LIGATURES.put("\uA73C", new String[] { "A", "Y" }); // AY
+    LIGATURES.put("\uA73D", new String[] { "a", "y" }); // ay
+    LIGATURES.put("\uA74E", new String[] { "O", "O" }); // OO
+    LIGATURES.put("\uA74F", new String[] { "o", "o" }); // oo
+    LIGATURES.put("\uAB50", new String[] { "u", "i" }); // ui
+    LIGATURES.put("\uFB00", new String[] { "f", "f" }); // ff
+    LIGATURES.put("\uFB01", new String[] { "f", "i" }); // fi
+    LIGATURES.put("\uFB02", new String[] { "f", "l" }); // fl
+    LIGATURES.put("\uFB03", new String[] { "f", "f", "i" }); // ffi
+    LIGATURES.put("\uFB04", new String[] { "f", "f", "l" }); // ffl
+    LIGATURES.put("\uFB06", new String[] { "s", "t" }); // st
   }
 }

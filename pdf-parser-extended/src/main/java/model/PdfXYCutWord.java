@@ -4,7 +4,6 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
 import org.json.JSONObject;
 
-import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
@@ -37,13 +36,19 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   }
 
   @Override
-  public boolean isHyphenized() {
-    return this.isHyphenized;
+  public PdfCharacter getFirstTextCharacter() {
+    if (getTextCharacters().size() > 0) {
+      return getTextCharacters().get(0);
+    }
+    return null;
   }
 
   @Override
-  public void setIsHyphenized(boolean hyphenized) {
-    this.isHyphenized = hyphenized;
+  public PdfCharacter getLastTextCharacter() {
+    if (getTextCharacters().size() > 0) {
+      return getTextCharacters().get(getTextCharacters().size() - 1);
+    }
+    return null;
   }
 
   @Override
@@ -125,7 +130,15 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   
   @Override
   public String getUnicode() {
-    return CollectionUtils.join(getTextCharacters(), "");
+    StringBuilder result = new StringBuilder();
+    
+    for (PdfCharacter character : getTextCharacters()) {
+      if (!character.ignore()) {
+        result.append(character != null ? character.toString() : "");
+      }
+    }
+    
+    return result.toString();
   }
 
   @Override
@@ -160,6 +173,6 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   
   @Override
   public String toString() {
-    return getUnicode();
+    return getUnicode() + " ";
   }
 }

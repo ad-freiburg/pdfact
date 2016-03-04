@@ -13,6 +13,7 @@ import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Comparators;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfNonTextParagraph;
 import model.PdfPage;
@@ -78,7 +79,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
       page.setNonTextParagraphs(nonTextParas);
 
-      List<PdfTextLine> lines = identifyLines(page, blocks);
+      List<PdfXYCutTextLine> lines = identifyLines(page, blocks);
       page.setTextLines(lines);
 
       List<PdfWord> words = identifyWords(page, lines);
@@ -114,10 +115,12 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Identifies text lines in the given list of blocks.
    */
-  protected List<PdfTextLine> identifyLines(PdfPage page, List<PdfArea> areas) {
-    List<PdfTextLine> textLines = new ArrayList<>();
+  protected List<PdfXYCutTextLine> identifyLines(PdfPage page,
+      List<PdfArea> areas) {
+    List<PdfXYCutTextLine> textLines = new ArrayList<>();
     for (PdfArea area : areas) {
       List<PdfArea> lineAreas = blockify(area, this.blockifyBlockRule);
+      
       textLines.addAll(toTextLines(page, lineAreas));
     }
     return textLines;
@@ -128,9 +131,12 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * words to the correspondent line and returns a list of all identified words
    * in the lines.
    */
-  protected List<PdfWord> identifyWords(PdfPage page, List<PdfTextLine> lines) {
+  protected List<PdfWord> identifyWords(PdfPage page,
+      List<PdfXYCutTextLine> lines) {
     List<PdfWord> words = new ArrayList<>();
-    for (PdfTextLine line : lines) {
+    PdfTextLine prevLine = null;
+
+    for (PdfXYCutTextLine line : lines) {
       List<PdfArea> wordAreas = blockify(line, this.blockifyLineRule);
 
       // Sort the words and the characters in the words by x-value.
@@ -139,24 +145,11 @@ public class PdfXYCutParser implements PdfExtendedParser {
         Collections.sort(area.getElements(), new Comparators.MinXComparator());
       }
 
-      List<PdfXYCutWord> lineWords = toWords(page, wordAreas);
-
-      // TODO: Dehyphenize.
-      if (!words.isEmpty()) {
-        PdfWord lastWord = words.get(words.size() - 1);
-        String lastCharacter = lastWord.getTextCharacters()
-            .get(lastWord.getTextCharacters().size() - 1).getUnicode();
-
-        if (lastCharacter != null && !lastCharacter.isEmpty()) {
-          char lastChar = lastCharacter.charAt(0);
-          if (lastChar == '-') {
-            lastWord.setIsHyphenized(true);
-          }
-        }
-      }
+      List<PdfXYCutWord> lineWords = toWords(page, wordAreas, prevLine);
 
       words.addAll(lineWords);
       line.setWords(lineWords);
+      prevLine = line;
     }
     return words;
   }
@@ -165,7 +158,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * Identifies paragraphs from the given list of text lines.
    */
   protected List<PdfTextParagraph> identifyParagraphs(PdfPage page,
-      List<PdfTextLine> lines) {
+      List<PdfXYCutTextLine> lines) {
     List<PdfTextParagraph> paragraphs = new ArrayList<>();
     PdfTextParagraph paragraph = new PdfXYCutTextParagraph(page);
 
@@ -254,6 +247,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return result;
   }
 
+  int i = 0;
+  
   /**
    * Tries to split the given area horizontally.
    */
@@ -264,10 +259,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (rect != null) {
       // Identify the vertical split lane.
       Rectangle lane = identifyHorizontalLane(area, rule);
-
-      if (lane != null) {
+      
+      if (lane != null) {        
         List<Rectangle> subRects = rect.splitHorizontally(lane.getYMidpoint());
-        for (Rectangle subRect : subRects) {
+        for (Rectangle subRect : subRects) {     
           result.add(new PdfXYCutArea(area, subRect));
         }
       }
@@ -369,7 +364,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Sweep the lane through the bounding box.
       while (pos >= rect.getMinY() && pos <= rect.getMaxY() - ruleLaneHeight) {
         ruleLane.moveTo(ruleLane.getMinX(), pos);
-
+                
         if (rule.isValidHorizontalLane(area, ruleLane)) {
           if (invalidLaneAlreadySeen) {
             // Expand the lane.
@@ -377,7 +372,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
             lane.setMaxY(Math.max(lane.getMaxY(), ruleLane.getMaxY()));
           }
         } else {
-          if (lane.getHeight() >= ruleLaneHeight) {
+          if (lane.getHeight() >= ruleLaneHeight) {            
             return lane;
           }
 
@@ -397,8 +392,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Transforms the given list of page areas to a list of text lines.
    */
-  protected List<PdfTextLine> toTextLines(PdfPage page, List<PdfArea> areas) {
-    List<PdfTextLine> result = new ArrayList<>();
+  protected List<PdfXYCutTextLine> toTextLines(PdfPage page,
+      List<PdfArea> areas) {
+    List<PdfXYCutTextLine> result = new ArrayList<>();
     for (PdfArea area : areas) {
       result.add(new PdfXYCutTextLine(page, area));
     }
@@ -406,13 +402,54 @@ public class PdfXYCutParser implements PdfExtendedParser {
   }
 
   /**
-   * Transforms the given list of page areas to a list of words.
+   * Transforms the given list of page areas to a list of words. The prevLine is
+   * used for dehyphenation.
    */
-  protected List<PdfXYCutWord> toWords(PdfPage page, List<PdfArea> areas) {
+  protected List<PdfXYCutWord> toWords(PdfPage page, List<PdfArea> areas,
+      PdfTextLine prevLine) {
     List<PdfXYCutWord> result = new ArrayList<>();
-    for (PdfArea area : areas) {
-      result.add(new PdfXYCutWord(page, area));
+
+    if (areas != null) {
+      int start = 0;
+
+      // Dehyphenize.
+      if (areas.size() > 0 && prevLine != null) {
+        PdfWord lastWord = prevLine.getLastWord();
+        if (lastWord != null) {
+          PdfCharacter lastCharacter = lastWord.getLastTextCharacter();
+          if (lastCharacter != null) {
+            // TODO: Allow another dashes ("--". "---")
+            if (lastCharacter.getUnicode().equals("-")) {
+              // The last word in the previous line ends with "-". Append the
+              // elements of the first area in current line to this last word.
+              PdfArea area = areas.get(0);
+
+              lastWord.addAnyElements(area.getElements());
+
+              start = 1;
+
+              // Ignore the hyphen, if the word doesn't start with an uppercase.
+              if (area.getElements() != null && !area.getElements().isEmpty()) {
+                // Get the first character.
+                String firstCharacter = area.getElements().get(0).toString();
+                if (!Character.isUpperCase(firstCharacter.charAt(0))) {
+                  // Ignore the hyphen
+                  lastCharacter.setIgnore(true);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      for (int i = start; i < areas.size(); i++) {
+        PdfArea area = areas.get(i);
+        PdfXYCutWord word = new PdfXYCutWord(page, area);
+
+        result.add(word);
+      }
     }
+
     return result;
   }
 

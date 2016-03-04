@@ -2,8 +2,11 @@ package parser.pdfbox.model;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.pdfbox.util.Matrix;
 import org.json.JSONObject;
@@ -24,6 +27,16 @@ import statistics.TextStatistician;
  * @author Claudius Korzen
  */
 public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
+  /**
+   * Adds non-decomposing diacritics to the hash with their related combining 
+   * character. These are values that the unicode spec claims are equivalent 
+   * but are not mapped in the form NFKC normalization method. Determined by 
+   * going through the Combining Diacritical Marks section of the Unicode spec 
+   * and identifying which characters are not mapped to by the normalization.
+   * For example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
+   */
+  protected static final Map<Integer, String> DIACRITICS;
+  
   /**
    * The rectangle.
    */
@@ -330,5 +343,82 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   @Override
   public String toString() {
     return getUnicode();
+  }
+  
+  /**
+   * Returns true if the given text is a diacritic char.
+   */
+  public boolean isDiacritic() {
+    String text = getUnicode();
+    
+    if (text == null || text.length() != 1) {
+      return false;
+    }
+    
+    int type = Character.getType(text.charAt(0));
+    return type == Character.NON_SPACING_MARK
+        || type == Character.MODIFIER_SYMBOL
+        || type == Character.MODIFIER_LETTER;
+  }
+
+  @Override
+  public void mergeDiacritic(PdfCharacter diacritic) {
+    if (diacritic == null || !diacritic.isDiacritic()) {
+      return;
+    }
+    
+    this.unicode += resolveDiacritic(diacritic);
+    this.rectangle = this.rectangle.union(diacritic.getRectangle());
+  }
+  
+  protected String resolveDiacritic(PdfCharacter diacritic) {
+    if (diacritic == null || diacritic.getUnicode() == null) {
+      return "";
+    }
+    
+    String str = diacritic.getUnicode();
+    int codePoint = str.codePointAt(0);
+    
+    // convert the characters not defined in the Unicode spec
+    if (DIACRITICS.containsKey(codePoint)) {
+      return DIACRITICS.get(codePoint);
+    } else {
+      return Normalizer.normalize(str, Normalizer.Form.NFKC).trim();
+    }
+  }
+  
+  static {
+    DIACRITICS = new HashMap<Integer, String>(31);
+    DIACRITICS.put(0x0060, "\u0300");
+    DIACRITICS.put(0x02CB, "\u0300");
+    DIACRITICS.put(0x0027, "\u0301");
+    DIACRITICS.put(0x02B9, "\u0301");
+    DIACRITICS.put(0x02CA, "\u0301");
+    DIACRITICS.put(0x005e, "\u0302");
+    DIACRITICS.put(0x02C6, "\u0302");
+    DIACRITICS.put(0x007E, "\u0303");
+    DIACRITICS.put(0x02C9, "\u0304");
+    DIACRITICS.put(0x00B0, "\u030A");
+    DIACRITICS.put(0x02BA, "\u030B");
+    DIACRITICS.put(0x02C7, "\u030C");
+    DIACRITICS.put(0x02C8, "\u030D");
+    DIACRITICS.put(0x0022, "\u030E");
+    DIACRITICS.put(0x02BB, "\u0312");
+    DIACRITICS.put(0x02BC, "\u0313");
+    DIACRITICS.put(0x0486, "\u0313");
+    DIACRITICS.put(0x055A, "\u0313");
+    DIACRITICS.put(0x02BD, "\u0314");
+    DIACRITICS.put(0x0485, "\u0314");
+    DIACRITICS.put(0x0559, "\u0314");
+    DIACRITICS.put(0x02D4, "\u031D");
+    DIACRITICS.put(0x02D5, "\u031E");
+    DIACRITICS.put(0x02D6, "\u031F");
+    DIACRITICS.put(0x02D7, "\u0320");
+    DIACRITICS.put(0x02B2, "\u0321");
+    DIACRITICS.put(0x02CC, "\u0329");
+    DIACRITICS.put(0x02B7, "\u032B");
+    DIACRITICS.put(0x02CD, "\u0331");
+    DIACRITICS.put(0x005F, "\u0332");
+    DIACRITICS.put(0x204E, "\u0359");
   }
 }

@@ -138,6 +138,11 @@ public class PdfBoxArea implements PdfArea {
    */
   protected boolean isTextLineStatisticsOutdated;
 
+  /** 
+   * Flag to indicate if we have to ignore this area from further processing.
+   */
+  protected boolean ignore;
+  
   // ___________________________________________________________________________
   // Constructors.
 
@@ -339,16 +344,19 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public void setTextCharacters(List<? extends PdfCharacter> characters) {
     this.charactersIndex.clear();
+    addTextCharacters(characters);
+  }
+
+  @Override
+  public void addTextCharacters(List<? extends PdfCharacter> characters) {
     if (characters != null) {
       for (PdfCharacter character : characters) {
         addTextCharacter(character);
       }
     }
   }
-
-  /**
-   * Adds the given text character to this page.
-   */
+  
+  @Override
   public void addTextCharacter(PdfCharacter character) {
     if (character != null) {
       addElement(character);
@@ -382,16 +390,19 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public void setWords(List<? extends PdfWord> words) {
     this.wordsIndex.clear();
+    addWords(words);
+  }
+
+  @Override
+  public void addWords(List<? extends PdfWord> words) {
     if (words != null) {
       for (PdfWord word : words) {
         addWord(word);
       }
     }
   }
-
-  /**
-   * Adds the given word to this page.
-   */
+  
+  @Override
   public void addWord(PdfWord word) {
     if (word != null) {
       addElement(word);
@@ -425,16 +436,19 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public void setTextLines(List<? extends PdfTextLine> lines) {
     this.textLinesIndex.clear();
+    addTextLines(lines);
+  }
+
+  @Override
+  public void addTextLines(List<? extends PdfTextLine> lines) {
     if (lines != null) {
       for (PdfTextLine line : lines) {
         addTextLine(line);
       }
     }
   }
-
-  /**
-   * Adds the given line to this page.
-   */
+  
+  @Override
   public void addTextLine(PdfTextLine line) {
     if (line != null) {
       addElement(line);
@@ -469,17 +483,20 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public void setParagraphs(List<? extends PdfTextParagraph> paragraphs) {
     this.textParagraphsIndex.clear();
+    addParagraphs(paragraphs);
+  }
+
+  @Override
+  public void addParagraphs(List<? extends PdfTextParagraph> paragraphs) {
     if (paragraphs != null) {
       for (PdfTextParagraph paragraph : paragraphs) {
-        addTextParagraph(paragraph);
+        addParagraph(paragraph);
       }
     }
   }
-
-  /**
-   * Adds the given paragraph to this page.
-   */
-  public void addTextParagraph(PdfTextParagraph paragraph) {
+  
+  @Override
+  public void addParagraph(PdfTextParagraph paragraph) {
     if (paragraph != null) {
       addElement(paragraph);
       addTextElement(paragraph);
@@ -606,16 +623,20 @@ public class PdfBoxArea implements PdfArea {
   public void setNonTextParagraphs(
       List<? extends PdfNonTextParagraph> paragraphs) {
     this.nonTextParagraphsIndex.clear();
+    addNonTextParagraphs(paragraphs);
+  }
+
+  @Override
+  public void addNonTextParagraphs(
+      List<? extends PdfNonTextParagraph> paragraphs) {
     if (paragraphs != null) {
       for (PdfNonTextParagraph paragraph : paragraphs) {
         addNonTextParagraph(paragraph);
       }
     }
   }
-
-  /**
-   * Adds the given non-text paragraph to this page.
-   */
+  
+  @Override
   public void addNonTextParagraph(PdfNonTextParagraph paragraph) {
     if (paragraph != null) {
       addElement(paragraph);
@@ -673,7 +694,7 @@ public class PdfBoxArea implements PdfArea {
    * Computes the dimension statistics.
    */
   protected DimensionStatistics computeDimensionStatistics() {
-    return DimensionStatistician.compute(getElements());
+    return DimensionStatistician.compute(getTextCharacters());
   }
 
   /**
@@ -772,5 +793,15 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public Collection<PdfColor> getColors() {
     return colors.values();
+  }
+
+  @Override
+  public boolean ignore() {
+    return ignore;
+  }
+
+  @Override
+  public void setIgnore(boolean ignore) {
+    this.ignore = ignore;
   }
 }

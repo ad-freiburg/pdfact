@@ -20,6 +20,7 @@ import org.apache.commons.cli.ParseException;
 import analyzer.PdfAnalyzer;
 import analyzer.PlainPdfAnalyzer;
 import de.freiburg.iif.path.FileAndDirectoryParser;
+import de.freiburg.iif.path.PathUtils;
 import model.PdfDocument;
 import model.PdfFeature;
 import parser.PdfExtendedParser;
@@ -30,6 +31,7 @@ import serializer.JsonPdfSerializer;
 import serializer.PdfSerializer;
 import serializer.TsvPdfSerializer;
 import serializer.XmlPdfSerializer;
+import serializer.TxtPdfSerializer;
 import visualizer.PdfVisualizer;
 import visualizer.PlainPdfVisualizer;
 
@@ -87,7 +89,7 @@ public class PdfParserCommandLine {
   /**
    * The valid pdf serializers.
    */
-  protected Map<String, PdfSerializer> validPdfSerializers;
+  protected static Map<String, PdfSerializer> validPdfSerializers;
 
   /**
    * The selected serializer to serialize the extracted features.
@@ -115,6 +117,11 @@ public class PdfParserCommandLine {
    */
   protected Path outputDirectory;
 
+  /**
+   * The output file.
+   */
+  protected Path outputFile;
+  
   /**
    * The prefix to consider on parsing input files given by the command line.
    */
@@ -156,6 +163,13 @@ public class PdfParserCommandLine {
     }
   }
 
+  static {
+    addSerializationFormatChoice(new TsvPdfSerializer());
+    addSerializationFormatChoice(new XmlPdfSerializer());
+    addSerializationFormatChoice(new JsonPdfSerializer());
+    addSerializationFormatChoice(new TxtPdfSerializer());
+  }
+  
   /**
    * Creates a new instance of this program based on the given arguments.
    * 
@@ -180,9 +194,6 @@ public class PdfParserCommandLine {
     evaluateInput(cmd);
     evaluateOutput(cmd);
 
-    addSerializationFormatChoice(new TsvPdfSerializer());
-    addSerializationFormatChoice(new XmlPdfSerializer());
-    addSerializationFormatChoice(new JsonPdfSerializer());
     evaluateSerializationFormat(cmd);
   }
 
@@ -324,6 +335,12 @@ public class PdfParserCommandLine {
    * Returns the name for the output file of the given text document.
    */
   protected Path getVisualizationTargetFile(PdfDocument document) {
+    if (this.outputFile != null) {
+      String parent = this.outputFile.getParent().toAbsolutePath().toString();
+      String filename = PathUtils.getBasename(this.outputFile) + "-v.pdf";
+      return Paths.get(parent, filename);
+    }
+    
     Path targetDir = getTargetDirectory(document);
     if (targetDir != null) {
       Path inputFile = document.getPdfFile();
@@ -341,6 +358,10 @@ public class PdfParserCommandLine {
    * Returns the name for the output file of the given text document.
    */
   protected Path getSerializationTargetFile(PdfDocument document) {
+    if (this.outputFile != null) {
+      return outputFile;
+    }
+    
     Path targetDir = getTargetDirectory(document);
     if (targetDir != null) {
       Path inputFile = document.getPdfFile();
@@ -417,21 +438,27 @@ public class PdfParserCommandLine {
     } else {
       Path output = Paths.get(outputStr);
 
-      if (!Files.exists(output)) {
-        // The output doesn't exist, try to create it.
-        this.outputDirectory = Files.createDirectories(output);
-      } else if (Files.isDirectory(output)) {
+      if (Files.isDirectory(output)) {
         // The output is a directory, everything ok.
         this.outputDirectory = output;
-      } else {
-        // The output is an existing file.
-        throw new IllegalArgumentException("The given output is a file.");
+      } else if (Files.isRegularFile(output)) {
+        if (Files.isDirectory(this.input)) {
+          // The output is an existing file although input is a driectory.
+          throw new IllegalArgumentException("The given output is a file.");
+        } else if (!Files.isWritable(output)) {
+          // The output isn't writable.
+          throw new IllegalArgumentException("Can't write to output.");
+        } else {
+          this.outputFile = output;
+        }
+      } else if (!Files.exists(output)) {
+        if (Files.isDirectory(this.input)) {
+          // The output doesn't exist, try to create it.
+          this.outputDirectory = Files.createDirectories(output);
+        } else {
+          this.outputFile = output;
+        }
       }
-    }
-
-    // Check, if we can write to the output directory.
-    if (!Files.isWritable(outputDirectory)) {
-      throw new IllegalArgumentException("Can't write to given directory");
     }
   }
 
@@ -457,30 +484,30 @@ public class PdfParserCommandLine {
   /**
    * Adds a choice for a pdf serializer.
    */
-  protected void addSerializationFormatChoice(PdfSerializer serializer) {
+  protected static void addSerializationFormatChoice(PdfSerializer serializer) {
     if (serializer != null) {
-      if (this.validPdfSerializers == null) {
-        this.validPdfSerializers = new LinkedHashMap<>();
+      if (validPdfSerializers == null) {
+        validPdfSerializers = new LinkedHashMap<>();
       }
-      this.validPdfSerializers.put(serializer.getOutputFormat(), serializer);
+      validPdfSerializers.put(serializer.getOutputFormat(), serializer);
     }
   }
 
   /**
    * Returns true, if the given format is a valid serialization format.
    */
-  protected boolean isValidSerializationFormat(String format) {
-    if (this.validPdfSerializers == null) {
+  protected static boolean isValidSerializationFormat(String format) {
+    if (validPdfSerializers == null) {
       return false;
     }
-    return this.validPdfSerializers.containsKey(format);
+    return validPdfSerializers.containsKey(format);
   }
 
   /**
    * Returns all valid serialization formats.
    */
-  protected List<String> getValidSerializationFormats() {
-    if (this.validPdfSerializers == null) {
+  protected static List<String> getValidSerializationFormats() {
+    if (validPdfSerializers == null) {
       return new ArrayList<>();
     }
     return new ArrayList<>(validPdfSerializers.keySet());
@@ -489,16 +516,16 @@ public class PdfParserCommandLine {
   /**
    * Returns the serializer for the given format.
    */
-  protected PdfSerializer getPdfSerializer(String format) {
-    return this.validPdfSerializers.get(format);
+  protected static PdfSerializer getPdfSerializer(String format) {
+    return validPdfSerializers.get(format);
   }
 
   /**
    * Returns the default pdf serializer.
    */
-  protected PdfSerializer getDefaultPdfSerializer() {
-    if (this.validPdfSerializers != null) {
-      return this.validPdfSerializers.values().iterator().next();
+  protected static PdfSerializer getDefaultPdfSerializer() {
+    if (validPdfSerializers != null) {
+      return validPdfSerializers.values().iterator().next();
     }
     return null;
   }
@@ -531,7 +558,7 @@ public class PdfParserCommandLine {
         .argName(OPTION_FORMAT)
         .longOpt(OPTION_FORMAT)
         .hasArg(true)
-        .desc("The output format. ")
+        .desc("The output format. Available: " + getValidSerializationFormats())
         .build());
 
     // Add option for the prefix.

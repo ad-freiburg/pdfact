@@ -22,7 +22,7 @@ public class TextLineStatistician {
   /**
    * Computes text statistics for the given object.
    */
-  public static TextLineStatistics compute(List<PdfTextLine> lines) {
+  public static TextLineStatistics compute(List<? extends PdfTextLine> lines) {
     PlainTextLineStatistics statistics = new PlainTextLineStatistics();
 
     computeAverageValues(lines, statistics);
@@ -48,7 +48,7 @@ public class TextLineStatistician {
    * Computes average statistic values for the given list of objects and stores
    * the values in the given statistics object.
    */
-  protected static void computeAverageValues(List<PdfTextLine> lines,
+  protected static void computeAverageValues(List<? extends PdfTextLine> lines,
       PlainTextLineStatistics statistics) {
 
     float sumLinePitches = 0;
@@ -72,8 +72,8 @@ public class TextLineStatistician {
    * Computes average statistic values for the given list of objects and stores
    * the values in the given statistics object.
    */
-  protected static void computeMostCommonValues(List<PdfTextLine> lines, 
-      PlainTextLineStatistics statistics) {
+  protected static void computeMostCommonValues(
+      List<? extends PdfTextLine> lines, PlainTextLineStatistics statistics) {
 
     Map<Float, Integer> linepitchFreqs = new HashMap<Float, Integer>();
 

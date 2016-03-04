@@ -75,13 +75,8 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
       String lineText = line.getUnicode();
       
       if (!lineText.isEmpty()) {
-        PdfWord lastWord = line.getWords().get(line.getWords().size() - 1);
-        if (lastWord.isHyphenized()) {
-          text.append(lineText.substring(0, lineText.length() - 1));
-        } else {
-          text.append(lineText);
-          text.append(" ");
-        }
+        text.append(lineText);
+        text.append(" ");
       }
     }
     

@@ -34,6 +34,16 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
    */
   public List<PdfElement> getElementsOverlapping(HasRectangle object);
 
+  /**
+   * Adds any elements to this area.
+   */
+  public void addAnyElements(List<? extends PdfElement> elements);
+  
+  /**
+   * Adds any element to this area.
+   */
+  public void addAnyElement(PdfElement element);
+  
   // ___________________________________________________________________________
 
   /**
@@ -57,9 +67,19 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object);
 
   /**
-   * Sets the text characters of this page.
+   * Sets the text characters of this area.
    */
   public void setTextCharacters(List<? extends PdfCharacter> characters);
+  
+  /**
+   * Adds the text characters to this area.
+   */
+  public void addTextCharacters(List<? extends PdfCharacter> characters);
+  
+  /**
+   * Adds a text characters to this area.
+   */
+  public void addTextCharacter(PdfCharacter character);
 
   // ___________________________________________________________________________
 
@@ -84,9 +104,19 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   public List<PdfWord> getWordsOverlapping(HasRectangle object);
 
   /**
-   * Sets the words of this page.
+   * Sets the text words of this area.
    */
   public void setWords(List<? extends PdfWord> words);
+  
+  /**
+   * Adds the words to this area.
+   */
+  public void addWords(List<? extends PdfWord> words);
+  
+  /**
+   * Adds a word to this area.
+   */
+  public void addWord(PdfWord word);
 
   // ___________________________________________________________________________
 
@@ -103,17 +133,27 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   /**
    * Returns the list of text lines which surround the given rectangle.
    */
-  public List<PdfTextLine> getTextLinesSurrounding(HasRectangle object);
+  public List<PdfTextLine> getTextLinesSurrounding(HasRectangle obj);
 
   /**
    * Returns the list of text lines which overlap the given rectangle.
    */
-  public List<PdfTextLine> getTextLinesOverlapping(HasRectangle object);
+  public List<PdfTextLine> getTextLinesOverlapping(HasRectangle obj);
 
   /**
-   * Sets the text lines of this page.
+   * Sets the text lines of this area.
    */
   public void setTextLines(List<? extends PdfTextLine> lines);
+  
+  /**
+   * Adds the text lines to this area.
+   */
+  public void addTextLines(List<? extends PdfTextLine> lines);
+  
+  /**
+   * Adds a text lines to this area.
+   */
+  public void addTextLine(PdfTextLine line);
 
   // ___________________________________________________________________________
 
@@ -125,22 +165,34 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   /**
    * Returns the list of text paragraphs within the given rectangle.
    */
-  public List<PdfTextParagraph> getParagraphsWithin(HasRectangle object);
+  public List<PdfTextParagraph> getParagraphsWithin(HasRectangle obj);
 
   /**
    * Returns the list of text paragraphs within the given rectangle.
    */
-  public List<PdfTextParagraph> getParagraphsSurrounding(HasRectangle object);
+  public List<PdfTextParagraph> getParagraphsSurrounding(
+      HasRectangle object);
 
   /**
    * Returns the list of text paragraphs which overlap the given rectangle.
    */
-  public List<PdfTextParagraph> getParagraphsOverlapping(HasRectangle object);
+  public List<PdfTextParagraph> getParagraphsOverlapping(
+      HasRectangle object);
 
   /**
-   * Sets the paragraphs of this page.
+   * Sets the text paragraphs of this area.
    */
   public void setParagraphs(List<? extends PdfTextParagraph> paragraphs);
+  
+  /**
+   * Adds the text paragraphs to this area.
+   */
+  public void addParagraphs(List<? extends PdfTextParagraph> paragraphs);
+  
+  /**
+   * Adds a paragraph to this area.
+   */
+  public void addParagraph(PdfTextParagraph paragraphs);
 
   // ___________________________________________________________________________
 
@@ -237,10 +289,21 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
       HasRectangle object);
 
   /**
-   * Sets the non text paragraphs of this page.
+   * Sets the non text paragraphs of this area.
    */
   public void setNonTextParagraphs(
       List<? extends PdfNonTextParagraph> paragraphs);
+  
+  /**
+   * Adds the non text paragrpahs to this area.
+   */
+  public void addNonTextParagraphs(
+      List<? extends PdfNonTextParagraph> paragraphs);
+  
+  /**
+   * Adds a non text paragraph to this area.
+   */
+  public void addNonTextParagraph(PdfNonTextParagraph paragraph);
 
   // ___________________________________________________________________________
 
@@ -288,4 +351,13 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
 
   // ___________________________________________________________________________
 
+  /**
+   * Returns true, if we have to ignore this area from further computations.
+   */
+  public boolean ignore();
+  
+  /**
+   * Sets the ignore flag of this area.
+   */
+  public void setIgnore(boolean ignore);
 }

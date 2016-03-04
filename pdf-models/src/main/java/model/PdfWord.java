@@ -7,12 +7,12 @@ package model;
  */
 public interface PdfWord extends PdfTextElement {
   /**
-   * Returns true, if this word is hyphenized.
+   * Returns the first character in this word.
    */
-  public boolean isHyphenized();
+  public PdfCharacter getFirstTextCharacter();
   
   /**
-   * Sets the isHyphenized flag.
+   * Returns the last character in this word.
    */
-  public void setIsHyphenized(boolean isHyphenized);
+  public PdfCharacter getLastTextCharacter();
 }

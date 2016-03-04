@@ -134,14 +134,22 @@ public class DimensionStatistician {
 
     float sumHeights = 0;
     float sumWidths = 0;
+    float numHeights = 0;
+    float numWidths = 0;
+    
     for (HasDimensionStatistics obj : objs) {
-      sumHeights += obj.getDimensionStatistics().getAverageHeight();
-      sumWidths += obj.getDimensionStatistics().getAverageWidth();
+      if (!Float.isNaN(obj.getDimensionStatistics().getAverageHeight())) {
+        sumHeights += obj.getDimensionStatistics().getAverageHeight();
+        numHeights++;
+      }
+      if (!Float.isNaN(obj.getDimensionStatistics().getAverageWidth())) {
+        sumWidths += obj.getDimensionStatistics().getAverageWidth();
+        numWidths++;
+      }
     }
 
-    float numObjs = (float) objs.size();
-    statistics.setAverageHeight(sumHeights / numObjs);
-    statistics.setAverageWidth(sumWidths / numObjs);
+    statistics.setAverageHeight(sumHeights / numHeights);
+    statistics.setAverageWidth(sumWidths / numWidths);
   }
 
   /**

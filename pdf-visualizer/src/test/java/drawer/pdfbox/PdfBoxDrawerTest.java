@@ -54,9 +54,9 @@ public class PdfBoxDrawerTest {
   @BeforeClass
   public static void setup() throws IOException {
     // Clean the output directory.
-    PathUtils.cleanDirectory(outputDir);
+    // PathUtils.cleanDirectory(outputDir);
     // Assert, that the output directory is empty.
-    Assert.assertTrue(PathUtils.listPaths(outputDir).isEmpty());
+    // Assert.assertTrue(PathUtils.listPaths(outputDir).isEmpty());
   }
   
   // ___________________________________________________________________________
@@ -129,6 +129,10 @@ public class PdfBoxDrawerTest {
 
     Assert.assertTrue(Files.exists(outputFile));
     // Assert that the output is equal to the groundtruth. 
+
+    System.out.println(groundTruthFile);
+    System.out.println(outputFile);
+    System.out.println(PathUtils.contentEquals(groundTruthFile, outputFile));
     
     Assert.assertTrue(PathUtils.contentEquals(groundTruthFile, outputFile));
   }
