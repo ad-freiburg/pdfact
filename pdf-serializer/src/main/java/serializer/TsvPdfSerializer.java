@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.freiburg.iif.collection.CollectionUtils;
-import model.HasFeature;
 import model.PdfColor;
 import model.PdfDocument;
+import model.PdfElement;
 import model.PdfFeature;
 import model.PdfFont;
 import model.PdfPage;
@@ -49,12 +49,12 @@ public class TsvPdfSerializer implements PdfSerializer {
     
     // Serializes the fonts.
     for (PdfFont font : document.getFonts()) {
-      lines.add(serialize(font));  
+      lines.add(toTsv(font));  
     }
     
     // Serializes the colors.
     for (PdfColor color : document.getColors()) {
-      lines.add(serialize(color));  
+      lines.add(toTsv(color));  
     }
     
     String serialized = CollectionUtils.join(lines, "\n");
@@ -80,11 +80,11 @@ public class TsvPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected List<String> serialize(List<? extends HasFeature> elements) 
+  protected List<String> serialize(List<? extends PdfElement> elements) 
       throws IOException {
     List<String> lines = new ArrayList<>();
     if (elements != null) {
-      for (HasFeature element : elements) {
+      for (PdfElement element : elements) {
         String serialized = serialize(element);
         if (serialized != null) {
           lines.add(serialized);  
@@ -97,7 +97,14 @@ public class TsvPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected String serialize(Serializable element) throws IOException {
+  protected String serialize(PdfElement element) throws IOException {
+    return element != null && !element.ignore() ? toTsv(element) : null;
+  }
+  
+  /**
+   * Serializes the given page to tsv.
+   */
+  protected String toTsv(Serializable element) throws IOException {
     return element != null ? element.toTsv() : null;
   }
 }

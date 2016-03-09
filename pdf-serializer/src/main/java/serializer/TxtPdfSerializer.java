@@ -83,6 +83,6 @@ public class TxtPdfSerializer implements PdfSerializer {
    * Serializes the given page to tsv.
    */
   protected String serialize(PdfElement element) throws IOException {
-    return element != null ? element.toString() : null;
+    return element != null && !element.ignore() ? element.toString() : null;
   }
 }

@@ -9,9 +9,9 @@ import java.util.List;
 
 import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.text.StringUtils;
-import model.HasFeature;
 import model.PdfColor;
 import model.PdfDocument;
+import model.PdfElement;
 import model.PdfFeature;
 import model.PdfFont;
 import model.PdfPage;
@@ -58,14 +58,14 @@ public class XmlPdfSerializer implements PdfSerializer {
     lines.add(indent("<fonts>", level++));
     // Serializes the fonts.
     for (PdfFont font : document.getFonts()) {
-      lines.add(serialize(font, level));  
+      lines.add(toXml(font, level));  
     }
     lines.add(indent("</fonts>", --level));
     
     lines.add(indent("<colors>", level++));
     // Serializes the colors.
     for (PdfColor color : document.getColors()) {
-      lines.add(serialize(color, level));  
+      lines.add(toXml(color, level));  
     }
     lines.add(indent("</colors>", --level));
     
@@ -103,11 +103,11 @@ public class XmlPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected List<String> serialize(List<? extends HasFeature> elements, 
+  protected List<String> serialize(List<? extends PdfElement> elements, 
       int indentLevel) throws IOException {
     List<String> lines = new ArrayList<>();
     if (elements != null) {
-      for (HasFeature element : elements) {
+      for (PdfElement element : elements) {
         String serialized = serialize(element, indentLevel);
         if (serialized != null) {
           lines.add(serialized);  
@@ -118,9 +118,18 @@ public class XmlPdfSerializer implements PdfSerializer {
   }
 
   /**
-   * Serializes the given page to tsv.
+   * Serializes the given page to xml.
    */
-  protected String serialize(Serializable element, int indentLevel) 
+  protected String serialize(PdfElement element, int indentLevel) 
+      throws IOException {
+    return element != null && !element.ignore() 
+        ? element.toXml(indentLevel, INDENT_LENGTH) : null;
+  }
+  
+  /**
+   * Serializes the given page to xml.
+   */
+  protected String toXml(Serializable element, int indentLevel) 
       throws IOException {
     return element != null ? element.toXml(indentLevel, INDENT_LENGTH) : null;
   }

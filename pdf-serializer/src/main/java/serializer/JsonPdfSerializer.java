@@ -9,9 +9,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import model.HasFeature;
 import model.PdfColor;
 import model.PdfDocument;
+import model.PdfElement;
 import model.PdfFeature;
 import model.PdfFont;
 import model.PdfPage;
@@ -51,13 +51,13 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     JSONArray fonts = new JSONArray();
     for (PdfFont font : document.getFonts()) {
-      fonts.put(serialize(font));
+      fonts.put(toJson(font));
     }
     json.put("fonts", fonts);
 
     JSONArray colors = new JSONArray();
     for (PdfColor color : document.getColors()) {
-      colors.put(serialize(color));
+      colors.put(toJson(color));
     }
     json.put("colors", colors);
 
@@ -90,11 +90,11 @@ public class JsonPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected JSONArray serialize(List<? extends HasFeature> elements)
+  protected JSONArray serialize(List<? extends PdfElement> elements)
     throws IOException {
     JSONArray json = new JSONArray();
     if (elements != null) {
-      for (HasFeature element : elements) {
+      for (PdfElement element : elements) {
         JSONObject serialized = serialize(element);
         if (serialized != null) {
           json.put(serialized);
@@ -107,7 +107,14 @@ public class JsonPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected JSONObject serialize(Serializable element) throws IOException {
+  protected JSONObject serialize(PdfElement element) throws IOException {
+    return element != null && !element.ignore() ? toJson(element) : null;
+  }
+  
+  /**
+   * Serializes the given page to tsv.
+   */
+  protected JSONObject toJson(Serializable element) throws IOException {
     return element != null ? element.toJson() : null;
   }
 }

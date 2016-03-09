@@ -36,7 +36,7 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   /**
    * Returns the unicode of this text line.
    */
-  public String getUnicode() {
+  public String getUnicode() {    
     return CollectionUtils.join(getWords()); 
   }
   
@@ -57,6 +57,10 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
 
   @Override
   public String toTsv() {
+    if (ignore) {
+      return null;
+    }
+    
     StringBuilder tsv = new StringBuilder();
     
     tsv.append(getFeature().getField());
@@ -78,6 +82,10 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
 
   @Override
   public String toXml(int indentLevel, int indentLength) {
+    if (ignore) {
+      return null;
+    }
+    
     StringBuilder xml = new StringBuilder();
     
     String indent = StringUtils.repeat(" ", indentLevel * indentLength);
@@ -102,6 +110,10 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
 
   @Override
   public JSONObject toJson() {
+    if (ignore) {
+      return null;
+    }
+    
     JSONObject json = new JSONObject();
     
     json.put("unicode", getUnicode());
