@@ -6,8 +6,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
+import model.PdfArea;
 import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
@@ -59,6 +62,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     for (PdfFeature feature : features) {
       visualizeFeature(page, feature, drawer);
     }
+    
+//    for (PdfArea area : page.getBlocks()) {
+//      visualizeElement(area, page, Color.BLACK, drawer);
+//      drawer.drawText("" + area.getRectangle(), page.getPageNumber(), area.getRectangle().getLowerRight(), Color.BLACK, 2f);
+//      drawer.drawRectangle(new SimpleRectangle(125.76056f,203.03093f,484.50726f,203.13094f), 4);
+//    }
   }
 
   // ___________________________________________________________________________
@@ -88,13 +97,20 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    */
   protected void visualizeElement(PdfElement element,
       Color color, PdfDrawer drawer) throws IOException {
+    visualizeElement(element, element.getPage(), color, drawer);
+  }
+  
+  /**
+   * Visualizes the given list of rectangles using the given drawer.
+   */
+  protected void visualizeElement(HasRectangle element, PdfPage page,
+      Color color, PdfDrawer drawer) throws IOException {
     if (element == null) {
       return;
     }
     
-    PdfPage page = element.getPage();
     if (page != null) {
-      int pageNumber = element.getPage().getPageNumber();
+      int pageNumber = page.getPageNumber();
       drawer.drawRectangle(element.getRectangle(), pageNumber, color);
     }
   }

@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import de.freiburg.iif.model.Rectangle;
 
 /**
@@ -54,4 +56,8 @@ public interface PdfPage extends PdfArea, HasTextLineStatistics {
    * Returns the coverage of figures in this page.
    */
   public float getFiguresCoverage();
+
+  public void setBlocks(List<? extends PdfArea> blocks);
+  
+  public List<? extends PdfArea> getBlocks();
 }

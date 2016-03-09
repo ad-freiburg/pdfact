@@ -154,7 +154,9 @@ public class ParagraphifyRule {
     PdfFont firstWordFont = firstWord != null ? firstWord.getFont() : null;
     
     if (prevLine != null
+        && prevLineFont != null
         && !prevLineFont.equals(pageFont)
+        && lastWordFont != null
         && !lastWordFont.equals(firstWordFont)
         && MathUtils.isSmaller(prevLine.getRectangle().getMaxX(),
             line.getRectangle().getMaxX(), 5f)

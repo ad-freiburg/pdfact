@@ -1,11 +1,14 @@
 package parser.pdfbox.model;
 
+import java.util.List;
+
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
+import model.PdfArea;
 import model.PdfFigure;
 import model.PdfPage;
 
@@ -177,5 +180,17 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
       cover += figure.getRectangle().getArea() / this.getRectangle().getArea();
     }
     return cover;
+  }
+
+  List<? extends PdfArea> blocks;
+  
+  @Override
+  public void setBlocks(List<? extends PdfArea> blocks) {
+    this.blocks = blocks;
+  }
+  
+  @Override
+  public List<? extends PdfArea> getBlocks() {
+    return this.blocks;
   }
 }

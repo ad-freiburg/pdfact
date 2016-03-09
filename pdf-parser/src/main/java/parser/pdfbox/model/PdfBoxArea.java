@@ -1,5 +1,6 @@
 package parser.pdfbox.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -260,6 +261,9 @@ public class PdfBoxArea implements PdfArea {
 
   @Override
   public List<PdfElement> getElementsOverlapping(HasRectangle object) {
+    if (object == null) {
+      return new ArrayList<>();
+    }
     return elementsIndex.overlappedBy(object.getRectangle());
   }
 
@@ -338,6 +342,9 @@ public class PdfBoxArea implements PdfArea {
 
   @Override
   public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object) {
+    if (object == null) {
+      return new ArrayList<>();
+    }
     return this.charactersIndex.overlappedBy(object.getRectangle());
   }
 

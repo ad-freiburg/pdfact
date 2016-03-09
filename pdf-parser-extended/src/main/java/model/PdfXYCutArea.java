@@ -125,6 +125,12 @@ public class PdfXYCutArea implements PdfArea {
    */
   protected boolean ignore;
   
+  /**
+   * This is the rectangle as it was computed from the XYCut. 
+   * (In contrast, 'rectangle' is the bounding box around the elements.)
+   */
+  protected Rectangle originalRectangle;
+  
   // ___________________________________________________________________________
   // Constructors.
 
@@ -160,6 +166,7 @@ public class PdfXYCutArea implements PdfArea {
    */
   public PdfXYCutArea(PdfArea parent, Rectangle area) {
     this(parent, parent.getElementsWithin(area));
+    this.originalRectangle = area;
   }
 
   /**
@@ -201,8 +208,8 @@ public class PdfXYCutArea implements PdfArea {
     if (element instanceof PdfXYCutWord) {
       wordsIndex.insert((PdfXYCutWord) element);
     }
-    if (element instanceof PdfXYCutTextLine) {
-      textLinesIndex.insert((PdfXYCutTextLine) element);
+    if (element instanceof PdfTextLine) {
+      textLinesIndex.insert((PdfTextLine) element);
       this.isTextLineStatisticsOutdated = true;
     }
     if (element instanceof PdfXYCutTextParagraph) {
@@ -740,5 +747,9 @@ public class PdfXYCutArea implements PdfArea {
   @Override
   public void setIgnore(boolean ignore) {
     this.ignore = ignore;    
+  }
+  
+  public Rectangle getOriginalRectangle() {
+    return this.originalRectangle;
   }
 }

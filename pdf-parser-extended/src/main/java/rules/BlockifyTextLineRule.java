@@ -33,12 +33,12 @@ public class BlockifyTextLineRule implements BlockifyRule {
   }
   
   @Override
-  public float getVerticalLaneWidth(PdfArea area) {
+  public float getVerticalLaneWidth(PdfArea area) {    
     return 0.5f;
   }
   
   @Override
-  public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {    
-    return area.getElementsOverlapping(lane).isEmpty();
+  public boolean isValidVerticalLane(PdfArea area, Rectangle lane) { 
+    return area.getTextCharactersOverlapping(lane).isEmpty();
   }
 }
