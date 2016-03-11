@@ -2,12 +2,19 @@ package model;
 
 import java.util.List;
 
+import de.freiburg.iif.model.Line;
+
 /**
  * The interface for a single text line.
  *
  * @author Claudius Korzen
  */
 public interface PdfTextLine extends PdfTextElement {
+  /**
+   * Sets the words in this line.
+   */
+  public void setWords(List<? extends PdfWord> words);
+  
   /**
    * Returns the words in this line.
    */
@@ -24,7 +31,7 @@ public interface PdfTextLine extends PdfTextElement {
   public PdfWord getLastWord();
   
   /**
-   * Sets the words in this line.
+   * Returns the baseline of this text line.
    */
-  void setWords(List<? extends PdfWord> words);
+  public Line getBaseLine();
 }

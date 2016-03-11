@@ -29,24 +29,18 @@ public class PdfBoxColor implements PdfColor {
    * The unique id of this color. Needed for serialization.
    */
   protected String id;
-  
-  /**
-   * The color in fashion of PdfBox.
-   */
-  protected PDColor color;
-  
+    
   /**
    * The rgb array.
    */
   protected float[] rgb = { 0.0f, 0.0f, 0.0f };
-    
+      
   /**
    * The default constructor.
    */
-  protected PdfBoxColor(PDColor color) {
-    this.color = color;
+  protected PdfBoxColor(float[] rgb) {
     this.id = "color-" + colorMap.size();
-    this.rgb = toRGB(color);
+    this.rgb = rgb;
   }
   
   /**
@@ -54,20 +48,20 @@ public class PdfBoxColor implements PdfColor {
    * equivalent PdfBoxColors will be equal.
    */
   public static PdfBoxColor create(PDColor color) throws IOException {
-    float[] rgb = toRGB(color);
+    return create(toRGB(color));
+  }
+  
+  /**
+   * Creates a PdfBoxColor from given PDColor. For two equal PDColors, also the
+   * equivalent PdfBoxColors will be equal.
+   */
+  public static PdfBoxColor create(float[] rgb) throws IOException {
     String rgbStr = rgb != null ? Arrays.toString(rgb) : null;
     
     if (!colorMap.containsKey(rgbStr)) {
-      colorMap.put(rgbStr, new PdfBoxColor(color));
+      colorMap.put(rgbStr, new PdfBoxColor(rgb));
     }
     return colorMap.get(rgbStr);
-  }
-    
-  /**
-   * Returns the color in fashion of PdfBox.
-   */
-  public PDColor getPdColor() {
-    return this.color;
   }
   
   public boolean isWhite() {
@@ -75,8 +69,8 @@ public class PdfBoxColor implements PdfColor {
   }
   
   public boolean isWhite(float tolerance) {
-    return rgb[0] > (1 - tolerance) && rgb[1] > (1 - tolerance) 
-        && rgb[2] > (1 - tolerance);
+    return rgb[0] >= (1 - tolerance) && rgb[1] >= (1 - tolerance) 
+        && rgb[2] >= (1 - tolerance);
   }
   
   @Override
@@ -163,7 +157,7 @@ public class PdfBoxColor implements PdfColor {
   /**
    * Transforms the given color to rgb array.
    */
-  protected static float[] toRGB(PDColor color) {
+  public static float[] toRGB(PDColor color) {
     try {
       float[] components = color.getComponents();
       PDColorSpace colorSpace = color.getColorSpace();
@@ -189,5 +183,10 @@ public class PdfBoxColor implements PdfColor {
   @Override
   public float getB() {
     return this.rgb[2];
+  }
+  
+  @Override 
+  public float[] getRGB() {
+    return this.rgb;
   }
 }

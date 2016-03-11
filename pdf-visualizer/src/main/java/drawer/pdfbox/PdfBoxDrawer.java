@@ -76,12 +76,13 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public PdfBoxDrawer(PDDocument pdDocument) throws IOException {
     this.pdDocument = pdDocument;
-    
+
     PDPageTree pages = pdDocument.getDocumentCatalog().getPages();
     this.streams.add(null); // Add dummy, because pageNumbers are 1-based.
     // Preallocate the list of streams.
     for (PDPage page : pages) {
-      streams.add(new PDPageContentStream(pdDocument, page, true, true));
+      streams.add(new PDPageContentStream(pdDocument, page,
+          PDPageContentStream.AppendMode.APPEND, true));
     }
   }
 

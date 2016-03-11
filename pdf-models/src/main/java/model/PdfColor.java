@@ -31,4 +31,9 @@ public interface PdfColor extends HasPdfDocument, HasId, Serializable {
    * Returns the value of the blue component.
    */
   public float getB();
+  
+  /**
+   * Returns the RGB array.
+   */
+  public float[] getRGB();
 }

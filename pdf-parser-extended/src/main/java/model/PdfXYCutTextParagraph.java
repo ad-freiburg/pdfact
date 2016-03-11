@@ -2,11 +2,17 @@ package model;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONObject;
 
+import static de.freiburg.iif.math.MathUtils.isEqual;
+import static de.freiburg.iif.math.MathUtils.isLarger;
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextLineStatistician;
@@ -18,23 +24,27 @@ import statistics.TextStatistician;
  * @author Claudius Korzen
  *
  */
-public class PdfXYCutTextParagraph extends PdfXYCutArea 
-    implements PdfTextParagraph {  
+public class PdfXYCutTextParagraph extends PdfXYCutArea
+    implements PdfTextParagraph {
   /**
    * The context of this paragraph.
    */
   protected String context;
-  
+
   /**
    * The role of this paragraph.
    */
   protected String role;
-  
+
+  protected Set<PdfTextAlignment> alignmentVariants;
+
   /**
    * The default constructor.
    */
   public PdfXYCutTextParagraph(PdfPage page) {
     super(page);
+    this.alignmentVariants = new HashSet<>();
+    this.alignmentVariants.addAll(Arrays.asList(PdfTextAlignment.values()));
   }
 
   /**
@@ -61,28 +71,53 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
    * Adds the given word to this line.
    */
   public void addTextLine(PdfTextLine line) {
-    this.elementsIndex.insert(line);
+    PdfTextAlignment lineAlignment = computeTextAlignment(line);
+
+    this.elementsIndex.insert(line.getTextCharacters());
     this.textElementsIndex.insert(line);
     this.textLinesIndex.insert(line);
+    this.wordsIndex.insert(line.getWords());
+    this.charactersIndex.insert(line.getTextCharacters());
+    this.isDimensionStatisticsOutdated = true;
+    this.isTextStatisticsOutdated = true;
     this.isTextLineStatisticsOutdated = true;
+
+    if (lineAlignment != null) {
+      switch (lineAlignment) {
+        case CENTERED:
+          alignmentVariants.remove(PdfTextAlignment.RIGHT);
+          alignmentVariants.remove(PdfTextAlignment.LEFT);
+          break;
+        case RIGHT:
+          alignmentVariants.remove(PdfTextAlignment.LEFT);
+          alignmentVariants.remove(PdfTextAlignment.CENTERED);
+          break;
+        case LEFT:
+          alignmentVariants.remove(PdfTextAlignment.CENTERED);
+          alignmentVariants.remove(PdfTextAlignment.RIGHT);
+          break;
+        default:
+          break;
+      }
+    }
   }
-  
+
   @Override
   public String getUnicode() {
     StringBuilder text = new StringBuilder();
 
     for (PdfTextLine line : getTextLines()) {
       String lineText = line.getUnicode();
-      
+
       if (!lineText.isEmpty()) {
         text.append(lineText);
         text.append(" ");
       }
     }
-    
+
     return text.toString();
   }
-   
+
   @Override
   public PdfFeature getFeature() {
     return PdfFeature.paragraphs;
@@ -91,7 +126,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   @Override
   public String toTsv() {
     StringBuilder tsv = new StringBuilder();
-    
+
     tsv.append(getFeature().getField());
     tsv.append("\t");
     tsv.append(getUnicode().replaceAll("\t", " "));
@@ -105,7 +140,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     tsv.append(getFontsize());
     tsv.append("\t");
     tsv.append(getColor().getId());
-    if (getContext()!= null) {
+    if (getContext() != null) {
       tsv.append("\t");
       tsv.append(getContext());
     }
@@ -113,16 +148,16 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
       tsv.append("\t");
       tsv.append(getRole());
     }
-    
+
     return tsv.toString();
   }
 
   @Override
   public String toXml(int indentLevel, int indentLength) {
     StringBuilder xml = new StringBuilder();
-    
+
     String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-    
+
     xml.append(indent);
     xml.append("<");
     xml.append(getFeature().getField());
@@ -142,15 +177,15 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     }
     xml.append(">");
     xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">"); 
-    
+    xml.append("</" + getFeature().getField() + ">");
+
     return xml.toString();
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    
+
     json.put("unicode", getUnicode());
     json.put("page", getPage().getPageNumber());
     json.put("minX", getRectangle().getMinX());
@@ -166,7 +201,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     if (getRole() != null) {
       json.put("role", getRole());
     }
-    
+
     return json;
   }
 
@@ -179,7 +214,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   public String getContext() {
     return this.context;
   }
-  
+
   @Override
   public void setRole(String role) {
     this.role = role;
@@ -200,17 +235,17 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     return !getTextLines().isEmpty() ? getTextLines().get(
         getTextLines().size() - 1) : null;
   }
-  
+
   @Override
   public DimensionStatistics computeDimensionStatistics() {
     return DimensionStatistician.accumulate(getTextLines());
   }
-  
+
   @Override
-  public TextStatistics computeTextStatistics() {    
+  public TextStatistics computeTextStatistics() {
     return TextStatistician.accumulate(getTextLines());
   }
-  
+
   @Override
   public TextLineStatistics computeTextLineStatistics() {
     return TextLineStatistician.compute(getTextLines());
@@ -245,9 +280,40 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     }
     return true;
   }
-  
+
   @Override
   public String toString() {
     return getUnicode();
+  }
+
+  @Override
+  public Set<PdfTextAlignment> getTextAlignmentVariants() {
+    return this.alignmentVariants;
+  }
+
+  public PdfTextAlignment computeTextAlignment(PdfTextLine line) {
+    PdfTextAlignment lineAlignment = null;
+    Rectangle rect = getRectangle();
+    Rectangle lineRect = line.getRectangle();
+
+    float tolerance = 0.5f * getDimensionStatistics().getAverageWidth();
+
+    if (rect != null && line.getRectangle() != null) {
+      float leftMargin = lineRect.getMinX() - rect.getMinX();
+      float rightMargin = rect.getMaxX() - lineRect.getMaxX();
+      float absLeftMargin = Math.abs(leftMargin);
+      float absRightMargin = Math.abs(rightMargin);
+
+      if (isEqual(absRightMargin, absLeftMargin, tolerance)
+          && absLeftMargin > tolerance) {
+        lineAlignment = PdfTextAlignment.CENTERED;
+      } else if (isLarger(leftMargin, rightMargin, tolerance)) {
+        lineAlignment = PdfTextAlignment.RIGHT;
+      } else {
+        lineAlignment = PdfTextAlignment.LEFT;
+      }
+    }
+
+    return lineAlignment;
   }
 }

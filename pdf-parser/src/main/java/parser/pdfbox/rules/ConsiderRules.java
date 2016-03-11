@@ -2,6 +2,8 @@ package parser.pdfbox.rules;
 
 import model.PdfCharacter;
 import model.PdfColor;
+import model.PdfFigure;
+import model.PdfShape;
 
 /**
  * Some rules.
@@ -40,5 +42,29 @@ public class ConsiderRules {
     }
     
     return true;
+  }
+  
+  /**
+   * Returns true, if the given figure should be considered on extraction.
+   */
+  public static boolean considerPdfFigure(PdfFigure figure) {
+    return true;
+  }
+  
+  /**
+   * Returns true, if the given shape should be considered on extraction.
+   */
+  public static boolean considerPdfShape(PdfShape shape) {
+    if (shape == null) {
+      return false;
+    }
+    
+    PdfColor color = shape.getColor();
+    
+    if (color == null) {
+      return false;
+    }
+    
+    return !color.isWhite(); 
   }
 }

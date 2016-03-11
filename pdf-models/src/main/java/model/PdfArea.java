@@ -11,7 +11,8 @@ import de.freiburg.iif.model.HasRectangle;
  * @author Claudius Korzen
  */
 public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
-    HasDimensionStatistics, HasTextStatistics, HasPdfColor, HasPdfFont {
+    HasDimensionStatistics, HasTextStatistics, HasPositionStatistics, 
+    HasPdfColor, HasPdfFont {
   // ___________________________________________________________________________
 
   /**

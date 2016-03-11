@@ -81,22 +81,29 @@ public class PdfXYCutParser implements PdfExtendedParser {
     }
 
     for (PdfPage page : document.getPages()) {
-      List<PdfXYCutArea> blocks = identifyBlocks(page);
-      page.setBlocks(blocks);
+      List<PdfXYCutArea> textBlocks = identifyTextBlocks(page);
+      page.setBlocks(textBlocks);
       
       List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
       page.setNonTextParagraphs(nonTextParas);
-
-      List<PdfXYCutTextLine> lines = identifyLines(page, blocks);
-      page.setTextLines(lines);
       
-      List<PdfXYCutWord> words = identifyWords(page, lines);
-      page.setWords(words);
-      
-      List<PdfXYCutTextParagraph> paragraphs = identifyParagraphs(page, lines);
-      page.setParagraphs(paragraphs);
+      for (PdfXYCutArea textBlock : textBlocks) {
+        List<PdfXYCutTextLine> lines = identifyLines(textBlock);
+        textBlock.setTextLines(lines);
+        
+        List<PdfXYCutWord> words = identifyWords(lines);
+        textBlock.setWords(words);
+        
+        List<PdfXYCutTextParagraph> paragraphs = identifyParagraphs(lines);
+        textBlock.setParagraphs(paragraphs);
+        
+        page.addTextLines(lines);
+        page.addWords(words);
+        page.addParagraphs(paragraphs);
+      }
     }
     
+    // TODO: Dehyphenize only after analyzing.
     dehyphenize(document);
 
     return document;
@@ -108,7 +115,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Identifies text blocks from text characters in the given page.
    */
-  protected List<PdfXYCutArea> identifyBlocks(PdfPage page) {
+  protected List<PdfXYCutArea> identifyTextBlocks(PdfPage page) {
     PdfXYCutArea area = new PdfXYCutArea(page, page.getTextCharacters());
     return blockify(area, this.blockifyPageRule);
   }
@@ -125,15 +132,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Identifies text lines in the given list of blocks.
    */
-  protected List<PdfXYCutTextLine> identifyLines(PdfPage page,
-      List<PdfXYCutArea> areas) {
-    List<PdfXYCutTextLine> textLines = new ArrayList<>();
-    for (PdfXYCutArea area : areas) {
-      List<PdfXYCutArea> lineAreas = blockify(area, this.blockifyBlockRule);
-      
-      textLines.addAll(toTextLines(page, lineAreas));
-    }
-    return textLines;
+  protected List<PdfXYCutTextLine> identifyLines(PdfXYCutArea textBlock) {
+    List<PdfXYCutArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
+    return new ArrayList<PdfXYCutTextLine>(toTextLines(lineAreas));
   }
   
   /**
@@ -141,11 +142,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * words to the correspondent line and returns a list of all identified words
    * in the lines.
    */
-  protected List<PdfXYCutWord> identifyWords(PdfPage page,
-      List<PdfXYCutTextLine> lines) {
+  protected List<PdfXYCutWord> identifyWords(List<PdfXYCutTextLine> lines) {
     List<PdfXYCutWord> words = new ArrayList<>();
     PdfTextLine prevLine = null;
-
+    
     for (PdfXYCutTextLine line : lines) {
       List<PdfXYCutArea> wordAreas = blockify(line, this.blockifyLineRule);
 
@@ -155,7 +155,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         Collections.sort(area.getElements(), new Comparators.MinXComparator());
       }
 
-      List<PdfXYCutWord> lineWords = toWords(page, wordAreas, prevLine);
+      List<PdfXYCutWord> lineWords = toWords(wordAreas, prevLine);
 
       words.addAll(lineWords);
       line.setWords(lineWords);
@@ -245,16 +245,22 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Identifies paragraphs from the given list of text lines.
    */
-  protected List<PdfXYCutTextParagraph> identifyParagraphs(PdfPage page,
+  protected List<PdfXYCutTextParagraph> identifyParagraphs(
       List<PdfXYCutTextLine> lines) {
     List<PdfXYCutTextParagraph> paragraphs = new ArrayList<>();
-    PdfXYCutTextParagraph paragraph = new PdfXYCutTextParagraph(page);
+    PdfXYCutTextParagraph paragraph = null;
 
     for (int i = 0; i < lines.size(); i++) {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
 
+      PdfPage page = line.getPage();
+      
+      if (paragraph == null) {
+        paragraph = new PdfXYCutTextParagraph(page);
+      }
+      
       if (ParagraphifyRule.introducesNewParagraph(page, paragraph, prevLine,
           line, nextLine)) {
         paragraphs.add(paragraph);
@@ -486,8 +492,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * the best matching textline (those that has the largest overlap with the 
    * element).
    */
-  protected List<PdfXYCutTextLine> toTextLines(PdfPage page, 
-      List<PdfXYCutArea> areas) {
+  protected List<PdfXYCutTextLine> toTextLines(List<PdfXYCutArea> areas) {
     List<PdfXYCutTextLine> textLines = new ArrayList<>();
     
     // Map all elements that do not perfectly match to any textline to a pair
@@ -499,7 +504,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
     
     for (PdfXYCutArea area : areas) {
       Rectangle rect = area.getOriginalRectangle();
-            
+      PdfPage page = area.getPage();      
+      
       // Create a new textline for this shape.
       PdfXYCutTextLine textLine = new PdfXYCutTextLine(page);
       textLines.add(textLine);
@@ -544,7 +550,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * Transforms the given list of page areas to a list of words. The prevLine is
    * used for dehyphenation.
    */
-  protected List<PdfXYCutWord> toWords(PdfPage page, List<PdfXYCutArea> areas,
+  protected List<PdfXYCutWord> toWords(List<PdfXYCutArea> areas,
       PdfTextLine prevLine) {
     List<PdfXYCutWord> result = new ArrayList<>();
 
@@ -583,7 +589,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
 
       for (int i = 0; i < areas.size(); i++) {
         PdfXYCutArea area = areas.get(i);
-        PdfXYCutWord word = new PdfXYCutWord(page, area);
+        PdfXYCutWord word = new PdfXYCutWord(area.getPage(), area);
 
         result.add(word);
       }
@@ -595,11 +601,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Transforms the given list of page areas to a list of paragraphs.
    */
-  protected List<PdfTextParagraph> toParagraphs(PdfPage page,
-      List<PdfXYCutArea> areas) {
+  protected List<PdfTextParagraph> toParagraphs(List<PdfXYCutArea> areas) {
     List<PdfTextParagraph> result = new ArrayList<>();
     for (PdfXYCutArea a : areas) {
-      result.add(new PdfXYCutTextParagraph(page, a));
+      result.add(new PdfXYCutTextParagraph(a.getPage(), a));
     }
     return result;
   }

@@ -9,7 +9,8 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics {
+public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics, 
+    HasTextLineStatistics {
   /**
    * Returns the list of pages.
    */

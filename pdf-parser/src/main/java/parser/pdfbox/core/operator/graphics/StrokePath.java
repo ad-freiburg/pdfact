@@ -28,7 +28,7 @@ public final class StrokePath extends OperatorProcessor {
     throws IOException {
 
     int windingRule = -1;
-    if (operands.size() > 1) {
+    if (operands.size() > 0) {
       windingRule = ((COSNumber) operands.get(0)).intValue();
     }
 
@@ -44,6 +44,7 @@ public final class StrokePath extends OperatorProcessor {
     } else {
       c = context.getGraphicsState().getNonStrokingColor();
     }
+    
     PdfBoxColor color = PdfBoxColor.create(c);
 
     GeneralPath linePath = context.getLinePath();
@@ -85,7 +86,7 @@ public final class StrokePath extends OperatorProcessor {
           rect.setMinY(Math.min(linePathPosition[1], curveEnd[1]));
           rect.setMaxX(Math.max(linePathPosition[0], curveEnd[0]));
           rect.setMaxY(Math.max(linePathPosition[1], curveEnd[1]));
-
+                    
           PdfBoxShape shape = new PdfBoxShape(context.getCurrentPage());
           shape.setRectangle(rect);
           shape.setColor(color);
@@ -101,12 +102,12 @@ public final class StrokePath extends OperatorProcessor {
           rect.setMinY(Math.min(linePathPosition[1], lineEnd[1]));
           rect.setMaxX(Math.max(linePathPosition[0], lineEnd[0]));
           rect.setMaxY(Math.max(linePathPosition[1], lineEnd[1]));
-
-          shape = new PdfBoxShape(context.getCurrentPage());
+          
+          shape = new PdfBoxShape(context.getCurrentPage());          
           shape.setRectangle(rect);
           shape.setColor(color);
           context.showShape(shape);
-
+          
           context.setLinePathPosition(lineEnd);
           break;
         case PathIterator.SEG_MOVETO:

@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.freiburg.iif.model.HasRectangle;
-import de.freiburg.iif.model.simple.SimpleRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
 import model.PdfArea;
@@ -63,11 +62,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       visualizeFeature(page, feature, drawer);
     }
     
-//    for (PdfArea area : page.getBlocks()) {
-//      visualizeElement(area, page, Color.BLACK, drawer);
-//      drawer.drawText("" + area.getRectangle(), page.getPageNumber(), area.getRectangle().getLowerRight(), Color.BLACK, 2f);
-//      drawer.drawRectangle(new SimpleRectangle(125.76056f,203.03093f,484.50726f,203.13094f), 4);
-//    }
+    for (PdfArea area : page.getBlocks()) {
+      visualizeElement(area, page, Color.BLACK, drawer);
+      drawer.drawText("" + area.getRectangle(), page.getPageNumber(), area.getRectangle().getLowerRight(), Color.BLACK, 2f);
+    }
   }
 
   // ___________________________________________________________________________

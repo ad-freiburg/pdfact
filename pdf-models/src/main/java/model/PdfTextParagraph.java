@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for a single pdf paragraph.
@@ -48,4 +49,15 @@ public interface PdfTextParagraph extends PdfTextElement,
    * Returns the role of this paragraph.
    */
   public String getRole();
+  
+  /**
+   * Returns all possible alignments for this paragraph.
+   */
+  public Set<PdfTextAlignment> getTextAlignmentVariants();
+  
+  /**
+   * Computes the alignment for the given line that results for the line if it
+   * would be added to this paragraph.
+   */
+  public PdfTextAlignment computeTextAlignment(PdfTextLine line);
 }

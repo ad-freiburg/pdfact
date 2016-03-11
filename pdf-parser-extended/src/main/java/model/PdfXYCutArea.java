@@ -10,6 +10,7 @@ import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
 import de.freiburg.iif.rtree.SimpleRTree;
 import statistics.DimensionStatistician;
+import statistics.PositionStatistician;
 import statistics.TextLineStatistician;
 import statistics.TextStatistician;
 
@@ -120,6 +121,16 @@ public class PdfXYCutArea implements PdfArea {
    */
   protected boolean isTextLineStatisticsOutdated;
 
+  /**
+   * The position statistics.
+   */
+  protected PositionStatistics positionStatistics;
+
+  /**
+   * Flag to indicate if the position statistics is outdated.
+   */
+  protected boolean isPositionStatisticsOutdated;
+  
   /**
    * Flag to indicate if we have to ignore this area.
    */
@@ -253,6 +264,7 @@ public class PdfXYCutArea implements PdfArea {
     registerColor(element.getColor());
     registerFont(element.getFont());
     this.isDimensionStatisticsOutdated = true;
+    this.isPositionStatisticsOutdated = true;
   }
   
   protected void addTextElement(PdfTextElement element) {
@@ -702,6 +714,33 @@ public class PdfXYCutArea implements PdfArea {
     return this.textLineStatistics == null || isTextLineStatisticsOutdated;
   }
 
+  // ___________________________________________________________________________
+  
+  /**
+   * Returns the position statistics.
+   */
+  public PositionStatistics getPositionStatistics() {
+    if (needsPositionStatisticsUpdate()) {
+      this.positionStatistics = computePositionStatistics();
+      this.isPositionStatisticsOutdated = false;
+    }
+    return positionStatistics;
+  }
+
+  /**
+   * Computes the position statistics.
+   */
+  public PositionStatistics computePositionStatistics() {
+    return PositionStatistician.compute(getElements());
+  }
+
+  /**
+   * Returns true, if the position statistics needs an update.
+   */
+  protected boolean needsPositionStatisticsUpdate() {
+    return this.positionStatistics == null || isPositionStatisticsOutdated;
+  }
+  
   // ___________________________________________________________________________
   
   @Override

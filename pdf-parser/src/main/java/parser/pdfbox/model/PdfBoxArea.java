@@ -26,9 +26,11 @@ import model.PdfTextElement;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
 import model.PdfWord;
+import model.PositionStatistics;
 import model.TextLineStatistics;
 import model.TextStatistics;
 import statistics.DimensionStatistician;
+import statistics.PositionStatistician;
 import statistics.TextLineStatistician;
 import statistics.TextStatistician;
 
@@ -139,6 +141,16 @@ public class PdfBoxArea implements PdfArea {
    */
   protected boolean isTextLineStatisticsOutdated;
 
+  /**
+   * The position statistics.
+   */
+  protected PositionStatistics positionStatistics;
+
+  /**
+   * Flag to indicate if the position statistics is outdated.
+   */
+  protected boolean isPositionStatisticsOutdated;
+  
   /** 
    * Flag to indicate if we have to ignore this area from further processing.
    */
@@ -272,6 +284,7 @@ public class PdfBoxArea implements PdfArea {
     registerColor(element.getColor());
     registerFont(element.getFont());
     this.isDimensionStatisticsOutdated = true;
+    this.isPositionStatisticsOutdated = true;
   }
 
   protected void addTextElement(PdfTextElement element) {
@@ -767,6 +780,33 @@ public class PdfBoxArea implements PdfArea {
 
   // ___________________________________________________________________________
 
+  /**
+   * Returns the position line statistics.
+   */
+  public PositionStatistics getPositionStatistics() {
+    if (needsPositionStatisticsUpdate()) {
+      this.positionStatistics = computePositionStatistics();
+      this.isPositionStatisticsOutdated = false;
+    }
+    return positionStatistics;
+  }
+
+  /**
+   * Computes the position statistics.
+   */
+  public PositionStatistics computePositionStatistics() {
+    return PositionStatistician.compute(getElements());
+  }
+
+  /**
+   * Returns true, if the position statistics needs an update.
+   */
+  protected boolean needsPositionStatisticsUpdate() {
+    return this.positionStatistics == null || isPositionStatisticsOutdated;
+  }
+  
+  // ___________________________________________________________________________
+  
   @Override
   public List<? extends PdfElement> getElementsByFeature(PdfFeature feature) {
     RTree<? extends PdfElement> index = indexesByFeature.get(feature);

@@ -58,7 +58,7 @@ public class DimensionStatistician {
   protected static void computeAverageValues(
       List<? extends HasRectangle> objects,
       PlainDimensionStatistics statistics) {
-
+    
     float sumHeights = 0;
     float sumWidths = 0;
     

@@ -14,16 +14,16 @@ import parser.pdfbox.model.PdfBoxShape;
 import parser.pdfbox.rules.ConsiderRules;
 
 /**
- * An implmentation of a pdf parser using PdfBox. 
+ * An implementation of a pdf parser using PdfBox. 
  *
  * @author Claudius Korzen
  *
  */
 public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {  
   /** 
-   * The current text document. 
+   * The current pdf document. 
    */
-  protected PdfBoxDocument textDocument;
+  protected PdfBoxDocument document;
   
   /**
    * The current page.
@@ -36,18 +36,11 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   protected int currentPageNumber;
   
   // ___________________________________________________________________________
-  
-  /**
-   * The default constructor.
-   */
-  public PdfBoxParser() {
     
-  }
-  
   @Override
   public PdfDocument parse(Path file) throws IOException {
     processFile(file);    
-    return this.textDocument;
+    return this.document;
   }
 
   @Override
@@ -67,14 +60,14 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   public void startDocument(PdfBoxDocument document) throws IOException {
     super.startDocument(document);    
     // Create new PdfTextDocument.
-    this.textDocument = document;
+    this.document = document;
   }
   
   @Override
   public void startPage(PdfBoxPage page) throws IOException {
     super.startPage(page);
     this.page = page;
-    this.textDocument.addTextPage(this.page);
+    this.document.addTextPage(this.page);
   }
   
   @Override
@@ -90,12 +83,17 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   public void showFigure(PdfBoxFigure figure) {
     super.showFigure(figure);
       
-    this.page.addFigure(figure);
+    if (ConsiderRules.considerPdfFigure(figure)) {
+      this.page.addFigure(figure);
+    }
   }
     
   @Override
   public void showShape(PdfBoxShape shape) {
     super.showShape(shape);
-    this.page.addShape(shape);
+        
+    if (ConsiderRules.considerPdfShape(shape)) {
+      this.page.addShape(shape);
+    }
   }
 }

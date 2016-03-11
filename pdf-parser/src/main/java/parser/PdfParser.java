@@ -12,7 +12,7 @@ import model.PdfDocument;
  */
 public interface PdfParser {
   /**
-   * Parses the given pdf file and returns the related PdfTextDocument.
+   * Parses the given pdf file and returns the produced PdfDocument.
    */
   public PdfDocument parse(Path file) throws IOException;
 

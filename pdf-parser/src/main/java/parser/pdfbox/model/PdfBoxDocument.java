@@ -14,8 +14,10 @@ import model.PdfColor;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
+import model.TextLineStatistics;
 import model.TextStatistics;
 import statistics.DimensionStatistician;
+import statistics.TextLineStatistician;
 import statistics.TextStatistician;
 
 /**
@@ -50,6 +52,11 @@ public class PdfBoxDocument implements PdfDocument {
   protected TextStatistics textStatistics;
   
   /**
+   * The text line statistics.
+   */
+  protected TextLineStatistics textLineStatistics;
+  
+  /**
    * Flag to indicate whether the dimension statistics need an update.
    */
   protected boolean needsDimensionStatisticsUpdate;
@@ -59,6 +66,11 @@ public class PdfBoxDocument implements PdfDocument {
    */
   protected boolean needsTextStatisticsUpdate;
 
+  /**
+   * Flag to indicate whether the text line statistics need an update.
+   */
+  protected boolean needsTextLineStatisticsUpdate;
+  
   // ___________________________________________________________________________
 
   /**
@@ -83,6 +95,7 @@ public class PdfBoxDocument implements PdfDocument {
       this.pages.add(page);
       this.needsDimensionStatisticsUpdate = true;
       this.needsTextStatisticsUpdate = true;
+      this.needsTextLineStatisticsUpdate = true;
     }
   }
 
@@ -135,6 +148,15 @@ public class PdfBoxDocument implements PdfDocument {
       this.needsTextStatisticsUpdate = false;
     }
     return this.textStatistics;
+  }
+  
+  @Override
+  public TextLineStatistics getTextLineStatistics() {
+    if (textLineStatistics == null || needsTextLineStatisticsUpdate) {
+      this.textLineStatistics = TextLineStatistician.accumulate(getPages());
+      this.needsTextLineStatisticsUpdate = false;
+    }
+    return this.textLineStatistics;
   }
 
   @Override

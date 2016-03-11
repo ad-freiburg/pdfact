@@ -5,6 +5,8 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
 import org.json.JSONObject;
 
 import de.freiburg.iif.collection.CollectionUtils;
+import de.freiburg.iif.model.Line;
+import de.freiburg.iif.model.simple.SimpleLine;
 import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
@@ -15,6 +17,11 @@ import statistics.TextStatistician;
  * @author Claudius Korzen
  */
 public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {  
+  /**
+   * The base line of this text line.
+   */
+  protected Line baseline;
+  
   /**
    * The default constructor.
    */
@@ -174,5 +181,13 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
       }
     }
     return true;
+  }
+  
+  @Override
+  public Line getBaseLine() {
+    float minY = getPositionStatistics().getMostCommonMinY();
+    
+    return new SimpleLine(getRectangle().getMinX(), minY, 
+                          getRectangle().getMaxX(), minY);
   }
 }
