@@ -1,6 +1,6 @@
 package model;
 
-import java.util.Map;
+import de.freiburg.iif.counter.FloatCounter;
 
 /**
  * Interface for text line statistics.
@@ -37,7 +37,7 @@ public interface TextLineStatistics {
   /**
    * Returns the baseline pitch frequencies.
    */
-  Map<Float, Integer> getLinepitchFrequencies();
+  FloatCounter getLinepitchesCounter();
 
   /**
    * Returns the largest baseline pitch.
@@ -67,6 +67,6 @@ public interface TextLineStatistics {
   /**
    * Returns the baseline pitch frequencies.
    */
-  Map<Float, Integer> getBaselinePitchFrequencies();
+  FloatCounter getBaselinePitchesCounter();
 }
 

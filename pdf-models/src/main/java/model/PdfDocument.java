@@ -15,7 +15,12 @@ public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics,
    * Returns the list of pages.
    */
   public List<PdfPage> getPages();
-    
+   
+  /**
+   * Returns the most common text alignment in this document.
+   */
+  public PdfTextAlignment getTextAlignment();
+  
   /**
    * Returns all fonts used in this document.
    */

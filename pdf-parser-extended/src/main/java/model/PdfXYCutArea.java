@@ -1,10 +1,14 @@
 package model;
 
+import static de.freiburg.iif.math.MathUtils.isEqual;
+import static de.freiburg.iif.math.MathUtils.isLarger;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
@@ -140,7 +144,21 @@ public class PdfXYCutArea implements PdfArea {
    * This is the rectangle as it was computed from the XYCut. 
    * (In contrast, 'rectangle' is the bounding box around the elements.)
    */
-  protected Rectangle originalRectangle;
+  protected Rectangle rawRectangle;
+  
+  /**
+   * The alignment of text lines in this area.
+   */
+  protected PdfTextAlignment alignment;
+  
+  /**
+   * Flag to indicate if we have to recompute the alignment.
+   */
+  protected boolean isAlignmentOutdated;
+  
+  protected boolean hasParagraphIndentations;
+  
+  protected boolean hasBodyIndentations;
   
   // ___________________________________________________________________________
   // Constructors.
@@ -177,7 +195,7 @@ public class PdfXYCutArea implements PdfArea {
    */
   public PdfXYCutArea(PdfArea parent, Rectangle area) {
     this(parent, parent.getElementsWithin(area));
-    this.originalRectangle = area;
+    this.rawRectangle = area;
   }
 
   /**
@@ -455,6 +473,7 @@ public class PdfXYCutArea implements PdfArea {
       addTextElement(line);
       this.textLinesIndex.insert(line);
       this.isTextLineStatisticsOutdated = true;
+      this.isAlignmentOutdated = true;
     }
   }
 
@@ -788,7 +807,49 @@ public class PdfXYCutArea implements PdfArea {
     this.ignore = ignore;    
   }
   
-  public Rectangle getOriginalRectangle() {
-    return this.originalRectangle;
+  public Rectangle getRawRectangle() {
+    return this.rawRectangle;
+  }
+  
+  public PdfTextAlignment getTextLineAlignment() {
+    if (alignment == null || isAlignmentOutdated) {
+      this.alignment = computeTextLineAlignment();
+    }
+    return this.alignment;
+  }
+    
+  public PdfTextAlignment computeTextLineAlignment() {
+    List<PdfTextLine> lines = getTextLines();
+    
+    if (lines == null) {
+      return null;
+    }
+    
+    Rectangle rect = getRectangle();
+    float tolerance = 0.5f * getDimensionStatistics().getAverageWidth();
+    
+    ObjectCounter<PdfTextAlignment> alignmentCounter = new ObjectCounter<>();
+    
+    for (PdfTextLine line : lines) {
+      Rectangle lineRect = line.getRectangle();
+      
+      if (rect != null && line.getRectangle() != null) {
+        float leftMargin = lineRect.getMinX() - rect.getMinX();
+        float rightMargin = rect.getMaxX() - lineRect.getMaxX();
+
+        if (isEqual(rightMargin, leftMargin, tolerance)) {
+          if (leftMargin > tolerance) {
+            alignmentCounter.add(PdfTextAlignment.CENTERED);
+          } else {
+            alignmentCounter.add(PdfTextAlignment.JUSTIFIED);
+          }
+        } else if (isLarger(leftMargin, rightMargin, tolerance)) {
+          alignmentCounter.add(PdfTextAlignment.RIGHT);
+        } else {
+          alignmentCounter.add(PdfTextAlignment.LEFT);
+        }
+      }
+    }
+    return alignmentCounter.getMostFrequentObject();
   }
 }

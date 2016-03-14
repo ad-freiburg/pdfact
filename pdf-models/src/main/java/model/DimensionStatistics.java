@@ -1,6 +1,6 @@
 package model;
 
-import java.util.Map;
+import de.freiburg.iif.counter.FloatCounter;
 
 /**
  * Interface for dimension statistics.
@@ -31,10 +31,10 @@ public interface DimensionStatistics {
   /**
    * Returns the height frequencies.
    */
-  Map<Float, Integer> getHeightFrequencies();
+  FloatCounter getHeightsCounter();
   
   /**
    * Returns the width frequencies.
    */
-  Map<Float, Integer> getWidthFrequencies();
+  FloatCounter getWidthsCounter();
 }

@@ -11,5 +11,7 @@ public enum PdfTextAlignment {
   /** Right alignment. **/
   RIGHT,
   /** Centered alignment. **/
-  CENTERED
+  CENTERED,
+  /** Justified alignment. **/
+  JUSTIFIED
 }

@@ -64,7 +64,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     
     for (PdfArea area : page.getBlocks()) {
       visualizeElement(area, page, Color.BLACK, drawer);
-      drawer.drawText("" + area.getRectangle(), page.getPageNumber(), area.getRectangle().getLowerRight(), Color.BLACK, 2f);
+      drawer.drawText("" + area.getTextLineAlignment(), page.getPageNumber(), area.getRectangle().getUpperLeft(), Color.BLACK, 5f);
     }
   }
 

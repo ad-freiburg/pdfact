@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Rectangle;
 
 /**
  * Interface that represents an arbitrary area of a page.
@@ -361,4 +362,8 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
    * Sets the ignore flag of this area.
    */
   public void setIgnore(boolean ignore);
+  
+  public Rectangle getRawRectangle();
+  
+  public PdfTextAlignment getTextLineAlignment();
 }

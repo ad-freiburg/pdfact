@@ -1,6 +1,6 @@
 package model;
 
-import java.util.Map;
+import de.freiburg.iif.counter.FloatCounter;
 
 /**
  * The statistics for text lines.
@@ -37,7 +37,7 @@ public class PlainTextLineStatistics implements TextLineStatistics {
   /**
    * The line pitch frequencies.
    */
-  protected Map<Float, Integer> linepitchFrequencies;
+  protected FloatCounter linepitchFrequencies;
   
   /**
    * The largest base line pitch.
@@ -67,7 +67,7 @@ public class PlainTextLineStatistics implements TextLineStatistics {
   /**
    * The most common line pitch frequencies.
    */
-  protected Map<Float, Integer> baselinePitchFrequencies;
+  protected FloatCounter baselinePitchFrequencies;
   
   @Override
   public float getMostCommonLinePitch() {
@@ -120,12 +120,12 @@ public class PlainTextLineStatistics implements TextLineStatistics {
   }
   
   @Override
-  public Map<Float, Integer> getLinepitchFrequencies() {
+  public FloatCounter getLinepitchesCounter() {
     return linepitchFrequencies;
   }
   
   @Override
-  public Map<Float, Integer> getBaselinePitchFrequencies() {
+  public FloatCounter getBaselinePitchesCounter() {
     return baselinePitchFrequencies;
   }
   
@@ -160,14 +160,14 @@ public class PlainTextLineStatistics implements TextLineStatistics {
   /**
    * Sets the line pitch frequencies.
    */
-  public void setLinepitchFrequencies(Map<Float, Integer> freqs) {
+  public void setLinepitchesCounter(FloatCounter freqs) {
     this.linepitchFrequencies = freqs;
   }
   
   /**
    * Sets the base line pitch frequencies.
    */
-  public void setBaselinePitchFrequencies(Map<Float, Integer> freqs) {
+  public void setBaselinePitchesCounter(FloatCounter freqs) {
     this.baselinePitchFrequencies = freqs;
   }
   

@@ -6,11 +6,13 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
+import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.PdfArea;
 import model.PdfFigure;
 import model.PdfPage;
+import model.PdfTextAlignment;
 
 /**
  * Concrete implementation of a PdfTextPage using PdfBox.
@@ -63,6 +65,11 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
    */
   protected float cropYOffset;
 
+  /**
+   * The alignment of the text line in this page.
+   */
+  protected PdfTextAlignment alignment;
+  
   /**
    * The default constructor.
    */
@@ -192,5 +199,23 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
   @Override
   public List<? extends PdfArea> getBlocks() {
     return this.blocks;
+  }
+
+  @Override
+  public PdfTextAlignment getTextLineAlignment() {
+    if (alignment == null) {
+      alignment = computeTextLineAlignment();
+    }
+    return alignment;
+  }
+  
+  public PdfTextAlignment computeTextLineAlignment() {
+    ObjectCounter<PdfTextAlignment> alignmentCounter = new ObjectCounter<>(); 
+    
+    for (PdfArea block : getBlocks()) {
+      alignmentCounter.add(block.getTextLineAlignment());
+    }
+        
+    return alignmentCounter.getMostFrequentObject();
   }
 }

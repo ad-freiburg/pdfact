@@ -69,10 +69,10 @@ public class BlockifyTextPageRule implements BlockifyRule {
     // Ideally, we should use most common values here. But doing so fails
     // for grotoap-20902190.pdf - because of so many dots on page 3 and 4.
     PdfDocument doc = area.getPdfDocument();
-    float docWidths = doc.getDimensionStatistics().getMostCommonHeight();
-    float pageWidths = area.getDimensionStatistics().getMostCommonHeight();
+    float docHeights = doc.getDimensionStatistics().getMostCommonHeight();
+    float pageHeights = area.getDimensionStatistics().getMostCommonHeight();
             
-    return 1.2f * Math.max(docWidths, pageWidths);
+    return 1.5f * Math.max(docHeights, pageHeights);
   }
 
   @Override

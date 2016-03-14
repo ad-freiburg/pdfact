@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -14,6 +16,7 @@ import model.PdfColor;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
+import model.PdfTextAlignment;
 import model.TextLineStatistics;
 import model.TextStatistics;
 import statistics.DimensionStatistician;
@@ -70,6 +73,11 @@ public class PdfBoxDocument implements PdfDocument {
    * Flag to indicate whether the text line statistics need an update.
    */
   protected boolean needsTextLineStatisticsUpdate;
+  
+  /**
+   * The alignment of text line in this document.
+   */
+  protected PdfTextAlignment alignment;
   
   // ___________________________________________________________________________
 
@@ -194,5 +202,36 @@ public class PdfBoxDocument implements PdfDocument {
   @Override
   public float getFontsize() {
     return getTextStatistics().getMostCommonFontsize();
+  }
+  
+  @Override
+  public PdfTextAlignment getTextAlignment() {
+    if (alignment == null) {
+      alignment = computeTextAlignment();
+    }
+    return alignment;
+  }
+  
+  public PdfTextAlignment computeTextAlignment() {
+    Map<PdfTextAlignment, Integer> alignmentFreqs = new HashMap<>(); 
+    
+    for (PdfPage page : getPages()) {
+      int freq = 0;
+      if (alignmentFreqs.containsKey(page.getTextLineAlignment())) {
+        freq = alignmentFreqs.get(page.getTextLineAlignment());
+      }
+      alignmentFreqs.put(page.getTextLineAlignment(), freq + 1);
+    }
+    
+    int maxFreq = 0;
+    PdfTextAlignment maxFreqAlignment = null;
+    for (Entry<PdfTextAlignment, Integer> entry : alignmentFreqs.entrySet()) {
+      if (entry.getValue() > maxFreq) {
+        maxFreq = entry.getValue();
+        maxFreqAlignment = entry.getKey();
+      }
+    }
+    
+    return maxFreqAlignment;
   }
 }

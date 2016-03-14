@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
 import de.freiburg.iif.rtree.SimpleRTree;
@@ -22,6 +23,7 @@ import model.PdfFont;
 import model.PdfNonTextParagraph;
 import model.PdfPage;
 import model.PdfShape;
+import model.PdfTextAlignment;
 import model.PdfTextElement;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
@@ -850,5 +852,21 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public void setIgnore(boolean ignore) {
     this.ignore = ignore;
+  }
+
+  @Override
+  public Rectangle getRawRectangle() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  public Line getVerticalSplitLine() {
+    return null;
+  }
+
+  @Override
+  public PdfTextAlignment getTextLineAlignment() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

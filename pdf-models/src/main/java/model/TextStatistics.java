@@ -1,6 +1,8 @@
 package model;
 
-import java.util.Map;
+import de.freiburg.iif.counter.FloatCounter;
+import de.freiburg.iif.counter.IntCounter;
+import de.freiburg.iif.counter.ObjectCounter;
 
 /**
  * Interface for text statistics.
@@ -32,17 +34,17 @@ public interface TextStatistics {
   /**
    * Returns the fontsize frequencies in a map.
    */
-  public Map<Float, Integer> getFontsizeFrequencies();
+  public FloatCounter getFontsizesCounter();
   
   /**
    * Returns the font frequencies in a map.
    */
-  public Map<PdfFont, Integer> getFontFrequencies();
+  public ObjectCounter<PdfFont> getFontsCounter();
   
   /**
    * Returns the color frequencies in a map.
    */
-  public Map<PdfColor, Integer> getColorFrequencies();
+  public ObjectCounter<PdfColor> getColorsCounter();
 
   /**
    * Returns the ascii ratio.
@@ -50,7 +52,17 @@ public interface TextStatistics {
   public float getAsciiRatio();
   
   /**
+   * Returns the ascii counter.
+   */
+  public IntCounter getAsciiCounter();
+  
+  /**
    * Returns the digits ratio.
    */
   public float getDigitsRatio();
+  
+  /**
+   * Returns the digits counter.
+   */
+  public IntCounter getDigitsCounter();
 }

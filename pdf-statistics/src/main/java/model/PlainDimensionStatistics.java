@@ -1,6 +1,6 @@
 package model;
 
-import java.util.Map;
+import de.freiburg.iif.counter.FloatCounter;
 
 /**
  * A plain implementation of DimensionStatistics.
@@ -32,12 +32,12 @@ public class PlainDimensionStatistics implements DimensionStatistics {
   /**
    * The height frequencies.
    */
-  protected Map<Float, Integer> heightFreqs;
+  protected FloatCounter heightsCounter;
 
   /**
    * The height frequencies.
    */
-  protected Map<Float, Integer> widthFreqs;
+  protected FloatCounter widthsCounter;
     
   // ___________________________________________________________________________
 
@@ -92,28 +92,28 @@ public class PlainDimensionStatistics implements DimensionStatistics {
   /**
    * Returns the height frequencies.
    */
-  public Map<Float, Integer> getHeightFrequencies() {
-    return heightFreqs;
+  public FloatCounter getHeightsCounter() {
+    return heightsCounter;
   }
 
   /**
    * Sets the height frequencies.
    */
-  public void setHeightFrequencies(Map<Float, Integer> heightFreqs) {
-    this.heightFreqs = heightFreqs;
+  public void setHeightsCounter(FloatCounter heightFreqs) {
+    this.heightsCounter = heightFreqs;
   }
 
   /**
    * Returns the width frequencies.
    */
-  public Map<Float, Integer> getWidthFrequencies() {
-    return widthFreqs;
+  public FloatCounter getWidthsCounter() {
+    return widthsCounter;
   }
 
   /**
    * Returns the width frequencies.
    */
-  public void setWidthFrequencies(Map<Float, Integer> widthFreqs) {
-    this.widthFreqs = widthFreqs;
+  public void setWidthsCounter(FloatCounter widthFreqs) {
+    this.widthsCounter = widthFreqs;
   }
 }
