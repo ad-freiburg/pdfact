@@ -129,12 +129,17 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   }
   
   @Override
+  public String toString() {
+    return getUnicode();
+  }
+  
+  @Override
   public String getUnicode() {
     StringBuilder result = new StringBuilder();
     
     for (PdfCharacter character : getTextCharacters()) {
-      if (!character.ignore()) {
-        result.append(character != null ? character.toString() : "");
+      if (character != null && !character.ignore()) {
+        result.append(character.toString());
       }
     }
     
@@ -169,10 +174,5 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       }
     }
     return true;
-  }
-  
-  @Override
-  public String toString() {
-    return getUnicode() + " ";
   }
 }

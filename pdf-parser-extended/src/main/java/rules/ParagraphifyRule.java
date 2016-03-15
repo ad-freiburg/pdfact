@@ -4,15 +4,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.freiburg.iif.counter.FloatCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import model.PdfArea;
+import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
 import model.PdfTextAlignment;
-import model.PdfTextParagraph;
 import model.PdfTextLine;
+import model.PdfTextParagraph;
 import model.PdfWord;
 import model.TextLineStatistics;
 import statistics.TextLineStatistician;
@@ -24,8 +26,9 @@ import statistics.TextLineStatistician;
  *
  */
 public class ParagraphifyRule {
-  protected static final Pattern REFERENCE_ANCHOR = Pattern.compile("^\\[(.*)\\]\\s+");
-  
+  protected static final Pattern REFERENCE_ANCHOR =
+      Pattern.compile("^\\[(.*)\\]\\s+");
+
   /**
    * Returns true, if the given parameters introduces a new paragraph.
    */
@@ -33,7 +36,7 @@ public class ParagraphifyRule {
       PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
 
-    System.out.println(line.getUnicode());
+    // System.out.println(line.getUnicode());
 
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {
@@ -43,50 +46,50 @@ public class ParagraphifyRule {
     // The line doesn't introduce a new paragraph, if the previous and the
     // current line have a overlapped element in common.
     if (haveOverlappedElementInCommon(prevLine, line)) {
-      System.out.println(" overlapped");
+      // System.out.println(" overlapped");
       return false;
     }
 
     // The line introduces a new paragraph, if it doesn't overlap the paragraph
     // horizontally.
     if (!overlapsHorizontally(paragraph, line)) {
-      System.out.println(" don't overlap");
+      // System.out.println(" don't overlap");
       return true;
     }
 
-//    if (prevLineIsTooShort(block, line, prevLine)) {
-//      System.out.println(" prev line too short");
-//      return true;
-//    }
-    
-    if (differInIndentation(paragraph, line)) {
-      System.out.println(" differ in indentation");
+    if (prevLineIsTooShort(block, line, prevLine)) {
+      // System.out.println(" prev line too short");
       return true;
     }
-    
+
+    if (differInIndentation(block, paragraph, line)) {
+      // System.out.println(" differ in indentation");
+      return true;
+    }
+
     if (prevAndCurrentLineStartsWithReferenceAnchor(prevLine, line)) {
-      System.out.println(" anchors");
+      // System.out.println(" anchors");
       return true;
     }
-    
+
     // The line introduces a new paragraph, if the font size of the line and the
     // fontsize of the previous line aren't almost equal.
     if (fontsizesAreTooDifferent(prevLine, line)) {
-      System.out.println(" fontsizes differ");
+      // System.out.println(" fontsizes differ");
       return true;
     }
 
     // The line introduces a new paragraph, if the pitch to the previous line
     // is larger than the most common line pitch in the paragraph.
     if (linepitchIsTooLarge(paragraph, prevLine, line)) {
-      System.out.println(" linepitch");
+      // System.out.println(" linepitch");
       return true;
     }
 
     // TODO: Experimental. Identify headings, which have same fontsize as
     // body.
     if (isProbablyHeading(paragraph, prevLine, line)) {
-      System.out.println(" is heading");
+      // System.out.println(" is heading");
       return true;
     }
 
@@ -96,68 +99,81 @@ public class ParagraphifyRule {
   /**
    * Returns true, if the previous line is too short.
    */
-  protected static boolean prevLineIsTooShort(PdfArea block, 
+  protected static boolean prevLineIsTooShort(PdfArea block,
       PdfTextLine line, PdfTextLine prevLine) {
     if (prevLine == null) {
       return false;
     }
-    
-    PdfTextAlignment alignment = line.getPdfDocument().getTextAlignment();
-    float tolerance = block.getDimensionStatistics().getMostCommonWidth();
-    if (alignment == PdfTextAlignment.JUSTIFIED) {
-      float prevLineMaxX = prevLine.getRectangle().getMaxX();
-      float blockMaxX = block.getRectangle().getMaxX();
-      return MathUtils.isSmaller(prevLineMaxX, blockMaxX, tolerance);  
+
+    PdfDocument document = block.getPdfDocument();
+
+    if (document.getTextAlignment() != PdfTextAlignment.JUSTIFIED) {
+      return false;
     }
-    
-    return false;
+
+    if (block.getTextLineAlignment() == PdfTextAlignment.CENTERED) {
+      return false;
+    }
+
+    // TODO: Don't recompute this on every line of the block.
+    FloatCounter lineMaxXCounter = new FloatCounter();
+    for (PdfTextLine l : block.getTextLines()) {
+      float maxX = MathUtils.round(l.getRectangle().getMaxX(), 0);
+      lineMaxXCounter.add(maxX);
+    }
+
+    float tolerance = block.getDimensionStatistics().getMostCommonWidth();
+    float prevLineMaxX = prevLine.getRectangle().getMaxX();
+    float blockMaxX = lineMaxXCounter.getMostFrequentFloat();
+
+    return MathUtils.isSmaller(prevLineMaxX, blockMaxX, tolerance);
   }
 
   /**
    * Returns true, if the indentation of the line differ from the indentation in
    * the given paragraph.
    */
-  protected static boolean differInIndentation(PdfTextParagraph para, 
-      PdfTextLine line) {
+  protected static boolean differInIndentation(PdfArea block,
+      PdfTextParagraph para, PdfTextLine line) {
     if (para == null) {
       return false;
     }
-        
+
     if (para.getTextLines() == null || para.getTextLines().size() < 2) {
       return false;
     }
-    
-    if (para.getTextLineAlignment() == PdfTextAlignment.CENTERED) {
+
+    if (block.getTextLineAlignment() == PdfTextAlignment.CENTERED) {
       return false;
     }
-    
+
     PdfTextLine lastLine = para.getLastTextLine();
     float tolerance = para.getDimensionStatistics().getMostCommonWidth();
-    
+
     float lastLineMinX = lastLine.getRectangle().getMinX();
     float lineMinX = line.getRectangle().getMinX();
     return !MathUtils.isEqual(lastLineMinX, lineMinX, tolerance);
   }
-  
+
   protected static boolean prevAndCurrentLineStartsWithReferenceAnchor(
       PdfTextLine prevLine, PdfTextLine line) {
     if (prevLine == null || line == null) {
       return false;
     }
-    
+
     String prevLineStr = prevLine.getUnicode();
     String lineStr = line.getUnicode();
-    
+
     if (prevLineStr == null || lineStr == null) {
       return false;
     }
-    
+
     Matcher prevLineMatcher = REFERENCE_ANCHOR.matcher(prevLineStr);
     Matcher lineMatcher = REFERENCE_ANCHOR.matcher(lineStr);
 
     return prevLineMatcher.find() && lineMatcher.find();
   }
-  
+
   /**
    * Returns true, if the given two lines are overlapped by a same third
    * element.
@@ -251,11 +267,9 @@ public class ParagraphifyRule {
     float pageBaselinePitch =
         pageLineStatistics.getSmallestSignificantBaselinepitch();
 
-    System.out.println(pitch + " " + pageLinePitch);
-    System.out.println(basePitch + " " + pageBaselinePitch);
-
     if (MathUtils.isLarger(pitch, pageLinePitch, pageLinePitch)
         && MathUtils.isLarger(basePitch, pageBaselinePitch, 2f)) {
+
       return true;
     }
 

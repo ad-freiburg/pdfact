@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import de.freiburg.iif.text.StringUtils;
@@ -281,7 +280,6 @@ public class PdfXYCutParser implements PdfExtendedParser {
 
     block.setParagraphs(paragraphs);
     
-    System.out.println(paragraphs.size());
     
     return paragraphs;
   }

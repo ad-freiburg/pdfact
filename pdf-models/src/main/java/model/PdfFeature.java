@@ -16,32 +16,32 @@ public enum PdfFeature {
   /**
    * The feature "paragraphs".
    */
-  paragraphs("paragraph", Color.RED),
+  paragraphs("paragraph", Color.RED, "\n\n"),
 
   /**
    * The feature "text lines".
    */
-  lines("line", Color.BLUE),
+  lines("line", Color.BLUE, " "),
 
   /**
    * The feature "words".
    */
-  words("word", Color.GREEN),
+  words("word", Color.GREEN, " "),
 
   /**
    * The feature "characters".
    */
-  characters("character", Color.GRAY),
+  characters("character", Color.GRAY, ""),
 
   /**
    * The feature "figures".
    */
-  figures("figure", Color.ORANGE),
+  figures("figure", Color.ORANGE, ""),
 
   /**
    * The feature "shape".
    */
-  shapes("shape", Color.MAGENTA);
+  shapes("shape", Color.MAGENTA, "");
 
   /**
    * The name of this feature.
@@ -49,16 +49,22 @@ public enum PdfFeature {
   String field;
 
   /**
-   * The color of this feature.
+   * The color to visualize this feature.
    */
   Color color;
   
   /**
+   * The delimiter of this feature on serialization.
+   */
+  String txtDelimiter;
+  
+  /**
    * The default constructor.
    */
-  private PdfFeature(String field, Color color) {
+  private PdfFeature(String field, Color color, String delimiter) {
     this.field = field;
     this.color = color;
+    this.txtDelimiter = delimiter;
   }
 
   /**
@@ -73,6 +79,13 @@ public enum PdfFeature {
    */
   public Color getColor() {
     return color;
+  }
+  
+  /**
+   * Returns the delimiter of this feature.
+   */
+  public String getDelimiter() {
+    return txtDelimiter;
   }
   
   /**

@@ -103,19 +103,26 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   }
 
   @Override
+  public String toString() {
+    return getUnicode();
+  }
+  
+  /**
+   * Returns the unicode of this text line.
+   */
   public String getUnicode() {
-    StringBuilder text = new StringBuilder();
+    StringBuilder result = new StringBuilder();
 
     for (PdfTextLine line : getTextLines()) {
-      String lineText = line.getUnicode();
-
-      if (!lineText.isEmpty()) {
-        text.append(lineText);
-        text.append(" ");
+      if (line != null && !line.ignore()) {
+        if (result.length() > 0) {
+          result.append(" ");
+        }
+        result.append(line.toString());
       }
     }
 
-    return text.toString();
+    return result.toString();
   }
 
   @Override
@@ -279,11 +286,6 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
       }
     }
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return getUnicode();
   }
 
   @Override

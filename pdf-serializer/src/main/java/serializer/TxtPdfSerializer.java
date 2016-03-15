@@ -40,6 +40,9 @@ public class TxtPdfSerializer implements PdfSerializer {
     
     // Serialize the pages.
     for (PdfPage page : document.getPages()) {
+      if (sb.length() > 0) {
+        sb.append(PdfFeature.paragraphs.getDelimiter());
+      }
       sb.append(serializePage(page, features));
     }
     
@@ -56,7 +59,7 @@ public class TxtPdfSerializer implements PdfSerializer {
     StringBuffer sb = new StringBuffer();
        
     for (PdfFeature feature : features) {
-      sb.append(serialize(page.getElementsByFeature(feature)));
+      sb.append(serialize(feature, page.getElementsByFeature(feature)));
     }
 
     return sb.toString();
@@ -65,13 +68,16 @@ public class TxtPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given page to tsv.
    */
-  protected String serialize(List<? extends PdfElement> elements) 
-      throws IOException {
+  protected String serialize(PdfFeature feature, 
+      List<? extends PdfElement> elements) throws IOException {
     StringBuffer sb = new StringBuffer();
     if (elements != null) {
       for (PdfElement element : elements) {
         String serialized = serialize(element);
         if (serialized != null) {
+          if (sb.length() > 0) {
+            sb.append(feature.getDelimiter());
+          }
           sb.append(serialized);  
         }
       }

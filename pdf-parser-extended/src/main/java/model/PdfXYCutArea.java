@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.model.HasRectangle;
@@ -828,7 +829,7 @@ public class PdfXYCutArea implements PdfArea {
     Rectangle rect = getRectangle();
     float tolerance = 0.5f * getDimensionStatistics().getAverageWidth();
     
-    ObjectCounter<PdfTextAlignment> alignmentCounter = new ObjectCounter<>();
+    ObjectCounter<PdfTextAlignment> counter = new ObjectCounter<>();
     
     for (PdfTextLine line : lines) {
       Rectangle lineRect = line.getRectangle();
@@ -839,17 +840,23 @@ public class PdfXYCutArea implements PdfArea {
 
         if (isEqual(rightMargin, leftMargin, tolerance)) {
           if (leftMargin > tolerance) {
-            alignmentCounter.add(PdfTextAlignment.CENTERED);
+            counter.add(PdfTextAlignment.CENTERED);
           } else {
-            alignmentCounter.add(PdfTextAlignment.JUSTIFIED);
+            counter.add(PdfTextAlignment.JUSTIFIED);
           }
         } else if (isLarger(leftMargin, rightMargin, tolerance)) {
-          alignmentCounter.add(PdfTextAlignment.RIGHT);
+          counter.add(PdfTextAlignment.RIGHT);
         } else {
-          alignmentCounter.add(PdfTextAlignment.LEFT);
+          counter.add(PdfTextAlignment.LEFT);
         }
       }
     }
-    return alignmentCounter.getMostFrequentObject();
+    Set<PdfTextAlignment> alignments = counter.getAllMostFrequentObjects();
+    if (alignments.contains(PdfTextAlignment.CENTERED)) {
+      return PdfTextAlignment.CENTERED;
+    } else if (alignments.contains(PdfTextAlignment.JUSTIFIED)) {
+      return PdfTextAlignment.JUSTIFIED;
+    }
+    return counter.getMostFrequentObject();
   }
 }

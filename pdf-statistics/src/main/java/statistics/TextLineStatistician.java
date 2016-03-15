@@ -34,8 +34,12 @@ public class TextLineStatistician {
       float linepitch = computeLinePitch(prevLine, line);
       float baselinePitch = computeBaseLinePitch(prevLine, line);
 
-      linePitchesCounter.add(linepitch);
-      basePitchesCounter.add(baselinePitch);
+      if (linepitch < Float.MAX_VALUE) {
+        linePitchesCounter.add(linepitch);
+      }
+      if (baselinePitch < Float.MAX_VALUE) {
+        basePitchesCounter.add(baselinePitch);
+      }
     }
 
     stats.setAverageLinePitch(linePitchesCounter.getAverageValue());
@@ -124,12 +128,24 @@ public class TextLineStatistician {
       return Float.MAX_VALUE;
     }
 
+    String string1 = line1.getUnicode();
+    String string2 = line2.getUnicode();
+    
+    if (string1 == null || string2 == null) {
+      return Float.MAX_VALUE;
+    }
+    
+    // Don't take too short lines into account. 
+    if (string1.length() < 10 && string2.length() < 10) {
+      return Float.MAX_VALUE;
+    }
+    
     // Compute the pitch to the previous line and to the next line.
     float minY = rect1.getMinY();
     // float lineMinY = line != null ? line.getRectangle().getMinY() : 0;
     float maxY = rect2.getMaxY();
 
-    return MathUtils.round(minY - maxY, 0);
+    return Math.abs(MathUtils.round(minY - maxY, 0));
   }
 
   /**
@@ -148,11 +164,23 @@ public class TextLineStatistician {
       return Float.MAX_VALUE;
     }
 
+    String string1 = line1.getUnicode();
+    String string2 = line2.getUnicode();
+    
+    if (string1 == null || string2 == null) {
+      return Float.MAX_VALUE;
+    }
+    
+    // Don't take too short lines into account. 
+    if (string1.length() < 10 && string2.length() < 10) {
+      return Float.MAX_VALUE;
+    }
+    
     // Compute the pitch to the previous line and to the next line.
     float minY = baseline1.getStartY();
     // float lineMinY = line != null ? line.getRectangle().getMinY() : 0;
     float maxY = baseline2.getStartY();
 
-    return MathUtils.round(minY - maxY, 0);
+    return Math.abs(MathUtils.round(minY - maxY, 0));
   }
 }
