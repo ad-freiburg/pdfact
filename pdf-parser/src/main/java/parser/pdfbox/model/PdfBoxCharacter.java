@@ -121,6 +121,11 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   }
 
   @Override
+  public String toString() {
+    return getUnicode();
+  }
+  
+  @Override
   public String getUnicode() {
     return unicode;
   }
@@ -339,12 +344,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     }
     return true;
   }
-  
-  @Override
-  public String toString() {
-    return getUnicode();
-  }
-  
+    
   /**
    * Returns true if the given text is a diacritic char.
    */
