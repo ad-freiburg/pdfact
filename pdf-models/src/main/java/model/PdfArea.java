@@ -366,4 +366,13 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   public Rectangle getRawRectangle();
   
   public PdfTextAlignment getTextLineAlignment();
+  
+  /**
+   * A string that identifies the textual markup, i.e. a string containing the 
+   * font and fontsize.
+   */
+  public String getMarkup();
+  
+  public PdfArea getBlock();
+  public void setBlock(PdfArea block);
 }

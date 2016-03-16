@@ -25,23 +25,100 @@ import model.PdfTextParagraph;
  */
 public class AnalyzeRules {
   /**
-   * Returns true, if we assume that the given paragraph represents a heading.
+   * Pattern to find figure captions.
    */
-  // TODO: Find more robust criteria to identify a heading.
-  public static boolean isHeading(PdfTextParagraph paragraph) {
+  static final Pattern FIGURE_CAPTION_PATTERN = Pattern.compile(
+      "^(fig(\\.?|ure)|abbildung)\\s*\\d+", Pattern.CASE_INSENSITIVE);
+  
+  /**
+   * Pattern to find table captions.
+   */
+  static final Pattern TABLE_CAPTION_PATTERN = Pattern.compile(
+      "^(table|tabelle)\\s*\\d+(\\.|:)", Pattern.CASE_INSENSITIVE);
+  
+  /**
+   * Returns true if we suppose that the given paragraph is a table caption. 
+   */
+  public static boolean isTableCaption(PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return false;
+    }
+    
+    String text = paragraph.getUnicode();
+    PdfPage page = paragraph.getPage();
+    
+    if (text == null || page == null) {
+      return false;
+    }
+    
+    Matcher tableCaptionMatcher = TABLE_CAPTION_PATTERN.matcher(text);
+    if (tableCaptionMatcher.find()) {
+      // There must be at least one shape (representing the table) in the 
+      // surrounding area.
+      Rectangle surrounding = new SimpleRectangle(paragraph.getRectangle());
+      surrounding.setMinX(surrounding.getMinX());
+      surrounding.setMaxX(surrounding.getMaxX());
+      surrounding.setMinY(surrounding.getMinY() - 75); // TODO
+      surrounding.setMaxY(surrounding.getMaxY() + 75); // TODO
+
+      return !page.getShapesOverlapping(surrounding).isEmpty();
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Returns true if we suppose that the given paragraph is a figure caption. 
+   */
+  public static boolean isFigureCaption(PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return false;
+    }
+    
+    String text = paragraph.getUnicode();
+    PdfPage page = paragraph.getPage();
+    
+    if (text == null || page == null) {
+      return false;
+    }
+    
+    Matcher tableCaptionMatcher = FIGURE_CAPTION_PATTERN.matcher(text);
+    if (tableCaptionMatcher.find()) {
+      // There must be at least one figure in the surrounding area.
+      Rectangle surrounding = new SimpleRectangle(paragraph.getRectangle());
+      surrounding.setMinX(surrounding.getMinX());
+      surrounding.setMaxX(surrounding.getMaxX());
+      surrounding.setMinY(surrounding.getMinY() - 75); // TODO
+      surrounding.setMaxY(surrounding.getMaxY() + 75); // TODO
+
+      return !page.getFiguresOverlapping(surrounding).isEmpty();
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Returns true if we suppose that the given paragraph is a section heading. 
+   */
+  public static boolean isSectionHeading(PdfTextParagraph paragraph) {
     if (paragraph == null) {
       return false;
     }
 
     PdfDocument document = paragraph.getPdfDocument();
-
-    if (document == null) {
+    String text = paragraph.getUnicode();
+    
+    if (document == null || text == null) {
       return false;
     }
 
-    String text = paragraph.getUnicode().toLowerCase();
-    text = StringUtils.removeWhitespaces(text);
+    // Remove numbers, remove whitespaces and transform to lowercases.
+    text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
 
+    if (document.getSectionHeadingMarkup() != null) {
+      
+    }
+    
     float paragraphFontsize = paragraph.getFontsize();
     float documentFontsize = document.getFontsize();
 
@@ -250,18 +327,6 @@ public class AnalyzeRules {
   public static boolean isImageBased(PdfPage page) {
     return page.getFiguresCoverage() > 0.75f; // TODO
   }
-  
-  /**
-   * Pattern to find figure captions.
-   */
-  protected static final Pattern FIGURE_CAPTION_PATTERN = Pattern.compile(
-      "^(fig(\\.?|ure)|abbildung)\\s*\\d+", Pattern.CASE_INSENSITIVE);
-
-  /**
-   * Pattern to find table captions.
-   */
-  protected static final Pattern TABLE_CAPTION_PATTERN = Pattern.compile(
-      "^(table|tabelle)\\s*\\d+(\\.|:)", Pattern.CASE_INSENSITIVE);
 
   /**
    * Common special paragraph headings.

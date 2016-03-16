@@ -34,7 +34,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   /**
    * The role of this paragraph.
    */
-  protected String role;
+  protected PdfRole role;
 
   protected Set<PdfTextAlignment> alignmentVariants;
 
@@ -223,12 +223,12 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   }
 
   @Override
-  public void setRole(String role) {
+  public void setRole(PdfRole role) {
     this.role = role;
   }
 
   @Override
-  public String getRole() {
+  public PdfRole getRole() {
     return this.role;
   }
 

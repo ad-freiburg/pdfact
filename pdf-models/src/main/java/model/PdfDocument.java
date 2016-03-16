@@ -40,4 +40,14 @@ public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics,
    * Returns the most common fontsize in this document.
    */
   public float getFontsize();  
+  
+  /**
+   * Returns the markup of section headings.  TODO: Move to Analyzer.
+   */
+  public String getSectionHeadingMarkup();
+
+  /**
+   * Sets the markup of section headings. TODO: Move to Analyzer.
+   */
+  public void setSectionHeadingMarkup(String markup);  
 }

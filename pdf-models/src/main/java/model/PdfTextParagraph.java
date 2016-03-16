@@ -43,12 +43,12 @@ public interface PdfTextParagraph extends PdfTextElement,
   /**
    * Sets the role of this paragraph.
    */
-  public void setRole(String role);
+  public void setRole(PdfRole role);
 
   /**
    * Returns the role of this paragraph.
    */
-  public String getRole();
+  public PdfRole getRole();
   
   /**
    * Returns all possible alignments for this paragraph.

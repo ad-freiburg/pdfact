@@ -14,6 +14,7 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfTextParagraph;
 
 /**
  * The default implmentation of a PdfVisualizer.
@@ -62,9 +63,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       visualizeFeature(page, feature, drawer);
     }
     
-    for (PdfArea area : page.getBlocks()) {
-      visualizeElement(area, page, Color.BLACK, drawer);
-      drawer.drawText("" + area.getTextLineAlignment(), page.getPageNumber(), area.getRectangle().getUpperLeft(), Color.BLACK, 5f);
+    int i = 0;
+    for (PdfTextParagraph para : page.getParagraphs()) {
+      visualizeElement(para, page, Color.BLACK, drawer);
+      drawer.drawText("" + para.getRole(), page.getPageNumber(), para.getRectangle().getUpperLeft(), Color.BLACK, 5f);
     }
   }
 

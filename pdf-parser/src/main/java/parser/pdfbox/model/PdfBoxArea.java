@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
@@ -152,12 +153,17 @@ public class PdfBoxArea implements PdfArea {
    * Flag to indicate if the position statistics is outdated.
    */
   protected boolean isPositionStatisticsOutdated;
-  
-  /** 
+
+  /**
    * Flag to indicate if we have to ignore this area from further processing.
    */
   protected boolean ignore;
-  
+
+  /**
+   * The block containing this area.
+   */
+  protected PdfArea block;
+
   // ___________________________________________________________________________
   // Constructors.
 
@@ -377,7 +383,7 @@ public class PdfBoxArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addTextCharacter(PdfCharacter character) {
     if (character != null) {
@@ -423,7 +429,7 @@ public class PdfBoxArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addWord(PdfWord word) {
     if (word != null) {
@@ -469,7 +475,7 @@ public class PdfBoxArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addTextLine(PdfTextLine line) {
     if (line != null) {
@@ -516,7 +522,7 @@ public class PdfBoxArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addParagraph(PdfTextParagraph paragraph) {
     if (paragraph != null) {
@@ -657,7 +663,7 @@ public class PdfBoxArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addNonTextParagraph(PdfNonTextParagraph paragraph) {
     if (paragraph != null) {
@@ -806,9 +812,9 @@ public class PdfBoxArea implements PdfArea {
   protected boolean needsPositionStatisticsUpdate() {
     return this.positionStatistics == null || isPositionStatisticsOutdated;
   }
-  
+
   // ___________________________________________________________________________
-  
+
   @Override
   public List<? extends PdfElement> getElementsByFeature(PdfFeature feature) {
     RTree<? extends PdfElement> index = indexesByFeature.get(feature);
@@ -859,7 +865,7 @@ public class PdfBoxArea implements PdfArea {
     // TODO Auto-generated method stub
     return null;
   }
-  
+
   public Line getVerticalSplitLine() {
     return null;
   }
@@ -868,5 +874,31 @@ public class PdfBoxArea implements PdfArea {
   public PdfTextAlignment getTextLineAlignment() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public String getMarkup() {
+    float fontsize = MathUtils.round(getFontsize(), 0);
+
+    PdfFont font = getFont();
+    if (font == null) {
+      return null;
+    }
+
+    String fontname = font.getFullName();
+    if (fontname == null) {
+      return null;
+    }
+
+    return fontname + "-" + fontsize;
+  }
+
+  @Override
+  public PdfArea getBlock() {
+    return block;
+  }
+
+  public void setBlock(PdfArea block) {
+    this.block = block;
   }
 }

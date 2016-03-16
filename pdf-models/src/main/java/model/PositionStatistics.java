@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Map;
-
 /**
  * Interface for position statistics.
  *

@@ -79,6 +79,11 @@ public class PdfBoxDocument implements PdfDocument {
    */
   protected PdfTextAlignment alignment;
   
+  /**
+   * The markup of section headings.
+   */
+  protected String sectionHeadingMarkup;
+  
   // ___________________________________________________________________________
 
   /**
@@ -233,5 +238,15 @@ public class PdfBoxDocument implements PdfDocument {
     }
     
     return maxFreqAlignment;
+  }
+
+  @Override
+  public void setSectionHeadingMarkup(String markup) {
+    this.sectionHeadingMarkup = markup;
+  }
+  
+  @Override
+  public String getSectionHeadingMarkup() {
+    return sectionHeadingMarkup;
   }
 }

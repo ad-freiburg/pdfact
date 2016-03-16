@@ -85,8 +85,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
       List<PdfArea> textBlocks = identifyTextBlocks(page);
       page.setBlocks(textBlocks);
       
-      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
-      page.setNonTextParagraphs(nonTextParas);
+//      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
+//      page.setNonTextParagraphs(nonTextParas);
       
       for (PdfArea textBlock : textBlocks) {
         textBlock.setTextLines(identifyLines(textBlock));
@@ -118,25 +118,50 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * Identifies text blocks from text characters in the given page.
    */
   protected List<PdfArea> identifyTextBlocks(PdfPage page) {
-    PdfArea area = new PdfXYCutArea(page, page.getTextCharacters());
-    return blockify(area, this.blockifyPageRule);
+    PdfArea area = new PdfXYCutArea(page, page.getElements());
+    List<PdfArea> blocks = blockify(area, this.blockifyPageRule);
+    
+    // TODO: Move it.
+    for (PdfArea block : blocks) {
+      for (PdfElement element : block.getElements()) {
+        element.setBlock(block);
+      }
+    }
+    
+    return blocks;
   }
 
-  /**
-   * Identifies non text paragraphs from non text elements in the given page.
-   */
-  protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
-    PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
-    List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
-    return toNonTextParagraphs(page, paraAreas);
-  }
+//  /**
+//   * Identifies non text paragraphs from non text elements in the given page.
+//   */
+//  protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
+//    PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
+//    List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
+//    List<PdfNonTextParagraph> paras = toNonTextParagraphs(page, paraAreas);
+//    
+//    // TODO: Move it.
+//    for (PdfNonTextParagraph para : paras) {
+//      for (PdfElement element : para.getElements()) {
+//        element.setBlock();
+//      }
+//    }
+//    
+//    return paras;
+//  }
 
   /**
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
     List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
-    return new ArrayList<PdfXYCutTextLine>(toTextLines(lineAreas));
+    List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
+    
+    // TODO: Move it.
+    for (PdfXYCutTextLine line : lines) {
+      line.setBlock(textBlock);
+    }
+    
+    return lines;
   }
   
   /**
@@ -161,6 +186,11 @@ public class PdfXYCutParser implements PdfExtendedParser {
 
       List<PdfXYCutWord> lineWords = toWords(wordAreas, prevLine);
 
+      // TODO: Move it.
+      for (PdfXYCutWord word : lineWords) {
+        word.setBlock(textBlock);
+      }
+      
       words.addAll(lineWords);
       line.setWords(lineWords);
       prevLine = line;
@@ -267,12 +297,14 @@ public class PdfXYCutParser implements PdfExtendedParser {
       
       if (paragraph == null) {
         paragraph = new PdfXYCutTextParagraph(page);
+        paragraph.setBlock(block);
       }
       
       if (ParagraphifyRule.introducesNewParagraph(block, paragraph, prevLine,
           line, nextLine)) {
         paragraphs.add(paragraph);
         paragraph = new PdfXYCutTextParagraph(page);
+        paragraph.setBlock(block);
       }
       paragraph.addTextLine(line);
     }
@@ -779,7 +811,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     }
     
     // Remove all punctuation marks (except "-").
-    String normalized = StringUtils.normalize(word, '-');
+    String normalized = StringUtils.normalize(word, false, false, true, '-');
     
     if (normalized == null) {
       return null;

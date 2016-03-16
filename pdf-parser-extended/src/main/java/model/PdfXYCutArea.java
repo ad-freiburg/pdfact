@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.freiburg.iif.counter.ObjectCounter;
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
@@ -115,7 +116,7 @@ public class PdfXYCutArea implements PdfArea {
    * Flag to indicate if the text statistics is outdated.
    */
   protected boolean isTextStatisticsOutdated;
-  
+
   /**
    * The text line statistics.
    */
@@ -135,31 +136,33 @@ public class PdfXYCutArea implements PdfArea {
    * Flag to indicate if the position statistics is outdated.
    */
   protected boolean isPositionStatisticsOutdated;
-  
+
   /**
    * Flag to indicate if we have to ignore this area.
    */
   protected boolean ignore;
-  
+
   /**
-   * This is the rectangle as it was computed from the XYCut. 
-   * (In contrast, 'rectangle' is the bounding box around the elements.)
+   * This is the rectangle as it was computed from the XYCut. (In contrast,
+   * 'rectangle' is the bounding box around the elements.)
    */
   protected Rectangle rawRectangle;
-  
+
   /**
    * The alignment of text lines in this area.
    */
   protected PdfTextAlignment alignment;
-  
+
   /**
    * Flag to indicate if we have to recompute the alignment.
    */
   protected boolean isAlignmentOutdated;
-  
+
   protected boolean hasParagraphIndentations;
-  
+
   protected boolean hasBodyIndentations;
+
+  protected PdfArea block;
   
   // ___________________________________________________________________________
   // Constructors.
@@ -189,7 +192,7 @@ public class PdfXYCutArea implements PdfArea {
     this.colors = new HashMap<>();
     this.fonts = new HashMap<>();
   }
-  
+
   /**
    * Creates a page area from the given parent, indexing all content objects
    * within the given rectangle.
@@ -206,32 +209,32 @@ public class PdfXYCutArea implements PdfArea {
     this(parent.getPage());
     addAnyElements(elements);
   }
-  
+
   @Override
   public void addAnyElements(List<? extends PdfElement> elements) {
     if (elements == null) {
       return;
     }
-    
+
     for (PdfElement element : elements) {
       addAnyElement(element);
     }
   }
-  
+
   @Override
   public void addAnyElement(PdfElement element) {
     if (element == null) {
       return;
     }
-    
+
     addElement(element);
-    
+
     if (element instanceof PdfTextElement) {
       addTextElement((PdfTextElement) element);
     } else {
       nonTextElementsIndex.insert(element);
     }
-    
+
     if (element instanceof PdfCharacter) {
       charactersIndex.insert((PdfCharacter) element);
     }
@@ -255,7 +258,7 @@ public class PdfXYCutArea implements PdfArea {
       nonTextParagraphsIndex.insert((PdfXYCutNonTextParagraph) element);
     }
   }
-    
+
   // ___________________________________________________________________________
 
   @Override
@@ -285,12 +288,12 @@ public class PdfXYCutArea implements PdfArea {
     this.isDimensionStatisticsOutdated = true;
     this.isPositionStatisticsOutdated = true;
   }
-  
+
   protected void addTextElement(PdfTextElement element) {
     this.textElementsIndex.insert(element);
     this.isTextStatisticsOutdated = true;
   }
-  
+
   // ___________________________________________________________________________
 
   @Override
@@ -371,7 +374,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   /**
    * Adds the given text character to this page.
    */
@@ -383,7 +386,7 @@ public class PdfXYCutArea implements PdfArea {
       this.charactersIndex.insert(character);
     }
   }
-  
+
   // ___________________________________________________________________________
 
   @Override
@@ -411,7 +414,7 @@ public class PdfXYCutArea implements PdfArea {
     this.wordsIndex.clear();
     addWords(words);
   }
-  
+
   @Override
   public void addWords(List<? extends PdfWord> words) {
     if (words != null) {
@@ -420,7 +423,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addWord(PdfWord word) {
     if (word != null) {
@@ -466,7 +469,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addTextLine(PdfTextLine line) {
     if (line != null) {
@@ -516,7 +519,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addParagraph(PdfTextParagraph paragraph) {
     if (paragraph != null) {
@@ -611,7 +614,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public void addNonTextParagraph(PdfNonTextParagraph paragraph) {
     if (paragraph != null) {
@@ -628,7 +631,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   protected void registerFont(PdfFont font) {
     if (font != null) {
       if (!this.fonts.containsKey(font.getId())) {
@@ -636,7 +639,7 @@ public class PdfXYCutArea implements PdfArea {
       }
     }
   }
-  
+
   @Override
   public PdfDocument getPdfDocument() {
     return this.page.getPdfDocument();
@@ -681,7 +684,7 @@ public class PdfXYCutArea implements PdfArea {
   }
 
   // ___________________________________________________________________________
-  
+
   /**
    * Returns the text statistics.
    */
@@ -706,9 +709,9 @@ public class PdfXYCutArea implements PdfArea {
   protected boolean needsTextStatisticsUpdate() {
     return this.textStatistics == null || isTextStatisticsOutdated;
   }
-  
+
   // ___________________________________________________________________________
-  
+
   /**
    * Returns the text line statistics.
    */
@@ -735,7 +738,7 @@ public class PdfXYCutArea implements PdfArea {
   }
 
   // ___________________________________________________________________________
-  
+
   /**
    * Returns the position statistics.
    */
@@ -760,9 +763,9 @@ public class PdfXYCutArea implements PdfArea {
   protected boolean needsPositionStatisticsUpdate() {
     return this.positionStatistics == null || isPositionStatisticsOutdated;
   }
-  
+
   // ___________________________________________________________________________
-  
+
   @Override
   public List<? extends PdfElement> getElementsByFeature(PdfFeature feature) {
     RTree<? extends PdfElement> index = indexesByFeature.get(feature);
@@ -776,18 +779,18 @@ public class PdfXYCutArea implements PdfArea {
   public PdfFont getFont() {
     return getTextStatistics().getMostCommonFont();
   }
-  
+
   @Override
   public PdfColor getColor() {
     // TODO: Consider also the color of figures.
-    return getTextStatistics().getMostCommonFontColor(); 
+    return getTextStatistics().getMostCommonFontColor();
   }
 
   @Override
   public float getFontsize() {
     return getTextStatistics().getMostCommonFontsize();
   }
-  
+
   @Override
   public Collection<PdfFont> getFonts() {
     return this.fonts.values();
@@ -805,35 +808,35 @@ public class PdfXYCutArea implements PdfArea {
 
   @Override
   public void setIgnore(boolean ignore) {
-    this.ignore = ignore;    
+    this.ignore = ignore;
   }
-  
+
   public Rectangle getRawRectangle() {
     return this.rawRectangle;
   }
-  
+
   public PdfTextAlignment getTextLineAlignment() {
     if (alignment == null || isAlignmentOutdated) {
       this.alignment = computeTextLineAlignment();
     }
     return this.alignment;
   }
-    
+
   public PdfTextAlignment computeTextLineAlignment() {
     List<PdfTextLine> lines = getTextLines();
-    
+
     if (lines == null) {
       return null;
     }
-    
+
     Rectangle rect = getRectangle();
     float tolerance = 0.5f * getDimensionStatistics().getAverageWidth();
-    
+
     ObjectCounter<PdfTextAlignment> counter = new ObjectCounter<>();
-    
+
     for (PdfTextLine line : lines) {
       Rectangle lineRect = line.getRectangle();
-      
+
       if (rect != null && line.getRectangle() != null) {
         float leftMargin = lineRect.getMinX() - rect.getMinX();
         float rightMargin = rect.getMaxX() - lineRect.getMaxX();
@@ -858,5 +861,32 @@ public class PdfXYCutArea implements PdfArea {
       return PdfTextAlignment.JUSTIFIED;
     }
     return counter.getMostFrequentObject();
+  }
+
+  @Override
+  public String getMarkup() {
+    float fontsize = MathUtils.round(getFontsize(), 0);
+    
+    PdfFont font = getFont();
+    if (font == null) {
+      return null;
+    }
+
+    String fontname = font.getFullName();
+    if (fontname == null) {
+      return null;
+    }
+
+    return fontname + "-" + fontsize;
+  }
+
+  @Override
+  public PdfArea getBlock() {
+    return block;
+  }
+
+  @Override
+  public void setBlock(PdfArea block) {
+    this.block = block;
   }
 }
