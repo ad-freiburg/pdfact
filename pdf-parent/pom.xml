@@ -4,7 +4,7 @@
 
   <groupId>icecite</groupId>
   <artifactId>pdf-engine</artifactId>
-  <name>pdf-engine</name>
+  <name>pdf-parent</name>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 

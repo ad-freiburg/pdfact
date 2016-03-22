@@ -6,7 +6,7 @@
     <groupId>icecite</groupId>
     <artifactId>pdf-engine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../pdf-engine/pom.xml</relativePath>
+    <relativePath>../pdf-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>pdf-models</artifactId>
