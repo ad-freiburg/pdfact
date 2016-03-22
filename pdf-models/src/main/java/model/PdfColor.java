@@ -5,7 +5,7 @@ package model;
  *
  * @author Claudius Korzen
  */
-public interface PdfColor extends HasPdfDocument, HasId, Serializable {  
+public interface PdfColor extends HasPdfDocument, HasId {  
   /**
    * Returns true, if this color is equal to white.
    */
@@ -16,6 +16,11 @@ public interface PdfColor extends HasPdfDocument, HasId, Serializable {
    * tolerance.
    */
   public boolean isWhite(float tolerance);
+  
+  /**
+   * Returns the RGB array.
+   */
+  public float[] getRGB();
   
   /**
    * Returns the value of the red component.
@@ -31,9 +36,4 @@ public interface PdfColor extends HasPdfDocument, HasId, Serializable {
    * Returns the value of the blue component.
    */
   public float getB();
-  
-  /**
-   * Returns the RGB array.
-   */
-  public float[] getRGB();
 }

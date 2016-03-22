@@ -1,12 +1,6 @@
 package model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
-
-import org.json.JSONObject;
-
 import de.freiburg.iif.model.Line;
-import de.freiburg.iif.model.simple.SimpleLine;
-import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
 
@@ -17,10 +11,18 @@ import statistics.TextStatistician;
  */
 public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   /**
+   * The mean line of this text line.
+   */
+  protected Line meanLine;
+  /**
    * The base line of this text line.
    */
-  protected Line baseline;
-
+  protected Line baseLine;
+  /**
+   * The role.
+   */
+  protected PdfRole role = PdfRole.UNKNOWN;
+  
   /**
    * The default constructor.
    */
@@ -63,6 +65,27 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   }
 
   @Override
+  public String getText(boolean includePunctuationMarks,
+      boolean includeSubscripts, boolean includeSuperscripts) {
+    StringBuilder result = new StringBuilder();
+
+    for (PdfWord word : getWords()) {
+      if (word != null && !word.ignore()) {
+        if (result.length() > 0) {
+          result.append(" ");
+        }
+        String text = word.getText(includePunctuationMarks, includeSubscripts,
+            includeSuperscripts);
+        if (text != null) {
+          result.append(text);
+        }
+      }
+    }
+
+    return result.length() > 0 ? result.toString() : null;
+  }
+
+  @Override
   public PdfWord getFirstWord() {
     return getWords().size() > 0 ? getWords().get(0) : null;
   }
@@ -78,94 +101,13 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   }
 
   @Override
-  public String toTsv() {
-    if (ignore) {
-      return null;
-    }
-
-    StringBuilder tsv = new StringBuilder();
-
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getUnicode().replaceAll("\t", " "));
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    tsv.append("\t");
-    tsv.append(getFont().getId());
-    tsv.append("\t");
-    tsv.append(getFontsize());
-    tsv.append("\t");
-    tsv.append(getColor().getId());
-
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    if (ignore) {
-      return null;
-    }
-
-    StringBuilder xml = new StringBuilder();
-
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" page=\"" + getPage().getPageNumber() + "\"");
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" font=\"" + getFont().getId() + "\"");
-    xml.append(" fontsize=\"" + getFontsize() + "\"");
-    xml.append(" color=\"" + getColor().getId() + "\"");
-    xml.append(">");
-    xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">");
-
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    if (ignore) {
-      return null;
-    }
-
-    JSONObject json = new JSONObject();
-
-    json.put("unicode", getUnicode());
-    json.put("page", getPage().getPageNumber());
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    json.put("font", getFont().getId());
-    json.put("fontsize", getFontsize());
-    json.put("color", getColor().getId());
-
-    return json;
-  }
-
-  @Override
   public DimensionStatistics computeDimensionStatistics() {
     return DimensionStatistician.accumulate(getTextCharacters());
   }
 
   @Override
   public TextStatistics computeTextStatistics() {
-    TextStatistics s = TextStatistician.accumulate(getTextCharacters());
-
-    // for (PdfCharacter character : getTextCharacters()) {
-    // System.out.println(character.getTextStatistics().getMostCommonFont());
-    // }
-    // System.out.println(s.getMostCommonFont());
-
-    return s;
+    return TextStatistician.accumulate(getTextCharacters());
   }
 
   @Override
@@ -199,10 +141,35 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   }
 
   @Override
-  public Line getBaseLine() {
-    float minY = getPositionStatistics().getMostCommonMinY();
+  public Line getMeanLine() {
+    return meanLine;
+  }
 
-    return new SimpleLine(getRectangle().getMinX(), minY,
-        getRectangle().getMaxX(), minY);
+  @Override
+  public void setMeanLine(Line meanLine) {
+    this.meanLine = meanLine;
+  }
+
+  @Override
+  public Line getBaseLine() {
+    return baseLine;
+  }
+
+  @Override
+  public void setBaseLine(Line baseLine) {
+    this.baseLine = baseLine;
+  }
+
+  @Override
+  public void setRole(PdfRole role) {
+    this.role = role;
+    for (PdfWord word : getWords()) {
+      word.setRole(role);
+    }
+  }
+
+  @Override
+  public PdfRole getRole() {
+    return role;
   }
 }

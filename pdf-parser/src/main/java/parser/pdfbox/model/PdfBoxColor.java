@@ -7,9 +7,7 @@ import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
-import org.json.JSONObject;
 
-import de.freiburg.iif.text.StringUtils;
 import model.PdfColor;
 import model.PdfDocument;
 
@@ -106,49 +104,6 @@ public class PdfBoxColor implements PdfColor {
     return Arrays.hashCode(rgb);
   }
   
-  @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-    
-    tsv.append("color");
-    tsv.append("\t");
-    tsv.append(getId());
-    tsv.append("\t");
-    tsv.append(Arrays.toString(rgb));
-    
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-    
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-        
-    xml.append(indent);
-    xml.append("<");
-    xml.append("color");
-    xml.append(" id=\"" + getId() + "\"");
-    xml.append(" r=\"" + rgb[0] + "\"");
-    xml.append(" g=\"" + rgb[1] + "\"");
-    xml.append(" b=\"" + rgb[2] + "\"");
-    xml.append(" />"); 
-    
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    
-    json.put("id", getId());
-    json.put("r", rgb[0]);
-    json.put("g", rgb[1]);
-    json.put("b", rgb[2]);
-    
-    return json;
-  }
-
   @Override
   public String getId() {
     return this.id;

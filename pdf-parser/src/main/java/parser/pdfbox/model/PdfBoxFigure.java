@@ -1,12 +1,10 @@
 package parser.pdfbox.model;
 
-import org.json.JSONObject;
-
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.text.StringUtils;
 import model.PdfFeature;
 import model.PdfFigure;
 import model.PdfPage;
+import model.PdfRole;
 
 /**
  * Concrete implementation of a PdfFigure using PdfBox.
@@ -19,6 +17,11 @@ public class PdfBoxFigure extends PdfBoxArea implements PdfFigure {
    */
   protected Rectangle rectangle;
 
+  /**
+   * The role.
+   */
+  protected PdfRole role = PdfRole.UNKNOWN;
+  
   /**
    * The default constructor.
    */
@@ -44,47 +47,14 @@ public class PdfBoxFigure extends PdfBoxArea implements PdfFigure {
   public PdfFeature getFeature() {
     return PdfFeature.figures;
   }
-
+  
   @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-    
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    
-    return tsv.toString();
+  public void setRole(PdfRole role) {
+    this.role = role;
   }
-
+  
   @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-    
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-            
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" />"); 
-    
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    
-    return json;
+  public PdfRole getRole() {
+    return role;
   }
 }

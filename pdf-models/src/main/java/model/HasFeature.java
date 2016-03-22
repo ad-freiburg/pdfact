@@ -6,7 +6,7 @@ package model;
  * @author Claudius Korzen
  *
  */
-public interface HasFeature extends Serializable {
+public interface HasFeature {
   /**
    * Returns the represented feature.
    */

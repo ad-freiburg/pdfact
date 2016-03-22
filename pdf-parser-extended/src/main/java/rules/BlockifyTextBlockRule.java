@@ -1,10 +1,10 @@
 package rules;
 
-import java.util.HashSet;
 import java.util.List;
 
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
+import model.Characters;
 import model.PdfArea;
 import model.PdfElement;
 import model.SweepDirection.HorizontalSweepDirection;
@@ -15,29 +15,7 @@ import model.SweepDirection.VerticalSweepDirection;
  *
  * @author Claudius Korzen
  */
-public class BlockifyTextBlockRule implements BlockifyRule {
-  /**
-   * The characters that extend below the baseline of a font. 
-   */
-  protected static final HashSet<Character> DESCENDERS = new HashSet<>();
-  /**
-   * The characters that extend above the mean line of a font.
-   */
-  protected static final HashSet<Character> ASCENDERS = new HashSet<>();
-
-  static {
-    DESCENDERS.add('g');
-    DESCENDERS.add('p');
-    DESCENDERS.add('q');
-    DESCENDERS.add('y');
-    
-    ASCENDERS.add('b');
-    ASCENDERS.add('d');
-    ASCENDERS.add('f');
-    ASCENDERS.add('h');
-    ASCENDERS.add('k');
-  }
-  
+public class BlockifyTextBlockRule implements BlockifyRule {  
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return HorizontalSweepDirection.TOP_TO_BOTTOM;
@@ -78,8 +56,8 @@ public class BlockifyTextBlockRule implements BlockifyRule {
         // It is not allowed that characters other than descenders and ascenders
         // intersect the lane.
         if (Character.isAlphabetic(c) 
-            && !DESCENDERS.contains(c) 
-            && !ASCENDERS.contains(c)) {
+            && !Characters.isDescender(c) 
+            && !Characters.isAscender(c)) {
           return false;
         }
         

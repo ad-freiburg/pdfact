@@ -23,15 +23,16 @@ import de.freiburg.iif.path.FileAndDirectoryParser;
 import de.freiburg.iif.path.PathUtils;
 import model.PdfDocument;
 import model.PdfFeature;
+import model.PdfRole;
 import parser.PdfExtendedParser;
 import parser.PdfParser;
 import parser.PdfXYCutParser;
 import parser.pdfbox.PdfBoxParser;
 import serializer.JsonPdfSerializer;
-import serializer.PdfSerializer;
-import serializer.TsvPdfSerializer;
 import serializer.XmlPdfSerializer;
+import serializer.TsvPdfSerializer;
 import serializer.TxtPdfSerializer;
+import serializer.PdfSerializer;
 import visualizer.PdfVisualizer;
 import visualizer.PlainPdfVisualizer;
 
@@ -46,6 +47,11 @@ public class PdfParserCommandLine {
    */
   protected static final String OPTION_FEATURE = "feature";
 
+  /**
+   * The name of the option to define the roles(s) to extract.
+   */
+  protected static final String OPTION_ROLE = "role";
+  
   /**
    * The name of the option to define the serialization format.
    */
@@ -143,6 +149,11 @@ public class PdfParserCommandLine {
   protected List<PdfFeature> features;
 
   /**
+   * The roles to serialize given by the command line.
+   */
+  protected List<PdfRole> roles;
+  
+  /**
    * Flag that indicates if we have to visualize the features.
    */
   protected boolean createVisualization;
@@ -166,8 +177,8 @@ public class PdfParserCommandLine {
   static {
     addSerializationFormatChoice(new TsvPdfSerializer());
     addSerializationFormatChoice(new XmlPdfSerializer());
-    addSerializationFormatChoice(new JsonPdfSerializer());
     addSerializationFormatChoice(new TxtPdfSerializer());
+    addSerializationFormatChoice(new JsonPdfSerializer());
   }
   
   /**
@@ -185,7 +196,17 @@ public class PdfParserCommandLine {
     this.pdfAnalyzer = new PlainPdfAnalyzer();
     this.pdfVisualizer = new PlainPdfVisualizer();
 
-    this.features = PdfFeature.fromNames(cmd.getOptionValues(OPTION_FEATURE));
+    if (cmd.hasOption(OPTION_FEATURE)) {
+      this.features = PdfFeature.fromNames(cmd.getOptionValues(OPTION_FEATURE));
+    } else {
+      this.features = PdfFeature.valuesAsList();
+    }
+    if (cmd.hasOption(OPTION_ROLE)) {
+      this.roles = PdfRole.fromNames(cmd.getOptionValues(OPTION_ROLE));
+    } else {
+      this.roles = PdfRole.valuesAsList();
+    }
+    
     this.prefix = cmd.getOptionValue(OPTION_PREFIX, "");
     this.suffix = cmd.getOptionValue(OPTION_SUFFIX, ".pdf");
     this.parseInputRecursively = cmd.hasOption(OPTION_RECURSIVE);
@@ -268,8 +289,11 @@ public class PdfParserCommandLine {
         Files.createDirectories(directory);
       }
 
+      pdfSerializer.setFeatures(this.features);
+      pdfSerializer.setRoles(this.roles);
+      
       OutputStream stream = Files.newOutputStream(serializationFile);
-      pdfSerializer.serialize(document, this.features, stream);
+      pdfSerializer.serialize(document, stream);
       stream.close();
 
       return;
@@ -592,6 +616,14 @@ public class PdfParserCommandLine {
         .desc("The features to extract. Available: " + PdfFeature.getNames())
         .build());
 
+    // Add option for the roles to extract.
+    options.addOption(Option.builder()
+        .argName(OPTION_ROLE)
+        .longOpt(OPTION_ROLE)
+        .hasArg(true)
+        .desc("The roles to extract. Available: " + PdfRole.getNames())
+        .build());
+    
     // Add option for the features to extract.
     options.addOption(Option.builder()
         .argName(OPTION_VISUALIZE)

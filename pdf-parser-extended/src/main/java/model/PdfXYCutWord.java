@@ -1,10 +1,5 @@
 package model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
-
-import org.json.JSONObject;
-
-import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
 
@@ -19,6 +14,26 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
    */
   protected boolean isHyphenized;
 
+  /**
+   * Flag that indicates if this word contains a superscript.
+   */
+  protected boolean containsSuperScript;
+
+  /**
+   * Flag that indicates if this word contains a subscript.
+   */
+  protected boolean containsSubScript;
+
+  /**
+   * Flag that indicates if this word contains a punctuation mark.
+   */
+  protected boolean containsPunctuationMark;
+
+  /**
+   * The role.
+   */
+  protected PdfRole role = PdfRole.UNKNOWN;
+  
   /**
    * The default constructor.
    */
@@ -57,93 +72,49 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   }
 
   @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getUnicode().replaceAll("\t", " "));
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    tsv.append("\t");
-    tsv.append(getFont().getId());
-    tsv.append("\t");
-    tsv.append(getFontsize());
-    tsv.append("\t");
-    tsv.append(getColor().getId());
-
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" page=\"" + getPage().getPageNumber() + "\"");
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" font=\"" + getFont().getId() + "\"");
-    xml.append(" fontsize=\"" + getFontsize() + "\"");
-    xml.append(" color=\"" + getColor().getId() + "\"");
-    xml.append(">");
-    xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">");
-
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-
-    json.put("unicode", getUnicode());
-    json.put("page", getPage().getPageNumber());
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    json.put("font", getFont().getId());
-    json.put("fontsize", getFontsize());
-    json.put("color", getColor().getId());
-
-    return json;
-  }
-
-  @Override
   public DimensionStatistics computeDimensionStatistics() {
     return DimensionStatistician.accumulate(getTextCharacters());
   }
-  
+
   @Override
-  public TextStatistics computeTextStatistics() {    
+  public TextStatistics computeTextStatistics() {
     return TextStatistician.accumulate(getTextCharacters());
   }
-  
+
   @Override
   public String toString() {
     return getUnicode();
   }
-  
+
   @Override
   public String getUnicode() {
     StringBuilder result = new StringBuilder();
-    
+
     for (PdfCharacter character : getTextCharacters()) {
       if (character != null && !character.ignore()) {
         result.append(character.toString());
       }
     }
-    
+
     return result.toString();
+  }
+
+  @Override
+  public String getText(boolean includePunctuationMarks,
+      boolean includeSubscripts, boolean includeSuperscripts) {
+    StringBuilder result = new StringBuilder();
+
+    for (PdfCharacter character : getTextCharacters()) {
+      if (character != null && !character.ignore()) {
+        String text = character.getText(includePunctuationMarks,
+            includeSubscripts, includeSuperscripts);
+        if (text != null) {
+          result.append(character.toString());
+        }
+      }
+    }
+
+    return result.length() > 0 ? result.toString() : null;
   }
 
   @Override
@@ -174,5 +145,53 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       }
     }
     return true;
+  }
+
+  @Override
+  public boolean isHyphenated() {
+    return false;
+  }
+
+  @Override
+  public boolean containsSubScript() {
+    return containsSubScript;
+  }
+
+  @Override
+  public void setContainsSubScript(boolean containsSubscript) {
+    this.containsSubScript = containsSubscript;
+  }
+
+  @Override
+  public boolean containsSuperScript() {
+    return containsSuperScript;
+  }
+
+  @Override
+  public void setContainsSuperScript(boolean containsSuperscript) {
+    this.containsSuperScript = containsSuperscript;
+  }
+
+  @Override
+  public boolean containsPunctuationMark() {
+    return containsPunctuationMark;
+  }
+
+  @Override
+  public void setContainsPunctuationMark(boolean containsPunctuationMark) {
+    this.containsPunctuationMark = containsPunctuationMark;
+  }
+
+  @Override
+  public void setRole(PdfRole role) {
+    this.role = role;
+    for (PdfCharacter character : getTextCharacters()) {
+      character.setRole(role);
+    }
+  }
+
+  @Override
+  public PdfRole getRole() {
+    return role;
   }
 }

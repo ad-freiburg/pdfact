@@ -6,5 +6,13 @@ package model;
  * @author Claudius Korzen
  */
 public interface PdfElement extends PdfArea, HasFeature {
-
+  /**
+   * Sets the role of this element.
+   */
+  public void setRole(PdfRole role);
+  
+  /**
+   * Returns the role of this element.
+   */
+  public PdfRole getRole();
 }

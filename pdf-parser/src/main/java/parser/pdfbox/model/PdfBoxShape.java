@@ -1,12 +1,10 @@
 package parser.pdfbox.model;
 
-import org.json.JSONObject;
-
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.text.StringUtils;
 import model.PdfColor;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfRole;
 import model.PdfShape;
 
 /**
@@ -25,6 +23,11 @@ public class PdfBoxShape extends PdfBoxArea implements PdfShape {
    */
   protected PdfBoxColor color;
    
+  /**
+   * The role of this shape.
+   */
+  protected PdfRole role = PdfRole.UNKNOWN;
+  
   /**
    * The default constructor.
    */
@@ -65,51 +68,14 @@ public class PdfBoxShape extends PdfBoxArea implements PdfShape {
   public PdfFeature getFeature() {
     return PdfFeature.shapes;
   }
-
+  
   @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-    
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    tsv.append("\t");
-    tsv.append(getColor().getId());
-    
-    return tsv.toString();
+  public void setRole(PdfRole role) {
+    this.role = role;
   }
-
+  
   @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-    
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-            
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" color=\"" + getColor().getId() + "\"");
-    xml.append(" />"); 
-    
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    json.put("color", getColor().getId());
-    
-    return json;
+  public PdfRole getRole() {
+    return role;
   }
 }

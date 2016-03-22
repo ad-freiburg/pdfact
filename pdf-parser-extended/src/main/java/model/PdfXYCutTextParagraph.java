@@ -1,19 +1,15 @@
 package model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
+import static de.freiburg.iif.math.MathUtils.isEqual;
+import static de.freiburg.iif.math.MathUtils.isLarger;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.json.JSONObject;
-
-import static de.freiburg.iif.math.MathUtils.isEqual;
-import static de.freiburg.iif.math.MathUtils.isLarger;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.text.StringUtils;
 import statistics.DimensionStatistician;
 import statistics.TextLineStatistician;
 import statistics.TextStatistician;
@@ -34,7 +30,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   /**
    * The role of this paragraph.
    */
-  protected PdfRole role;
+  protected PdfRole role = PdfRole.UNKNOWN;
 
   protected Set<PdfTextAlignment> alignmentVariants;
 
@@ -106,7 +102,7 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   public String toString() {
     return getUnicode();
   }
-  
+
   /**
    * Returns the unicode of this text line.
    */
@@ -126,92 +122,31 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   }
 
   @Override
+  public String getText(boolean includePunctuationMarks,
+      boolean includeSubscripts, boolean includeSuperscripts) {
+    StringBuilder result = new StringBuilder();
+
+    for (PdfTextLine line : getTextLines()) {
+      if (line != null && !line.ignore()) {
+        if (result.length() > 0) {
+          result.append(" ");
+        }
+        String text = line.getText(includePunctuationMarks, includeSubscripts,
+            includeSuperscripts);
+        if (text != null) {
+          result.append(text);
+        }
+      }
+    }
+
+    return result.length() > 0 ? result.toString() : null;
+  }
+
+  @Override
   public PdfFeature getFeature() {
     return PdfFeature.paragraphs;
   }
-
-  @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getUnicode().replaceAll("\t", " "));
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    tsv.append("\t");
-    tsv.append(getFont().getId());
-    tsv.append("\t");
-    tsv.append(getFontsize());
-    tsv.append("\t");
-    tsv.append(getColor().getId());
-    if (getContext() != null) {
-      tsv.append("\t");
-      tsv.append(getContext());
-    }
-    if (getRole() != null) {
-      tsv.append("\t");
-      tsv.append(getRole());
-    }
-
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" page=\"" + getPage().getPageNumber() + "\"");
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" font=\"" + getFont().getId() + "\"");
-    xml.append(" fontsize=\"" + getFontsize() + "\"");
-    xml.append(" color=\"" + getColor().getId() + "\"");
-    if (getContext() != null) {
-      xml.append(" context=\"" + getContext() + "\"");
-    }
-    if (getRole() != null) {
-      xml.append(" role=\"" + getRole() + "\"");
-    }
-    xml.append(">");
-    xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">");
-
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-
-    json.put("unicode", getUnicode());
-    json.put("page", getPage().getPageNumber());
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    json.put("font", getFont().getId());
-    json.put("fontsize", getFontsize());
-    json.put("color", getColor().getId());
-    if (getContext() != null) {
-      json.put("context", getContext());
-    }
-    if (getRole() != null) {
-      json.put("role", getRole());
-    }
-
-    return json;
-  }
-
+  
   @Override
   public void setContext(String context) {
     this.context = context;
@@ -225,6 +160,9 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   @Override
   public void setRole(PdfRole role) {
     this.role = role;
+    for (PdfTextLine line : getTextLines()) {
+      line.setRole(role);
+    }
   }
 
   @Override

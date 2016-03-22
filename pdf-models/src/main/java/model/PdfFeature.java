@@ -2,6 +2,7 @@ package model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,23 +47,23 @@ public enum PdfFeature {
   /**
    * The name of this feature.
    */
-  String field;
+  String fieldName;
 
   /**
    * The color to visualize this feature.
    */
   Color color;
-  
+
   /**
    * The delimiter of this feature on serialization.
    */
   String txtDelimiter;
-  
+
   /**
    * The default constructor.
    */
   private PdfFeature(String field, Color color, String delimiter) {
-    this.field = field;
+    this.fieldName = field;
     this.color = color;
     this.txtDelimiter = delimiter;
   }
@@ -70,8 +71,8 @@ public enum PdfFeature {
   /**
    * Returns the name of the field of this feature.
    */
-  public String getField() {
-    return field;
+  public String getFieldName() {
+    return fieldName;
   }
 
   /**
@@ -80,14 +81,14 @@ public enum PdfFeature {
   public Color getColor() {
     return color;
   }
-  
+
   /**
    * Returns the delimiter of this feature.
    */
   public String getDelimiter() {
     return txtDelimiter;
   }
-  
+
   /**
    * The features by name.
    */
@@ -125,14 +126,9 @@ public enum PdfFeature {
 
     List<PdfFeature> features = new ArrayList<>();
     for (String name : names) {
-      if (!isValidFeature(name)) {
-        throw new IllegalArgumentException(
-            "\"" + name + "\" is not a valid feature");
-      }
-
       PdfFeature feature = fromName(name);
       if (feature != null) {
-        features.add(fromName(name));
+        features.add(feature);
       }
     }
     return features;
@@ -142,10 +138,15 @@ public enum PdfFeature {
    * Returns the feature that is associated with the given name.
    */
   public static PdfFeature fromName(String name) {
-    if (name == null) {
-      return null;
+    if (!isValidFeature(name)) {
+      throw new IllegalArgumentException(
+          "\"" + name + "\" is not a valid feature");
     }
 
     return features.get(name.toLowerCase());
+  }
+
+  public static List<PdfFeature> valuesAsList() {
+    return Arrays.asList(values());
   }
 }

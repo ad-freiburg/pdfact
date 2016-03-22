@@ -27,8 +27,6 @@ import parser.PdfParser;
 import parser.pdfbox.PdfBoxParser;
 import serializer.JsonPdfSerializer;
 import serializer.PdfSerializer;
-import serializer.TsvPdfSerializer;
-import serializer.XmlPdfSerializer;
 
 /**
  * The main class to start the pdf parser.
@@ -112,9 +110,10 @@ public class PdfParserMain {
   static {
     // Define the available output formatters.
     PdfSerializer[] outputFormatters = { 
-        new TsvPdfSerializer(),
-        new XmlPdfSerializer(),
-        new JsonPdfSerializer(),
+//        new TsvPdfSerializer(),
+//        new XmlPdfSerializer(),
+//        new JsonPdfSerializer(),
+        new JsonPdfSerializer()
     };
     pdfSerializers = new HashMap<>();
     for (PdfSerializer formatter : outputFormatters) {

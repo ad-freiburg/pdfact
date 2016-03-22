@@ -9,7 +9,6 @@ import java.util.List;
 import de.freiburg.iif.model.HasRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
-import model.PdfArea;
 import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
@@ -39,9 +38,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (features == null || features.isEmpty()) {
       features = Arrays.asList(PdfFeature.values());
     }
-    
+
     for (PdfPage page : document.getPages()) {
-      visualizePage(page, features, drawer);  
+      visualizePage(page, features, drawer);
     }
 
     drawer.writeTo(stream);
@@ -58,15 +57,19 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (features == null) {
       return;
     }
-    
+
     for (PdfFeature feature : features) {
       visualizeFeature(page, feature, drawer);
     }
-    
-    int i = 0;
+
     for (PdfTextParagraph para : page.getParagraphs()) {
-      visualizeElement(para, page, Color.BLACK, drawer);
-      drawer.drawText("" + para.getRole(), page.getPageNumber(), para.getRectangle().getUpperLeft(), Color.BLACK, 5f);
+      Color color = Color.BLACK;
+      if (para.getRole() != null) {
+        color = Color.GREEN;
+      }
+      visualizeElement(para, page, color, drawer);
+      drawer.drawText("" + para.getRole(), page.getPageNumber(),
+          para.getRectangle().getUpperLeft(), color, 5f);
     }
   }
 
@@ -75,18 +78,18 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Visualizes the paragraphs of the given document using the given drawer.
    */
-  protected void visualizeFeature(PdfPage page, PdfFeature feature, 
+  protected void visualizeFeature(PdfPage page, PdfFeature feature,
       PdfDrawer drawer) throws IOException {
     if (feature == null) {
       return;
     }
-    
+
     if (page == null) {
       return;
     }
-    
+
     for (PdfElement element : page.getElementsByFeature(feature)) {
-      visualizeElement(element, feature.getColor(), drawer);  
+      visualizeElement(element, feature.getColor(), drawer);
     }
   }
 
@@ -99,7 +102,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       Color color, PdfDrawer drawer) throws IOException {
     visualizeElement(element, element.getPage(), color, drawer);
   }
-  
+
   /**
    * Visualizes the given list of rectangles using the given drawer.
    */
@@ -108,7 +111,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (element == null) {
       return;
     }
-    
+
     if (page != null) {
       int pageNumber = page.getPageNumber();
       drawer.drawRectangle(element.getRectangle(), pageNumber, color);

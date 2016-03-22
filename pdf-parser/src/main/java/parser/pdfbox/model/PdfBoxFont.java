@@ -1,7 +1,5 @@
 package parser.pdfbox.model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,10 +7,8 @@ import java.util.Map;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
-import org.json.JSONObject;
 
 import de.freiburg.iif.path.LineReader;
-import de.freiburg.iif.text.StringUtils;
 import model.PdfDocument;
 import model.PdfFont;
 
@@ -212,60 +208,7 @@ public class PdfBoxFont implements PdfFont {
   }
   
   // ___________________________________________________________________________
-  
-  @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
     
-    tsv.append("font");
-    tsv.append("\t");
-    tsv.append(getId());
-    tsv.append("\t");
-    tsv.append(getBasename());
-    tsv.append("\t");
-    tsv.append(isBold ? "1" : 0);
-    tsv.append("\t");
-    tsv.append(isItalic ? "1" : 0);
-    tsv.append("\t");
-    tsv.append(isType3Font ? "1" : 0);
-    
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-    
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-            
-    xml.append(indent);
-    xml.append("<");
-    xml.append("font");
-    xml.append(" id=\"" + getId() + "\"");
-    xml.append(" name=\"" + escapeXml11(getBasename()) + "\"");
-    xml.append(" bold=\"" + (isBold ? "true" : "false") + "\"");
-    xml.append(" italic=\"" + (isItalic ? "true" : "false") + "\"");
-    xml.append(" type3=\"" + (isType3Font ? "true" : "false") + "\"");
-    xml.append(" />"); 
-    
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    
-    json.put("id", getId());
-    json.put("name", getBasename());
-    json.put("bold", isBold);
-    json.put("italic", isItalic);
-    json.put("type3", isType3Font);
-    
-    return json;
-  }
-  
-  // ___________________________________________________________________________
-  
   /**
    * Reads the afm map from file.
    * 

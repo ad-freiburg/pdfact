@@ -1,7 +1,5 @@
 package parser.pdfbox.model;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml11;
-
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.pdfbox.util.Matrix;
-import org.json.JSONObject;
 
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.text.StringUtils;
 import model.DimensionStatistics;
 import model.PdfCharacter;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfRole;
 import model.TextStatistics;
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
@@ -28,15 +25,15 @@ import statistics.TextStatistician;
  */
 public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   /**
-   * Adds non-decomposing diacritics to the hash with their related combining 
-   * character. These are values that the unicode spec claims are equivalent 
-   * but are not mapped in the form NFKC normalization method. Determined by 
-   * going through the Combining Diacritical Marks section of the Unicode spec 
-   * and identifying which characters are not mapped to by the normalization.
-   * For example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
+   * Adds non-decomposing diacritics to the hash with their related combining
+   * character. These are values that the unicode spec claims are equivalent but
+   * are not mapped in the form NFKC normalization method. Determined by going
+   * through the Combining Diacritical Marks section of the Unicode spec and
+   * identifying which characters are not mapped to by the normalization. For
+   * example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
    */
   protected static final Map<Integer, String> DIACRITICS;
-  
+
   /**
    * The rectangle.
    */
@@ -86,7 +83,27 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
    * This character wrapped in a list.
    */
   protected List<PdfCharacter> characterInList;
+
+  /**
+   * The role of this character.
+   */
+  protected PdfRole role = PdfRole.UNKNOWN;
   
+  /**
+   * The flag indicating if this character is a subscript.
+   */
+  protected boolean isSubScript;
+
+  /**
+   * The flag indicating if this character is a superscript.
+   */
+  protected boolean isSuperScript;
+
+  /**
+   * The flag indicating if this character is a punctuation mark.
+   */
+  protected boolean isPunctuationMark;
+
   // ___________________________________________________________________________
   // Constructor.
 
@@ -107,7 +124,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   public List<PdfCharacter> getTextCharacters() {
     return this.characterInList;
   }
-  
+
   @Override
   public Rectangle getRectangle() {
     return this.rectangle;
@@ -124,7 +141,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   public String toString() {
     return getUnicode();
   }
-  
+
   @Override
   public String getUnicode() {
     return unicode;
@@ -237,79 +254,17 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   }
 
   @Override
-  public String toTsv() {
-    StringBuilder tsv = new StringBuilder();
-
-    tsv.append(getFeature().getField());
-    tsv.append("\t");
-    tsv.append(getUnicode().replaceAll("\t", " "));
-    tsv.append("\t");
-    tsv.append(getPage().getPageNumber());
-    tsv.append("\t");
-    tsv.append(getRectangle());
-    tsv.append("\t");
-    tsv.append(getFont().getId());
-    tsv.append("\t");
-    tsv.append(getFontsize());
-    tsv.append("\t");
-    tsv.append(getColor().getId());
-
-    return tsv.toString();
-  }
-
-  @Override
-  public String toXml(int indentLevel, int indentLength) {
-    StringBuilder xml = new StringBuilder();
-
-    String indent = StringUtils.repeat(" ", indentLevel * indentLength);
-
-    xml.append(indent);
-    xml.append("<");
-    xml.append(getFeature().getField());
-    xml.append(" page=\"" + getPage().getPageNumber() + "\"");
-    xml.append(" minX=\"" + getRectangle().getMinX() + "\"");
-    xml.append(" minY=\"" + getRectangle().getMinY() + "\"");
-    xml.append(" maxX=\"" + getRectangle().getMaxX() + "\"");
-    xml.append(" maxY=\"" + getRectangle().getMaxY() + "\"");
-    xml.append(" font=\"" + getFont().getId() + "\"");
-    xml.append(" fontsize=\"" + getFontsize() + "\"");
-    xml.append(" color=\"" + getColor().getId() + "\"");
-    xml.append(">");
-    xml.append(escapeXml11(getUnicode()));
-    xml.append("</" + getFeature().getField() + ">");
-
-    return xml.toString();
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-
-    json.put("unicode", getUnicode());
-    json.put("page", getPage().getPageNumber());
-    json.put("minX", getRectangle().getMinX());
-    json.put("minY", getRectangle().getMinY());
-    json.put("maxX", getRectangle().getMaxX());
-    json.put("maxY", getRectangle().getMaxY());
-    json.put("font", getFont().getId());
-    json.put("fontsize", getFontsize());
-    json.put("color", getColor().getId());
-
-    return json;
-  }
-
-  @Override
   public DimensionStatistics computeDimensionStatistics() {
     return DimensionStatistician.compute(getTextCharacters());
   }
-  
+
   @Override
-  public TextStatistics computeTextStatistics() {   
+  public TextStatistics computeTextStatistics() {
     TextStatistics s = TextStatistician.compute(getTextCharacters());
-        
+
     return s;
   }
-  
+
   @Override
   public int getCodePoint() {
     return code;
@@ -344,17 +299,17 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     }
     return true;
   }
-    
+
   /**
    * Returns true if the given text is a diacritic char.
    */
   public boolean isDiacritic() {
     String text = getUnicode();
-    
+
     if (text == null || text.length() != 1) {
       return false;
     }
-    
+
     int type = Character.getType(text.charAt(0));
     return type == Character.NON_SPACING_MARK
         || type == Character.MODIFIER_SYMBOL
@@ -366,19 +321,19 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     if (diacritic == null || !diacritic.isDiacritic()) {
       return;
     }
-    
+
     this.unicode += resolveDiacritic(diacritic);
     this.rectangle = this.rectangle.union(diacritic.getRectangle());
   }
-  
+
   protected String resolveDiacritic(PdfCharacter diacritic) {
     if (diacritic == null || diacritic.getUnicode() == null) {
       return "";
     }
-    
+
     String str = diacritic.getUnicode();
     int codePoint = str.codePointAt(0);
-    
+
     // convert the characters not defined in the Unicode spec
     if (DIACRITICS.containsKey(codePoint)) {
       return DIACRITICS.get(codePoint);
@@ -386,7 +341,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
       return Normalizer.normalize(str, Normalizer.Form.NFKC).trim();
     }
   }
-  
+
   static {
     DIACRITICS = new HashMap<Integer, String>(31);
     DIACRITICS.put(0x0060, "\u0300");
@@ -420,5 +375,57 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     DIACRITICS.put(0x02CD, "\u0331");
     DIACRITICS.put(0x005F, "\u0332");
     DIACRITICS.put(0x204E, "\u0359");
+  }
+
+  @Override
+  public boolean isSubScript() {
+    return isSubScript;
+  }
+
+  @Override
+  public void setIsSubScript(boolean isSubscript) {
+    this.isSubScript = isSubscript;
+  }
+
+  @Override
+  public boolean isSuperScript() {
+    return isSuperScript;
+  }
+
+  @Override
+  public void setIsSuperScript(boolean isSuperscript) {
+    this.isSuperScript = isSuperscript;
+  }
+
+  @Override
+  public boolean isPunctuationMark() {
+    return isPunctuationMark;
+  }
+
+  @Override
+  public void setIsPunctuationMark(boolean isPuncutationMark) {
+    this.isPunctuationMark = isPuncutationMark;
+  }
+
+  @Override
+  public String getText(boolean includePunctuationMarks,
+      boolean includeSubscripts, boolean includeSuperscripts) {
+    if ((!includePunctuationMarks && isPunctuationMark())
+        || (!includeSubscripts && isSubScript())
+        || (!includeSuperscripts && isSuperScript())) {
+      return null;
+    }
+
+    return getUnicode();
+  }
+  
+  @Override
+  public void setRole(PdfRole role) {
+    this.role = role;
+  }
+  
+  @Override
+  public PdfRole getRole() {
+    return role;
   }
 }

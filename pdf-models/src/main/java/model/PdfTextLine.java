@@ -29,9 +29,24 @@ public interface PdfTextLine extends PdfTextElement {
    * Returns the last word in this font.
    */
   public PdfWord getLastWord();
+
+  /**
+   * Returns the meanline of this text line.
+   */
+  public Line getMeanLine();
+  
+  /**
+   * Sets the meanline of this text line.
+   */
+  public void setMeanLine(Line meanLine);
   
   /**
    * Returns the baseline of this text line.
    */
   public Line getBaseLine();
+  
+  /**
+   * Sets the baseline of this text line.
+   */
+  public void setBaseLine(Line baseLine);
 }

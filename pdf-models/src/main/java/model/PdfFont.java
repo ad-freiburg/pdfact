@@ -5,7 +5,7 @@ package model;
  *
  * @author Claudius Korzen
  */
-public interface PdfFont extends HasPdfDocument, HasId, Serializable {
+public interface PdfFont extends HasPdfDocument, HasId {
   /**
    * Returns the pdf name of this font.
    * 

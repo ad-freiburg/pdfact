@@ -20,14 +20,4 @@ public interface PdfNonTextParagraph extends PdfElement {
    * Returns the context of this paragraph.
    */
   public String getContext();
-  
-  /**
-   * Sets the role of this paragraph.
-   */
-  public void setRole(String role);
-  
-  /**
-   * Returns the role of this paragraph.
-   */
-  public String getRole();
 }
