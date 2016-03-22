@@ -28,6 +28,7 @@ import parser.PdfExtendedParser;
 import parser.PdfParser;
 import parser.PdfXYCutParser;
 import parser.pdfbox.PdfBoxParser;
+import revise.PdfRevisor;
 import serializer.JsonPdfSerializer;
 import serializer.XmlPdfSerializer;
 import serializer.TsvPdfSerializer;
@@ -91,6 +92,11 @@ public class PdfParserCommandLine {
    * The pdf analyzer to identify the roles of paragraphs.
    */
   protected PdfAnalyzer pdfAnalyzer;
+  
+  /**
+   * The pdf revisor.
+   */
+  protected PdfRevisor pdfRevisor;
   
   /**
    * The valid pdf serializers.
@@ -194,6 +200,7 @@ public class PdfParserCommandLine {
     this.pdfParser = new PdfBoxParser();
     this.extendedPdfParser = new PdfXYCutParser();
     this.pdfAnalyzer = new PlainPdfAnalyzer();
+    this.pdfRevisor = new PdfRevisor();
     this.pdfVisualizer = new PlainPdfVisualizer();
 
     if (cmd.hasOption(OPTION_FEATURE)) {
@@ -248,6 +255,9 @@ public class PdfParserCommandLine {
     // Analyze the document.
     analyze(document);
     
+    // Revise the document.
+    revise(document);
+    
     // Serialize the document.
     serialize(document);
 
@@ -273,6 +283,13 @@ public class PdfParserCommandLine {
     pdfAnalyzer.analyze(document);
   }
 
+  /**
+   * Revises the given document.
+   */
+  protected void revise(PdfDocument document) throws IOException {
+    pdfRevisor.revise(document);
+  }
+  
   /**
    * Serializes the given document.
    */

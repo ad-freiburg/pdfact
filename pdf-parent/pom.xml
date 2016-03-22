@@ -28,6 +28,7 @@
     <module>../pdf-visualizer</module>
     <module>../pdf-models</module>
     <module>../pdf-statistics</module>
+    <module>../pdf-revisor</module>
     <module>../pdf-cli</module>
   </modules>
 
@@ -48,6 +49,11 @@
       <artifactId>guice</artifactId>
       <version>3.0</version>
     </dependency>
+    <dependency>
+      <groupId>icecite</groupId>
+      <artifactId>pdf-models</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -62,8 +68,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.2</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <!-- Configure the checkstyle plugin. -->
