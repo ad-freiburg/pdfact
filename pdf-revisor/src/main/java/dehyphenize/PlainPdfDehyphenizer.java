@@ -8,6 +8,7 @@ import de.freiburg.iif.text.StringUtils;
 import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfPage;
+import model.PdfRole;
 import model.PdfTextLine;
 import model.PdfWord;
 
@@ -34,9 +35,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
     // well as in "quasi-ergodic".
     Map<String, Integer> hyphenZoneFreqs = computeHyphenZoneFreqs(document);
     
-    for (PdfPage page : document.getPages()) {
-      dehyphenize(page, hyphenZoneFreqs);
-    }
+    dehyphenize(document, hyphenZoneFreqs);
   }
 
   // ___________________________________________________________________________
@@ -46,66 +45,74 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
    * frequencies of the hyphen zones in the document and is needed to identify
    * intended hyphens.
    */
-  protected void dehyphenize(PdfPage page, Map<String, Integer> hyphenFreqs) {
-    if (page == null) {
+  protected void dehyphenize(PdfDocument document, Map<String, Integer> hyphenFreqs) {
+    if (document == null) {
       return;
     }
+
+    Map<PdfRole, PdfTextLine> prevBodyLines = new HashMap<>();
     
-    List<PdfTextLine> lines = page.getTextLines();
+    for (PdfPage page : document.getPages()) {
+      List<PdfTextLine> lines = page.getTextLines();
     
-    if (lines == null) {
-      return;
-    }
+      if (lines == null) {
+        return;
+      }
+      
+      for (PdfTextLine line : lines) {
+        if (line == null) {
+          continue;
+        }
+                
+        PdfTextLine prevBodyLine = prevBodyLines.get(line.getRole());
+        if (prevBodyLine != null) {
+          PdfWord lastBodyWord = prevBodyLine.getLastWord();
+          if (lastBodyWord != null) {
+            PdfCharacter lastBodyCharacter = lastBodyWord.getLastTextCharacter();
+            if (lastBodyCharacter != null) {
+              // Check, if the last line ends with an hyphen.
+              // TODO: Allow another dashes ("--". "---")
+              if (lastBodyCharacter.getUnicode().equals("-")) {
+                // The last line ends with a hyphen. 
+                PdfWord word = line.getFirstWord();
     
-    PdfTextLine prevLine = null;
-    for (PdfTextLine line : lines) {
-      if (prevLine != null) {
-        PdfWord lastWord = prevLine.getLastWord();
-        if (lastWord != null) {
-          PdfCharacter lastCharacter = lastWord.getLastTextCharacter();
-          if (lastCharacter != null) {
-            // Check, if the last line ends with an hyphen.
-            // TODO: Allow another dashes ("--". "---")
-            if (lastCharacter.getUnicode().equals("-")) {
-              // The last line ends with a hyphen. 
-              PdfWord word = line.getFirstWord();
-  
-              // Decide, if we have to ignore the hyphen or not.
-              boolean ignoreHyphen = true;
-              
-              // Obtain the frequency of the hyphen zone of the word in the 
-              // document.
-              int hyphenZoneFreq = 0;
-              String withHyphen = lastWord.getUnicode() + word.getUnicode();
-              String hyphenZone = getHyphenZone(withHyphen, 3);
-              if (hyphenFreqs.containsKey(hyphenZone)) {
-                hyphenZoneFreq = hyphenFreqs.get(hyphenZone);
-              }
-              
-              if (hyphenZoneFreq > 0) {
-                // Don't ignore the hyphen, if there are further occurrences of 
-                // the hyphen zone in the document.
-                ignoreHyphen = false;
-              } else {
-                // Otherwise, ignore the hyphen, if the first character after
-                // the hyphen isn't a upper case.
-                String firstChar = word.getFirstTextCharacter().toString();
-                ignoreHyphen = !Character.isUpperCase(firstChar.charAt(0));
-              }
-              
-              // Merge the both words.
-              lastWord.addAnyElements(word.getElements());
-              // Ignore the word (because it was merged with the previous word)
-              word.setIgnore(true);  
-              // Ignore the hyphen if necessary.
-              if (ignoreHyphen) {
-                lastCharacter.setIgnore(true);
+                // Decide, if we have to ignore the hyphen or not.
+                boolean ignoreHyphen = true;
+                
+                // Obtain the frequency of the hyphen zone of the word in the 
+                // document.
+                int hyphenZoneFreq = 0;
+                String withHyphen = lastBodyWord.getUnicode() + word.getUnicode();
+                String hyphenZone = getHyphenZone(withHyphen, 3);
+                if (hyphenFreqs.containsKey(hyphenZone)) {
+                  hyphenZoneFreq = hyphenFreqs.get(hyphenZone);
+                }
+                
+                if (hyphenZoneFreq > 0) {
+                  // Don't ignore the hyphen, if there are further occurrences of 
+                  // the hyphen zone in the document.
+                  ignoreHyphen = false;
+                } else {
+                  // Otherwise, ignore the hyphen, if the first character after
+                  // the hyphen isn't a upper case.
+                  String firstChar = word.getFirstTextCharacter().toString();
+                  ignoreHyphen = !Character.isUpperCase(firstChar.charAt(0));
+                }
+                
+                // Merge the both words.
+                lastBodyWord.addAnyElements(word.getElements());
+                // Ignore the word (because it was merged with the previous word)
+                word.setIgnore(true);  
+                // Ignore the hyphen if necessary.
+                if (ignoreHyphen) {
+                  lastBodyCharacter.setIgnore(true);
+                }
               }
             }
           }
         }
+        prevBodyLines.put(line.getRole(), line);
       }
-      prevLine = line;
     }
   }    
   

@@ -120,7 +120,7 @@ public class TxtPdfSerializer implements PdfSerializer {
     if (elements == null) {
       return null;
     }
-
+    
     List<String> serializedElements = new ArrayList<>();
     for (PdfElement element : elements) {
       // Serialize the element only if its role is included in the given roles.

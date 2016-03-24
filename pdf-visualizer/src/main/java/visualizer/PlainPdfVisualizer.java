@@ -13,6 +13,7 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfRole;
 import model.PdfTextParagraph;
 
 /**
@@ -64,13 +65,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
     for (PdfTextParagraph para : page.getParagraphs()) {
       Color color = Color.BLACK;
-      if (para.getRole() != null) {
-        color = Color.GREEN;
+      if (para.getRole() != PdfRole.UNKNOWN) {
+        color = Color.BLUE;
       }
       visualizeElement(para, page, color, drawer);
       drawer.drawText("" + para.getRole(), page.getPageNumber(),
-          para.getRectangle().getUpperLeft(), color, 5f);
-    }
+          para.getRectangle().getUpperLeft(), color);
+    }    
   }
 
   // ___________________________________________________________________________

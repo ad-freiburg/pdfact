@@ -163,11 +163,27 @@ public class PdfParagraphCharacteristics {
       List<PdfTextParagraph> paragraphs = page.getParagraphs();
 
       if (paragraphs != null && !paragraphs.isEmpty()) {
-        PdfTextParagraph topMost = paragraphs.get(0);
+        float minMinY = Float.MAX_VALUE;
+        float maxMaxY = -Float.MAX_VALUE;
+        PdfTextParagraph topMost = null;
+        PdfTextParagraph lowerMost = null;
+
+        // Find lower most and top most paragraph.
+        for (PdfTextParagraph paragraph : paragraphs) {
+          if (paragraph.getRectangle().getMinY() < minMinY) {
+            minMinY = paragraph.getRectangle().getMinY();
+            lowerMost = paragraph;
+          }
+          if (paragraph.getRectangle().getMaxY() > maxMaxY) {
+            maxMaxY = paragraph.getRectangle().getMaxY();
+            topMost = paragraph;
+          }
+        }
+
         if (topMost.getTextLines().size() < 3) {
           potentialPageHeaders.add(topMost);
         }
-        PdfTextParagraph lowerMost = paragraphs.get(paragraphs.size() - 1);
+
         if (lowerMost.getTextLines().size() < 3) {
           potentialPageFooters.add(lowerMost);
         }
@@ -199,7 +215,10 @@ public class PdfParagraphCharacteristics {
       for (int i = 1; i < potentialPageHeaders.size(); i++) {
         PdfTextParagraph potentialPageHeader = potentialPageHeaders.get(i);
         Rectangle potentialPageHeaderRect = potentialPageHeader.getRectangle();
-        if (pageHeaderArea.overlaps(potentialPageHeaderRect)) {
+        if (pageHeaderArea.overlaps(potentialPageHeaderRect)
+            && MathUtils.isEqual(potentialPageHeaderRect.getHeight(),
+                pageHeaderArea.getHeight(),
+                0.1f * pageHeaderArea.getHeight())) {
           pageHeaderArea = pageHeaderArea.union(potentialPageHeaderRect);
           numPageHeaderMembers++;
         } else {
@@ -221,11 +240,12 @@ public class PdfParagraphCharacteristics {
       for (int i = 1; i < potentialPageFooters.size(); i++) {
         PdfTextParagraph potentialPageFooter = potentialPageFooters.get(i);
         Rectangle potentialPageFooterRect = potentialPageFooter.getRectangle();
-        if (pageFooterArea.overlaps(potentialPageFooterRect)) {
+        if (pageFooterArea.overlaps(potentialPageFooterRect)
+            && MathUtils.isEqual(potentialPageFooterRect.getHeight(),
+                pageFooterArea.getHeight(),
+                0.1f * pageFooterArea.getHeight())) {
           pageFooterArea = pageFooterArea.union(potentialPageFooterRect);
           numPageFooterMembers++;
-        } else {
-          break;
         }
       }
 

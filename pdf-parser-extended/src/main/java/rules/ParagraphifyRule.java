@@ -114,14 +114,18 @@ public class ParagraphifyRule {
     if (block.getTextLineAlignment() == PdfTextAlignment.CENTERED) {
       return false;
     }
-
+    
     // TODO: Don't recompute this on every line of the block.
     FloatCounter lineMaxXCounter = new FloatCounter();
     for (PdfTextLine l : block.getTextLines()) {
       float maxX = MathUtils.round(l.getRectangle().getMaxX(), 0);
       lineMaxXCounter.add(maxX);
     }
-
+    
+    if (lineMaxXCounter.getMostFrequentFloatCount() < 2) {
+      return false;
+    }
+    
     float tolerance = block.getDimensionStatistics().getMostCommonWidth();
     float prevLineMaxX = prevLine.getRectangle().getMaxX();
     float blockMaxX = lineMaxXCounter.getMostFrequentFloat();

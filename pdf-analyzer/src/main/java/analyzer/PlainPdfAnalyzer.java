@@ -42,6 +42,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
    */
   protected static final Pattern TABLE_CAPTION_PATTERN = Pattern.compile(
       "^(table|tabelle)\\s*\\d+(\\.|:)", Pattern.CASE_INSENSITIVE);
+  
+  /**
+   * Pattern to find lables of formulas.
+   */
+  protected static final Pattern FORMULA_LABEL_PATTERN = Pattern.compile(
+      "\\([0-9]{1,3}\\)$", Pattern.CASE_INSENSITIVE);
 
   @Override
   public void analyze(PdfDocument document) {
@@ -181,6 +187,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         Rectangle pageHeaderArea = characteristics.getPageHeaderArea();
         Rectangle pageFooterArea = characteristics.getPageFooterArea();
 
+        
         if (pageHeaderArea != null) {
           if (rect.overlaps(pageHeaderArea)
               && MathUtils.isEqual(rect.getHeight(), pageHeaderArea.getHeight(),
@@ -208,7 +215,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
-        if (paragraph.getRole() != null) {
+        if (paragraph.getRole() != PdfRole.UNKNOWN) {
           continue;
         }
 
@@ -359,10 +366,11 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         if (text == null || page == null) {
           continue;
         }
-
+       
         // Check if the paragraph could be a caption.
         Matcher tableCaptionMatcher = FIGURE_CAPTION_PATTERN.matcher(text);
         if (tableCaptionMatcher.find()) {
+          
           // The paragraph is potential caption. To acknowledge, search for a
           // figure above and below the caption.
 
@@ -385,7 +393,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           List<? extends PdfElement> nonTextElementsBelow =
               page.getNonTextElementsOverlapping(below);
           int numNonTextElementsBelow = nonTextElementsBelow.size();
-
+          
           // Compare the number of non text elements in both areas.
           if (numNonTextElementsAbove == 0 && numNonTextElementsBelow == 0) {
             // No figures above and below the paragraph. So the paragraph is
@@ -398,13 +406,14 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           paragraph.setRole(PdfRole.FIGURE_CAPTION);
 
           // Try to identify all paragraphs of the figure.
-          float width = MathUtils.round(paragraph.getRectangle().getWidth(), 0);
+          float minX = MathUtils.round(paragraph.getRectangle().getMinX(), 1);
+          float maxX = MathUtils.round(paragraph.getRectangle().getMaxX(), 1);
 
           if (numNonTextElementsAbove > numNonTextElementsBelow) {
             // Extend the search area above the caption to upper bound of page.
             above.setMaxY(page.getRectangle().getMaxY());
 
-            // Consume all paragraphs that are more smaller than the caption.
+            // Consume all paragraphs that are smaller than the caption.
             List<PdfTextParagraph> paras = page.getParagraphsOverlapping(above);
             Collections.sort(paras, new Comparators.MinYComparator());
 
@@ -414,11 +423,14 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
               }
 
               Rectangle rect = para.getRectangle();
-              float paraWidth = MathUtils.round(rect.getWidth(), 0);
-
-              // Abort if we see a paragraph that is wider than the caption.
-              if (paraWidth >= width) {
-                return;
+              float paraMinX = MathUtils.round(rect.getMinX(), 1);
+              float paraMaxX = MathUtils.round(rect.getMaxX(), 1);
+              
+              // Abort if we see a paragraph that exceeds the left or right 
+              // border of the caption.
+              if (!MathUtils.isLarger(paraMinX, minX, 1f) 
+                  || !MathUtils.isSmaller(paraMaxX, maxX, 1f)) {
+                break;
               }
 
               para.setRole(PdfRole.FIGURE);
@@ -427,7 +439,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
             // Extend the search area below the caption to lower bound of page.
             below.setMinY(page.getRectangle().getMinY());
 
-            // Consume all paragraphs that are more smaller than the caption.
+            // Consume all paragraphs that are smaller than the caption.
             List<PdfTextParagraph> paras = page.getParagraphsOverlapping(below);
             Collections.sort(paras,
                 Collections.reverseOrder(new Comparators.MinYComparator()));
@@ -438,11 +450,14 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
               }
 
               Rectangle rect = para.getRectangle();
-              float paraWidth = MathUtils.round(rect.getWidth(), 0);
+              float paraMinX = MathUtils.round(rect.getMinX(), 1);
+              float paraMaxX = MathUtils.round(rect.getMaxX(), 1);
 
-              // Abort if we see a paragraph that is wider than the caption.
-              if (paraWidth >= width) {
-                return;
+              // Abort if we see a paragraph that exceeds the left or right 
+              // border of the caption.
+              if (!MathUtils.isLarger(paraMinX, minX, 1f) 
+                  || !MathUtils.isSmaller(paraMaxX, maxX, 1f)) {
+                break;
               }
 
               para.setRole(PdfRole.FIGURE);
@@ -479,8 +494,18 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
             }
           }
         }
-        if (numMathWords > numNonMathWords) {
+
+        if (numMathWords / (numMathWords + numNonMathWords) > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
+          continue;
+        }
+        
+        String text = paragraph.getText(true, true, true);
+        
+        Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
+        if (m.find()) {
+          paragraph.setRole(PdfRole.FORMULA);
+          continue;
         }
       }
     }
@@ -492,6 +517,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   protected static void analyzeForAbstract(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     boolean abstractHeaderAlreadySeen = false;
+    String abstractMarkup = null;
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
         if (abstractHeaderAlreadySeen) {
@@ -499,7 +525,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
             return;
           }
 
+          String markup = paragraph.getMarkup();
+          if (abstractMarkup != null && abstractMarkup.equals(markup)) {
+            return;
+          }
+          
           paragraph.setRole(PdfRole.ABSTRACT);
+          abstractMarkup = paragraph.getMarkup();
         }
 
         if (paragraph.getRole() == PdfRole.ABSTRACT_HEADING) {

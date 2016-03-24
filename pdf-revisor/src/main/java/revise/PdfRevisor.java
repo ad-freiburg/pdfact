@@ -2,15 +2,15 @@ package revise;
 
 import dehyphenize.PdfDehyphenizer;
 import dehyphenize.PlainPdfDehyphenizer;
-import merge.PdfParagraphMerger;
-import merge.PlainPdfParagraphMerger;
+import merge.PdfBodyTextMerger;
+import merge.PlainPdfBodyTextMerger;
 import model.PdfDocument;
 
 public class PdfRevisor {
   /**
    * The paragraph merger.
    */
-  protected PdfParagraphMerger merger;
+  protected PdfBodyTextMerger merger;
   
   /** 
    * The dehyphenizer. 
@@ -21,7 +21,7 @@ public class PdfRevisor {
    * The public constructor.
    */
   public PdfRevisor() {
-    this.merger = new PlainPdfParagraphMerger();
+    this.merger = new PlainPdfBodyTextMerger();
     this.dehypehnizer = new PlainPdfDehyphenizer();
   }
   
@@ -39,7 +39,7 @@ public class PdfRevisor {
    * Merges the paragraphs of the given document.
    */
   protected void mergeParagraphs(PdfDocument document) {
-    this.merger.merge(document);
+    this.merger.mergeBodyText(document);
   }
   
   /**
