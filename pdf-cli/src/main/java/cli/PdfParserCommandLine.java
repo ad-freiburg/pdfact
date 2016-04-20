@@ -448,8 +448,8 @@ public class PdfParserCommandLine {
       throw new IllegalArgumentException("There is no input given.");
     }
 
-    this.input = Paths.get(inputStr);
-
+    this.input = Paths.get(inputStr).toAbsolutePath();
+        
     // Check if the input is readable.
     if (!Files.isReadable(this.input)) {
       throw new IllegalArgumentException("The input can't be read.");
