@@ -24,13 +24,14 @@ Once you have checked out the project you can request updates via
 
 Build the project:
     
-    cd icecite/pdf-cli
+    cd icecite/pdf-parent
     mvn install
 
 ### Extracting text from PDF files
 
 Extract text from PDF files:
     
+    cd icecite/pdf-cli
     java -jar target/pdf-cli-*-jar-with-dependencies.jar [options] <input> [<output>]
 
 This will parse the given input (which may be a pdf file or a directory of pdf 
