@@ -55,7 +55,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
     float docWidths = doc.getDimensionStatistics().getMostCommonWidth();
     float pageWidths = area.getDimensionStatistics().getMostCommonWidth();
 
-    return 2.5f * Math.max(docWidths, pageWidths);
+    return 2f * Math.max(docWidths, pageWidths);
   }
 
   @Override

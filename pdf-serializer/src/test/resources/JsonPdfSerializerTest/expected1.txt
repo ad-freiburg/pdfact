@@ -1,104 +1,91 @@
 {
-   "pages":[
-      {
-         "characters":[
-            {
-               "minY":0,
-               "color":"color-1",
-               "minX":0,
-               "maxY":5,
-               "maxX":5,
-               "unicode":"a",
-               "fontsize":12,
-               "font":"font-1"
-            },
-            {
-               "minY":2.5,
-               "color":"color-2",
-               "minX":5,
-               "maxY":3.700000047683716,
-               "maxX":7.199999809265137,
-               "unicode":"b",
-               "fontsize":10.5,
-               "font":"font-1"
-            }
-         ],
-         "figures":[
-            {
-               "minY":0,
-               "minX":0,
-               "maxY":5,
-               "maxX":5
-            }
-         ],
-         "shapes":[
-            {
-               "minY":2.5,
-               "color":"color-2",
-               "minX":5,
-               "maxY":3.700000047683716,
-               "maxX":7.199999809265137
-            }
-         ],
-         "words":[
-
-         ],
-         "id":1,
-         "paragraphs":[
-
-         ],
-         "lines":[
-
-         ]
-      },
-      {
-         "characters":[
-
-         ],
-         "figures":[
-            {
-               "minY":2.5,
-               "minX":5,
-               "maxY":3.700000047683716,
-               "maxX":7.199999809265137
-            }
-         ],
-         "shapes":[
-
-         ],
-         "words":[
-
-         ],
-         "id":2,
-         "paragraphs":[
-
-         ],
-         "lines":[
-
-         ]
-      }
-   ],
-   "fonts":[
-      {
-         "type3":false,
-         "name":"arial",
-         "id":"font-1",
-         "bold":false,
-         "italic":false
-      }
-   ],
-   "colors":[
-      {
-         "r":0,
-         "b":0,
-         "g":0,
-         "id":"color-1"
-      },
-      {
-         "r":0,
-         "b":0,
-         "g":0,
-         "id":"color-2"
-      }
-   ]
+    "pages": [
+        {
+            "character": [
+                {
+                    "mostCommonColor": "color-1",
+                    "role": "unknown",
+                    "endColor": "color-1",
+                    "maxY": 5,
+                    "maxX": 5,
+                    "endFont": "font-1",
+                    "mostCommonFont": "font-1",
+                    "startColor": "color-1",
+                    "endFontsize": 12,
+                    "minY": 0,
+                    "minX": 0,
+                    "mostCommonFontsize": 12,
+                    "text": "a",
+                    "page": 1,
+                    "startFont": "font-1",
+                    "startFontsize": 12
+                },
+                {
+                    "mostCommonColor": "color-2",
+                    "role": "unknown",
+                    "endColor": "color-2",
+                    "maxY": 3.700000047683716,
+                    "maxX": 7.199999809265137,
+                    "endFont": "font-1",
+                    "mostCommonFont": "font-1",
+                    "startColor": "color-2",
+                    "endFontsize": 10.5,
+                    "minY": 2.5,
+                    "minX": 5,
+                    "mostCommonFontsize": 10.5,
+                    "text": "b",
+                    "page": 1,
+                    "startFont": "font-1",
+                    "startFontsize": 10.5
+                }
+            ],
+            "figure": [{
+                "role": "figure",
+                "minY": 0,
+                "minX": 0,
+                "maxY": 5,
+                "maxX": 5
+            }],
+            "shape": [{
+                "mostCommonColor": "color-2",
+                "role": "figure",
+                "minY": 2.5,
+                "minX": 5,
+                "maxY": 3.700000047683716,
+                "maxX": 7.199999809265137
+            }],
+            "id": 1
+        },
+        {
+            "figure": [{
+                "role": "figure",
+                "minY": 2.5,
+                "minX": 5,
+                "maxY": 3.700000047683716,
+                "maxX": 7.199999809265137
+            }],
+            "id": 2
+        }
+    ],
+    "fonts": [{
+        "type3": false,
+        "name": "arial",
+        "id": "font-1",
+        "bold": false,
+        "italic": false
+    }],
+    "colors": [
+        {
+            "r": 0,
+            "b": 0,
+            "g": 0,
+            "id": "color-1"
+        },
+        {
+            "r": 0,
+            "b": 0,
+            "g": 0,
+            "id": "color-2"
+        }
+    ]
 }

@@ -5,20 +5,26 @@ import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_B;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_G;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_R;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_DOCUMENT;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_COLOR;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT_SIZE;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT_SIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_X;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_Y;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_X;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_Y;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_PAGE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_ROLE;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONTSIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONTS;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_BOLD;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_ITALIC;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_TYPE3;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_NAME;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONTSIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_PAGES;
 import static serializer.PdfSerializerConstants.INDENT_LENGTH;
 
@@ -26,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +42,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import de.freiburg.iif.collection.CollectionUtils;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.text.StringUtils;
+import model.Comparators;
+import model.PdfCharacter;
 import model.PdfColor;
 import model.PdfDocument;
 import model.PdfElement;
@@ -297,15 +306,66 @@ public class XmlPdfSerializer implements PdfSerializer {
     if (font != null) {
       String fontId = font.getId();
       float fs = element.getFontsize();
-      xml.append(" " + CONTEXT_NAME_ELEMENT_FONT + "=\"" + fontId + "\"");
-      xml.append(" " + CONTEXT_NAME_ELEMENT_FONT_SIZE + "=\"" + fs + "\"");
+      xml.append(
+          " " + CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT + "=\"" + fontId + "\"");
+      xml.append(
+          " " + CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT_SIZE + "=\"" + fs + "\"");
     }
 
-    // Append the color.
+    // Add font of first and last character.
+    PdfFont firstCharacterFont = null;
+    PdfFont lastCharacterFont = null;
+    PdfColor firstCharacterColor = null;
+    PdfColor lastCharacterColor = null;
+    float firstCharacterFontsize = 0;
+    float lastCharacterFontsize = 0;
+    List<PdfCharacter> characters = element.getTextCharacters();
+    if (characters != null && !characters.isEmpty()) {
+      Collections.sort(characters, new Comparators.MinXComparator());
+
+      PdfCharacter firstCharacter = characters.get(0);
+      PdfCharacter lastCharacter = characters.get(characters.size() - 1);
+
+      if (firstCharacter != null) {
+        firstCharacterFont = firstCharacter.getFont();
+        firstCharacterFontsize = firstCharacter.getFontsize();
+        firstCharacterColor = firstCharacter.getColor();
+      }
+      if (lastCharacter != null) {
+        lastCharacterFont = lastCharacter.getFont();
+        lastCharacterFontsize = lastCharacter.getFontsize();
+        lastCharacterColor = lastCharacter.getColor();
+      }
+    }
+    if (firstCharacterFont != null) {
+      xml.append(" " + CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONT + "=\""
+          + firstCharacterFont.getId() + "\"");
+      xml.append(" " + CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONTSIZE + "=\""
+          + firstCharacterFontsize + "\"");
+    }
+    if (lastCharacterFont != null) {
+      xml.append(" " + CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONT + "=\""
+          + lastCharacterFont.getId() + "\"");
+      xml.append(" " + CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONTSIZE + "=\""
+          + lastCharacterFontsize + "\"");
+    }
+
+    // Append the most common color.
     PdfColor color = element.getColor();
     if (color != null) {
       String colorId = color.getId();
-      xml.append(" " + CONTEXT_NAME_ELEMENT_COLOR + "=\"" + colorId + "\"");
+      xml.append(" " + CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR + "=\"" + colorId
+          + "\"");
+    }
+    // Append the color of first character.
+    if (firstCharacterColor != null) {
+      xml.append(" " + CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_COLOR + "=\""
+          + firstCharacterColor.getId() + "\"");
+    }
+    // Append the color of last character.
+    if (lastCharacterColor != null) {
+      xml.append(" " + CONTEXT_NAME_ELEMENT_LAST_CHARACTER_COLOR + "=\""
+          + lastCharacterColor.getId() + "\"");
     }
 
     // Append the role.
@@ -362,7 +422,8 @@ public class XmlPdfSerializer implements PdfSerializer {
     PdfColor color = element.getColor();
     if (color != null) {
       String colorId = color.getId();
-      xml.append(" " + CONTEXT_NAME_ELEMENT_COLOR + "=\"" + colorId + "\"");
+      xml.append(" " + CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR + "=\"" + colorId
+          + "\"");
     }
 
     // Append the role.

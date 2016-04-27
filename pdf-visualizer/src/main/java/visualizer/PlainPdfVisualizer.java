@@ -63,15 +63,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       visualizeFeature(page, feature, drawer);
     }
 
-    for (PdfTextParagraph para : page.getParagraphs()) {
-      Color color = Color.BLACK;
-      if (para.getRole() != PdfRole.UNKNOWN) {
-        color = Color.BLUE;
-      }
-      visualizeElement(para, page, color, drawer);
-      drawer.drawText("" + para.getRole(), page.getPageNumber(),
-          para.getRectangle().getUpperLeft(), color);
-    }    
+//    for (PdfTextParagraph para : page.getParagraphs()) {
+//      Color color = Color.BLACK;
+//      if (para.getRole() != PdfRole.UNKNOWN) {
+//        color = Color.BLUE;
+//      }
+//      visualizeElement(para, page, color, drawer);
+//      drawer.drawText("" + para.getRole(), page.getPageNumber(),
+//          para.getRectangle().getUpperLeft(), color);
+//    }    
   }
 
   // ___________________________________________________________________________

@@ -182,9 +182,20 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       boundingBox.setMaxX(defaultBoundingBox.getMaxX());
     }
 
+    // In some pdfs, fontsize is equal to '1.0' for every character. 
+    // In this case, multiplying it with the scaling factor gives the correct 
+    // fontsize. In other pdfs, the fontsizes are correct and multiplying it 
+    // with the scaling factor would result in too large fontsizes.
+    // Observation: In the latter case, fontsize and scale factor are equal, 
+    // so multiply the fontsize and the scale factor only when they aren't 
+    // equal.
+    // TODO: Verify, that this is a correct observation.
     float fontsize = getGraphicsState().getTextState().getFontSize();
-    // fontsize = fontsize * trm.getScalingFactorX();
-
+    float scaleFactorX = trm.getScalingFactorX();
+    if (fontsize != scaleFactorX) {
+      fontsize *= scaleFactorX;
+    }
+        
     // Use our additional glyph list for Unicode mapping
     unicode = font.toUnicode(code, glyphList);
 

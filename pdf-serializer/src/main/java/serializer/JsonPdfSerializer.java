@@ -5,9 +5,11 @@ import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_B;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_G;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_ID;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_R;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_COLOR;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT;
-import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT_SIZE;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_COLOR;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT_SIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_X;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_Y;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_X;
@@ -15,18 +17,23 @@ import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_Y;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_PAGE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_ROLE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_TEXT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONTSIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONTS;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_ID;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_BOLD;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_ITALIC;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_IS_TYPE3;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_NAME;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONT;
+import static serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONTSIZE;
 import static serializer.PdfSerializerConstants.CONTEXT_NAME_PAGES;
 import static serializer.PdfSerializerConstants.INDENT_LENGTH;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +43,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.freiburg.iif.model.Rectangle;
+import model.Comparators;
+import model.PdfCharacter;
 import model.PdfColor;
 import model.PdfDocument;
 import model.PdfElement;
@@ -275,13 +284,60 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     PdfFont font = element.getFont();
     if (font != null) {
-      json.put(CONTEXT_NAME_ELEMENT_FONT, font.getId());
-      json.put(CONTEXT_NAME_ELEMENT_FONT_SIZE, element.getFontsize());
+      json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT, font.getId());
+      json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT_SIZE,
+          element.getFontsize());
+    }
+
+    // Add font of first and last character.
+    PdfFont firstCharacterFont = null;
+    PdfFont lastCharacterFont = null;
+    PdfColor firstCharacterColor = null;
+    PdfColor lastCharacterColor = null;
+    float firstCharacterFontsize = 0;
+    float lastCharacterFontsize = 0;
+    List<PdfCharacter> characters = element.getTextCharacters();
+    if (characters != null && !characters.isEmpty()) {
+      Collections.sort(characters, new Comparators.MinXComparator());
+
+      PdfCharacter firstCharacter = characters.get(0);
+      PdfCharacter lastCharacter = characters.get(characters.size() - 1);
+
+      if (firstCharacter != null) {
+        firstCharacterFont = firstCharacter.getFont();
+        firstCharacterFontsize = firstCharacter.getFontsize();
+        firstCharacterColor = firstCharacter.getColor();
+      }
+      if (lastCharacter != null) {
+        lastCharacterFont = lastCharacter.getFont();
+        lastCharacterFontsize = lastCharacter.getFontsize();
+        lastCharacterColor = lastCharacter.getColor();
+      }
+    }
+    if (firstCharacterFont != null) {
+      json.put(CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONT,
+          firstCharacterFont.getId());
+      json.put(CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_FONTSIZE,
+          firstCharacterFontsize);
+    }
+    if (lastCharacterFont != null) {
+      json.put(CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONT,
+          lastCharacterFont.getId());
+      json.put(CONTEXT_NAME_ELEMENT_LAST_CHARACTER_FONTSIZE,
+          lastCharacterFontsize);
     }
 
     PdfColor color = element.getColor();
     if (color != null) {
-      json.put(CONTEXT_NAME_ELEMENT_COLOR, color.getId());
+      json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR, color.getId());
+    }
+    if (firstCharacterColor != null) {
+      json.put(CONTEXT_NAME_ELEMENT_FIRST_CHARACTER_COLOR,
+          firstCharacterColor.getId());
+    }
+    if (lastCharacterColor != null) {
+      json.put(CONTEXT_NAME_ELEMENT_LAST_CHARACTER_COLOR,
+          lastCharacterColor.getId());
     }
 
     PdfRole role = element.getRole();
@@ -312,7 +368,7 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     PdfColor color = element.getColor();
     if (color != null) {
-      json.put(CONTEXT_NAME_ELEMENT_COLOR, color.getId());
+      json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR, color.getId());
     }
 
     PdfRole role = element.getRole();
