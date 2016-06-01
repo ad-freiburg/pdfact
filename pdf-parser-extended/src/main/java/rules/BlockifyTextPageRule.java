@@ -109,7 +109,11 @@ public class BlockifyTextPageRule implements BlockifyRule {
     float docHeights = doc.getDimensionStatistics().getMostCommonHeight();
     float pageHeights = area.getDimensionStatistics().getMostCommonHeight();
 
-    return 1.5f * Math.max(docHeights, pageHeights);
+    // System.out.println(Math.max(docHeights, pageHeights) + " " +
+    // doc.getEstimatedLinePitch());
+
+    return 1.5f * doc.getEstimatedLinePitch();
+    // return 1.5f * Math.max(docHeights, pageHeights);
   }
 
   @Override

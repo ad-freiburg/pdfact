@@ -364,7 +364,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Tries to split the given area vertically.
    */
-  protected List<PdfArea> splitVertically(PdfArea area, 
+  public List<PdfArea> splitVertically(PdfArea area, 
       BlockifyRule rule) {
     List<PdfArea> result = new ArrayList<PdfArea>();
 
@@ -388,7 +388,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   /**
    * Tries to split the given area horizontally.
    */
-  protected List<PdfArea> splitHorizontally(PdfArea area, 
+  public List<PdfArea> splitHorizontally(PdfArea area, 
       BlockifyRule rule) {
     List<PdfArea> result = new ArrayList<PdfArea>();
 

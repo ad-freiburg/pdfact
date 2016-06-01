@@ -50,4 +50,6 @@ public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics,
    * Sets the markup of section headings. TODO: Move to Analyzer.
    */
   public void setSectionHeadingMarkup(String markup);  
+  
+  public int getEstimatedLinePitch();
 }

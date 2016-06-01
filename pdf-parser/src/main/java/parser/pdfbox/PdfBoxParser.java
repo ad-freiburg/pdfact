@@ -62,10 +62,10 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
     // Create new PdfTextDocument.
     this.document = document;
   }
-  
+    
   @Override
   public void startPage(PdfBoxPage page) throws IOException {
-    super.startPage(page);
+    super.startPage(page);    
     this.page = page;
     this.document.addTextPage(this.page);
   }
@@ -73,7 +73,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   @Override
   protected void showPdfTextCharacter(PdfBoxCharacter character) {
     super.showPdfTextCharacter(character);
-        
+            
     if (ConsiderRules.considerPdfCharacter(character)) {
       this.page.addTextCharacter(character);
     }

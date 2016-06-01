@@ -375,4 +375,7 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   
   public PdfArea getBlock();
   public void setBlock(PdfArea block);
+
+  public void setRects(List<Rectangle> subRects);
+  public List<Rectangle> getRects();
 }

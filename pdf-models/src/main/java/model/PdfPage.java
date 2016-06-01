@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 
+import de.freiburg.iif.counter.IntCounter;
 import de.freiburg.iif.model.Rectangle;
 
 /**
@@ -57,6 +58,8 @@ public interface PdfPage extends PdfArea, HasTextLineStatistics {
    */
   public float getFiguresCoverage();
 
+  public IntCounter getEstimatedLinePitchCounter();
+  
   public void setBlocks(List<? extends PdfArea> blocks);
   
   public List<? extends PdfArea> getBlocks();

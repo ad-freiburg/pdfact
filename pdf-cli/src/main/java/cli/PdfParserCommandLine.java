@@ -30,10 +30,10 @@ import parser.PdfXYCutParser;
 import parser.pdfbox.PdfBoxParser;
 import revise.PdfRevisor;
 import serializer.JsonPdfSerializer;
-import serializer.XmlPdfSerializer;
+import serializer.PdfSerializer;
 import serializer.TsvPdfSerializer;
 import serializer.TxtPdfSerializer;
-import serializer.PdfSerializer;
+import serializer.XmlPdfSerializer;
 import visualizer.PdfVisualizer;
 import visualizer.PlainPdfVisualizer;
 
@@ -199,6 +199,7 @@ public class PdfParserCommandLine {
 
     this.pdfParser = new PdfBoxParser();
     this.extendedPdfParser = new PdfXYCutParser();
+//    this.extendedPdfParser = new NewPdfXYCutParser();
     this.pdfAnalyzer = new PlainPdfAnalyzer();
     this.pdfRevisor = new PdfRevisor();
     this.pdfVisualizer = new PlainPdfVisualizer();

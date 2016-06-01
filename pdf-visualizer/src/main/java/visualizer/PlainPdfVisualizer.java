@@ -5,16 +5,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
+import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
-import model.PdfRole;
-import model.PdfTextParagraph;
+import model.PdfTextLine;
+import model.PdfWord;
 
 /**
  * The default implmentation of a PdfVisualizer.
@@ -63,15 +68,46 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       visualizeFeature(page, feature, drawer);
     }
 
-//    for (PdfTextParagraph para : page.getParagraphs()) {
-//      Color color = Color.BLACK;
-//      if (para.getRole() != PdfRole.UNKNOWN) {
-//        color = Color.BLUE;
+//    if (page.getRects() != null) {
+//      for (Rectangle rect : page.getRects()) {
+//        drawer.drawRectangle(rect, page.getPageNumber(), Color.BLACK);
 //      }
-//      visualizeElement(para, page, color, drawer);
-//      drawer.drawText("" + para.getRole(), page.getPageNumber(),
-//          para.getRectangle().getUpperLeft(), color);
-//    }    
+//    }
+    
+    for (PdfArea block : page.getBlocks()) {
+//      drawer.drawRectangle(block.getRectangle(), page.getPageNumber(),
+//          Color.BLACK);
+      if (block.getRects() != null) {
+        for (Rectangle rect : block.getRects()) {
+          drawer.drawRectangle(rect, page.getPageNumber(), Color.BLUE);
+        }
+      }
+//      for (PdfWord word : block.getWords()) {
+//        drawer.drawRectangle(word.getRectangle(), page.getPageNumber(),
+//            Color.BLUE);
+//      } 
+      Random r = new Random();
+      for (PdfTextLine line : block.getTextLines()) {
+        Color color = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
+        for (PdfCharacter character : line.getTextCharacters()) {
+          drawer.drawRectangle(character.getRectangle(), page.getPageNumber(), color);
+        }
+        drawer.drawRectangle(line.getRectangle(), page.getPageNumber(),
+            Color.BLUE);
+      } 
+      
+    }
+    
+//    drawer.drawRectangle(new SimpleRectangle(316.81195f,541.1039f,556.87244f,550.3539f), page.getPageNumber());
+//    drawer.drawRectangle(new SimpleRectangle(316.81195f,541.1039f,556.87244f,550.3539f), page.getPageNumber());
+    drawer.drawRectangle(new SimpleRectangle(320.39597f,548.1713f,555.92334f,549.4213f), page.getPageNumber());
+//    if (page.getRects() != null) {
+//      for (Rectangle rect : page.getRects()) {
+//        drawer.drawRectangle(rect.getRectangle(), page.getPageNumber(),
+//            Color.BLACK);
+//      }
+//    }
+    
   }
 
   // ___________________________________________________________________________

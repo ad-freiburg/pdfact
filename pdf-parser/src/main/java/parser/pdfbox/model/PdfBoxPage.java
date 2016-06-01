@@ -6,10 +6,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
+import de.freiburg.iif.counter.IntCounter;
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfFigure;
 import model.PdfPage;
 import model.PdfTextAlignment;
@@ -70,6 +72,13 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
    */
   protected PdfTextAlignment alignment;
   
+  protected IntCounter verticalCharacterPitchesCounter;
+  
+  /**
+   * The most recently added text character.
+   */
+  protected PdfCharacter prevTextCharacter;
+  
   /**
    * The default constructor.
    */
@@ -109,6 +118,7 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
 
     this.artBox = this.cropBox;
     this.trimBox = this.cropBox;
+    this.verticalCharacterPitchesCounter = new IntCounter();
   }
 
   @Override
@@ -217,5 +227,41 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
     }
         
     return alignmentCounter.getMostFrequentObject();
+  }
+  
+  Rectangle prevRect = null;
+  Rectangle rect = null;
+  
+  @Override
+  public void addTextCharacter(PdfCharacter character) {
+    super.addTextCharacter(character);
+    
+//    if (rect == null || !character.getRectangle().overlapsVertically(rect)) {
+//      if (rect != null && prevRect != null) {
+//        int pitch = (int) (prevRect.getMinY() - rect.getMaxY());
+//        verticalCharacterPitchesCounter.add(pitch);
+//      }
+//      
+//      prevRect = rect;
+//      rect = new SimpleRectangle(character.getRectangle());
+//    } else {
+//      rect = rect.union(character.getRectangle());
+//    }
+    
+    if (prevTextCharacter != null) {
+      Rectangle rect = character.getRectangle();
+      Rectangle prevRect = prevTextCharacter.getRectangle();
+      if (!rect.overlapsVertically(prevRect) 
+          && rect.getMinX() < prevRect.getMinX()) {
+        int pitch = (int) Math.abs(rect.getMaxY() - prevRect.getMinY());
+        verticalCharacterPitchesCounter.add(pitch);
+      }
+    }
+        
+    this.prevTextCharacter = character;
+  }
+  
+  public IntCounter getEstimatedLinePitchCounter() {
+    return verticalCharacterPitchesCounter;
   }
 }

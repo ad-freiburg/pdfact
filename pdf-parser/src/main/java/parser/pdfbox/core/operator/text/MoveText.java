@@ -31,9 +31,10 @@ public class MoveText extends OperatorProcessor {
 
     COSNumber tx = (COSNumber) arguments.get(0);
     COSNumber ty = (COSNumber) arguments.get(1);
-
+    
     Matrix matrix = new Matrix(1, 0, 0, 1, tx.floatValue(), ty.floatValue());
     tlm.concatenate(matrix);
+        
     context.setTextMatrix(tlm.clone());
   }
 

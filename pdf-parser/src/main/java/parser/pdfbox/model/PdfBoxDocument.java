@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import de.freiburg.iif.counter.IntCounter;
 import model.Comparators;
 import model.DimensionStatistics;
 import model.PdfColor;
@@ -248,5 +249,13 @@ public class PdfBoxDocument implements PdfDocument {
   @Override
   public String getSectionHeadingMarkup() {
     return sectionHeadingMarkup;
+  }
+  
+  public int getEstimatedLinePitch() {
+    IntCounter counter = new IntCounter();
+    for (PdfPage page : pages) {
+      counter.add(page.getEstimatedLinePitchCounter());
+    }
+    return counter.getMostFrequentInteger();
   }
 }

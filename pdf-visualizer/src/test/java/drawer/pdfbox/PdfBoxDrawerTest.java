@@ -96,7 +96,7 @@ public class PdfBoxDrawerTest {
     PdfBoxDrawer v = new PdfBoxDrawer(path);
     
     Assert.assertNotNull(v.getPdDocument());
-    Assert.assertEquals(11, v.streams.size());
+    Assert.assertEquals(11, v.pageStreams.size());
   }
   
   /**

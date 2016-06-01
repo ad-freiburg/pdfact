@@ -163,7 +163,7 @@ public class PdfBoxArea implements PdfArea {
    * The block containing this area.
    */
   protected PdfArea block;
-
+  
   // ___________________________________________________________________________
   // Constructors.
 
@@ -900,5 +900,17 @@ public class PdfBoxArea implements PdfArea {
 
   public void setBlock(PdfArea block) {
     this.block = block;
+  }
+
+  List<Rectangle> rects;
+  
+  @Override
+  public void setRects(List<Rectangle> subRects) {
+    this.rects = subRects;
+  }
+
+  @Override
+  public List<Rectangle> getRects() {
+    return this.rects;
   }
 }
