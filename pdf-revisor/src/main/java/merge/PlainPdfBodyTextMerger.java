@@ -52,6 +52,7 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
         
         if (appendToPrevBodyTextParagraph(paragraph, prevBodyTextParagraph)) {
           prevBodyTextParagraph.addTextLines(paragraph.getTextLines());
+          paragraph.setIgnore(true);
         } else {
           revisedParagraphs.add(paragraph);
         }

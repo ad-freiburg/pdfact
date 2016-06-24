@@ -14,7 +14,6 @@ import model.Comparators;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfElement;
-import model.PdfTextLine;
 
 /**
  * Splitter to split a page into blocks.
@@ -52,7 +51,7 @@ public class XYTextlineCut extends XYCut {
       return false;
     }
 
-    float mostCommonFontsize = area.getTextStatistics().getMostCommonFontsize();
+//    float mostCommonFontsize = area.getTextStatistics().getMostCommonFontsize();
 
     // Try to decide if the given lane is a valid line separator by only
     // allowing specific elements intersecting this lane.
@@ -67,12 +66,12 @@ public class XYTextlineCut extends XYCut {
     }
     
     int numAscenders = 0;
-    int numDescenders = 0;
+//    int numDescenders = 0;
     
     // Inspect each intersected element.
     for (PdfElement element : overlappingElements) {
       String string = element.toString();
-      float fontsize = MathUtils.round(element.getFontsize(), 1);
+//      float fontsize = MathUtils.round(element.getFontsize(), 1);
 
       // Ignore elements whose fontsize is significantly smaller than the most
       // common fontsize in the given area. This is supposed to allow sub- and
@@ -90,7 +89,7 @@ public class XYTextlineCut extends XYCut {
         boolean isDescender = Characters.isDescender(c);
         
         numAscenders += isAscender ? 1 : 0;
-        numDescenders += isDescender ? 1 : 0;
+//        numDescenders += isDescender ? 1 : 0;
         
         // It is not allowed that characters other than descenders and ascenders
         // intersect the lane.

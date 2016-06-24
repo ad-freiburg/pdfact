@@ -49,10 +49,10 @@ public class NewPdfXYCutParser implements PdfExtendedParser {
       List<PdfArea> textBlocks = identifyTextBlocks(page);
       page.setBlocks(textBlocks);
 
-      for (PdfArea textBlock : textBlocks) {
+//      for (PdfArea textBlock : textBlocks) {
 //        textBlock.setTextLines(identifyLines(textBlock));
 //        textBlock.setWords(identifyWords(textBlock));
-      }
+//      }
     }
       
     List<? extends PdfArea> blocks = document.getPages().get(6).getBlocks();
