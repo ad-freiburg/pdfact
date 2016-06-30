@@ -55,4 +55,9 @@ public interface PdfCharacter extends PdfTextElement {
    * Sets the flag whether this character is a punctuation mark.
    */
   public void setIsPunctuationMark(boolean isPunctuationMark);
+  
+  /**
+   * Returns the extraction order number.
+   */
+  public int getExtractionOrderNumber();
 }

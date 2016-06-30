@@ -8,6 +8,7 @@ import java.util.List;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfElement;
 import model.SweepDirection.HorizontalSweepDirection;
@@ -48,14 +49,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
   @Override
   public float getVerticalLaneWidth(PdfArea area) {
-    // Ideally, we should use most common values here. But doing so fails
-    // for grotoap-20902190.pdf - because of so many dots on page 3 and 4.
-    PdfDocument doc = area.getPdfDocument();
-
-    float docWidths = doc.getDimensionStatistics().getMostCommonWidth();
-    float pageWidths = area.getDimensionStatistics().getMostCommonWidth();
-
-    return 2f * Math.max(docWidths, pageWidths);
+    return .1f;
   }
 
   @Override
@@ -65,37 +59,22 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
     PdfDocument doc = area.getPdfDocument();
     float mostCommonWidth = doc.getDimensionStatistics().getMostCommonWidth();
-
+    
+    // Don't allow the lane if resulting subareas are too slim.
     if (leftHalfWidth < 5 * mostCommonWidth
         || rightHalfWidth < 5 * mostCommonWidth) {
       return false;
     }
-
-    return area.getElementsOverlapping(lane).isEmpty();
+    
+    boolean overlapsChars = area.getTextCharactersOverlapping(lane).isEmpty();
+    
+    if (!overlapsChars) {
+      return false;
+    }
+    
+    return !separatesConsecutiveCharacters(area, lane);
   }
-
-  protected float computeWidthOfLeftHalf(PdfArea area, Rectangle lane) {
-    Rectangle leftHalf = new SimpleRectangle();
-    leftHalf.setMinX(area.getRectangle().getMinX());
-    leftHalf.setMinY(area.getRectangle().getMinY());
-    leftHalf.setMaxX(lane.getRectangle().getMinX());
-    leftHalf.setMaxY(area.getRectangle().getMaxY());
-    List<PdfElement> leftHalfElements = area.getElementsOverlapping(leftHalf);
-    Rectangle boundBox = SimpleRectangle.computeBoundingBox(leftHalfElements);
-    return boundBox.getWidth();
-  }
-
-  protected float computeWidthOfRightHalf(PdfArea area, Rectangle lane) {
-    Rectangle rightHalf = new SimpleRectangle();
-    rightHalf.setMinX(lane.getRectangle().getMaxX());
-    rightHalf.setMinY(area.getRectangle().getMinY());
-    rightHalf.setMaxX(area.getRectangle().getMaxX());
-    rightHalf.setMaxY(area.getRectangle().getMaxY());
-    List<PdfElement> rightHalfElements = area.getElementsOverlapping(rightHalf);
-    Rectangle boundBox = SimpleRectangle.computeBoundingBox(rightHalfElements);
-    return boundBox.getWidth();
-  }
-
+  
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return this.horizontalLaneSweepDirection;
@@ -119,5 +98,84 @@ public class BlockifyTextPageRule implements BlockifyRule {
   @Override
   public boolean isValidHorizontalLane(PdfArea area, Rectangle lane) {
     return area.getElementsOverlapping(lane).isEmpty();
+  }
+  
+  // ===========================================================================
+  
+  protected float computeWidthOfLeftHalf(PdfArea area, Rectangle lane) {
+    Rectangle leftHalf = new SimpleRectangle();
+    leftHalf.setMinX(area.getRectangle().getMinX());
+    leftHalf.setMinY(area.getRectangle().getMinY());
+    leftHalf.setMaxX(lane.getRectangle().getMinX());
+    leftHalf.setMaxY(area.getRectangle().getMaxY());
+    List<PdfElement> leftHalfElements = area.getElementsOverlapping(leftHalf);
+    Rectangle boundBox = SimpleRectangle.computeBoundingBox(leftHalfElements);
+    return boundBox.getWidth();
+  }
+
+  protected float computeWidthOfRightHalf(PdfArea area, Rectangle lane) {
+    Rectangle rightHalf = new SimpleRectangle();
+    rightHalf.setMinX(lane.getRectangle().getMaxX());
+    rightHalf.setMinY(area.getRectangle().getMinY());
+    rightHalf.setMaxX(area.getRectangle().getMaxX());
+    rightHalf.setMaxY(area.getRectangle().getMaxY());
+    List<PdfElement> rightHalfElements = area.getElementsOverlapping(rightHalf);
+    Rectangle boundBox = SimpleRectangle.computeBoundingBox(rightHalfElements);
+    return boundBox.getWidth();
+  }
+
+  /**
+   * Returns true if the given lane separates consecutive characters. 
+   * 
+   * To be more exact, this method returns true if there is an element A to the 
+   * left of the lane and and an element B to the right of the lane where 
+   * B.extractionOrderNumber == A.extractionOrderNumber and A and B overlaps
+   * vertically. 
+   */
+  protected boolean separatesConsecutiveCharacters(PdfArea area, 
+      Rectangle lane) {
+    float mcWidth = area.getDimensionStatistics().getMostCommonWidth();
+    float mcHeight = area.getDimensionStatistics().getMostCommonHeight();
+    
+    // Define the search area to the left of the lane.
+    Rectangle leftArea = new SimpleRectangle();
+    leftArea.setMinX(area.getRectangle().getMinX() - 5 * mcWidth);
+    leftArea.setMinY(lane.getMinY());
+    leftArea.setMaxX(lane.getMaxX());
+    leftArea.setMaxY(lane.getMaxY());
+    
+    // Obtain the characters overlapping the left area.
+    List<PdfCharacter> lChars = area.getTextCharactersOverlapping(leftArea);
+       
+    // Iterate through the characters to the left of the lane.
+    for (int i = 0; i < lChars.size(); i++) {
+      PdfCharacter lChar = lChars.get(i);
+                  
+      // Define the search area to the right of the lane. 
+      Rectangle rightArea = new SimpleRectangle();
+      rightArea.setMinX(lane.getMinX());
+      // Restrict the maxX to the right border of the area.
+      rightArea.setMaxX(area.getRectangle().getMaxX());
+      // Restrict the y dimensions to those of the left character.
+      rightArea.setMinY(lChar.getRectangle().getMinY() - mcHeight);
+      rightArea.setMaxY(lChar.getRectangle().getMaxY() + mcHeight);
+      
+      // Obtain the characters overlapping the right area.
+      List<PdfCharacter> rChars = area.getTextCharactersOverlapping(rightArea);
+      
+      // Iterate through the characters to the right of the lane and check, if
+      // there is an character 'rightChar' with 
+      // rightChar.extractionOrderNumber == leftChar.extractionOrderNumber + 1
+      for (PdfCharacter rChar : rChars) {
+        int leftExtractionOrderNumber = lChar.getExtractionOrderNumber();
+        int rightExtractionOrderNumber = rChar.getExtractionOrderNumber();
+                
+        if (rightExtractionOrderNumber == leftExtractionOrderNumber + 1) {
+          // There is a consecutive char pair that is divided by the lane.
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

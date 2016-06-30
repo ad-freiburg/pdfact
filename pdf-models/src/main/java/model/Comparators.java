@@ -39,6 +39,33 @@ public class Comparators {
   }
 
   /**
+   * A comparator to sort objects, containing a rectangle, by getMaxX().
+   * 
+   * @author Claudius Korzen *
+   */
+  public static class MaxXComparator implements Comparator<HasRectangle> {
+    @Override
+    public int compare(HasRectangle o1, HasRectangle o2) {
+      if (o1 == null && o2 == null) {
+        return 0;
+      }
+      if (o1 == null) {
+        return 1;
+      }
+      if (o2 == null) {
+        return -1;
+      }
+      if (o1.getRectangle().getMaxX() < o2.getRectangle().getMaxX()) {
+        return -1;
+      }
+      if (o1.getRectangle().getMaxX() > o2.getRectangle().getMaxX()) {
+        return 1;
+      }
+      return 0;
+    }
+  }
+  
+  /**
    * A comparator to sort objects, containing a rectangle, by getMinY().
    * 
    * @author Claudius Korzen *

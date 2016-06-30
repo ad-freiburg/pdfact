@@ -57,6 +57,7 @@ public class ParagraphifyRule {
       return true;
     }
 
+    // TODO: Doesn't work if text is not justified.
     if (prevLineIsTooShort(block, line, prevLine)) {
       // System.out.println(" prev line too short");
       return true;
@@ -130,7 +131,7 @@ public class ParagraphifyRule {
     float prevLineMaxX = prevLine.getRectangle().getMaxX();
     float blockMaxX = lineMaxXCounter.getMostFrequentFloat();
 
-    return MathUtils.isSmaller(prevLineMaxX, blockMaxX, tolerance);
+    return MathUtils.isSmaller(prevLineMaxX, blockMaxX, 10 * tolerance);
   }
 
   /**
