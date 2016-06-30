@@ -66,9 +66,9 @@ public class BlockifyTextPageRule implements BlockifyRule {
       return false;
     }
     
-    boolean overlapsChars = area.getTextCharactersOverlapping(lane).isEmpty();
+    boolean overlapsChars = !area.getTextCharactersOverlapping(lane).isEmpty();
     
-    if (!overlapsChars) {
+    if (overlapsChars) {
       return false;
     }
     
@@ -90,7 +90,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
     // System.out.println(Math.max(docHeights, pageHeights) + " " +
     // doc.getEstimatedLinePitch());
-
+        
     return 1.5f * doc.getEstimatedLinePitch();
     // return 1.5f * Math.max(docHeights, pageHeights);
   }

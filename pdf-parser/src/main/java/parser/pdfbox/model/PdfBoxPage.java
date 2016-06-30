@@ -253,8 +253,12 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
       Rectangle prevRect = prevTextCharacter.getRectangle();
       if (!rect.overlapsVertically(prevRect) 
           && rect.getMinX() < prevRect.getMinX()) {
-        int pitch = (int) Math.abs(rect.getMaxY() - prevRect.getMinY());
-        verticalCharacterPitchesCounter.add(pitch);
+        // TODO: Math symbols pollute the vertical pitch. Find a good method
+        // to ignore math symbols.
+        if (Character.isAlphabetic(character.getCodePoint())) {
+          int pitch = (int) Math.abs(rect.getMaxY() - prevRect.getMinY());
+          verticalCharacterPitchesCounter.add(pitch);
+        }
       }
     }
         

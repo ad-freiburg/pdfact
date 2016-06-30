@@ -283,7 +283,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   protected List<PdfXYCutTextParagraph> identifyParagraphs(PdfArea block) {    
     List<PdfXYCutTextParagraph> paragraphs = new ArrayList<>();
     PdfXYCutTextParagraph paragraph = null;
-
+    
     List<PdfTextLine> lines = block.getTextLines();
         
     for (int i = 0; i < lines.size(); i++) {
