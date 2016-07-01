@@ -289,7 +289,7 @@ public class PdfStreamEngine {
     String name = operator.getName();
     OperatorProcessor processor = this.operators.get(name);
         
-    // System.out.println(currentPageNumber + " " + operator + " " + operands);
+//    System.out.println(currentPageNumber + " " + operator + " " + operands);
     
     if (processor != null) {
       processor.setContext(this);

@@ -40,7 +40,7 @@ public class BeginInlineImage extends OperatorProcessor {
     throws IOException {
     Matrix ctm = context.getCurrentTransformationMatrix();
     COSDictionary params = operator.getImageParameters();
-
+    
     int width = params.getInt(COSName.W, COSName.WIDTH, -1);
     int height = params.getInt(COSName.H, COSName.HEIGHT, -1);
     

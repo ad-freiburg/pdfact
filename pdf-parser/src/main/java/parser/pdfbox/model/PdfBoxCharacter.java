@@ -323,7 +323,12 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     }
 
     this.unicode += resolveDiacritic(diacritic);
-    this.rectangle = this.rectangle.union(diacritic.getRectangle());
+    
+    // TODO: There is an issue where the characters may be located in different
+    // columns / pages. So merging the rectangles would result in rectangle
+    // spanning most of the page (and in bad paragraphs identification).
+    // Example: 76.pdf. So for now, don't merge the rectangles.
+//    this.rectangle = this.rectangle.union(diacritic.getRectangle());
   }
 
   protected String resolveDiacritic(PdfCharacter diacritic) {

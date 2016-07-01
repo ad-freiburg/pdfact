@@ -165,7 +165,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
     super.showGlyph(unicode, code, font, trm);
-
+    
     Rectangle boundingBox = null;
     if (font instanceof PDType3Font) {
       processType3Stream(((PDType3Font) font).getCharProc(code), trm);
@@ -217,7 +217,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
-
+    
     PdfBoxCharacter character = new PdfBoxCharacter(currentPage, unicode);
     character.setCharCode(code);
     character.setRectangle(boundingBox);
@@ -227,6 +227,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     character.setColor(color);
     character.setExtractionOrderNumber(this.extractionOrderNumber++);
 
+    
     // Handle diacritic characters:
     // In most cases, diacritic characters are represented in its decomposed 
     // form. For example, "è" may be represented as the two characters "'e" or 

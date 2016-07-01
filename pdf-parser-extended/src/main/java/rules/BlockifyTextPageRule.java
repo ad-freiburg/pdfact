@@ -5,6 +5,7 @@ import static model.SweepDirection.VerticalSweepDirection.LEFT_TO_RIGHT;
 
 import java.util.List;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.PdfArea;
@@ -49,6 +50,30 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
   @Override
   public float getVerticalLaneWidth(PdfArea area) {
+//    float mcHeight = area.getDimensionStatistics().getMostCommonHeight();
+//    
+//    PdfDocument doc = area.getPdfDocument();
+    
+//    float docWidths = doc.getDimensionStatistics().getMostCommonWidth();
+//    float pageWidths = area.getDimensionStatistics().getMostCommonWidth();
+    
+    // Obtaining a suitable width of vertical lanes is a complex thing.
+    // Normally, columns are separated clearly by a vertical lane, such that we
+    // can define a proper width for (it (for example based on the most common
+    // character width in the area. But from time to time, some text, figures or
+    // tables may extend into column lanes which breaks our approach that a 
+    // lane must be empty to be a valid column lane.
+    // Because of that we define the width of a vertical lane as small as
+    // possible (0.1). 
+    // Exception: If the lane is "too low" we don't allow such a small vertical 
+    // lane width (because it may break columns with a very low height, 1-2 
+    // lines for example).
+    
+//    if (area.getRectangle().getHeight() < 10 * mcHeight) {
+//      System.out.println(docWidths + " " + pageWidths);
+//      return 3f * Math.max(docWidths, pageWidths);
+//    }
+    
     return .1f;
   }
 
@@ -68,10 +93,19 @@ public class BlockifyTextPageRule implements BlockifyRule {
     
     boolean overlapsChars = !area.getTextCharactersOverlapping(lane).isEmpty();
     
+    // The lane isn't valid, if it overlaps any elements.
     if (overlapsChars) {
       return false;
     }
     
+    // The lane is valid, if it is larger than "the default width" 
+    // (see getVerticalLaneWidth).
+    if (MathUtils.isLarger(lane.getWidth(), 0.1f, 0.01f)) {
+      return true;
+    }
+    
+    // The lane doesn't overlap elements and is of default width. Check if it
+    // separates consecutive characters.
     return !separatesConsecutiveCharacters(area, lane);
   }
   
@@ -170,7 +204,8 @@ public class BlockifyTextPageRule implements BlockifyRule {
         int leftExtractionOrderNumber = lChar.getExtractionOrderNumber();
         int rightExtractionOrderNumber = rChar.getExtractionOrderNumber();
                 
-        if (rightExtractionOrderNumber == leftExtractionOrderNumber + 1) {
+        if (rightExtractionOrderNumber == leftExtractionOrderNumber + 1
+            || rightExtractionOrderNumber == leftExtractionOrderNumber + 2) {
           // There is a consecutive char pair that is divided by the lane.
           return true;
         }

@@ -64,7 +64,7 @@ public class ConsiderRules {
     if (color == null) {
       return false;
     }
-    
+        
     return !color.isWhite(); 
   }
 }

@@ -35,9 +35,7 @@ public class ParagraphifyRule {
   public static boolean introducesNewParagraph(PdfArea block,
       PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
-
-    // System.out.println(line.getUnicode());
-
+    
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {
       return false;
@@ -46,51 +44,49 @@ public class ParagraphifyRule {
     // The line doesn't introduce a new paragraph, if the previous and the
     // current line have a overlapped element in common.
     if (haveOverlappedElementInCommon(prevLine, line)) {
-      // System.out.println(" overlapped");
       return false;
     }
 
     // The line introduces a new paragraph, if it doesn't overlap the paragraph
     // horizontally.
     if (!overlapsHorizontally(paragraph, line)) {
-      // System.out.println(" don't overlap");
       return true;
     }
 
     // TODO: Doesn't work if text is not justified.
     if (prevLineIsTooShort(block, line, prevLine)) {
-      // System.out.println(" prev line too short");
       return true;
     }
 
     if (differInIndentation(block, paragraph, line)) {
-      // System.out.println(" differ in indentation");
       return true;
     }
 
     if (prevAndCurrentLineStartsWithReferenceAnchor(prevLine, line)) {
-      // System.out.println(" anchors");
       return true;
     }
 
     // The line introduces a new paragraph, if the font size of the line and the
     // fontsize of the previous line aren't almost equal.
     if (fontsizesAreTooDifferent(prevLine, line)) {
-      // System.out.println(" fontsizes differ");
+      return true;
+    }
+    
+    // The line introduces a new paragraph, if the height of the line and the
+    // height of the previous line aren't almost equal.
+    if (lineHeightsAreTooDifferent(prevLine, line)) {
       return true;
     }
 
     // The line introduces a new paragraph, if the pitch to the previous line
     // is larger than the most common line pitch in the paragraph.
     if (linepitchIsTooLarge(paragraph, prevLine, line)) {
-      // System.out.println(" linepitch");
       return true;
     }
 
     // TODO: Experimental. Identify headings, which have same fontsize as
     // body.
     if (isProbablyHeading(paragraph, prevLine, line)) {
-      // System.out.println(" is heading");
       return true;
     }
 
@@ -130,7 +126,7 @@ public class ParagraphifyRule {
     float tolerance = block.getDimensionStatistics().getMostCommonWidth();
     float prevLineMaxX = prevLine.getRectangle().getMaxX();
     float blockMaxX = lineMaxXCounter.getMostFrequentFloat();
-
+    
     return MathUtils.isSmaller(prevLineMaxX, blockMaxX, 10 * tolerance);
   }
 
@@ -143,7 +139,7 @@ public class ParagraphifyRule {
     if (para == null) {
       return false;
     }
-
+    
     if (para.getTextLines() == null || para.getTextLines().size() < 2) {
       return false;
     }
@@ -157,7 +153,8 @@ public class ParagraphifyRule {
 
     float lastLineMinX = lastLine.getRectangle().getMinX();
     float lineMinX = line.getRectangle().getMinX();
-    return !MathUtils.isEqual(lastLineMinX, lineMinX, tolerance);
+    
+    return !MathUtils.isEqual(lineMinX, lastLineMinX, tolerance);
   }
 
   protected static boolean prevAndCurrentLineStartsWithReferenceAnchor(
@@ -229,6 +226,21 @@ public class ParagraphifyRule {
         || MathUtils.isSmaller(lineFontsize, prevLineFontsize, 0.49f);
   }
 
+  /**
+   * Analyzes the heights of the given lines and returns true, if the
+   * heights "are too different".
+   */
+  protected static boolean lineHeightsAreTooDifferent(PdfTextLine prevLine,
+      PdfTextLine line) {
+    float lineHeight = line != null ? line.getRectangle().getHeight() : 0;
+    float prevLineHeight = prevLine != null ? prevLine.getRectangle().getHeight() : 0;
+
+    float largerLineHeight = Math.max(lineHeight, prevLineHeight);
+    float smallerLineHeight = Math.min(lineHeight, prevLineHeight);
+    
+    return !MathUtils.isEqual(largerLineHeight, smallerLineHeight, smallerLineHeight);
+  }
+  
   // /**
   // * Analyzes the linepitch and returns true, if the linepitch is too large.
   // */
