@@ -29,6 +29,10 @@ public class ParagraphifyRule {
   protected static final Pattern REFERENCE_ANCHOR =
       Pattern.compile("^\\[(.*)\\]\\s+");
 
+  protected static void log(Object text) {
+//    System.out.println(text);
+  }
+  
   /**
    * Returns true, if the given parameters introduces a new paragraph.
    */
@@ -36,60 +40,77 @@ public class ParagraphifyRule {
       PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     
+    log(line);
+    
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {
+      log(1);
       return false;
     }
 
     // The line doesn't introduce a new paragraph, if the previous and the
     // current line have a overlapped element in common.
     if (haveOverlappedElementInCommon(prevLine, line)) {
+      log(2);
       return false;
     }
 
     // The line introduces a new paragraph, if it doesn't overlap the paragraph
     // horizontally.
     if (!overlapsHorizontally(paragraph, line)) {
+      log(3);
       return true;
     }
 
     // TODO: Doesn't work if text is not justified.
     if (prevLineIsTooShort(block, line, prevLine)) {
+      log(4);
       return true;
     }
 
-    if (differInIndentation(block, paragraph, line)) {
+//    if (differInIndentation(block, paragraph, line)) {
+//      return true;
+//    }
+    
+    if (differInAlignment(block, paragraph, line)) {
+      log(5);
       return true;
     }
 
     if (prevAndCurrentLineStartsWithReferenceAnchor(prevLine, line)) {
+      log(6);
       return true;
     }
 
     // The line introduces a new paragraph, if the font size of the line and the
     // fontsize of the previous line aren't almost equal.
     if (fontsizesAreTooDifferent(prevLine, line)) {
+      log(7);
       return true;
     }
     
-    // The line introduces a new paragraph, if the height of the line and the
-    // height of the previous line aren't almost equal.
-    if (lineHeightsAreTooDifferent(prevLine, line)) {
-      return true;
-    }
+//    // The line introduces a new paragraph, if the height of the line and the
+//    // height of the previous line aren't almost equal.
+//    if (lineHeightsAreTooDifferent(prevLine, line)) {
+//      log(8);
+//      return true;
+//    }
 
     // The line introduces a new paragraph, if the pitch to the previous line
     // is larger than the most common line pitch in the paragraph.
     if (linepitchIsTooLarge(paragraph, prevLine, line)) {
+      log(9);
       return true;
     }
 
     // TODO: Experimental. Identify headings, which have same fontsize as
     // body.
     if (isProbablyHeading(paragraph, prevLine, line)) {
+      log(10);
       return true;
     }
 
+    log(11);
     return false;
   }
 
@@ -157,6 +178,50 @@ public class ParagraphifyRule {
     return !MathUtils.isEqual(lineMinX, lastLineMinX, tolerance);
   }
 
+  /**
+   * Returns true, if the alignment of the line differ from the alignment in
+   * the given paragraph.
+   */
+  protected static boolean differInAlignment(PdfArea block,
+      PdfTextParagraph para, PdfTextLine line) {
+    if (para == null) {
+      return false;
+    }
+    
+    if (line == null) {
+      return false;
+    }
+    
+    if (para.getTextLines() == null || para.getTextLines().isEmpty()) {
+      return false;
+    }
+
+    PdfTextLine lastLine = para.getLastTextLine();
+    
+    if (lastLine == null) {
+      return false;
+    }
+    
+    if (lastLine.getAlignment() == PdfTextAlignment.CENTERED 
+        && line.getAlignment() != PdfTextAlignment.CENTERED) {
+      log("A");
+      return true;
+    }
+    
+    if (line.getAlignment() == PdfTextAlignment.CENTERED 
+        && lastLine.getAlignment() != PdfTextAlignment.CENTERED) {
+      log("B: " + line + " " + lastLine);
+      return true;
+    }
+    
+    if (line.getAlignment() == PdfTextAlignment.RIGHT 
+        && lastLine.getAlignment() != PdfTextAlignment.RIGHT) {
+      log("C");
+      return true;
+    }
+    return false;
+  }
+  
   protected static boolean prevAndCurrentLineStartsWithReferenceAnchor(
       PdfTextLine prevLine, PdfTextLine line) {
     if (prevLine == null || line == null) {
@@ -221,7 +286,7 @@ public class ParagraphifyRule {
       PdfTextLine line) {
     float lineFontsize = line != null ? line.getFontsize() : 0;
     float prevLineFontsize = prevLine != null ? prevLine.getFontsize() : 0;
-
+    
     return MathUtils.isLarger(lineFontsize, prevLineFontsize, 0.49f)
         || MathUtils.isSmaller(lineFontsize, prevLineFontsize, 0.49f);
   }

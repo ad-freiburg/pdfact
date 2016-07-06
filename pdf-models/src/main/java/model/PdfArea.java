@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
 
 /**
@@ -378,4 +379,7 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
 
   public void setRects(List<Rectangle> subRects);
   public List<Rectangle> getRects();
+  
+  public Line getColumnXRange();
+  public void setColumnXRange(Line range);
 }

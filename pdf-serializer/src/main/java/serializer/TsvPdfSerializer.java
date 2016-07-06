@@ -39,6 +39,8 @@ import model.PdfFont;
 import model.PdfPage;
 import model.PdfRole;
 import model.PdfTextElement;
+import model.PdfTextLine;
+import model.PdfTextParagraph;
 
 /**
  * Serializes a PdfDocument to tsv format.
@@ -142,9 +144,24 @@ public class TsvPdfSerializer implements PdfSerializer {
 
     // Obtain the features to serialize.
     List<PdfFeature> features = getFeaturesToSerialize();
-
+    
     if (features != null) {
       for (PdfFeature f : features) {
+        /**
+         * This feature was added for David. He needs the paragraphs with the 
+         * associated lines. Remove it if it not needed anymore.
+         */
+        if (f == PdfFeature.paragraphs_with_lines) {
+          List<PdfTextParagraph> paragraphs = page.getParagraphs();
+          for (PdfElement para : paragraphs) {
+            lines.add(serializeElement(para));
+            for (PdfTextLine line : para.getTextLines()) {
+              lines.add(serializeElement(line));
+            }
+          }
+          continue;
+        }
+        
         // Obtain the elements by feature.
         List<? extends PdfElement> elements = page.getElementsByFeature(f);
 

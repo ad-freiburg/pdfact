@@ -164,6 +164,8 @@ public class PdfBoxArea implements PdfArea {
    */
   protected PdfArea block;
   
+  protected Line columnXRange;
+  
   // ___________________________________________________________________________
   // Constructors.
 
@@ -821,7 +823,7 @@ public class PdfBoxArea implements PdfArea {
     if (index != null) {
       return index.getIndexEntries();
     }
-    return null;
+    return new ArrayList<>();
   }
 
   @Override
@@ -912,5 +914,15 @@ public class PdfBoxArea implements PdfArea {
   @Override
   public List<Rectangle> getRects() {
     return this.rects;
+  }
+
+  @Override
+  public Line getColumnXRange() {
+    return this.columnXRange;
+  }
+
+  @Override
+  public void setColumnXRange(Line range) {
+    this.columnXRange = range;
   }
 }

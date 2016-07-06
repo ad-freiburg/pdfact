@@ -49,4 +49,14 @@ public interface PdfTextLine extends PdfTextElement {
    * Sets the baseline of this text line.
    */
   public void setBaseLine(Line baseLine);
+  
+  /**
+   * Returns the alignment of this line.
+   */
+  public PdfTextAlignment getAlignment();
+
+  /**
+   * Sets the alignment of this line.
+   */
+  public void setAlignment(PdfTextAlignment computeLineAlignment);
 }

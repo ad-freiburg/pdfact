@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,8 +31,10 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfNonTextParagraph;
 import model.PdfPage;
+import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
+import model.PdfWord;
 import model.PdfXYCutArea;
 import model.PdfXYCutNonTextParagraph;
 import model.PdfXYCutTextLine;
@@ -90,12 +94,12 @@ public class PdfXYCutParser implements PdfExtendedParser {
       
 //      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
 //      page.setNonTextParagraphs(nonTextParas);
-      
+            
       for (PdfArea textBlock : textBlocks) {
         textBlock.setTextLines(identifyLines(textBlock));
         textBlock.setWords(identifyWords(textBlock));
         // textBlock.setParagraphs(identifyParagraphs(textBlock));
-        
+                
         page.addTextLines(textBlock.getTextLines());
         page.addWords(textBlock.getWords());
         // page.addParagraphs(textBlock.getParagraphs());
@@ -104,6 +108,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     
     for (PdfPage page : document.getPages()) {      
       for (PdfArea textBlock : page.getBlocks()) {
+        identifyLineAlignments(textBlock);
         page.addParagraphs(identifyParagraphs(textBlock));
       }
     }
@@ -119,6 +124,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
    */
   protected List<PdfArea> identifyTextBlocks(PdfPage page) {
     PdfArea area = new PdfXYCutArea(page, page.getElements());
+    
+    area.setColumnXRange(identifyReliableXRange(area));
+    
     List<PdfArea> blocks = blockify(area, this.blockifyPageRule);
     
     // TODO: Move it.
@@ -127,7 +135,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         element.setBlock(block);
       }
     }
-    
+        
     return blocks;
   }
 
@@ -149,19 +157,122 @@ public class PdfXYCutParser implements PdfExtendedParser {
 //    return paras;
 //  }
 
+  boolean b = false;
+  
   /**
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
+    b = true;
     List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
+    b = false;
     List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
     
     // TODO: Move it.
-    for (PdfXYCutTextLine line : lines) {
+    for (int i = 0; i < lines.size(); i++) {
+      PdfXYCutTextLine line = lines.get(i);
+      
       line.setBlock(textBlock);
+      line.setColumnXRange(textBlock.getColumnXRange());
     }
     
     return lines;
+  }
+  
+  protected void identifyLineAlignments(PdfArea textBlock) {
+    List<PdfTextLine> lines = textBlock.getTextLines();
+    
+    // TODO: Move it.
+    for (int i = 0; i < lines.size(); i++) {
+      PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
+      PdfTextLine line = lines.get(i);
+      PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
+            
+      line.setAlignment(computeLineAlignment(prevLine, line, nextLine));
+    }
+  }
+  
+  protected PdfTextAlignment computeLineAlignment(PdfTextLine prevLine, 
+      PdfTextLine line, PdfTextLine nextLine) {
+    PdfTextAlignment alignment = computeLineAlignment(line);
+    
+    if (prevLine != null) {      
+      float prevMinX = MathUtils.round(computeBoundingBoxToConsider(prevLine).getMinX(), 1);
+      float minX = MathUtils.round(computeBoundingBoxToConsider(line).getMinX(), 1);
+      
+      // If line.minX == prevLine.minX, take the alignment of prevLine.
+      if (MathUtils.isEqual(prevMinX, minX, 0.1f)) {
+        return prevLine.getAlignment();
+      }
+    }
+    return alignment;
+  }
+  
+  Pattern formulaLabelPattern = Pattern.compile("\\(.{1,5}\\)");
+  
+  protected PdfTextAlignment computeLineAlignment(PdfTextLine line) {
+    if (line != null) {   
+      Rectangle boundingBox = computeBoundingBoxToConsider(line);
+      Line columnXRange = line.getColumnXRange();
+      
+      if (columnXRange != null) {
+        float lineMinX = boundingBox.getMinX();
+        float lineMaxX = boundingBox.getMaxX();
+        float columnMinX = columnXRange.getStartX();
+        float columnMaxX = columnXRange.getEndX();
+        
+        float leftMargin = Math.max(0, lineMinX - columnMinX);
+        float rightMargin = Math.max(0, columnMaxX - lineMaxX);
+        
+        float tolerance = 0.5f * line.getPage().getDimensionStatistics().getMostCommonWidth();
+                
+        if (leftMargin > tolerance && rightMargin > tolerance) {
+          return PdfTextAlignment.CENTERED;
+        }
+        
+        if (leftMargin < tolerance && rightMargin < tolerance) {
+          return PdfTextAlignment.JUSTIFIED;
+        }
+        
+        if (leftMargin > tolerance) {
+          return PdfTextAlignment.RIGHT;
+        }
+        
+        return PdfTextAlignment.LEFT;
+      }
+    }
+    return null;
+  }
+  
+  protected Rectangle computeBoundingBoxToConsider(PdfTextLine line) {
+    List<PdfWord> words = line.getWords();   
+    List<PdfWord> wordsToConsider = new ArrayList<>();
+    
+    if (words != null && !words.isEmpty()) {
+      // Check if to consider first word.        
+      PdfWord firstWord = words.get(0);
+      
+      // Don't consider the first word if its starts with an itemize bullet.
+      if (!firstWord.getUnicode().startsWith("•")) {
+        wordsToConsider.add(firstWord);
+      }
+    
+      // Add all words in the middle.
+      for (int i = 1; i < words.size() - 1; i++) {
+        wordsToConsider.add(words.get(i));
+      }
+        
+      // Check if to consider last word.
+      PdfWord lastWord = words.get(words.size() - 1);
+      if (lastWord != null) {
+        Matcher m = formulaLabelPattern.matcher(lastWord.getUnicode());
+        if (!m.matches()) {
+          wordsToConsider.add(lastWord);
+        }
+      }
+    }
+    
+    return SimpleRectangle.computeBoundingBox(wordsToConsider);
   }
   
   /**
@@ -188,6 +299,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // TODO: Move it.
       for (PdfXYCutWord word : lineWords) {
         word.setBlock(textBlock);
+        word.setColumnXRange(textBlock.getColumnXRange());
       }
       
       words.addAll(lineWords);
@@ -296,6 +408,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       if (paragraph == null) {
         paragraph = new PdfXYCutTextParagraph(page);
         paragraph.setBlock(block);
+        paragraph.setColumnXRange(block.getColumnXRange());
       }
       
       if (ParagraphifyRule.introducesNewParagraph(block, paragraph, prevLine,
@@ -303,6 +416,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         paragraphs.add(paragraph);
         paragraph = new PdfXYCutTextParagraph(page);
         paragraph.setBlock(block);
+        paragraph.setColumnXRange(block.getColumnXRange());
       }
       paragraph.addTextLine(line);
     }
@@ -340,7 +454,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (areas.isEmpty()) {
       // The area couldn't be separated vertically. Try it horizontally.
       areas = splitHorizontally(area, rule);
-
+      
       if (areas.isEmpty()) {
         // The area couldn't also be separated horizontally.
         // Add the area to result.
@@ -354,11 +468,83 @@ public class PdfXYCutParser implements PdfExtendedParser {
     } else {
       // The area was split vertically.
       for (PdfArea subarea : areas) {
+        subarea.setColumnXRange(identifyReliableXRange(subarea));
+        
         blockify(subarea, rule, result);
       }
     }
   }
 
+  /**
+   * Identifies the "reliable" range in x dimension of the given area. In 
+   * general, the minX and maxX values of an area are dictated by the outermost 
+   * elements. This is critical if most of the elements (lines for example) 
+   * have comparable minX and maxX values but only a single line exceeds these
+   * values. 
+   * 
+   * For example, a column could look like this:
+   * 
+   * This is a very long heading.
+   * This is the text
+   * in the column to
+   * show the problem
+   * ................
+   * ................
+   * ................
+   * 
+   * The first line of the column is an outlier (because its maxX value exceeds 
+   * the (comparable) maxX values of all other lines. So the x-range of the 
+   * column is dictated by this line. 
+   * 
+   * This methods tries to identify the x-range that is defined by the "most 
+   * common" minX and maxX values. 
+   * 
+   * To be exact, this method takes the minX and maxX values that are taken by
+   * at most half of the elements in this area. 
+   */
+  protected Line identifyReliableXRange(PdfArea area) {
+    Line xRange = new SimpleLine(area.getRectangle().getLowerLeft(), 
+        area.getRectangle().getLowerRight());
+    
+    FloatCounter minXCounter = new FloatCounter();
+    FloatCounter maxXCounter = new FloatCounter();
+    FloatCounter minYCounter = new FloatCounter();
+    
+    for (PdfElement element : area.getElements()) {
+      // Count the occurrences of minX values.
+      minXCounter.add(MathUtils.round(element.getRectangle().getMinX(), 1));
+      // Count the occurrences of maxX values.
+      maxXCounter.add(MathUtils.round(element.getRectangle().getMaxX(), 1));
+      // Count the occurrences of minY values.
+      minYCounter.add(MathUtils.round(element.getRectangle().getMinY(), 0));
+    }
+      
+    int threshold = Math.min(minXCounter.getMostFrequentFloatCount() / 2, minYCounter.size() / 2);
+    xRange.setStartX(minXCounter.getSmallestFloatOccuringAtLeast(threshold));
+    
+    threshold = Math.min(maxXCounter.getMostFrequentFloatCount() / 2, minYCounter.size() / 2);
+    xRange.setEndX(maxXCounter.getLargestFloatOccuringAtLeast(threshold));
+    
+//    xRange.setEndX(maxXCounter.getMostFrequentFloat());
+    
+//    int threshold = Math.max(2, minYCounter.size() / 2);
+//    
+//    float minX = minXCounter.getSmallestFloatOccuringAtLeast(threshold);
+//    System.out.println(minXCounter);
+//    if (minX < Float.MAX_VALUE) {
+//      // Choose the that x-value which occurs at least around "#lines/2"
+//      
+//    }
+//    
+//    float maxX = maxXCounter.getLargestFloatOccuringAtLeast(threshold);
+//    if (maxX > Float.MIN_VALUE) {
+//      // Choose the that x-value which occurs at least around "#lines/2"
+//      xRange.setEndX(maxX);
+//    }
+    
+    return xRange;
+  }
+  
   // ___________________________________________________________________________
 
   /**
@@ -376,7 +562,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
       if (lane != null) {
         List<Rectangle> subRects = rect.splitVertically(lane.getXMidpoint());
         for (Rectangle subRect : subRects) {
-          result.add(new PdfXYCutArea(area, subRect));
+          PdfArea subarea = new PdfXYCutArea(area, subRect);
+          subarea.setColumnXRange(area.getColumnXRange());
+          result.add(subarea);
         }
       }
     }
@@ -396,11 +584,13 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (rect != null) {
       // Identify the vertical split lane.
       Rectangle lane = identifyHorizontalLane(area, rule);
-      
+
       if (lane != null) {        
         List<Rectangle> subRects = rect.splitHorizontally(lane.getYMidpoint());
         for (Rectangle subRect : subRects) {
-          result.add(new PdfXYCutArea(area, subRect));
+          PdfArea subarea = new PdfXYCutArea(area, subRect);
+          subarea.setColumnXRange(area.getColumnXRange());
+          result.add(subarea);
         }
       }
     }

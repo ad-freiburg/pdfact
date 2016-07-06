@@ -3,6 +3,7 @@ package model;
 import static de.freiburg.iif.math.MathUtils.isEqual;
 import static de.freiburg.iif.math.MathUtils.isLarger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.rtree.RTree;
 import de.freiburg.iif.rtree.SimpleRTree;
@@ -163,6 +165,8 @@ public class PdfXYCutArea implements PdfArea {
   protected boolean hasBodyIndentations;
 
   protected PdfArea block;
+  
+  protected Line columnXRange;
   
   // ___________________________________________________________________________
   // Constructors.
@@ -772,7 +776,7 @@ public class PdfXYCutArea implements PdfArea {
     if (index != null) {
       return index.getIndexEntries();
     }
-    return null;
+    return new ArrayList<>();
   }
 
   @Override
@@ -900,5 +904,15 @@ public class PdfXYCutArea implements PdfArea {
   @Override
   public List<Rectangle> getRects() {
     return this.rects;
+  }
+
+  @Override
+  public Line getColumnXRange() {
+    return this.columnXRange;
+  }
+
+  @Override
+  public void setColumnXRange(Line range) {
+    this.columnXRange = range;
   }
 }

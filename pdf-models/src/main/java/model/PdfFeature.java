@@ -42,8 +42,14 @@ public enum PdfFeature {
   /**
    * The feature "shape".
    */
-  shapes("shape", Color.MAGENTA, "");
+  shapes("shape", Color.MAGENTA, ""),
 
+  /**
+   * This feature was added for David. He needs the paragraphs with the 
+   * associated lines. Remove it if it not needed anymore.
+   */
+  paragraphs_with_lines(null, Color.BLACK, "");
+  
   /**
    * The name of this feature.
    */

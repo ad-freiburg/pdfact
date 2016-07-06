@@ -22,6 +22,10 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
    * The role.
    */
   protected PdfRole role = PdfRole.UNKNOWN;
+  /**
+   * The alignment.
+   */
+  protected PdfTextAlignment alignment;
   
   /**
    * The default constructor.
@@ -171,5 +175,13 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   @Override
   public PdfRole getRole() {
     return role;
+  }
+  
+  public PdfTextAlignment getAlignment() {
+    return this.alignment;
+  }
+  
+  public void setAlignment(PdfTextAlignment alignment) {
+    this.alignment = alignment;
   }
 }

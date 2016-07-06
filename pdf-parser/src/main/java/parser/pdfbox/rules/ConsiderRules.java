@@ -30,6 +30,12 @@ public class ConsiderRules {
       return false;
     }
     
+//    // Don't consider the character "|" because it is used as PARA_ADDENDUM in
+//    // tex-paragraph-parser.
+    if ("|".equals(character.getUnicode().trim())) {
+      return false;
+    }
+    
     // Don't consider the character, if its orientation isn't 0.
     if (character.getOrientation() != 0) {
       return false;
