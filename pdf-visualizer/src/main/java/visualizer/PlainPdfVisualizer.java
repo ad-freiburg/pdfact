@@ -15,6 +15,8 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfTextLine;
+import model.PdfTextParagraph;
 
 /**
  * The default implmentation of a PdfVisualizer.
@@ -60,6 +62,16 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     for (PdfFeature feature : features) {
+      /**
+       * This feature was added for David. He needs the paragraphs with the 
+       * associated lines. Remove it if it not needed anymore.
+       */
+      if (feature == PdfFeature.paragraphs_with_lines) {
+        visualizeFeature(page, PdfFeature.lines, drawer);
+        visualizeFeature(page, PdfFeature.paragraphs, drawer);
+        continue;
+      }
+      
       visualizeFeature(page, feature, drawer);
     }
 
