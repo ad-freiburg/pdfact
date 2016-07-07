@@ -17,6 +17,7 @@ import model.PdfTextLine;
 import model.PdfTextParagraph;
 import model.PdfWord;
 import model.TextLineStatistics;
+import model.TextStatistics;
 import statistics.TextLineStatistician;
 
 /**
@@ -61,6 +62,11 @@ public class ParagraphifyRule {
       log(3);
       return true;
     }
+    
+    if (haveSameSpecialFontFace(paragraph, line)) {
+      log(12);
+      return false;
+    }
 
     // TODO: Doesn't work if text is not justified.
     if (prevLineIsTooShort(block, line, prevLine)) {
@@ -82,12 +88,13 @@ public class ParagraphifyRule {
       return true;
     }
 
-    // The line introduces a new paragraph, if the font size of the line and the
-    // fontsize of the previous line aren't almost equal.
-    if (fontsizesAreTooDifferent(prevLine, line)) {
-      log(7);
-      return true;
-    }
+//    // The line introduces a new paragraph, if the font size of the line and the
+//    // fontsize of the previous line aren't almost equal.
+//    if (fontsizesAreTooDifferent(prevLine, line)) {
+//      log(7);
+//      System.out.println(line.getPage().getPageNumber() + " "  + line);
+//      return true;
+//    }
     
 //    // The line introduces a new paragraph, if the height of the line and the
 //    // height of the previous line aren't almost equal.
@@ -178,6 +185,36 @@ public class ParagraphifyRule {
     return !MathUtils.isEqual(lineMinX, lastLineMinX, tolerance);
   }
 
+  protected static boolean haveSameSpecialFontFace(PdfArea block,
+      PdfTextLine line) {
+    if (block == null) {
+      return false;
+    }
+        
+    if (line == null) {
+      return false;
+    }
+    
+    TextStatistics docStats = block.getPdfDocument().getTextStatistics();
+    PdfFont mostCommonDocFont = docStats.getMostCommonFont();
+    float mostCommonDocFontsize = docStats.getMostCommonFontsize();
+    
+    TextStatistics lineStats = line.getTextStatistics();
+    PdfFont mostCommonLineFont = lineStats.getMostCommonFont();
+    float mostCommonLineFontsize = lineStats.getMostCommonFontsize();
+    
+    TextStatistics blockStats = block.getTextStatistics();
+    PdfFont mostCommonBlockFont = blockStats.getMostCommonFont();
+    float mostCommonBlockFontsize = blockStats.getMostCommonFontsize();
+    
+    if (mostCommonLineFont == mostCommonBlockFont
+        && mostCommonLineFontsize == mostCommonBlockFontsize) {
+      return mostCommonLineFont != mostCommonDocFont 
+          && mostCommonLineFontsize > mostCommonDocFontsize;
+    }
+    return false;
+  }
+  
   /**
    * Returns true, if the alignment of the line differ from the alignment in
    * the given paragraph.
@@ -201,7 +238,7 @@ public class ParagraphifyRule {
     if (lastLine == null) {
       return false;
     }
-    
+        
     if (lastLine.getAlignment() == PdfTextAlignment.CENTERED 
         && line.getAlignment() != PdfTextAlignment.CENTERED) {
       log("A");
@@ -273,9 +310,10 @@ public class ParagraphifyRule {
   /**
    * Returns true, if the given elements overlaps horizontally.
    */
-  protected static boolean overlapsHorizontally(HasRectangle hr1,
-      HasRectangle hr2) {
-    return hr1.getRectangle().overlapsHorizontally(hr2.getRectangle());
+  protected static boolean overlapsHorizontally(PdfArea area,
+      PdfTextLine line2) {
+    return area.getColumnXRange().equals(line2.getColumnXRange());
+//    return hr1.getRectangle().overlapsHorizontally(hr2.getRectangle());
   }
 
   /**

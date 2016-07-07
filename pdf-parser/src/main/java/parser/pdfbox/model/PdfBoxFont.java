@@ -1,14 +1,19 @@
 package parser.pdfbox.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDSimpleFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
+import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
 
 import de.freiburg.iif.path.LineReader;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfFont;
 
@@ -17,7 +22,7 @@ import model.PdfFont;
  *
  * @author Claudius Korzen
  */
-public class PdfBoxFont implements PdfFont {
+public class PdfBoxFont implements PdfFont  {
   /**
    * Maps a PDFont to its equivalent PdfFont object.
    */
@@ -206,7 +211,7 @@ public class PdfBoxFont implements PdfFont {
   public PdfDocument getPdfDocument() {
     return null;
   }
-  
+    
   // ___________________________________________________________________________
     
   /**

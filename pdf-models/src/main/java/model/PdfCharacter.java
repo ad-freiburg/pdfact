@@ -60,4 +60,9 @@ public interface PdfCharacter extends PdfTextElement {
    * Returns the extraction order number.
    */
   public int getExtractionOrderNumber();
+  
+  /**
+   * Returns true if this characters has a valid encoding.
+   */
+  public boolean hasEncoding();
 }

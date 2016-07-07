@@ -11,8 +11,7 @@ import model.PdfShape;
  * @author Claudius Korzen
  *
  */
-public class ConsiderRules {
-
+public class ConsiderRules {  
   /**
    * Returns true, if the given character should be considered on extraction.
    */
@@ -24,15 +23,9 @@ public class ConsiderRules {
       return false;
     }
 
-    // TODO: The font may have an enecoding for a whitepace. Check this.
-    // Don't consider the character, if its doesn't hold any content.
-    if (character.getUnicode().trim().isEmpty()) {
-      return false;
-    }
-    
-//    // Don't consider the character "|" because it is used as PARA_ADDENDUM in
-//    // tex-paragraph-parser.
-    if ("|".equals(character.getUnicode().trim())) {
+    // Don't consider the character "|" because it is used as PARA_ADDENDUM in
+    // tex-paragraph-parser.
+    if ("|".equals(character.getUnicode().trim()) && character.getFontsize() < 6.5f) { // TODO
       return false;
     }
     
@@ -40,10 +33,20 @@ public class ConsiderRules {
     if (character.getOrientation() != 0) {
       return false;
     }
-
+    
     // Don't consider the character, if its a proper rectangle.
     if (character.getRectangle().getWidth() <= 0 
         || character.getRectangle().getHeight() <= 0) {
+      return false;
+    }
+    
+    // If the character has a valid encoding, we have to consider it.
+    if (character.hasEncoding()) {
+      return true;
+    }
+    
+    // Don't consider the character, if its doesn't hold any content.
+    if (character.getUnicode().trim().isEmpty()) {
       return false;
     }
     

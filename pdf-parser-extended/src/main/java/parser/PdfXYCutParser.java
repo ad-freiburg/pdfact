@@ -25,6 +25,7 @@ import de.freiburg.iif.model.simple.SimpleLine;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
 import model.Comparators;
+import model.DimensionStatistics;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfDocument;
@@ -156,16 +157,12 @@ public class PdfXYCutParser implements PdfExtendedParser {
 //    
 //    return paras;
 //  }
-
-  boolean b = false;
   
   /**
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
-    b = true;
     List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
-    b = false;
     List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
     
     // TODO: Move it.
@@ -188,29 +185,37 @@ public class PdfXYCutParser implements PdfExtendedParser {
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
             
-      line.setAlignment(computeLineAlignment(prevLine, line, nextLine));
+      line.setAlignment(computeLineAlignment(textBlock, prevLine, line, 
+          nextLine));
     }
   }
   
-  protected PdfTextAlignment computeLineAlignment(PdfTextLine prevLine, 
-      PdfTextLine line, PdfTextLine nextLine) {
-    PdfTextAlignment alignment = computeLineAlignment(line);
+  protected PdfTextAlignment computeLineAlignment(PdfArea block, 
+      PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
+    PdfTextAlignment alignment = computeLineAlignment(block, line);
     
-    if (prevLine != null) {      
-      float prevMinX = MathUtils.round(computeBoundingBoxToConsider(prevLine).getMinX(), 1);
-      float minX = MathUtils.round(computeBoundingBoxToConsider(line).getMinX(), 1);
+    if (prevLine != null) {
+      Rectangle prevBoundingBox = computeBoundingBoxToConsider(prevLine);
+      float prevMinX = MathUtils.round(prevBoundingBox.getMinX(), 1);
+      Rectangle boundingBox = computeBoundingBoxToConsider(line);
+      float minX = MathUtils.round(boundingBox.getMinX(), 1);
+           
+      PdfTextAlignment prevAlignment = prevLine.getAlignment();
       
       // If line.minX == prevLine.minX, take the alignment of prevLine.
-      if (MathUtils.isEqual(prevMinX, minX, 0.1f)) {
+      if (prevAlignment != PdfTextAlignment.CENTERED 
+          && MathUtils.isEqual(prevMinX, minX, 0.1f)) {
         return prevLine.getAlignment();
       }
     }
+    
     return alignment;
   }
   
-  Pattern formulaLabelPattern = Pattern.compile("\\(.{1,5}\\)");
+  Pattern formulaLabelPattern = Pattern.compile("\\(\\d{1,2}(\\.\\d{1,2})?\\)");
   
-  protected PdfTextAlignment computeLineAlignment(PdfTextLine line) {
+  protected PdfTextAlignment computeLineAlignment(PdfArea block,
+      PdfTextLine line) {
     if (line != null) {   
       Rectangle boundingBox = computeBoundingBoxToConsider(line);
       Line columnXRange = line.getColumnXRange();
@@ -224,7 +229,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
         float leftMargin = Math.max(0, lineMinX - columnMinX);
         float rightMargin = Math.max(0, columnMaxX - lineMaxX);
         
-        float tolerance = 0.5f * line.getPage().getDimensionStatistics().getMostCommonWidth();
+        DimensionStatistics stats = block.getDimensionStatistics();
+        float tolerance = 0.5f * stats.getMostCommonWidth();
                 
         if (leftMargin > tolerance && rightMargin > tolerance) {
           return PdfTextAlignment.CENTERED;
@@ -468,7 +474,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
     } else {
       // The area was split vertically.
       for (PdfArea subarea : areas) {
-        subarea.setColumnXRange(identifyReliableXRange(subarea));
+        Line xRange = identifyReliableXRange(subarea);
+        if (xRange != null) {
+          subarea.setColumnXRange(xRange);
+        }
         
         blockify(subarea, rule, result);
       }
@@ -503,8 +512,16 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * at most half of the elements in this area. 
    */
   protected Line identifyReliableXRange(PdfArea area) {
-    Line xRange = new SimpleLine(area.getRectangle().getLowerLeft(), 
-        area.getRectangle().getLowerRight());
+    if (area == null) {
+      return null;
+    }
+    
+    Rectangle rect = area.getRectangle();
+    if (rect == null) {
+      return null;
+    }
+    
+    Line xRange = new SimpleLine(rect.getLowerLeft(), rect.getLowerRight());
     
     FloatCounter minXCounter = new FloatCounter();
     FloatCounter maxXCounter = new FloatCounter();
@@ -518,30 +535,17 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Count the occurrences of minY values.
       minYCounter.add(MathUtils.round(element.getRectangle().getMinY(), 0));
     }
-      
-    int threshold = Math.min(minXCounter.getMostFrequentFloatCount() / 2, minYCounter.size() / 2);
+    
+    int numMostFrequentMinX = minXCounter.getMostFrequentFloatCount();
+    int numMostFrequentMaxX = maxXCounter.getMostFrequentFloatCount();
+    int numMinYValues = minYCounter.size();
+    int minXThreshold = Math.min(numMostFrequentMinX / 2, numMinYValues / 2);
+    int maxXThreshold = Math.min(numMostFrequentMaxX / 2, numMinYValues / 2);
+    int threshold = Math.min(minXThreshold, maxXThreshold);
+    
     xRange.setStartX(minXCounter.getSmallestFloatOccuringAtLeast(threshold));
-    
-    threshold = Math.min(maxXCounter.getMostFrequentFloatCount() / 2, minYCounter.size() / 2);
     xRange.setEndX(maxXCounter.getLargestFloatOccuringAtLeast(threshold));
-    
-//    xRange.setEndX(maxXCounter.getMostFrequentFloat());
-    
-//    int threshold = Math.max(2, minYCounter.size() / 2);
-//    
-//    float minX = minXCounter.getSmallestFloatOccuringAtLeast(threshold);
-//    System.out.println(minXCounter);
-//    if (minX < Float.MAX_VALUE) {
-//      // Choose the that x-value which occurs at least around "#lines/2"
-//      
-//    }
-//    
-//    float maxX = maxXCounter.getLargestFloatOccuringAtLeast(threshold);
-//    if (maxX > Float.MIN_VALUE) {
-//      // Choose the that x-value which occurs at least around "#lines/2"
-//      xRange.setEndX(maxX);
-//    }
-    
+        
     return xRange;
   }
   
@@ -570,8 +574,6 @@ public class PdfXYCutParser implements PdfExtendedParser {
     }
     return result;
   }
-
-  int i = 0;
   
   /**
    * Tries to split the given area horizontally.

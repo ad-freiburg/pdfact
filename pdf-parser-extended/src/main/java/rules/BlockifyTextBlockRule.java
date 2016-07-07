@@ -1,11 +1,7 @@
 package rules;
 
-import java.util.HashMap;
 import java.util.List;
 
-import com.google.inject.spi.Element;
-
-import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
@@ -20,21 +16,6 @@ import model.SweepDirection.VerticalSweepDirection;
  * @author Claudius Korzen
  */
 public class BlockifyTextBlockRule implements BlockifyRule {
-  /**
-   * Remember the last splitted block.
-   */
-  protected PdfArea prevArea;
-
-  /**
-   * Remember the last split result for the last splitted block.
-   */
-  protected List<PdfElement> prevOverlappingElements;
-
-  /**
-   * Remember the last split result for the last splitted block.
-   */
-  protected boolean prevLaneIsValid;
-
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return HorizontalSweepDirection.TOP_TO_BOTTOM;
@@ -53,115 +34,23 @@ public class BlockifyTextBlockRule implements BlockifyRule {
 
     // Try to decide if the given lane is a valid line separator by only 
     // allowing specific elements intersecting this lane.
-    List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
-
-    if (area.getPage().getPageNumber() == 17) {
-      System.out.println(overlappingElements);
-    }
+    List<PdfElement> overlappingEls = area.getElementsOverlapping(lane);
     
     // The lane is totally valid, if it doesn't overlap any elements.
-    if (overlappingElements.isEmpty()) {
+    if (overlappingEls.isEmpty()) {
       return true;
     }
 
-    if (area.getPage().getPageNumber() == 17) {
-      System.out.println("contains1: " + containsOnlyAscDesc(overlappingElements));
-    }
-    if (containsOnlyAscDesc(overlappingElements)) {
-      if (area.getPage().getPageNumber() == 17) {
-      }
-      return !containsOnlyAscDesc(area, overlappingElements);
+    // If the lane is valid depends on the type of the overlapping elements.
+    if (consistsOnlyOfAscendersOrDescenders(overlappingEls)) {
+      // The lane is valid, if the overlapping elements are ascenders or 
+      // descenders exclusively and the line to which the element belongs to
+      // contains at least one non-ascender/descender.
+      return !lineConsistsOnlyOfAscendersOrDescenders(area, overlappingEls);
     }
         
     return false;
   }
-
-  //  @Override
-  //  public boolean isValidHorizontalLane(PdfArea area, Rectangle lane) {
-  //    if (area == null || lane == null) {
-  //      return false;
-  //    }
-  //        
-  //    float mostCommonFontsize = area.getTextStatistics().getMostCommonFontsize();
-  //    
-  //    // Try to decide if the given lane is a valid line separator by only 
-  //    // allowing specific elements intersecting this lane.
-  //    List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
-  //              
-  //    if (area.getPage().getPageNumber() == 24) {
-  //      System.out.println(overlappingElements);
-  //    }
-  //    
-  //    // The lane is totally valid, if it doesn't overlap any elements.
-  //    if (overlappingElements.isEmpty()) {
-  //      this.prevArea = area;
-  //      this.prevLaneIsValid = true;
-  //      this.prevOverlappingElements = overlappingElements;
-  //      if (area.getPage().getPageNumber() == 24) {
-  //        System.out.println(true);
-  //      }
-  //      return true;
-  //    }
-  //        
-  //    // Otherwise, we have decision depends on the characteristics of the 
-  //    // overlapped elements.
-  //    for (PdfElement element : overlappingElements) {
-  //      String string = element.toString();
-  //      float fontsize = MathUtils.round(element.getFontsize(), 1);
-  //      
-  //      // Ignore elements whose fontsize is significantly smaller than the most 
-  //      // common fontsize in the given area. This is supposed to allow sub- and 
-  //      // supscripts to intersect the lane.
-  ////      if (MathUtils.isSmaller(fontsize, mostCommonFontsize, 0.5f)) {
-  ////        continue;
-  ////      }
-  //            
-  //      if (string != null && !string.isEmpty()) {
-  //        char c = string.charAt(0);
-  //        
-  //        // It is not allowed that characters other than descenders and ascenders
-  //        // intersect the lane.
-  //        if (Character.isAlphabetic(c) 
-  //            && !Characters.isDescender(c) 
-  //            && !Characters.isAscender(c)) {
-  //          this.prevArea = area;
-  //          this.prevLaneIsValid = false;
-  //          this.prevOverlappingElements = overlappingElements;
-  //          if (area.getPage().getPageNumber() == 24) {
-  //            System.out.println(false);
-  //          }
-  //          return false;
-  //        }
-  //        
-  //        // It is not allowed that digits intersect the lane.
-  //        if (Character.isDigit(c)) {
-  //          this.prevArea = area;
-  //          this.prevLaneIsValid = false;
-  //          this.prevOverlappingElements = overlappingElements;
-  //          if (area.getPage().getPageNumber() == 24) {
-  //            System.out.println(false);
-  //          }
-  //          return false;
-  //        }
-  //      }
-  //    }
-  //        
-  //    // If this code is reached, only ascenders or descenders overlaps the 
-  //    // lane. The lane is only valid, if the previous lane in the area doesn't 
-  //    // overlap any characters.     
-  //    if (isEqualOverlappingElements(prevOverlappingElements, overlappingElements)) {
-  //      if (area.getPage().getPageNumber() == 24) {
-  //        System.out.println(prevLaneIsValid);
-  //      }
-  //      return prevLaneIsValid;
-  //    } else {
-  //      if (area.getPage().getPageNumber() == 24) {
-  //        System.out.println(prevArea != area || !prevLaneIsValid);
-  //      }
-  //      
-  //      return prevArea != area || !prevLaneIsValid;
-  //    }
-  //  }
 
   @Override
   public VerticalSweepDirection getVerticalLaneSweepDirection() {
@@ -178,34 +67,14 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     return false;
   }
 
-  protected boolean isEqualOverlappingElements(List<PdfElement> elements1,
-      List<PdfElement> elements2) {
-    if (elements1 == null && elements2 == null) {
-      return true;
-    }
-
-    if (elements1 == null) {
-      return false;
-    }
-
-    if (elements2 == null) {
-      return false;
-    }
-
-    if (elements1.size() != elements2.size()) {
-      return false;
-    }
-
-    for (int i = 0; i < elements1.size(); i++) {
-      if (!elements1.get(i).equals(elements2.get(i))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  protected boolean containsOnlyAscDesc(List<PdfElement> elements) {
-    for (PdfElement element : elements) {
+  // ---------------------------------------------------------------------------
+  
+  /**
+   * Returns true, if the given elements consists only of ascenders and 
+   * descenders.
+   */
+  protected boolean consistsOnlyOfAscendersOrDescenders(List<PdfElement> els) {
+    for (PdfElement element : els) {
       String string = element.toString();
 
       if (string != null && !string.isEmpty()) {
@@ -228,24 +97,29 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     return true;
   }
 
-  protected boolean containsOnlyAscDesc(PdfArea area,
+  /**
+   * Returns true, if the area which is spanned by the given elements in the 
+   * given area only consists of ascenders and descenders.
+   */
+  protected boolean lineConsistsOnlyOfAscendersOrDescenders(PdfArea area,
       List<PdfElement> elements) {
-    Rectangle boundingBox = SimpleRectangle.computeBoundingBox(elements);
-
-    boundingBox.setMinX(area.getRectangle().getMinX());
-    boundingBox.setMaxX(area.getRectangle().getMaxX());
-
-    List<PdfElement> overlappingElements =
-        area.getElementsOverlapping(boundingBox);
-
+    // Define the search area (the bounding box of elements).
+    Rectangle bBox = SimpleRectangle.computeBoundingBox(elements);
+    // Expand the search area to full width of area.
+    bBox.setMinX(area.getRectangle().getMinX()); 
+    bBox.setMaxX(area.getRectangle().getMaxX());
+    // Add minimal margin to allow things like a'
+    bBox.setMinY(bBox.getMinY());
+    bBox.setMaxY(bBox.getMaxY());
+        
+    // Compute overlapping elements.
+    List<PdfElement> overlappingElements = area.getElementsOverlapping(bBox);
+    
     if (overlappingElements.isEmpty()) {
       return false;
     }
-
-    if (area.getPage().getPageNumber() == 17) {
-      System.out.println("  *  " + overlappingElements);
-    }
     
+    // Obtain if the overlapping elements only consists of ascenders/descenders.
     for (PdfElement element : overlappingElements) {
       String string = element.toString();
 
@@ -254,9 +128,6 @@ public class BlockifyTextBlockRule implements BlockifyRule {
         if (Characters.isLatinLetter(c)
             && !Characters.isDescender(c)
             && !Characters.isAscender(c)) {
-          if (area.getPage().getPageNumber() == 17) {
-            System.out.println(c);
-          }
           return false;
         }
       }

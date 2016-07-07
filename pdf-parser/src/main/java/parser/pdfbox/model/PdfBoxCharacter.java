@@ -104,6 +104,11 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
    */
   protected boolean isPunctuationMark;
 
+  /**
+   * The flag to indicate whether this character has an encoding. 
+   */
+  protected boolean hasEncoding;
+  
   // ___________________________________________________________________________
   // Constructor.
 
@@ -432,5 +437,17 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   @Override
   public PdfRole getRole() {
     return role;
+  }
+
+  @Override
+  public boolean hasEncoding() {
+    return hasEncoding;
+  }
+  
+  /**
+   * Sets the has encoding flag.
+   */
+  public void setHasEncoding(boolean hasEncoding) {
+    this.hasEncoding = hasEncoding;
   }
 }

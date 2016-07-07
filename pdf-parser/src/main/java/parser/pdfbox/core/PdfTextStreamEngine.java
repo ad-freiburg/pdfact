@@ -199,21 +199,30 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     // Use our additional glyph list for Unicode mapping
     unicode = font.toUnicode(code, glyphList);
 
+    boolean hasEncoding = unicode != null;
+    
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it
     // until this point in PDFTextStreamEngine.
     if (unicode == null) {
       if (font instanceof PDSimpleFont) {
+        PDSimpleFont simpleFont = (PDSimpleFont) font;
+        
         char c = (char) code;
         unicode = new String(new char[] { c });
+        
+        String name = simpleFont.getGlyphList().codePointToName(code);
+        String glyphUnicode = simpleFont.getGlyphList().toUnicode(name);
+        
+        hasEncoding = glyphUnicode != null;        
       } else {
         // Acrobat doesn't seem to coerce composite font's character codes,
         // instead it skips them. See the "allah2.pdf" TestTextStripper file.
         return;
       }
     }
-
+    
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
@@ -226,7 +235,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     character.setFontsize(fontsize);
     character.setColor(color);
     character.setExtractionOrderNumber(this.extractionOrderNumber++);
-
+    character.setHasEncoding(hasEncoding);
     
     // Handle diacritic characters:
     // In most cases, diacritic characters are represented in its decomposed 
