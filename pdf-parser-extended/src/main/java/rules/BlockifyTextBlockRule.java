@@ -1,5 +1,6 @@
 package rules;
 
+import java.util.HashSet;
 import java.util.List;
 
 import de.freiburg.iif.model.Rectangle;
@@ -15,7 +16,7 @@ import model.SweepDirection.VerticalSweepDirection;
  *
  * @author Claudius Korzen
  */
-public class BlockifyTextBlockRule implements BlockifyRule {
+public class BlockifyTextBlockRule implements BlockifyRule {  
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return HorizontalSweepDirection.TOP_TO_BOTTOM;
@@ -35,20 +36,19 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     // Try to decide if the given lane is a valid line separator by only 
     // allowing specific elements intersecting this lane.
     List<PdfElement> overlappingEls = area.getElementsOverlapping(lane);
-    
+                
     // The lane is totally valid, if it doesn't overlap any elements.
-    if (overlappingEls.isEmpty()) {
+    if (overlappingEls.isEmpty()) {      
       return true;
     }
-
+        
     // If the lane is valid depends on the type of the overlapping elements.
     if (consistsOnlyOfAscendersOrDescenders(overlappingEls)) {
       // The lane is valid, if the overlapping elements are ascenders or 
       // descenders exclusively and the line to which the element belongs to
-      // contains at least one non-ascender/descender.
+      // contains at least one non-ascender/descender.            
       return !lineConsistsOnlyOfAscendersOrDescenders(area, overlappingEls);
     }
-        
     return false;
   }
 
@@ -70,6 +70,78 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   // ---------------------------------------------------------------------------
   
   /**
+   * Returns true, if the given elements consists only of ascenders.
+   */
+  protected boolean contains(List<PdfElement> elements1, 
+      List<PdfElement> elements2) {
+    if (elements1 == null || elements2 == null) {
+      return false;
+    }
+    
+    HashSet<PdfElement> elements1Set = new HashSet<>(elements1);
+    for (PdfElement element : elements2) {
+      if (!elements1Set.contains(element)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Returns true, if the given elements consists only of ascenders.
+   */
+  protected boolean consistsOnlyOfAscenders(List<PdfElement> els) {
+    if (els == null) {
+      return false;
+    }
+    
+    for (PdfElement element : els) {
+      String string = element.toString();
+
+      if (string != null && !string.isEmpty()) {
+        char c = string.charAt(0);
+
+        // It is not allowed that characters other than descenders and ascenders
+        // intersect the lane.
+        if (Character.isAlphabetic(c)
+            && !Characters.isAscender(c)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Returns true, if the given elements consists only of ascenders.
+   */
+  protected boolean consistsOnlyOfDescenders(List<PdfElement> els) {
+    if (els == null) {
+      return false;
+    }
+    
+    for (PdfElement element : els) {
+      String string = element.toString();
+
+      if (string != null && !string.isEmpty()) {
+        char c = string.charAt(0);
+
+        // It is not allowed that characters other than descenders and ascenders
+        // intersect the lane.
+        if (Character.isAlphabetic(c)
+            && !Characters.isDescender(c)) {
+          return false;
+        }
+        
+        if (Character.isDigit(c)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
+  /**
    * Returns true, if the given elements consists only of ascenders and 
    * descenders.
    */
@@ -85,11 +157,6 @@ public class BlockifyTextBlockRule implements BlockifyRule {
         if (Character.isAlphabetic(c)
             && !Characters.isDescender(c)
             && !Characters.isAscender(c)) {
-          return false;
-        }
-
-        // It is not allowed that digits intersect the lane.
-        if (Character.isDigit(c)) {
           return false;
         }
       }
@@ -115,6 +182,9 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     // Compute overlapping elements.
     List<PdfElement> overlappingElements = area.getElementsOverlapping(bBox);
     
+//    bBox = SimpleRectangle.computeBoundingBox(overlappingElements);
+//    overlappingElements = area.getElementsOverlapping(bBox);
+        
     if (overlappingElements.isEmpty()) {
       return false;
     }

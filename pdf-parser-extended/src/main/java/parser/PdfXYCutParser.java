@@ -212,7 +212,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return alignment;
   }
   
-  Pattern formulaLabelPattern = Pattern.compile("\\(\\d{1,2}(\\.\\d{1,2})?\\)");
+  // Support formula labels like (1), (10), (100), (1.2) and (1a), (A1)
+  Pattern formulaLabelPattern = Pattern.compile("\\(([A-Z])?\\d{1,3}([a-z]?)(\\.\\d{1,2})?\\)");
   
   protected PdfTextAlignment computeLineAlignment(PdfArea block,
       PdfTextLine line) {

@@ -206,7 +206,7 @@ public class ParagraphifyRule {
     TextStatistics blockStats = block.getTextStatistics();
     PdfFont mostCommonBlockFont = blockStats.getMostCommonFont();
     float mostCommonBlockFontsize = blockStats.getMostCommonFontsize();
-    
+        
     if (mostCommonLineFont == mostCommonBlockFont
         && mostCommonLineFontsize == mostCommonBlockFontsize) {
       return mostCommonLineFont != mostCommonDocFont 
@@ -290,7 +290,7 @@ public class ParagraphifyRule {
     List<? extends HasRectangle> prevAreas = null;
     if (prevLine != null) {
       Rectangle prevRectangle = prevLine.getRectangle();
-      prevAreas = page.getElementsOverlapping(prevRectangle);
+      prevAreas = page.getNonTextElementsOverlapping(prevRectangle);
 
       List<? extends HasRectangle> areas = null;
       if (line != null) {
