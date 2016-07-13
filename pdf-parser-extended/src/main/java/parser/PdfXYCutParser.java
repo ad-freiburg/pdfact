@@ -158,17 +158,22 @@ public class PdfXYCutParser implements PdfExtendedParser {
 //    return paras;
 //  }
   
+  boolean b = false;
+  
   /**
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
+    b = true;
     List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
+    b = false;
+        
     List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
     
     // TODO: Move it.
     for (int i = 0; i < lines.size(); i++) {
       PdfXYCutTextLine line = lines.get(i);
-      
+            
       line.setBlock(textBlock);
       line.setColumnXRange(textBlock.getColumnXRange());
     }
@@ -567,13 +572,23 @@ public class PdfXYCutParser implements PdfExtendedParser {
       if (lane != null) {
         List<Rectangle> subRects = rect.splitVertically(lane.getXMidpoint());
         for (Rectangle subRect : subRects) {
-          PdfArea subarea = new PdfXYCutArea(area, subRect);
-          subarea.setColumnXRange(area.getColumnXRange());
-          result.add(subarea);
+          List<PdfElement> subs = area.getElementsOverlapping(subRect, 0.75f);
+          if (!subs.isEmpty()) {            
+            PdfXYCutArea subarea = new PdfXYCutArea(area, subs);
+            subarea.setColumnXRange(area.getColumnXRange());
+            subarea.setRawRectangle(subRect);
+            result.add(subarea);
+          }
         }
       }
     }
-    return result;
+    
+    // Return the result list only if there are at least 2 subareas.
+    if (result.size() > 1) {
+      return result;
+    } else {
+      return new ArrayList<>();
+    }
   }
   
   /**
@@ -587,17 +602,31 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (rect != null) {
       // Identify the vertical split lane.
       Rectangle lane = identifyHorizontalLane(area, rule);
-
+      
       if (lane != null) {        
         List<Rectangle> subRects = rect.splitHorizontally(lane.getYMidpoint());
         for (Rectangle subRect : subRects) {
-          PdfArea subarea = new PdfXYCutArea(area, subRect);
-          subarea.setColumnXRange(area.getColumnXRange());
-          result.add(subarea);
+//          PdfArea subarea = new PdfXYCutArea(area, subRect);
+//          subarea.setColumnXRange(area.getColumnXRange());
+//          result.add(subarea);
+          
+          List<PdfElement> subs = area.getElementsOverlapping(subRect, 0.75f);
+          if (!subs.isEmpty()) {            
+            PdfXYCutArea subarea = new PdfXYCutArea(area, subs);
+            subarea.setColumnXRange(area.getColumnXRange());
+            subarea.setRawRectangle(subRect);            
+            result.add(subarea);
+          }
         }
       }
     }
-    return result;
+    
+    // Return the result list only if there are at least 2 subareas.
+    if (result.size() > 1) {
+      return result;
+    } else {
+      return new ArrayList<>();
+    }
   }
 
   // ___________________________________________________________________________
@@ -645,7 +674,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
             lane.setMaxX(Math.max(lane.getMaxX(), ruleLane.getMaxX()));
           }
         } else {
-          if (lane.getWidth() >= ruleLaneWidth) {
+          if (MathUtils.isLargerOrEqual(lane.getWidth(), ruleLaneWidth, 0.01f)) {
             return lane;
           }
 
@@ -664,6 +693,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    */
   protected Rectangle identifyHorizontalLane(PdfArea area, BlockifyRule rule) {
     Rectangle rect = area.getRectangle();
+        
     if (rect != null) {
       // Determine the sweep direction.
       HorizontalSweepDirection dir = rule.getHorizontalLaneSweepDirection();
@@ -690,11 +720,12 @@ public class PdfXYCutParser implements PdfExtendedParser {
       float pos = lMinY;
       // TODO: Do we really need this flag?
       boolean invalidLaneAlreadySeen = false;
-
+            
       // Sweep the lane through the bounding box.
       while (pos >= rect.getMinY() && pos <= rect.getMaxY() - ruleLaneHeight) {
+        
         ruleLane.moveTo(ruleLane.getMinX(), pos);
-                
+                   
         if (rule.isValidHorizontalLane(area, ruleLane)) {
           if (invalidLaneAlreadySeen) {
             // Expand the lane.
@@ -702,7 +733,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
             lane.setMaxY(Math.max(lane.getMaxY(), ruleLane.getMaxY()));
           }
         } else {
-          if (lane.getHeight() >= ruleLaneHeight) {            
+          if (MathUtils.isLargerOrEqual(lane.getHeight(), ruleLaneHeight, 0.01f)) {
             return lane;
           }
 
@@ -734,10 +765,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
     // overlap ratio.
     Map<PdfElement, Pair<Float, PdfXYCutTextLine>> undecided = new HashMap<>();
     
-    for (PdfArea area : areas) {
+    for (PdfArea area : areas) {      
       Rectangle rect = area.getRawRectangle();
       PdfPage page = area.getPage();      
-      
+            
       // Create a new textline for this shape.
       PdfXYCutTextLine textLine = new PdfXYCutTextLine(page);
       textLines.add(textLine);

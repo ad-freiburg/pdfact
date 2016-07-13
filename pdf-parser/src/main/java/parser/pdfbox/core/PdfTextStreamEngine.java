@@ -84,8 +84,6 @@ import parser.pdfbox.model.PdfBoxFont;
 public class PdfTextStreamEngine extends PdfStreamEngine {
   /** The custom glyph list. */
   protected GlyphList glyphList;
-  /** The extraction order number. */
-  protected int extractionOrderNumber = 0;
 
   /**
    * The default constructor.
@@ -223,6 +221,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       }
     }
     
+
+    
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
@@ -234,7 +234,6 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     character.setFont(pdfFont);
     character.setFontsize(fontsize);
     character.setColor(color);
-    character.setExtractionOrderNumber(this.extractionOrderNumber++);
     character.setHasEncoding(hasEncoding);
     
     // Handle diacritic characters:
@@ -319,7 +318,6 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       character.setFont(pdfFont);
       character.setFontsize(size);
       character.setColor(color);
-      character.setExtractionOrderNumber(this.extractionOrderNumber++);
 
       showPdfTextCharacter(character);
     }

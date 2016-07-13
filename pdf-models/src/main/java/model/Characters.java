@@ -28,7 +28,11 @@ public class Characters {
    * The characters that are aligned to the baseline of a text line.
    */
   public static final HashSet<Character> MEANLINE_CHARACTERS = new HashSet<>();
-
+  /**
+   * The characters that represents a cap of a character.
+   */
+  public static final HashSet<Character> CAPS = new HashSet<>();
+  
   static {
     PUNCTUATION_MARKS.add('.');
     PUNCTUATION_MARKS.add('?');
@@ -135,6 +139,9 @@ public class Characters {
     MEANLINE_CHARACTERS.add('x');
     MEANLINE_CHARACTERS.add('y');
     MEANLINE_CHARACTERS.add('z');
+    
+    CAPS.add('→');
+    CAPS.add('~');
   }
   
   public static boolean isLetter(PdfCharacter character) {
@@ -244,5 +251,17 @@ public class Characters {
   
   public static boolean isBaselineCharacter(char character) {
     return BASELINE_CHARACTERS.contains(character);
+  }
+  
+  public static boolean isCapCharacter(PdfCharacter character) {
+    return isCapCharacter(character.getUnicode());
+  }
+  
+  public static boolean isCapCharacter(String character) {
+    return isCapCharacter(character.charAt(0));
+  }
+  
+  public static boolean isCapCharacter(char character) {
+    return CAPS.contains(character);
   }
 }

@@ -34,6 +34,8 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
    */
   protected PdfRole role = PdfRole.UNKNOWN;
   
+  protected int extractionOrderNumber;
+  
   /**
    * The default constructor.
    */
@@ -193,5 +195,19 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   @Override
   public PdfRole getRole() {
     return role;
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

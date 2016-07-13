@@ -15,4 +15,9 @@ public interface PdfElement extends PdfArea, HasFeature {
    * Returns the role of this element.
    */
   public PdfRole getRole();
+  
+  /**
+   * Returns the extraction order number.
+   */
+  public int getExtractionOrderNumber();
 }

@@ -35,6 +35,8 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
    */
   protected int currentPageNumber;
   
+  protected int currentExtractionOrderNumber;
+  
   // ___________________________________________________________________________
     
   @Override
@@ -75,6 +77,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
     super.showPdfTextCharacter(character);
             
     if (ConsiderRules.considerPdfCharacter(character)) {
+      character.setExtractionOrderNumber(this.currentExtractionOrderNumber++);
       this.page.addTextCharacter(character);
     }
   }
@@ -84,6 +87,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
     super.showFigure(figure);
       
     if (ConsiderRules.considerPdfFigure(figure)) {
+      figure.setExtractionOrderNumber(this.currentExtractionOrderNumber++);
       this.page.addFigure(figure);
     }
   }
@@ -93,6 +97,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
     super.showShape(shape);
         
     if (ConsiderRules.considerPdfShape(shape)) {
+      shape.setExtractionOrderNumber(this.currentExtractionOrderNumber++);
       this.page.addShape(shape);
     }
   }

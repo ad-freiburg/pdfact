@@ -22,6 +22,8 @@ public class PdfBoxFigure extends PdfBoxArea implements PdfFigure {
    */
   protected PdfRole role = PdfRole.UNKNOWN;
   
+  protected int extractionOrderNumber;
+  
   /**
    * The default constructor.
    */
@@ -56,5 +58,19 @@ public class PdfBoxFigure extends PdfBoxArea implements PdfFigure {
   @Override
   public PdfRole getRole() {
     return role;
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

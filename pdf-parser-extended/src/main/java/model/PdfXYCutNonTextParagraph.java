@@ -17,6 +17,8 @@ public class PdfXYCutNonTextParagraph extends PdfXYCutArea
    * The role of this paragraph.
    */
   protected PdfRole role = PdfRole.UNKNOWN;
+
+  protected int extractionOrderNumber;
   
   /**
    * The default constructor.
@@ -66,5 +68,19 @@ public class PdfXYCutNonTextParagraph extends PdfXYCutArea
   public void addNonTextElement(PdfElement element) {
     this.elementsIndex.insert(element);
     this.nonTextElementsIndex.insert(element);
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

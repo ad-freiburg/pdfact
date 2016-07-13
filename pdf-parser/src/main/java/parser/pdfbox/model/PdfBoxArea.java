@@ -289,6 +289,15 @@ public class PdfBoxArea implements PdfArea {
     return elementsIndex.overlappedBy(object.getRectangle());
   }
 
+  @Override
+  public List<PdfElement> getElementsOverlapping(HasRectangle object, 
+      float overlapRatio) {
+    if (object == null) {
+      return new ArrayList<>();
+    }
+    return elementsIndex.overlappedBy(object.getRectangle(), overlapRatio);
+  }
+  
   protected void addElement(PdfElement element) {
     this.elementsIndex.insert(element);
     registerColor(element.getColor());

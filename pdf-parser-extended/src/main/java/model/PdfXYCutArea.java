@@ -202,7 +202,7 @@ public class PdfXYCutArea implements PdfArea {
    * within the given rectangle.
    */
   public PdfXYCutArea(PdfArea parent, Rectangle area) {
-    this(parent, parent.getElementsWithin(area));
+    this(parent, parent.getElementsOverlapping(area, 0.6f));
     this.rawRectangle = area;
   }
 
@@ -285,6 +285,12 @@ public class PdfXYCutArea implements PdfArea {
     return elementsIndex.overlappedBy(object.getRectangle());
   }
 
+  @Override
+  public List<PdfElement> getElementsOverlapping(HasRectangle object, 
+      float overlapRatio) {
+    return elementsIndex.overlappedBy(object.getRectangle(), overlapRatio);
+  }
+  
   protected void addElement(PdfElement element) {
     this.elementsIndex.insert(element);
     registerColor(element.getColor());
@@ -815,6 +821,10 @@ public class PdfXYCutArea implements PdfArea {
     this.ignore = ignore;
   }
 
+  public void setRawRectangle(Rectangle rect) {
+    this.rawRectangle = rect;
+  }
+  
   public Rectangle getRawRectangle() {
     return this.rawRectangle;
   }

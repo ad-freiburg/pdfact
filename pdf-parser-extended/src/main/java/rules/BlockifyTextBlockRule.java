@@ -2,9 +2,9 @@ package rules;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
 import model.PdfArea;
 import model.PdfElement;
@@ -16,7 +16,42 @@ import model.SweepDirection.VerticalSweepDirection;
  *
  * @author Claudius Korzen
  */
-public class BlockifyTextBlockRule implements BlockifyRule {  
+public class BlockifyTextBlockRule implements BlockifyRule {
+  /** 
+   * The overlapping elements of previous lane. 
+   */
+  protected List<PdfElement> prevOverlappingElements;
+  
+  /** 
+   * The flag to indicate whether the previous lane is valid.
+   */
+  protected boolean prevIsValidHorizontalLane;
+  
+  /** 
+   * The flag to indicate whether the previous overlapping elements consists 
+   * only of ascenders and descenders.
+   */
+  protected boolean prevHasOnlyAscendersDescenders;
+
+  // ===========================================================================
+  
+  @Override
+  public VerticalSweepDirection getVerticalLaneSweepDirection() {
+    return VerticalSweepDirection.LEFT_TO_RIGHT;
+  }
+
+  @Override
+  public float getVerticalLaneWidth(PdfArea area) {
+    return Float.MAX_VALUE;
+  }
+
+  @Override
+  public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {
+    return false;
+  }
+  
+  // ===========================================================================
+  
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return HorizontalSweepDirection.TOP_TO_BOTTOM;
@@ -33,119 +68,179 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       return false;
     }
 
-    // Try to decide if the given lane is a valid line separator by only 
-    // allowing specific elements intersecting this lane.
-    List<PdfElement> overlappingEls = area.getElementsOverlapping(lane);
-                
-    // The lane is totally valid, if it doesn't overlap any elements.
-    if (overlappingEls.isEmpty()) {      
-      return true;
+    // Decide if the given lane is a valid lane based on overlapping elements.
+    List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
+
+    if (equals(prevOverlappingElements, overlappingElements)) {
+      // The set of current overlapping elements is equal to the previous 
+      // overlapping elements.
+      return handleEqualOverlappingElements(area, lane, overlappingElements);
+    } else if (overlappingElements.isEmpty()) {
+      // The set of current overlapping elements is empty.
+      return handleEmptyOverlappingElements(area, lane, overlappingElements);
+    } else {
+      // The set of current overlapping elements is *not* empty.
+      return handleNonEmptyOverlappingElements(area, lane, overlappingElements);
     }
-        
-    // If the lane is valid depends on the type of the overlapping elements.
-    if (consistsOnlyOfAscendersOrDescenders(overlappingEls)) {
-      // The lane is valid, if the overlapping elements are ascenders or 
-      // descenders exclusively and the line to which the element belongs to
-      // contains at least one non-ascender/descender.            
-      return !lineConsistsOnlyOfAscendersOrDescenders(area, overlappingEls);
+  }
+
+  // ===========================================================================
+  
+  /**
+   * Decides if the given lane is valid, given that the set of given 
+   * overlapping elements is equal to the previous overlapping elements.
+   */
+  protected boolean handleEqualOverlappingElements(PdfArea area, Rectangle lane,
+      List<PdfElement> elements) {
+    this.prevOverlappingElements = elements;
+    this.prevHasOnlyAscendersDescenders = hasOnlyAscendersDescenders(elements);
+    // No need to update this.prevIsValidHorizontalLane.
+    return this.prevIsValidHorizontalLane;
+  }
+  
+  /**
+   * Decides if the given lane is valid, given that the given lane *doesn't* 
+   * overlap any elements.
+   */
+  protected boolean handleEmptyOverlappingElements(PdfArea area, Rectangle lane,
+      List<PdfElement> elements) {
+    this.prevOverlappingElements = elements;
+    this.prevHasOnlyAscendersDescenders = true; // (elements is empty)
+    // The lane is valid if it *doesn't* split associated elements.
+    this.prevIsValidHorizontalLane = !splitsAssociatedElements(area, lane);
+    return this.prevIsValidHorizontalLane;
+  }
+
+  /**
+   * Decides if the given lane is valid, given that the given lane *does* 
+   * overlap any elements.
+   */
+  protected boolean handleNonEmptyOverlappingElements(PdfArea area,
+      Rectangle lane, List<PdfElement> elements) {
+    // Obtain, if the elements consists only of ascenders/descenders.
+    boolean hasOnlyAscsDescs = hasOnlyAscendersDescenders(elements);
+
+    if (hasOnlyAscsDescs) {
+      // The current overlapping elements consist only of ascenders and
+      // descenders. If also the previous overlapping elements consist only of 
+      // ascenders/descenders and the set of current elements is a subset
+      // of the previous overlapping elements, return the previous computed 
+      // result.
+      if (this.prevHasOnlyAscendersDescenders) {
+        if (isSubSet(elements, prevOverlappingElements)) {
+          this.prevOverlappingElements = elements;
+          this.prevHasOnlyAscendersDescenders = true;
+          // No need to update this.prevIsValidHorizontalLane
+          return this.prevIsValidHorizontalLane;
+        }
+      }
+
+      // The current overlapping elements consist only of ascenders and
+      // descenders. If the previous overlapping elements *don't* consist only 
+      // of ascenders/descenders, the lane is valid if it doesn't split 
+      // associated elements.
+      if (!this.prevHasOnlyAscendersDescenders) {
+        this.prevOverlappingElements = elements;
+        this.prevIsValidHorizontalLane = !splitsAssociatedElements(area, lane);
+        this.prevHasOnlyAscendersDescenders = true;
+        return prevIsValidHorizontalLane;
+      }
     }
+    
+    // The current overlapping elements consists of at least one 
+    // non-ascender/descender. The lane is not valid.
+    this.prevOverlappingElements = elements;
+    this.prevIsValidHorizontalLane = false;
+    this.prevHasOnlyAscendersDescenders = hasOnlyAscsDescs;
+
     return false;
   }
 
-  @Override
-  public VerticalSweepDirection getVerticalLaneSweepDirection() {
-    return VerticalSweepDirection.LEFT_TO_RIGHT;
-  }
+  // ===========================================================================
 
-  @Override
-  public float getVerticalLaneWidth(PdfArea area) {
-    return Float.MAX_VALUE;
-  }
+  /**
+   * Returns true if the given lane splits associated elements in the given 
+   * area.
+   */
+  protected boolean splitsAssociatedElements(PdfArea area, Rectangle lane) {
+    // Obtain, if we have split two consecutive elements.
+    Rectangle rectangle = area.getRectangle();
+    float midpoint = lane.getYMidpoint();
 
-  @Override
-  public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {
-    return false;
+    List<Rectangle> subRectangles = rectangle.splitHorizontally(midpoint);
+
+    Rectangle upperHalf = subRectangles.get(0);
+    List<PdfElement> upperElements = area.getElementsWithin(upperHalf);
+
+    Rectangle lowerHalf = subRectangles.get(1);
+    List<PdfElement> lowerElements = area.getElementsWithin(lowerHalf);
+
+    // Find the element with highest extraction order number in upper half.
+    int highestUpperElementNum = -1;
+    for (PdfElement element : upperElements) {
+      if (element.getExtractionOrderNumber() > highestUpperElementNum) {
+        highestUpperElementNum = element.getExtractionOrderNumber();
+      }
+    }
+
+    // Find the element with highest extraction order number in lower half.
+    int lowestLowerElementNum = Integer.MAX_VALUE;
+    for (PdfElement element : lowerElements) {
+      if (element.getExtractionOrderNumber() < lowestLowerElementNum) {
+        lowestLowerElementNum = element.getExtractionOrderNumber();
+      }
+    }
+
+    return highestUpperElementNum > lowestLowerElementNum;
   }
 
   // ---------------------------------------------------------------------------
-  
+
   /**
-   * Returns true, if the given elements consists only of ascenders.
+   * Returns true, if the two given lists constains the same elements.
    */
-  protected boolean contains(List<PdfElement> elements1, 
+  protected boolean equals(List<PdfElement> els1, List<PdfElement> els2) {
+    if (els1 == null || els2 == null) {
+      return false;
+    }
+
+    if (els1.size() != els2.size()) {
+      return false;
+    }
+
+    Set<PdfElement> els2Set = new HashSet<>(els2);
+    for (PdfElement el : els1) {
+      if (!els2Set.contains(el)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns true, if elements1 is a subset if elements2.
+   */
+  protected boolean isSubSet(List<PdfElement> elements1,
       List<PdfElement> elements2) {
     if (elements1 == null || elements2 == null) {
       return false;
     }
-    
-    HashSet<PdfElement> elements1Set = new HashSet<>(elements1);
-    for (PdfElement element : elements2) {
-      if (!elements1Set.contains(element)) {
+
+    HashSet<PdfElement> elements2Set = new HashSet<>(elements2);
+    for (PdfElement element : elements1) {
+      if (!elements2Set.contains(element)) {
         return false;
       }
     }
     return true;
   }
-  
-  /**
-   * Returns true, if the given elements consists only of ascenders.
-   */
-  protected boolean consistsOnlyOfAscenders(List<PdfElement> els) {
-    if (els == null) {
-      return false;
-    }
-    
-    for (PdfElement element : els) {
-      String string = element.toString();
 
-      if (string != null && !string.isEmpty()) {
-        char c = string.charAt(0);
-
-        // It is not allowed that characters other than descenders and ascenders
-        // intersect the lane.
-        if (Character.isAlphabetic(c)
-            && !Characters.isAscender(c)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  
-  /**
-   * Returns true, if the given elements consists only of ascenders.
-   */
-  protected boolean consistsOnlyOfDescenders(List<PdfElement> els) {
-    if (els == null) {
-      return false;
-    }
-    
-    for (PdfElement element : els) {
-      String string = element.toString();
-
-      if (string != null && !string.isEmpty()) {
-        char c = string.charAt(0);
-
-        // It is not allowed that characters other than descenders and ascenders
-        // intersect the lane.
-        if (Character.isAlphabetic(c)
-            && !Characters.isDescender(c)) {
-          return false;
-        }
-        
-        if (Character.isDigit(c)) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-  
   /**
    * Returns true, if the given elements consists only of ascenders and 
    * descenders.
    */
-  protected boolean consistsOnlyOfAscendersOrDescenders(List<PdfElement> els) {
+  protected boolean hasOnlyAscendersDescenders(List<PdfElement> els) {
     for (PdfElement element : els) {
       String string = element.toString();
 
@@ -161,48 +256,6 @@ public class BlockifyTextBlockRule implements BlockifyRule {
         }
       }
     }
-    return true;
-  }
-
-  /**
-   * Returns true, if the area which is spanned by the given elements in the 
-   * given area only consists of ascenders and descenders.
-   */
-  protected boolean lineConsistsOnlyOfAscendersOrDescenders(PdfArea area,
-      List<PdfElement> elements) {
-    // Define the search area (the bounding box of elements).
-    Rectangle bBox = SimpleRectangle.computeBoundingBox(elements);
-    // Expand the search area to full width of area.
-    bBox.setMinX(area.getRectangle().getMinX()); 
-    bBox.setMaxX(area.getRectangle().getMaxX());
-    // Add minimal margin to allow things like a'
-    bBox.setMinY(bBox.getMinY());
-    bBox.setMaxY(bBox.getMaxY());
-        
-    // Compute overlapping elements.
-    List<PdfElement> overlappingElements = area.getElementsOverlapping(bBox);
-    
-//    bBox = SimpleRectangle.computeBoundingBox(overlappingElements);
-//    overlappingElements = area.getElementsOverlapping(bBox);
-        
-    if (overlappingElements.isEmpty()) {
-      return false;
-    }
-    
-    // Obtain if the overlapping elements only consists of ascenders/descenders.
-    for (PdfElement element : overlappingElements) {
-      String string = element.toString();
-
-      if (string != null && !string.isEmpty()) {
-        char c = string.charAt(0);
-        if (Characters.isLatinLetter(c)
-            && !Characters.isDescender(c)
-            && !Characters.isAscender(c)) {
-          return false;
-        }
-      }
-    }
-
     return true;
   }
 }

@@ -2,6 +2,7 @@ package main;
 
 import org.apache.commons.cli.CommandLine;
 
+import de.freiburg.iif.math.MathUtils;
 import model.PdfDocument;
 import parser.PdfExtendedParser;
 import parser.PdfXYCutParser;
@@ -41,7 +42,7 @@ public class PdfExtendedParserMain extends PdfParserMain {
   public static void main(String[] args) throws Exception {
     // Parse the command line.
     CommandLine cmd = parseCommandLine(args);
-        
+            
     // Start the program.
     new PdfExtendedParserMain(cmd).process();     
   }

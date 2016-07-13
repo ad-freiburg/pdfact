@@ -29,6 +29,11 @@ public class PdfBoxShape extends PdfBoxArea implements PdfShape {
   protected PdfRole role = PdfRole.UNKNOWN;
   
   /**
+   * The extraction order number.
+   */
+  protected int extractionOrderNumber;
+  
+  /**
    * The default constructor.
    */
   public PdfBoxShape(PdfPage page) {
@@ -77,5 +82,19 @@ public class PdfBoxShape extends PdfBoxArea implements PdfShape {
   @Override
   public PdfRole getRole() {
     return role;
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

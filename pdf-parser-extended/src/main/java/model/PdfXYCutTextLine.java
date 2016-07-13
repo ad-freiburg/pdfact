@@ -27,6 +27,8 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
    */
   protected PdfTextAlignment alignment;
   
+  protected int extractionOrderNumber;
+  
   /**
    * The default constructor.
    */
@@ -183,5 +185,19 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   
   public void setAlignment(PdfTextAlignment alignment) {
     this.alignment = alignment;
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

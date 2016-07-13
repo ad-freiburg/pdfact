@@ -34,6 +34,8 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
 
   protected Set<PdfTextAlignment> alignmentVariants;
 
+  protected int extractionOrderNumber;
+  
   /**
    * The default constructor.
    */
@@ -255,5 +257,19 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
     }
 
     return lineAlignment;
+  }
+  
+  /**
+   * Returns the extraction order number of this character.
+   */
+  public int getExtractionOrderNumber() {
+    return extractionOrderNumber;
+  }
+
+  /**
+   * Sets the extraction order number of this character.
+   */
+  public void setExtractionOrderNumber(int extractionOrderNumber) {
+    this.extractionOrderNumber = extractionOrderNumber;
   }
 }

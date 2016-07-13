@@ -38,6 +38,12 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   public List<PdfElement> getElementsOverlapping(HasRectangle object);
 
   /**
+   * Returns the list of all elements which overlap the given rectangle.
+   */
+  public List<PdfElement> getElementsOverlapping(HasRectangle object, 
+      float overlapRatio);
+  
+  /**
    * Adds any elements to this area.
    */
   public void addAnyElements(List<? extends PdfElement> elements);
