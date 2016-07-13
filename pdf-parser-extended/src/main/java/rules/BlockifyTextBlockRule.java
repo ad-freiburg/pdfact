@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import model.Characters;
 import model.PdfArea;
@@ -21,20 +22,20 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * The overlapping elements of previous lane. 
    */
   protected List<PdfElement> prevOverlappingElements;
-  
+
   /** 
    * The flag to indicate whether the previous lane is valid.
    */
   protected boolean prevIsValidHorizontalLane;
-  
+
   /** 
    * The flag to indicate whether the previous overlapping elements consists 
    * only of ascenders and descenders.
    */
-  protected boolean prevHasOnlyAscendersDescenders;
+  protected boolean prevHasOnlyCriticalElements;
 
   // ===========================================================================
-  
+
   @Override
   public VerticalSweepDirection getVerticalLaneSweepDirection() {
     return VerticalSweepDirection.LEFT_TO_RIGHT;
@@ -49,9 +50,9 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {
     return false;
   }
-  
+
   // ===========================================================================
-  
+
   @Override
   public HorizontalSweepDirection getHorizontalLaneSweepDirection() {
     return HorizontalSweepDirection.TOP_TO_BOTTOM;
@@ -71,6 +72,8 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     // Decide if the given lane is a valid lane based on overlapping elements.
     List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
 
+    debug(area, lane.getRectangle() + " " + overlappingElements);
+
     if (equals(prevOverlappingElements, overlappingElements)) {
       // The set of current overlapping elements is equal to the previous 
       // overlapping elements.
@@ -85,7 +88,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   }
 
   // ===========================================================================
-  
+
   /**
    * Decides if the given lane is valid, given that the set of given 
    * overlapping elements is equal to the previous overlapping elements.
@@ -93,11 +96,17 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   protected boolean handleEqualOverlappingElements(PdfArea area, Rectangle lane,
       List<PdfElement> elements) {
     this.prevOverlappingElements = elements;
-    this.prevHasOnlyAscendersDescenders = hasOnlyAscendersDescenders(elements);
+    // Obtain if the elements contains only ascenders, descenders and small
+    // characters (because they prefer to exceed line boundaries).
+    this.prevHasOnlyCriticalElements = hasOnlyAscendersDescenders(elements) 
+        || hasOnlySmallCharacters(area, elements);
     // No need to update this.prevIsValidHorizontalLane.
+
+    debug(area, prevIsValidHorizontalLane + " (1)");
+
     return this.prevIsValidHorizontalLane;
   }
-  
+
   /**
    * Decides if the given lane is valid, given that the given lane *doesn't* 
    * overlap any elements.
@@ -105,9 +114,12 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   protected boolean handleEmptyOverlappingElements(PdfArea area, Rectangle lane,
       List<PdfElement> elements) {
     this.prevOverlappingElements = elements;
-    this.prevHasOnlyAscendersDescenders = true; // (elements is empty)
+    this.prevHasOnlyCriticalElements = true; // (elements is empty)
     // The lane is valid if it *doesn't* split associated elements.
     this.prevIsValidHorizontalLane = !splitsAssociatedElements(area, lane);
+
+    debug(area, prevIsValidHorizontalLane + " (2)");
+
     return this.prevIsValidHorizontalLane;
   }
 
@@ -117,20 +129,25 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    */
   protected boolean handleNonEmptyOverlappingElements(PdfArea area,
       Rectangle lane, List<PdfElement> elements) {
-    // Obtain, if the elements consists only of ascenders/descenders.
-    boolean hasOnlyAscsDescs = hasOnlyAscendersDescenders(elements);
+    // Obtain if the elements contains only ascenders, descenders and small
+    // characters (because they prefer to exceed line boundaries).
+    boolean hasOnlyCriticalElements = hasOnlyAscendersDescenders(elements) 
+        || hasOnlySmallCharacters(area, elements);
 
-    if (hasOnlyAscsDescs) {
+    if (hasOnlyCriticalElements) {
       // The current overlapping elements consist only of ascenders and
       // descenders. If also the previous overlapping elements consist only of 
       // ascenders/descenders and the set of current elements is a subset
       // of the previous overlapping elements, return the previous computed 
       // result.
-      if (this.prevHasOnlyAscendersDescenders) {
+      if (this.prevHasOnlyCriticalElements) {
         if (isSubSet(elements, prevOverlappingElements)) {
           this.prevOverlappingElements = elements;
-          this.prevHasOnlyAscendersDescenders = true;
+          this.prevHasOnlyCriticalElements = true;
           // No need to update this.prevIsValidHorizontalLane
+
+          debug(area, prevIsValidHorizontalLane + " (3)");
+
           return this.prevIsValidHorizontalLane;
         }
       }
@@ -139,19 +156,24 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       // descenders. If the previous overlapping elements *don't* consist only 
       // of ascenders/descenders, the lane is valid if it doesn't split 
       // associated elements.
-      if (!this.prevHasOnlyAscendersDescenders) {
+      if (!this.prevHasOnlyCriticalElements) {
         this.prevOverlappingElements = elements;
         this.prevIsValidHorizontalLane = !splitsAssociatedElements(area, lane);
-        this.prevHasOnlyAscendersDescenders = true;
+        this.prevHasOnlyCriticalElements = true;
+
+        debug(area, prevIsValidHorizontalLane + " (4)");
+
         return prevIsValidHorizontalLane;
       }
     }
-    
+
     // The current overlapping elements consists of at least one 
     // non-ascender/descender. The lane is not valid.
     this.prevOverlappingElements = elements;
     this.prevIsValidHorizontalLane = false;
-    this.prevHasOnlyAscendersDescenders = hasOnlyAscsDescs;
+    this.prevHasOnlyCriticalElements = hasOnlyCriticalElements;
+
+    debug(area, prevIsValidHorizontalLane + " (5)");
 
     return false;
   }
@@ -257,5 +279,28 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       }
     }
     return true;
+  }
+
+  /**
+   * Returns true, if the given elements consists only of ascenders and 
+   * descenders.
+   */
+  protected boolean hasOnlySmallCharacters(PdfArea area,
+      List<PdfElement> els) {
+    float mcFontsize =
+        MathUtils.round(area.getTextStatistics().getMostCommonFontsize(), 0);
+    for (PdfElement element : els) {
+      float fontsize = MathUtils.round(element.getFontsize(), 0);
+      if (fontsize >= mcFontsize) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  protected static void debug(PdfArea area, Object object) {
+//    if (area.getPage().getPageNumber() == 28) {
+//      System.out.println(object);
+//    }
   }
 }

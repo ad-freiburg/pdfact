@@ -163,7 +163,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
     super.showGlyph(unicode, code, font, trm);
-    
+        
     Rectangle boundingBox = null;
     if (font instanceof PDType3Font) {
       processType3Stream(((PDType3Font) font).getCharProc(code), trm);
@@ -198,22 +198,27 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     unicode = font.toUnicode(code, glyphList);
 
     boolean hasEncoding = unicode != null;
-    
+          
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it
     // until this point in PDFTextStreamEngine.
     if (unicode == null) {
-      if (font instanceof PDSimpleFont) {
+      if (font instanceof PDSimpleFont) { 
         PDSimpleFont simpleFont = (PDSimpleFont) font;
         
         char c = (char) code;
         unicode = new String(new char[] { c });
-        
-        String name = simpleFont.getGlyphList().codePointToName(code);
-        String glyphUnicode = simpleFont.getGlyphList().toUnicode(name);
-        
-        hasEncoding = glyphUnicode != null;        
+
+        // Obtain if the font has an encoding for the given code.
+        if (font instanceof PDType1Font) {          
+          PDType1Font type1Font = (PDType1Font) font;
+          hasEncoding = !".notdef".equals(type1Font.codeToName(code));
+        } else {          
+          String name = simpleFont.getGlyphList().codePointToName(code);
+          String glyphUnicode = simpleFont.getGlyphList().toUnicode(name);
+          hasEncoding = glyphUnicode != null;
+        }
       } else {
         // Acrobat doesn't seem to coerce composite font's character codes,
         // instead it skips them. See the "allah2.pdf" TestTextStripper file.
@@ -268,7 +273,10 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     }
     
     // Return the character only if it is no diacritic.
-    if (!character.isDiacritic()) {
+    // TODO: There could be characters that are actually diacritics but have
+    // a special encoding (and hence a different meaning). That's the case for
+    // pdf 76 (page 5) for example.
+    if (!character.isDiacritic() || hasEncoding) {
       showPdfTextCharacter(character);
     }
     

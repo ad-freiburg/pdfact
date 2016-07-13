@@ -763,7 +763,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     // related textline.
     // At the end, the element will be assigned to the textline with highest
     // overlap ratio.
-    Map<PdfElement, Pair<Float, PdfXYCutTextLine>> undecided = new HashMap<>();
+    Map<PdfElement, Pair<Float, PdfXYCutTextLine>> mappings = new HashMap<>();
     
     for (PdfArea area : areas) {      
       Rectangle rect = area.getRawRectangle();
@@ -775,31 +775,26 @@ public class PdfXYCutParser implements PdfExtendedParser {
       
       // Obtain all elements that overlaps this shape.
       List<PdfCharacter> elements = page.getTextCharactersOverlapping(rect);
-      
+            
       for (PdfCharacter element : elements) {
         float ratio = element.getRectangle().computeOverlapRatio(rect);
+
+        // The element isn't fully contained by the shape.
+        float bestRatioSoFar = 0;
+        if (mappings.containsKey(element)) {
+          bestRatioSoFar = mappings.get(element).getLeft();
+        }
         
-        if (ratio < 1) {
-          // The element isn't fully contained by the shape.
-          float bestRatioSoFar = 0;
-          if (undecided.containsKey(element)) {
-            bestRatioSoFar = undecided.get(element).getLeft();
-          }
-          
-          // Update best matching text line if necessary.
-          if (ratio > bestRatioSoFar) {
-            undecided.put(element, new ImmutablePair<>(ratio, textLine));
-          }
-        } else {
-          // The element is fully contained by the shape. Assign the element.
-          textLine.addAnyElement(element);
+        // Update best matching text line if necessary.
+        if (ratio > bestRatioSoFar) {
+          mappings.put(element, new ImmutablePair<>(ratio, textLine));
         }
       }
     }
     
     // Assign each undecided elements to the best macthing textlines.
     for (Entry<PdfElement, Pair<Float, PdfXYCutTextLine>> entry 
-        : undecided.entrySet()) {
+        : mappings.entrySet()) {
       PdfElement element = entry.getKey();
       PdfTextLine textLine = entry.getValue().getRight();
       textLine.addAnyElement(element);

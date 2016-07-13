@@ -17,7 +17,7 @@ public class ConsiderRules {
    */
   public static boolean considerPdfCharacter(PdfCharacter character) {
     PdfColor color = character.getColor();
-
+    
     // Don't consider the character, if its color is white.
     if (color != null && color.isWhite(0.05f)) {
       return false;
@@ -25,7 +25,8 @@ public class ConsiderRules {
 
     // Don't consider the character "|" because it is used as PARA_ADDENDUM in
     // tex-paragraph-parser.
-    if ("|".equals(character.getUnicode().trim()) && character.getFontsize() < 6.5f) { // TODO
+    if ("|".equals(character.getUnicode().trim()) 
+        && character.getFontsize() < 6.5f) { // TODO
       return false;
     }
     
