@@ -6,10 +6,12 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
-import de.freiburg.iif.counter.IntCounter;
+import de.freiburg.iif.counter.FloatCounter;
 import de.freiburg.iif.counter.ObjectCounter;
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
+import model.Characters;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfFigure;
@@ -72,7 +74,7 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
    */
   protected PdfTextAlignment alignment;
   
-  protected IntCounter verticalCharacterPitchesCounter;
+  protected FloatCounter verticalCharacterPitchesCounter;
   
   /**
    * The most recently added text character.
@@ -118,7 +120,7 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
 
     this.artBox = this.cropBox;
     this.trimBox = this.cropBox;
-    this.verticalCharacterPitchesCounter = new IntCounter();
+    this.verticalCharacterPitchesCounter = new FloatCounter();
   }
 
   @Override
@@ -255,8 +257,11 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
           && rect.getMinX() < prevRect.getMinX()) {
         // TODO: Math symbols pollute the vertical pitch. Find a good method
         // to ignore math symbols.
-        if (Character.isAlphabetic(character.getCodePoint())) {
-          int pitch = (int) Math.abs(rect.getMaxY() - prevRect.getMinY());
+        if (Characters.isLatinLetter(prevTextCharacter) 
+            && Characters.isLatinLetter(character)) {
+          float maxY = MathUtils.round(rect.getMaxY(), 0);
+          float prevMinY = MathUtils.round(prevRect.getMinY(), 0);
+          float pitch = Math.abs(maxY - prevMinY);
           verticalCharacterPitchesCounter.add(pitch);
         }
       }
@@ -265,7 +270,7 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
     this.prevTextCharacter = character;
   }
   
-  public IntCounter getEstimatedLinePitchCounter() {
+  public FloatCounter getEstimatedLinePitchCounter() {
     return verticalCharacterPitchesCounter;
   }
 }

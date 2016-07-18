@@ -124,7 +124,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
     // System.out.println(Math.max(docHeights, pageHeights) + " " +
     // doc.getEstimatedLinePitch());
-        
+            
     return 1.5f * doc.getEstimatedLinePitch();
     // return 1.5f * Math.max(docHeights, pageHeights);
   }

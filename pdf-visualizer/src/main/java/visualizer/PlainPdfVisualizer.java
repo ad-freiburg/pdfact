@@ -15,8 +15,6 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
-import model.PdfTextLine;
-import model.PdfTextParagraph;
 
 /**
  * The default implmentation of a PdfVisualizer.
@@ -60,7 +58,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (features == null) {
       return;
     }
-
+    
     for (PdfFeature feature : features) {
       /**
        * This feature was added for David. He needs the paragraphs with the 

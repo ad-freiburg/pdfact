@@ -41,7 +41,7 @@ public class ParagraphifyRule {
       PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     
-    log(line);
+    log(line + " " + paragraph + " " + paragraph.getTextLines());
     
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {

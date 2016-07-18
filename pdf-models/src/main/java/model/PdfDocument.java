@@ -51,5 +51,5 @@ public interface PdfDocument extends HasDimensionStatistics, HasTextStatistics,
    */
   public void setSectionHeadingMarkup(String markup);  
   
-  public int getEstimatedLinePitch();
+  public float getEstimatedLinePitch();
 }
