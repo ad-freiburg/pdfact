@@ -105,6 +105,11 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   protected boolean isPunctuationMark;
 
   /**
+   * The flag indicating if this character is a diacritic.
+   */
+  protected boolean isDiacritic;
+  
+  /**
    * The flag to indicate whether this character has an encoding. 
    */
   protected boolean hasEncoding;
@@ -120,6 +125,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     this.unicode = unicode;
     this.characterInList = new ArrayList<>();
     this.characterInList.add(this);
+    this.isDiacritic = computeIsDiacritic();
   }
 
   // ___________________________________________________________________________
@@ -308,7 +314,21 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
   /**
    * Returns true if the given text is a diacritic char.
    */
+  public void setIsDiacritic(boolean diacritic) {
+    this.isDiacritic = diacritic;
+  }
+  
+  /**
+   * Returns true if the given text is a diacritic char.
+   */
   public boolean isDiacritic() {
+    return this.isDiacritic;
+  }
+  
+  /**
+   * Returns true if the given text is a diacritic char.
+   */
+  protected boolean computeIsDiacritic() {
     String text = getUnicode();
 
     if (text == null || text.length() != 1) {

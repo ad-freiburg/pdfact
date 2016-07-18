@@ -254,6 +254,9 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     // diacritic and the character "in front" of the character 
     // (prePreviousCharacter) and (b) the diacritic and the character "behind"
     // the character (the current character).
+    
+    // The character could be a diacritic but not merged with any character.
+    // So obtain, if the diacritic is merged with any character.    
     if (prevCharacter != null && prevCharacter.isDiacritic()) {
       Rectangle prevRectangle = prevCharacter.getRectangle();
       Rectangle prePrevRectangle = null;
@@ -265,10 +268,14 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       float overlap1 = prevRectangle.computeHorizontalOverlap(prePrevRectangle);
       float overlap2 = prevRectangle.computeHorizontalOverlap(boundingBox);
             
-      if (overlap1 >= overlap2) {
+      if (overlap1 < 0.01f && overlap2 < 0.01) {
+        prevCharacter.setIsDiacritic(false);
+      } else if (overlap1 >= overlap2) {
         prePrevCharacter.mergeDiacritic(prevCharacter);
+        prevCharacter.setIsDiacritic(true);
       } else {
         character.mergeDiacritic(prevCharacter);
+        prevCharacter.setIsDiacritic(true);
       }
     }
     
@@ -276,9 +283,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     // TODO: There could be characters that are actually diacritics but have
     // a special encoding (and hence a different meaning). That's the case for
     // pdf 76 (page 5) for example.
-    if (!character.isDiacritic() || hasEncoding) {
-      showPdfTextCharacter(character);
-    }
+    showPdfTextCharacter(character);
     
     prePrevCharacter = prevCharacter;
     prevCharacter = character;

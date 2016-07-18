@@ -75,7 +75,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
               if (lastBodyCharacter.getUnicode().equals("-")) {
                 // The last line ends with a hyphen. 
                 PdfWord word = line.getFirstWord();
-    
+                
                 // Decide, if we have to ignore the hyphen or not.
                 boolean ignoreHyphen = true;
                 
@@ -101,6 +101,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
                 
                 // Merge the both words.
                 lastBodyWord.addAnyElements(word.getElements());
+                                
                 // Ignore the word (because it was merged with the previous word)
                 word.setIgnore(true);  
                 // Ignore the hyphen if necessary.

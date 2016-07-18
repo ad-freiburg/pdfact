@@ -309,6 +309,9 @@ public class PdfParserCommandLine {
 
       pdfSerializer.setFeatures(this.features);
       pdfSerializer.setRoles(this.roles);
+      pdfSerializer.setSerializePunctuationMarks(true);
+      pdfSerializer.setSerializeSuperscripts(false);
+      pdfSerializer.setSerializeSubscripts(false);
       
       OutputStream stream = Files.newOutputStream(serializationFile);
       pdfSerializer.serialize(document, stream);

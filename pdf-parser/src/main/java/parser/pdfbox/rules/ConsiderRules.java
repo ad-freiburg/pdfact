@@ -16,6 +16,11 @@ public class ConsiderRules {
    * Returns true, if the given character should be considered on extraction.
    */
   public static boolean considerPdfCharacter(PdfCharacter character) {
+    // Don't consider the character, if it is a diacritic.
+    if (character.isDiacritic()) {
+      return false;
+    }
+    
     PdfColor color = character.getColor();
     
     // Don't consider the character, if its color is white.

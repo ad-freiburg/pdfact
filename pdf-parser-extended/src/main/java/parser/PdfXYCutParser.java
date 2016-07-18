@@ -43,6 +43,7 @@ import model.PdfXYCutTextParagraph;
 import model.PdfXYCutWord;
 import model.SweepDirection.HorizontalSweepDirection;
 import model.SweepDirection.VerticalSweepDirection;
+import model.TextStatistics;
 import rules.BlockifyNonTextPageRule;
 import rules.BlockifyRule;
 import rules.BlockifyTextBlockRule;
@@ -869,8 +870,13 @@ public class PdfXYCutParser implements PdfExtendedParser {
     Line meanLine = null;
     FloatCounter maxYCounter = new FloatCounter();
     
+    TextStatistics stats = line.getTextStatistics();
+    float fontSize = MathUtils.round(stats.getMostCommonFontsize(), 1);
+    
     for (PdfCharacter character : line.getTextCharacters()) {
-      if (Characters.isMeanlineCharacter(character)) {
+      float charFontsize = MathUtils.round(character.getFontsize(), 1);
+      if (Characters.isMeanlineCharacter(character)
+          && fontSize == charFontsize) {
         float maxY = MathUtils.round(character.getRectangle().getMaxY(), 1);
         maxYCounter.add(maxY);
       }
@@ -886,7 +892,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
     FloatCounter minYCounter = new FloatCounter();
     
     for (PdfCharacter character : line.getTextCharacters()) {
-      if (Characters.isBaselineCharacter(character)) {
+      float charFontsize = MathUtils.round(character.getFontsize(), 1);
+      if (Characters.isBaselineCharacter(character)
+          && fontSize == charFontsize) {
         float minY = MathUtils.round(character.getRectangle().getMinY(), 1);
         minYCounter.add(minY);
       }

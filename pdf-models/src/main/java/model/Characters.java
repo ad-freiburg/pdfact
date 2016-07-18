@@ -50,6 +50,9 @@ public class Characters {
     DESCENDERS.add('p');
     DESCENDERS.add('q');
     DESCENDERS.add('y');
+    DESCENDERS.add('f'); // If f is italic.
+    DESCENDERS.add('Q');
+    DESCENDERS.add('J');
 
     ASCENDERS.add('b');
     ASCENDERS.add('d');

@@ -495,7 +495,8 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           }
         }
 
-        if (numMathWords / (numMathWords + numNonMathWords) > 0.75f) {
+        float mathWordsRatio = numMathWords / (numMathWords + numNonMathWords);
+        if (mathWordsRatio > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;
         }
@@ -503,7 +504,11 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         String text = paragraph.getText(true, true, true);
         
         Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
-        if (m.find()) {
+        // As before, mathWordRatio must exceed a given threshold such that 
+        // lines like "After a few manipulations, we now obtain with (35)" 
+        // aren't classified as formula
+        // formula.
+        if (m.find() && mathWordsRatio > 0.5f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;
         }
