@@ -107,7 +107,7 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     StringBuilder result = new StringBuilder();
 
     for (PdfCharacter character : getTextCharacters()) {
-      if (character != null && !character.ignore()) {
+      if (character != null && !character.ignore()) {        
         String text = character.getText(includePunctuationMarks,
             includeSubscripts, includeSuperscripts);
         if (text != null) {

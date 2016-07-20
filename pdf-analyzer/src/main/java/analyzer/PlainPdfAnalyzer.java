@@ -6,13 +6,14 @@ import static analyzer.MathSymbols.isMathSymbol;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static model.Patterns.*;
 
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import de.freiburg.iif.text.StringUtils;
 import model.Comparators;
+import model.Patterns;
 import model.PdfColor;
 import model.PdfDocument;
 import model.PdfElement;
@@ -20,6 +21,7 @@ import model.PdfFont;
 import model.PdfPage;
 import model.PdfRole;
 import model.PdfShape;
+import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
 import model.PdfWord;
@@ -31,24 +33,6 @@ import model.PdfWord;
  *
  */
 public class PlainPdfAnalyzer implements PdfAnalyzer {
-  /**
-   * Pattern to find figure captions.
-   */
-  protected static final Pattern FIGURE_CAPTION_PATTERN = Pattern.compile(
-      "^(fig(\\.?|ure)|abbildung)\\s*\\d+", Pattern.CASE_INSENSITIVE);
-
-  /**
-   * Pattern to find table captions.
-   */
-  protected static final Pattern TABLE_CAPTION_PATTERN = Pattern.compile(
-      "^(table|tabelle)\\s*\\d+(\\.|:)", Pattern.CASE_INSENSITIVE);
-  
-  /**
-   * Pattern to find lables of formulas.
-   */
-  protected static final Pattern FORMULA_LABEL_PATTERN = Pattern.compile(
-      "\\([0-9]{1,3}\\)$", Pattern.CASE_INSENSITIVE);
-
   @Override
   public void analyze(PdfDocument document) {
     PdfParagraphCharacteristics characteristics =
@@ -82,40 +66,42 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
       return;
     }
 
-    // Analyze only the first page.
-    PdfPage firstPage = pages.get(0);
-    float fontsize = document.getTextStatistics().getMostCommonFontsize();
-
     PdfTextParagraph titleParagraph = null;
     float titleParagraphScore = 0;
+    
+    // Analyze only the first two pages.
+    for (int i = 0; i < 2; i++) {
+      PdfPage page = pages.get(i);
+      float fontsize = document.getTextStatistics().getMostCommonFontsize();
 
-    for (PdfTextParagraph paragraph : firstPage.getParagraphs()) {
-      if (paragraph.getRole() != PdfRole.UNKNOWN) {
-        continue;
-      }
-
-      // Don't consider paragraphs with fontsize <= most common fontsize.
-      if (paragraph.getFontsize() <= fontsize) {
-        continue;
-      }
-
-      // Compute score for the paragraph: the average word occurrences.
-      int sumOcurrences = 0;
-      float numWords = paragraph.getWords().size();
-
-      if (numWords > 0) {
-        for (PdfWord word : paragraph.getWords()) {
-          String wordStr = word.getUnicode();
-          wordStr = StringUtils.normalize(wordStr, false, false, true);
-
-          sumOcurrences += characteristics.getOccurrence(wordStr);
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+        if (paragraph.getRole() != PdfRole.UNKNOWN) {
+          continue;
         }
 
-        float score = sumOcurrences / numWords;
+        // Don't consider paragraphs with fontsize <= most common fontsize.
+        if (paragraph.getFontsize() <= fontsize) {
+          continue;
+        }
 
-        if (score > titleParagraphScore) {
-          titleParagraphScore = score;
-          titleParagraph = paragraph;
+        // Compute score for the paragraph: the average word occurrences.
+        int sumOcurrences = 0;
+        float numWords = paragraph.getWords().size();
+
+        if (numWords > 0) {
+          for (PdfWord word : paragraph.getWords()) {
+            String wordStr = word.getUnicode();
+            wordStr = StringUtils.normalize(wordStr, false, false, true);
+
+            sumOcurrences += characteristics.getOccurrence(wordStr);
+          }
+
+          float score = sumOcurrences / numWords;
+
+          if (score > titleParagraphScore) {
+            titleParagraphScore = score;
+            titleParagraph = paragraph;
+          }
         }
       }
     }
@@ -141,7 +127,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
     // Analyze only the first page.
     PdfPage firstPage = pages.get(0);
-
+    
     for (PdfTextParagraph paragraph : firstPage.getParagraphs()) {
       if (paragraph.getRole() != PdfRole.UNKNOWN) {
         continue;
@@ -186,7 +172,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         Rectangle rect = paragraph.getRectangle();
         Rectangle pageHeaderArea = characteristics.getPageHeaderArea();
         Rectangle pageFooterArea = characteristics.getPageFooterArea();
-
         
         if (pageHeaderArea != null) {
           if (rect.overlaps(pageHeaderArea)
@@ -212,17 +197,21 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     if (document == null) {
       return;
     }
+    
+    PdfFont docFont = document.getTextStatistics().getMostCommonFont();
 
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
         if (paragraph.getRole() != PdfRole.UNKNOWN) {
           continue;
         }
-
+ 
         // TODO: Move this method to external class.
         String markup = PdfParagraphCharacteristics.getMarkup(paragraph);
+                
         String sectionHeadingMarkup = characteristics.getSectionHeadingMarkup();
-
+        PdfFont sectionHeadingFont = characteristics.getSectionHeadingFont();
+        
         if (characteristics.isAbstractHeading(paragraph)) {
           paragraph.setRole(PdfRole.ABSTRACT_HEADING);
           continue;
@@ -232,10 +221,25 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           paragraph.setRole(PdfRole.REFERENCES_HEADING);
           continue;
         }
-
+        
         if (markup != null && markup.equals(sectionHeadingMarkup)) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
           continue;
+        }
+
+        PdfFont paraFont = paragraph.getFont();
+        // Identify headings of subsections.
+        if (sectionHeadingFont != docFont && paraFont == sectionHeadingFont) {
+          paragraph.setRole(PdfRole.SECTION_HEADING);
+          continue;
+        }
+        
+        // Experimental: Identify headings of (subsub-) sections where the font
+        // isn't equal to sectionHeadingFont.
+        String text = paragraph.getUnicode();
+        Matcher matcher = Patterns.SECTION_HEADING_START_PATTERN.matcher(text);
+        if (matcher.find() && paraFont != docFont) {
+          paragraph.setRole(PdfRole.SECTION_HEADING);
         }
       }
     }
@@ -314,7 +318,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
               // Abort if we see a paragraph that is wider than the caption.
               if (paraWidth >= width) {
-                return;
+                break;
               }
 
               para.setRole(PdfRole.TABLE);
@@ -339,7 +343,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
               // Abort if we see a paragraph that is wider than the caption.
               if (paraWidth >= width) {
-                return;
+                break;
               }
 
               para.setRole(PdfRole.TABLE);
@@ -369,11 +373,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
        
         // Check if the paragraph could be a caption.
         Matcher tableCaptionMatcher = FIGURE_CAPTION_PATTERN.matcher(text);
-        if (tableCaptionMatcher.find()) {
-          
+        if (tableCaptionMatcher.find()) {          
           // The paragraph is potential caption. To acknowledge, search for a
           // figure above and below the caption.
 
+          float docWidth = document.getDimensionStatistics().getMostCommonWidth();
+          float docHeight = document.getDimensionStatistics().getMostCommonHeight();
+          
           // Search for non text elements above the caption (in small excerpt).
           Rectangle above = new SimpleRectangle();
           above.setMinX(paragraph.getRectangle().getMinX());
@@ -384,6 +390,18 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
               page.getNonTextElementsOverlapping(above);
           int numNonTextElementsAbove = nonTextElementsAbove.size();
 
+          // Check if there is at least one element that is large enough.
+          boolean containsLargeNonTextElementAbove = false;
+          for (PdfElement element : nonTextElementsAbove) {
+            Rectangle rect = element.getRectangle();
+            
+            // TODO: Don't consider simple lines in formulas
+            if (rect.getWidth() > 1 && rect.getHeight() > 1) { 
+              containsLargeNonTextElementAbove = true;
+              break;
+            }
+          }
+          
           // Search for non text elements below the caption (in small excerpt).
           Rectangle below = new SimpleRectangle();
           below.setMinX(paragraph.getRectangle().getMinX());
@@ -394,8 +412,21 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
               page.getNonTextElementsOverlapping(below);
           int numNonTextElementsBelow = nonTextElementsBelow.size();
           
+          // Check if there is at least one element that is large enough.
+          boolean containsLargeNonTextElementBelow = false;
+          for (PdfElement element : nonTextElementsBelow) {
+            Rectangle rect = element.getRectangle();
+            
+            // TODO: Don't consider simple lines in formulas
+            if (rect.getWidth() > 1 && rect.getHeight() > 1) {
+              containsLargeNonTextElementBelow = true;
+              break;
+            }
+          }
+          
           // Compare the number of non text elements in both areas.
-          if (numNonTextElementsAbove == 0 && numNonTextElementsBelow == 0) {
+          // 4 because to respect rectangles that are "drawn by 4 edges.
+          if (!containsLargeNonTextElementAbove && !containsLargeNonTextElementBelow) {
             // No figures above and below the paragraph. So the paragraph is
             // not a caption.
             continue;
@@ -486,7 +517,9 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           for (PdfWord word : line.getWords()) {
             String str = word.getUnicode().toLowerCase().trim();
 
-            if (isMathSymbol(str) || containsMathSymbol(str)
+            if (line.getAlignment() == PdfTextAlignment.LEFT) {
+              numNonMathWords++;
+            } else if (isMathSymbol(str) || containsMathSymbol(str)
                 || word.containsSubScript() || word.containsSuperScript()) {
               numMathWords++;
             } else {

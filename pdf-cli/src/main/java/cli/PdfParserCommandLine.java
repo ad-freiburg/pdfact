@@ -21,6 +21,7 @@ import analyzer.PdfAnalyzer;
 import analyzer.PlainPdfAnalyzer;
 import de.freiburg.iif.path.FileAndDirectoryParser;
 import de.freiburg.iif.path.PathUtils;
+import model.Patterns;
 import model.PdfDocument;
 import model.PdfFeature;
 import model.PdfRole;
@@ -169,7 +170,7 @@ public class PdfParserCommandLine {
   /**
    * The main method.
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {    
     try {
       new PdfParserCommandLine(args).process();
     } catch (IllegalArgumentException e) {

@@ -141,7 +141,7 @@ public class TxtPdfSerializer implements PdfSerializer {
     if (element == null) {
       return null;
     }
-
+    
     // TODO: Get rid of ignore method. Is still needed for dehyphenation.
     if (element.ignore()) {
       return null;

@@ -8,6 +8,7 @@ import de.freiburg.iif.counter.FloatCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.text.StringUtils;
 import model.PdfArea;
 import model.PdfDocument;
 import model.PdfFont;
@@ -41,7 +42,7 @@ public class ParagraphifyRule {
       PdfTextParagraph paragraph, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     
-    log(line + " " + paragraph + " " + paragraph.getTextLines());
+    log(line);
     
     // The line doesn't introduce a new paragraph, if the paragraph is empty.
     if (paragraph.getTextLines().isEmpty()) {
@@ -117,6 +118,12 @@ public class ParagraphifyRule {
       return true;
     }
 
+    // TODO: Experimental. Identify page numbers.
+    if (isProbablyPageNumber(line)) {
+      log(12);
+      return true;
+    }
+    
     log(11);
     return false;
   }
@@ -238,7 +245,7 @@ public class ParagraphifyRule {
     if (lastLine == null) {
       return false;
     }
-        
+           
     if (lastLine.getAlignment() == PdfTextAlignment.CENTERED 
         && line.getAlignment() != PdfTextAlignment.CENTERED) {
       log("A");
@@ -432,6 +439,33 @@ public class ParagraphifyRule {
         && paragraph.getTextLines().size() == 1) {
       return true;
     }
+    return false;
+  }
+  
+  /**
+   * Returns true, if the given line is probably a page number. EXPERIMENTAL.
+   * TO be more exact: This method returns true when the given paragraph 
+   * represents an integer value and when the paragraph is centered in page. 
+   */
+  protected static boolean isProbablyPageNumber(PdfTextLine line) {
+    if (line == null) {
+      return false;
+    }
+    
+    String text = line.getUnicode(); 
+    boolean isNumber = StringUtils.isInteger(text);
+           
+    if (isNumber) {
+      PdfPage page = line.getPage();
+      Rectangle pageRect = page.getRectangle();
+      Rectangle paraRect = line.getRectangle();
+      
+      float leftMargin = paraRect.getMinX() - pageRect.getMinX();
+      float rightMargin = pageRect.getMaxX() - paraRect.getMaxX();
+            
+      return MathUtils.isEqual(leftMargin, rightMargin, 5f);
+    }
+    
     return false;
   }
 }

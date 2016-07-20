@@ -1,5 +1,7 @@
 package analyzer;
 
+import static model.Patterns.SECTION_HEADING_START_PATTERN;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,7 +44,7 @@ public class PdfParagraphCharacteristics {
    * A lot of math symbols.
    */
   static final HashSet<String> MATH_SYMBOLS = new HashSet<>();
-
+  
   static {
     WELL_KNOWN_SECTION_HEADINGS.add("introduction");
     WELL_KNOWN_SECTION_HEADINGS.add("relatedwork");
@@ -121,6 +123,11 @@ public class PdfParagraphCharacteristics {
   protected String sectionHeadingMarkup;
 
   /**
+   * The common font of section headings.
+   */
+  protected PdfFont sectionHeadingFont;
+  
+  /**
    * The area of page headers.
    */
   protected Rectangle pageHeaderArea;
@@ -159,6 +166,8 @@ public class PdfParagraphCharacteristics {
     List<PdfTextParagraph> potentialPageHeaders = new ArrayList<>();
     List<PdfTextParagraph> potentialPageFooters = new ArrayList<>();
 
+    int numPagesToConsider = 0;
+    
     for (PdfPage page : pages) {
       List<PdfTextParagraph> paragraphs = page.getParagraphs();
 
@@ -179,7 +188,7 @@ public class PdfParagraphCharacteristics {
             topMost = paragraph;
           }
         }
-
+        
         if (topMost.getTextLines().size() < 3) {
           potentialPageHeaders.add(topMost);
         }
@@ -189,8 +198,13 @@ public class PdfParagraphCharacteristics {
         }
 
         for (PdfTextParagraph para : paragraphs) {
-          if (sectionHeadingMarkup == null && isWellKnownSectionHeading(para)) {
-            this.sectionHeadingMarkup = getMarkup(para);
+          if (isWellKnownSectionHeading(para)) {
+            if (this.sectionHeadingMarkup == null) {
+              this.sectionHeadingMarkup = getMarkup(para);
+            }  
+            if (this.sectionHeadingFont == null) {
+              this.sectionHeadingFont = para.getFont();
+            }
           }
 
           for (PdfWord word : para.getWords()) {
@@ -202,6 +216,7 @@ public class PdfParagraphCharacteristics {
             }
           }
         }
+        numPagesToConsider++;
       }
     }
 
@@ -226,7 +241,7 @@ public class PdfParagraphCharacteristics {
         }
       }
 
-      if (numPageHeaderMembers > 0.75f * pages.size()) {
+      if (numPageHeaderMembers > 0.75f * numPagesToConsider) {
         this.pageHeaderArea = pageHeaderArea;
       }
     }
@@ -240,16 +255,17 @@ public class PdfParagraphCharacteristics {
       for (int i = 1; i < potentialPageFooters.size(); i++) {
         PdfTextParagraph potentialPageFooter = potentialPageFooters.get(i);
         Rectangle potentialPageFooterRect = potentialPageFooter.getRectangle();
+        
         if (pageFooterArea.overlaps(potentialPageFooterRect)
-            && MathUtils.isEqual(potentialPageFooterRect.getHeight(),
-                pageFooterArea.getHeight(),
+            && MathUtils.isEqual(potentialPageFooterRect.getHeight(), 
+                pageFooterArea.getHeight(), 
                 0.1f * pageFooterArea.getHeight())) {
           pageFooterArea = pageFooterArea.union(potentialPageFooterRect);
           numPageFooterMembers++;
         }
       }
-
-      if (numPageFooterMembers > 0.75f * pages.size()) {
+      
+      if (numPageFooterMembers > 0.75f * numPagesToConsider) {
         this.pageFooterArea = pageFooterArea;
       }
     }
@@ -271,9 +287,12 @@ public class PdfParagraphCharacteristics {
       return false;
     }
 
+    // Remove roman numerals.
+    text = SECTION_HEADING_START_PATTERN.matcher(text).replaceFirst("");
+    
     // Remove numbers, remove whitespaces and transform to lowercases.
-    text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
-
+    text = StringUtils.normalize(text, true, true, true);
+    
     return WELL_KNOWN_SECTION_HEADINGS.contains(text);
   }
 
@@ -350,6 +369,16 @@ public class PdfParagraphCharacteristics {
     return this.sectionHeadingMarkup;
   }
 
+  /**
+   * Returns the section heading markup.
+   */
+  public PdfFont getSectionHeadingFont() {
+    if (!isCharacterized) {
+      characterize();
+    }
+    return this.sectionHeadingFont;
+  }
+  
   /**
    * Returns the page header area.
    */

@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
 import model.PdfArea;
@@ -15,6 +16,7 @@ import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFeature;
 import model.PdfPage;
+import model.PdfTextLine;
 
 /**
  * The default implmentation of a PdfVisualizer.
@@ -58,7 +60,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (features == null) {
       return;
     }
-    
+        
     for (PdfFeature feature : features) {
       /**
        * This feature was added for David. He needs the paragraphs with the 

@@ -33,7 +33,9 @@ public class PdfXYCutNonTextParagraph extends PdfXYCutArea
   public PdfXYCutNonTextParagraph(PdfPage page, PdfArea area) {
     this(page);
     
-    setTextLines(area.getTextLines());
+    for (PdfElement element : area.getNonTextElements()) {
+      addNonTextElement(element);
+    }
   }
 
   @Override

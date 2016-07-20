@@ -96,7 +96,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       
 //      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
 //      page.setNonTextParagraphs(nonTextParas);
-            
+                  
       for (PdfArea textBlock : textBlocks) {
         textBlock.setTextLines(identifyLines(textBlock));
         textBlock.setWords(identifyWords(textBlock));
@@ -141,23 +141,16 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return blocks;
   }
 
-//  /**
-//   * Identifies non text paragraphs from non text elements in the given page.
-//   */
-//  protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
-//    PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
-//    List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
-//    List<PdfNonTextParagraph> paras = toNonTextParagraphs(page, paraAreas);
-//    
-//    // TODO: Move it.
-//    for (PdfNonTextParagraph para : paras) {
-//      for (PdfElement element : para.getElements()) {
-//        element.setBlock();
-//      }
-//    }
-//    
-//    return paras;
-//  }
+  /**
+   * Identifies non text paragraphs from non text elements in the given page.
+   */
+  protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
+    PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
+    List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
+    List<PdfNonTextParagraph> paras = toNonTextParagraphs(page, paraAreas);
+            
+    return paras;
+  }
   
   boolean b = false;
   
@@ -165,9 +158,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
-    b = true;
     List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
-    b = false;
         
     List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
     
@@ -534,7 +525,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     FloatCounter maxXCounter = new FloatCounter();
     FloatCounter minYCounter = new FloatCounter();
     
-    for (PdfElement element : area.getElements()) {
+    for (PdfElement element : area.getTextCharacters()) {
       // Count the occurrences of minX values.
       minXCounter.add(MathUtils.round(element.getRectangle().getMinX(), 1));
       // Count the occurrences of maxX values.

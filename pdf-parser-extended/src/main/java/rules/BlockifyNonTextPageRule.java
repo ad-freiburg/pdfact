@@ -49,6 +49,7 @@ public class BlockifyNonTextPageRule implements BlockifyRule {
 
   @Override
   public boolean isValidVerticalLane(PdfArea area, Rectangle lane) {
+    System.out.println(area.getNonTextElementsOverlapping(lane));
     return area.getNonTextElementsOverlapping(lane).isEmpty();
   }
 
