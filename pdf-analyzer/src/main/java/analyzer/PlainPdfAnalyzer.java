@@ -70,7 +70,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     float titleParagraphScore = 0;
     
     // Analyze only the first two pages.
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
       PdfPage page = pages.get(i);
       float fontsize = document.getTextStatistics().getMostCommonFontsize();
 
@@ -97,7 +97,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           }
 
           float score = sumOcurrences / numWords;
-
+          
           if (score > titleParagraphScore) {
             titleParagraphScore = score;
             titleParagraph = paragraph;
@@ -219,6 +219,11 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
         if (characteristics.isReferencesHeading(paragraph)) {
           paragraph.setRole(PdfRole.REFERENCES_HEADING);
+          continue;
+        }
+        
+        if (characteristics.isAcknowledgmentHeading(paragraph)) {
+          paragraph.setRole(PdfRole.SECTION_HEADING);
           continue;
         }
         

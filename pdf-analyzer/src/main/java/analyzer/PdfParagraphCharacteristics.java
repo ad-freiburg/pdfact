@@ -41,6 +41,11 @@ public class PdfParagraphCharacteristics {
   static final HashSet<String> REFERENCES_HEADINGS = new HashSet<>();
 
   /**
+   * All (normalized) headings for the ACKNOWLEDGEMENT.
+   */
+  static final HashSet<String> ACKNOWLEDGEMENT_HEADINGS = new HashSet<>();
+  
+  /**
    * A lot of math symbols.
    */
   static final HashSet<String> MATH_SYMBOLS = new HashSet<>();
@@ -53,6 +58,8 @@ public class PdfParagraphCharacteristics {
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgement");
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgment");
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgments");
+    WELL_KNOWN_SECTION_HEADINGS.add("acknowlegement");
+    WELL_KNOWN_SECTION_HEADINGS.add("acknowlegements");
     WELL_KNOWN_SECTION_HEADINGS.add("referencesandnotes");
     WELL_KNOWN_SECTION_HEADINGS.add("bibliography");
     WELL_KNOWN_SECTION_HEADINGS.add("conclusion");
@@ -64,6 +71,13 @@ public class PdfParagraphCharacteristics {
     REFERENCES_HEADINGS.add("references");
     REFERENCES_HEADINGS.add("bibliography");
 
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowledgements");
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowledgement");
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowledgment");
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowledgments");
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowlegement");
+    ACKNOWLEDGEMENT_HEADINGS.add("acknowlegements");
+    
     MATH_SYMBOLS.add("+");
     MATH_SYMBOLS.add("-");
     MATH_SYMBOLS.add("/");
@@ -143,11 +157,17 @@ public class PdfParagraphCharacteristics {
   protected ObjectCounter<String> documentWordsCounter;
 
   /**
+   * The counter for hyphenated s of the pdf document.
+   */
+  protected ObjectCounter<String> hyphenatedWordsCounter;
+  
+  /**
    * Creates a new paragraph inspector for the given document.
    */
   public PdfParagraphCharacteristics(PdfDocument document) {
     this.document = document;
     this.documentWordsCounter = new ObjectCounter<>();
+    this.hyphenatedWordsCounter = new ObjectCounter<>();
   }
 
   protected void characterize() {
@@ -213,6 +233,14 @@ public class PdfParagraphCharacteristics {
             // System.out.println(wordStr);
             if (!StringUtils.isStopWord(wordStr)) {
               documentWordsCounter.add(wordStr);
+            }
+            
+            // Check if the word contains a hyphen somewhere in the middle.
+            int indexOfHyphen = wordStr.indexOf("-");
+            if (indexOfHyphen > 0 && indexOfHyphen < wordStr.length() - 1) {
+              // Add the prefix + first character behind the hyphen.
+              // Example: For the word "sugar-free", add "sugar-f"
+              hyphenatedWordsCounter.add(wordStr.substring(0, indexOfHyphen + 1));
             }
           }
         }
@@ -334,6 +362,26 @@ public class PdfParagraphCharacteristics {
     text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
 
     return REFERENCES_HEADINGS.contains(text);
+  }
+  
+  /**
+   * Returns true, if the given paragraph is the heading of acknowledgement.
+   */
+  public boolean isAcknowledgmentHeading(PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return false;
+    }
+
+    String text = paragraph.getUnicode();
+
+    if (text == null) {
+      return false;
+    }
+
+    // Remove numbers, remove whitespaces and transform to lowercases.
+    text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
+
+    return ACKNOWLEDGEMENT_HEADINGS.contains(text);
   }
 
   // ___________________________________________________________________________
