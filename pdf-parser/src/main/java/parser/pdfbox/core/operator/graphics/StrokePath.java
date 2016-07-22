@@ -12,6 +12,7 @@ import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimplePoint;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import parser.pdfbox.core.operator.OperatorProcessor;
 import parser.pdfbox.model.PdfBoxColor;
@@ -81,12 +82,16 @@ public final class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_CUBICTO:
           float[] curveEnd = Arrays.copyOfRange(coordinates, 4, 6);
 
-          Rectangle rect = new SimpleRectangle();
-          rect.setMinX(Math.min(linePathPosition[0], curveEnd[0]));
-          rect.setMinY(Math.min(linePathPosition[1], curveEnd[1]));
-          rect.setMaxX(Math.max(linePathPosition[0], curveEnd[0]));
-          rect.setMaxY(Math.max(linePathPosition[1], curveEnd[1]));
-                    
+//          Rectangle rect = new SimpleRectangle();
+//          rect.setMinX(Math.min(linePathPosition[0], curveEnd[0]));
+//          rect.setMinY(Math.min(linePathPosition[1], curveEnd[1]));
+//          rect.setMaxX(Math.max(linePathPosition[0], curveEnd[0]));
+//          rect.setMaxY(Math.max(linePathPosition[1], curveEnd[1]));
+              
+          Rectangle rect = SimpleRectangle.from2Vertices(
+              new SimplePoint(linePathPosition[0], linePathPosition[1]),
+              new SimplePoint(curveEnd[0], curveEnd[1]));
+          
           PdfBoxShape shape = new PdfBoxShape(context.getCurrentPage());
           shape.setRectangle(rect);
           shape.setColor(color);
@@ -97,11 +102,15 @@ public final class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_LINETO:
           float[] lineEnd = Arrays.copyOf(coordinates, 2);
 
-          rect = new SimpleRectangle();
-          rect.setMinX(Math.min(linePathPosition[0], lineEnd[0]));
-          rect.setMinY(Math.min(linePathPosition[1], lineEnd[1]));
-          rect.setMaxX(Math.max(linePathPosition[0], lineEnd[0]));
-          rect.setMaxY(Math.max(linePathPosition[1], lineEnd[1]));
+//          rect = new SimpleRectangle();
+//          rect.setMinX(Math.min(linePathPosition[0], lineEnd[0]));
+//          rect.setMinY(Math.min(linePathPosition[1], lineEnd[1]));
+//          rect.setMaxX(Math.max(linePathPosition[0], lineEnd[0]));
+//          rect.setMaxY(Math.max(linePathPosition[1], lineEnd[1]));
+          
+          rect = SimpleRectangle.from2Vertices(
+              new SimplePoint(linePathPosition[0], linePathPosition[1]),
+              new SimplePoint(lineEnd[0], lineEnd[1]));
           
           shape = new PdfBoxShape(context.getCurrentPage());          
           shape.setRectangle(rect);
@@ -118,12 +127,16 @@ public final class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_QUADTO:
           float[] quadEnd = Arrays.copyOfRange(coordinates, 2, 4);
 
-          rect = new SimpleRectangle();
-          rect.setMinX(Math.min(linePathPosition[0], quadEnd[0]));
-          rect.setMinY(Math.min(linePathPosition[1], quadEnd[1]));
-          rect.setMaxX(Math.max(linePathPosition[0], quadEnd[0]));
-          rect.setMaxY(Math.max(linePathPosition[1], quadEnd[1]));
+//          rect = new SimpleRectangle();
+//          rect.setMinX(Math.min(linePathPosition[0], quadEnd[0]));
+//          rect.setMinY(Math.min(linePathPosition[1], quadEnd[1]));
+//          rect.setMaxX(Math.max(linePathPosition[0], quadEnd[0]));
+//          rect.setMaxY(Math.max(linePathPosition[1], quadEnd[1]));
 
+          rect = SimpleRectangle.from2Vertices(
+              new SimplePoint(linePathPosition[0], linePathPosition[1]),
+              new SimplePoint(quadEnd[0], quadEnd[1]));
+          
           shape = new PdfBoxShape(context.getCurrentPage());
           shape.setRectangle(rect);
           shape.setColor(color);

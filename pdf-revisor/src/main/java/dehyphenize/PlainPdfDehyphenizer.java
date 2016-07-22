@@ -122,7 +122,9 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
   protected boolean isIgnoreHyphen(PdfWord prevWord, PdfWord word,
       ObjectCounter<String> noHyphenWords, ObjectCounter<String> prefixes) {
     String prevWordText = prevWord.getUnicode();
-    String wordText = word.getUnicode();
+    // The word may contain another hyphens, but we want to analyze only
+    // the part until first hyphen.
+    String wordText = word.getUnicode().split("-")[0];
 
     String prefix = prevWordText.substring(0, prevWordText.length() - 1);
     String normalizedPrefix = normalize(prefix);
@@ -131,7 +133,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
         
     int prefixNum = prefixes.getCount(normalizedPrefix);
     int withoutHyphenNum = noHyphenWords.getCount(normalizedNoHyphen);
-        
+                
     if (prefixNum == 0 && withoutHyphenNum == 0) {
       // Neither 'noHyphenWords' nor 'prefixes' knows the word(s).
       
@@ -151,7 +153,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
       
       char charBeforeHyphen = prefix.charAt(normalizedPrefix.length() - 1);
       char charAfterHyphen = wordText.charAt(0);
-      
+            
       if (!Character.isAlphabetic(charBeforeHyphen)) {
         return false;
       }

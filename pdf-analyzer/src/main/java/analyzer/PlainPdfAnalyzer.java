@@ -2,11 +2,14 @@ package analyzer;
 
 import static analyzer.MathSymbols.containsMathSymbol;
 import static analyzer.MathSymbols.isMathSymbol;
+import static model.Patterns.FIGURE_CAPTION_PATTERN;
+import static model.Patterns.FORMULA_LABEL_PATTERN;
+import static model.Patterns.TABLE_CAPTION_PATTERN;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-import static model.Patterns.*;
 
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
@@ -18,13 +21,14 @@ import model.PdfColor;
 import model.PdfDocument;
 import model.PdfElement;
 import model.PdfFont;
+import model.PdfNonTextParagraph;
 import model.PdfPage;
 import model.PdfRole;
-import model.PdfShape;
 import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
 import model.PdfWord;
+import model.TextStatistics;
 
 /**
  * The concrete implementation of a Pdf Analyzer.
@@ -33,6 +37,12 @@ import model.PdfWord;
  *
  */
 public class PlainPdfAnalyzer implements PdfAnalyzer {
+  /** Flag to indicate whether the heading of abstract was found. */
+  protected boolean abstractHeadingFound;
+  /** Flag to indicate whether the abstract was found. */
+  protected boolean abstractFound;
+  
+  
   @Override
   public void analyze(PdfDocument document) {
     PdfParagraphCharacteristics characteristics =
@@ -46,6 +56,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     analyzeForFigures(document, characteristics);
     analyzeForSeparatedFormulas(document, characteristics);
     analyzeForAbstract(document, characteristics);
+    analyzeForOtherHeaderFields(document, characteristics);
     analyzeForReferences(document, characteristics);
     analyzeForBody(document, characteristics);
   }
@@ -70,8 +81,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     float titleParagraphScore = 0;
     
     // Analyze only the first two pages.
-    for (int i = 0; i < 1; i++) {
-      PdfPage page = pages.get(i);
+    for (PdfPage page : pages) {
       float fontsize = document.getTextStatistics().getMostCommonFontsize();
 
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
@@ -104,10 +114,11 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           }
         }
       }
-    }
-
-    if (titleParagraph != null) {
-      titleParagraph.setRole(PdfRole.TITLE);
+      
+      if (titleParagraph != null) {
+        titleParagraph.setRole(PdfRole.TITLE);
+        return;
+      }  
     }
   }
 
@@ -214,6 +225,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         
         if (characteristics.isAbstractHeading(paragraph)) {
           paragraph.setRole(PdfRole.ABSTRACT_HEADING);
+          this.abstractHeadingFound = true;
           continue;
         }
 
@@ -242,7 +254,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         // Experimental: Identify headings of (subsub-) sections where the font
         // isn't equal to sectionHeadingFont.
         String text = paragraph.getUnicode();
-        Matcher matcher = Patterns.SECTION_HEADING_START_PATTERN.matcher(text);
+        Matcher matcher = Patterns.ITEMIZE_START_PATTERN.matcher(text);
         if (matcher.find() && paraFont != docFont) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
         }
@@ -253,7 +265,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Returns true if we suppose that the given paragraph is a figure caption.
    */
-  protected static void analyzeForTables(PdfDocument document,
+  protected void analyzeForTables(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
@@ -279,8 +291,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           above.setMaxX(paragraph.getRectangle().getMaxX());
           above.setMinY(paragraph.getRectangle().getMaxY() + 1);
           above.setMaxY(paragraph.getRectangle().getMaxY() + 75); // TODO
-          List<PdfShape> shapesAbove = page.getShapesOverlapping(above);
-          int numShapesAbove = shapesAbove.size();
+          List<PdfNonTextParagraph> nonTextParagraphsAbove =
+              page.getNonTextParagraphsOverlapping(above);
+          float areaNonTextParasAbove = 0;
+          for (PdfNonTextParagraph para : nonTextParagraphsAbove) {
+            areaNonTextParasAbove += para.getRectangle().getArea();
+          }
 
           // Search for non text elements below the caption (in small excerpt).
           Rectangle below = new SimpleRectangle();
@@ -288,11 +304,15 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           below.setMaxX(paragraph.getRectangle().getMaxX());
           below.setMinY(paragraph.getRectangle().getMinY() - 75); // TODO
           below.setMaxY(paragraph.getRectangle().getMinY() - 1);
-          List<PdfShape> shapesBelow = page.getShapesOverlapping(below);
-          int numShapesBelow = shapesBelow.size();
+          List<PdfNonTextParagraph> nonTextParagraphsBelow = 
+              page.getNonTextParagraphsOverlapping(below);
+          float areaNonTextParasBelow = 0;
+          for (PdfNonTextParagraph para : nonTextParagraphsBelow) {
+            areaNonTextParasBelow += para.getRectangle().getArea();
+          }
 
           // Compare the number of non text elements in both areas.
-          if (numShapesAbove == 0 && numShapesBelow == 0) {
+          if (areaNonTextParasAbove == 0 && areaNonTextParasBelow == 0) {
             // No figures above and below the paragraph. So the paragraph is
             // not a caption.
             continue;
@@ -305,12 +325,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           // Try to identify all paragraphs of the figure.
           float width = MathUtils.round(paragraph.getRectangle().getWidth(), 0);
 
-          if (numShapesAbove > numShapesBelow) {
-            // Extend the search area above the caption to upper bound of page.
-            above.setMaxY(page.getRectangle().getMaxY());
-
+          if (areaNonTextParasAbove > areaNonTextParasBelow) {
             // Consume all paragraphs that are more smaller than the caption.
-            List<PdfTextParagraph> paras = page.getParagraphsOverlapping(above);
+            List<PdfTextParagraph> paras = new ArrayList<>();
+            for (PdfNonTextParagraph nonTextPara : nonTextParagraphsAbove) {
+              paras.addAll(page.getParagraphsOverlapping(nonTextPara));
+            }
             Collections.sort(paras, new Comparators.MinYComparator());
 
             for (PdfTextParagraph para : paras) {
@@ -318,37 +338,20 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
                 continue;
               }
 
-              Rectangle rect = para.getRectangle();
-              float paraWidth = MathUtils.round(rect.getWidth(), 0);
-
-              // Abort if we see a paragraph that is wider than the caption.
-              if (paraWidth >= width) {
-                break;
-              }
-
               para.setRole(PdfRole.TABLE);
             }
           } else {
-            // Extend the search area below the caption to lower bound of page.
-            below.setMinY(page.getRectangle().getMinY());
-
             // Consume all paragraphs that are more smaller than the caption.
-            List<PdfTextParagraph> paras = page.getParagraphsOverlapping(below);
-
+            List<PdfTextParagraph> paras = new ArrayList<>();
+            for (PdfNonTextParagraph nonTextPara : nonTextParagraphsBelow) {
+              paras.addAll(page.getParagraphsOverlapping(nonTextPara));
+            }
             Collections.sort(paras,
                 Collections.reverseOrder(new Comparators.MinYComparator()));
 
             for (PdfTextParagraph para : paras) {
               if (para.getRole() != PdfRole.UNKNOWN) {
                 continue;
-              }
-
-              Rectangle rect = para.getRectangle();
-              float paraWidth = MathUtils.round(rect.getWidth(), 0);
-
-              // Abort if we see a paragraph that is wider than the caption.
-              if (paraWidth >= width) {
-                break;
               }
 
               para.setRole(PdfRole.TABLE);
@@ -362,7 +365,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Returns true if we suppose that the given paragraph is a figure caption.
    */
-  protected static void analyzeForFigures(PdfDocument document,
+  protected void analyzeForFigures(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
@@ -381,9 +384,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         if (tableCaptionMatcher.find()) {          
           // The paragraph is potential caption. To acknowledge, search for a
           // figure above and below the caption.
-
-          float docWidth = document.getDimensionStatistics().getMostCommonWidth();
-          float docHeight = document.getDimensionStatistics().getMostCommonHeight();
           
           // Search for non text elements above the caption (in small excerpt).
           Rectangle above = new SimpleRectangle();
@@ -507,7 +507,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Returns true if we suppose that the given paragraph is a formula.
    */
-  protected static void analyzeForSeparatedFormulas(PdfDocument document,
+  protected void analyzeForSeparatedFormulas(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
@@ -540,12 +540,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
         
         String text = paragraph.getText(true, true, true);
-        
+              
         Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
         // As before, mathWordRatio must exceed a given threshold such that 
         // lines like "After a few manipulations, we now obtain with (35)" 
         // aren't classified as formula
         // formula.
+                
         if (m.find() && mathWordsRatio > 0.5f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;
@@ -554,40 +555,157 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     }
   }
 
+//  /**
+//   * Returns true if we suppose that the given paragraph is an abstract.
+//   */
+//  protected void analyzeForAbstract(PdfDocument document,
+//      PdfParagraphCharacteristics characteristics) {
+//    boolean abstractHeaderAlreadySeen = false;
+//    String abstractMarkup = null;
+//    for (PdfPage page : document.getPages()) {
+//      for (PdfTextParagraph paragraph : page.getParagraphs()) {        
+//        if (abstractHeaderAlreadySeen) {
+//          if (paragraph.getRole() != PdfRole.UNKNOWN) {
+//            return;
+//          }
+//
+//          String markup = paragraph.getMarkup();
+//          if (abstractMarkup != null && abstractMarkup.equals(markup)) {
+//            return;
+//          }
+//          
+//          paragraph.setRole(PdfRole.ABSTRACT);
+//          this.abstractFound = true;
+//          abstractMarkup = paragraph.getMarkup();
+//        }
+//
+//        if (paragraph.getRole() == PdfRole.ABSTRACT_HEADING) {
+//          abstractHeaderAlreadySeen = true;
+//        }
+//      }
+//    }
+//  }
+  
   /**
    * Returns true if we suppose that the given paragraph is an abstract.
    */
-  protected static void analyzeForAbstract(PdfDocument document,
+  protected void analyzeForAbstract(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
-    boolean abstractHeaderAlreadySeen = false;
-    String abstractMarkup = null;
     for (PdfPage page : document.getPages()) {
-      for (PdfTextParagraph paragraph : page.getParagraphs()) {
-        if (abstractHeaderAlreadySeen) {
-          if (paragraph.getRole() != PdfRole.UNKNOWN) {
+      PdfTextParagraph prevParagraph = null;
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {          
+        Threeway t = isAbstract(prevParagraph, paragraph);
+                
+        switch (t) {
+          case TRUE:
+            paragraph.setRole(PdfRole.ABSTRACT);
+            this.abstractFound = true;
+            break;
+          case FALSE:
             return;
-          }
-
-          String markup = paragraph.getMarkup();
-          if (abstractMarkup != null && abstractMarkup.equals(markup)) {
-            return;
-          }
-          
-          paragraph.setRole(PdfRole.ABSTRACT);
-          abstractMarkup = paragraph.getMarkup();
+          case CONTINUE:
+          default:
+            continue;
+            
         }
-
-        if (paragraph.getRole() == PdfRole.ABSTRACT_HEADING) {
-          abstractHeaderAlreadySeen = true;
-        }
+                        
+        prevParagraph = paragraph;
       }
     }
   }
 
+  protected Threeway isAbstract(PdfTextParagraph prevParagraph, 
+      PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return Threeway.FALSE;
+    }
+    
+    // Abstract usually don't follow any section headings.
+    if (paragraph.getRole() == PdfRole.SECTION_HEADING) {
+      return Threeway.FALSE;
+    }
+    
+    // Don't overwrite existing roles. 
+    if (paragraph.getRole() != PdfRole.UNKNOWN) {
+      return Threeway.CONTINUE;
+    }
+    
+    // Ignore paragrpahs with less than 50 characters.
+    if (paragraph.getWords().size() < 50) {
+      return Threeway.CONTINUE;
+    }
+    
+    if (prevParagraph != null) {
+      if (prevParagraph.getRole() == PdfRole.ABSTRACT_HEADING) {
+        return Threeway.TRUE;
+      }
+      
+      if (prevParagraph.getRole() == PdfRole.ABSTRACT) {
+        if (prevParagraph.getMarkup().equals(paragraph.getMarkup())) {
+          return Threeway.TRUE;
+        } else {
+          return Threeway.FALSE;
+        }
+      }
+    }
+    
+    PdfDocument document = paragraph.getPdfDocument();
+    TextStatistics stats = document.getTextStatistics();
+    
+    PdfFont docFont = stats.getMostCommonFont();
+    float docFontsize = MathUtils.round(stats.getMostCommonFontsize(), 0);
+    
+    PdfFont paraFont = paragraph.getFont();
+    float paraFontsize = MathUtils.round(paragraph.getFontsize(), 1);
+    
+    if (paraFont != docFont) {
+      return Threeway.TRUE;
+    }
+    
+    if (paraFontsize < docFontsize) {
+      return Threeway.TRUE;
+    }
+    
+    return Threeway.FALSE;
+  }
+  
+  /**
+   * Returns true if we suppose that the given paragraph belongs to the 
+   * document header.
+   */
+  protected void analyzeForOtherHeaderFields(PdfDocument document,
+      PdfParagraphCharacteristics characteristics) {
+    
+    // Mark all paragraphs before the abstract that wasn't annotated yet, 
+    // as "HEADER_OTHER".
+    
+    // If no abstract was found, we don't know where to stop. Abort.
+    if (!this.abstractHeadingFound && !this.abstractFound) {
+      return;
+    }
+    
+    for (PdfPage page : document.getPages()) {
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+        // Abort if we have reached the abstract.
+        if (paragraph.getRole() == PdfRole.ABSTRACT_HEADING 
+            || paragraph.getRole() == PdfRole.ABSTRACT) {
+          return;
+        }
+        
+        // Don't overwrite existing roles.
+        if (paragraph.getRole() != PdfRole.UNKNOWN) {
+          continue;
+        }
+        
+        paragraph.setRole(PdfRole.HEADER_OTHER);
+      }
+    }
+  }
+  
   /**
    * Returns true if we suppose that the given paragraph is an abstract.
    */
-  protected static void analyzeForReferences(PdfDocument document,
+  protected void analyzeForReferences(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     boolean referencesHeaderAlreadySeen = false;
     for (PdfPage page : document.getPages()) {
@@ -612,7 +730,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Returns true if we suppose that the given paragraph is an abstract.
    */
-  protected static void analyzeForBody(PdfDocument document,
+  protected void analyzeForBody(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     PdfFont font = document.getTextStatistics().getMostCommonFont();
     PdfColor fontColor = document.getTextStatistics().getMostCommonFontColor();
@@ -635,5 +753,9 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
       }
     }
+  }
+  
+  protected enum Threeway {
+    TRUE, FALSE, CONTINUE
   }
 }

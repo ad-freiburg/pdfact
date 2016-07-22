@@ -272,4 +272,26 @@ public class PdfXYCutTextParagraph extends PdfXYCutArea
   public void setExtractionOrderNumber(int extractionOrderNumber) {
     this.extractionOrderNumber = extractionOrderNumber;
   }
+
+  @Override
+  public PdfWord getFirstWord() {
+    PdfTextLine firstTextLine = getFirstTextLine();
+    
+    if (firstTextLine != null) {
+      return firstTextLine.getFirstWord();
+    }
+    
+    return null;
+  }
+
+  @Override
+  public PdfWord getLastWord() {
+    PdfTextLine lastTextLine = getLastTextLine();
+    
+    if (lastTextLine != null) {
+      return lastTextLine.getLastWord();
+    }
+    
+    return null;
+  }
 }

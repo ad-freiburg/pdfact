@@ -50,4 +50,14 @@ public interface PdfTextParagraph extends PdfTextElement,
    * would be added to this paragraph.
    */
   public PdfTextAlignment computeTextAlignment(PdfTextLine line);
+  
+  /**
+   * Returns the first word.
+   */
+  public PdfWord getFirstWord();
+  
+  /**
+   * Returns the last word.
+   */
+  public PdfWord getLastWord();
 }

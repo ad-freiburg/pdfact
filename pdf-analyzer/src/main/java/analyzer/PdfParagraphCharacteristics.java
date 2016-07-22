@@ -1,6 +1,6 @@
 package analyzer;
 
-import static model.Patterns.SECTION_HEADING_START_PATTERN;
+import static model.Patterns.ITEMIZE_START_PATTERN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -314,9 +314,9 @@ public class PdfParagraphCharacteristics {
     if (text == null) {
       return false;
     }
-
+    
     // Remove roman numerals.
-    text = SECTION_HEADING_START_PATTERN.matcher(text).replaceFirst("");
+    text = ITEMIZE_START_PATTERN.matcher(text).replaceFirst("");
     
     // Remove numbers, remove whitespaces and transform to lowercases.
     text = StringUtils.normalize(text, true, true, true);

@@ -3,6 +3,7 @@ package parser.pdfbox.core;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.fontbox.afm.CharMetric;
@@ -163,7 +164,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
     super.showGlyph(unicode, code, font, trm);
-        
+
     Rectangle boundingBox = null;
     if (font instanceof PDType3Font) {
       processType3Stream(((PDType3Font) font).getCharProc(code), trm);
@@ -293,7 +294,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   public void showLigature(String[] unicodes, int code, PDFont font, 
       Matrix trm) throws IOException {
     super.showLigature(unicodes, code, font, trm);
-
+    
     float size = getGraphicsState().getTextState().getFontSize();
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
@@ -331,7 +332,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       character.setFont(pdfFont);
       character.setFontsize(size);
       character.setColor(color);
-
+     
       showPdfTextCharacter(character);
     }
   }

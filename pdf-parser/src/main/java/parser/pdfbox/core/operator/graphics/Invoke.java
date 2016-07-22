@@ -29,6 +29,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
 
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimplePoint;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import parser.pdfbox.core.operator.OperatorProcessor;
 import parser.pdfbox.model.PdfBoxColor;
@@ -85,11 +86,16 @@ public class Invoke extends OperatorProcessor {
       ctmAT.scale(1f / imageWidth, 1f / imageHeight);
       Matrix at = new Matrix(ctmAT);
 
-      Rectangle boundBox = new SimpleRectangle();
-      boundBox.setMinX(ctm.getTranslateX());
-      boundBox.setMinY(ctm.getTranslateY());
-      boundBox.setMaxX(ctm.getTranslateX() + at.getScaleX() * imageWidth);
-      boundBox.setMaxY(ctm.getTranslateY() + at.getScaleY() * imageHeight);
+      Rectangle boundBox = SimpleRectangle.from2Vertices(
+          new SimplePoint(ctm.getTranslateX(), ctm.getTranslateY()), 
+          new SimplePoint(ctm.getTranslateX() + at.getScaleX() * imageWidth, 
+              ctm.getTranslateY() + at.getScaleY() * imageHeight));
+      
+//      Rectangle boundBox = new SimpleRectangle();
+//      boundBox.setMinX(ctm.getTranslateX());
+//      boundBox.setMinY(ctm.getTranslateY());
+//      boundBox.setMaxX(ctm.getTranslateX() + at.getScaleX() * imageWidth);
+//      boundBox.setMaxY(ctm.getTranslateY() + at.getScaleY() * imageHeight);
 
       PdfBoxColor exclusiveColor = getExclusiveColor(image.getImage());
       

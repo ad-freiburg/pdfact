@@ -13,6 +13,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDInlineImage;
 import org.apache.pdfbox.util.Matrix;
 
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimplePoint;
 import de.freiburg.iif.model.simple.SimpleRectangle;
 import parser.pdfbox.core.operator.OperatorProcessor;
 import parser.pdfbox.model.PdfBoxColor;
@@ -54,7 +55,11 @@ public class BeginInlineImage extends OperatorProcessor {
     // Type3 streams may contain BI operands, but we don't wan't to consider
     // those.
     if (!context.isType3Stream()) {
-      Rectangle boundBox = new SimpleRectangle(minX, minY, maxX, maxY);
+//      Rectangle boundBox = new SimpleRectangle(minX, minY, maxX, maxY);
+      
+      Rectangle boundBox = SimpleRectangle.from2Vertices(
+          new SimplePoint(minX, minY), 
+          new SimplePoint(maxX, maxY));
       
       PDImage image = new PDInlineImage(operator.getImageParameters(),
           operator.getImageData(), context.getResources());

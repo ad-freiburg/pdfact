@@ -4,6 +4,7 @@ import static model.SweepDirection.HorizontalSweepDirection.BOTTOM_TO_TOP;
 import static model.SweepDirection.HorizontalSweepDirection.TOP_TO_BOTTOM;
 import static model.SweepDirection.VerticalSweepDirection.LEFT_TO_RIGHT;
 import static model.SweepDirection.VerticalSweepDirection.RIGHT_TO_LEFT;
+import static model.Patterns.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +26,7 @@ import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
 import model.Comparators;
 import model.DimensionStatistics;
+import model.Patterns;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfDocument;
@@ -94,8 +95,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
       List<PdfArea> textBlocks = identifyTextBlocks(page);
       page.setBlocks(textBlocks);
       
-//      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
-//      page.setNonTextParagraphs(nonTextParas);
+      List<PdfNonTextParagraph> nonTextParas = identifyNonTextParagraphs(page);
+      page.setNonTextParagraphs(nonTextParas);
                   
       for (PdfArea textBlock : textBlocks) {
         textBlock.setTextLines(identifyLines(textBlock));
@@ -146,7 +147,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
    */
   protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
     PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
+    b = true;
     List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
+    b = false;
     List<PdfNonTextParagraph> paras = toNonTextParagraphs(page, paraAreas);
             
     return paras;
@@ -208,10 +211,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     
     return alignment;
   }
-  
-  // Support formula labels like (1), (10), (100), (1.2) and (1a), (A1)
-  Pattern formulaLabelPattern = Pattern.compile("\\(([A-Z])?\\d{1,3}([a-z]?)(\\.\\d{1,2})?\\)");
-  
+    
   protected PdfTextAlignment computeLineAlignment(PdfArea block,
       PdfTextLine line) {
     if (line != null) {   
@@ -255,12 +255,13 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (words != null && !words.isEmpty()) {
       // Check if to consider first word.        
       PdfWord firstWord = words.get(0);
-      
-      // Don't consider the first word if its starts with an itemize bullet.
-      if (!firstWord.getUnicode().startsWith("•")) {
-        wordsToConsider.add(firstWord);
+      if (firstWord != null) {
+        Matcher m = ITEMIZE_START_PATTERN.matcher(firstWord.getUnicode());
+        if (!m.matches()) {
+          wordsToConsider.add(firstWord);
+        }
       }
-    
+          
       // Add all words in the middle.
       for (int i = 1; i < words.size() - 1; i++) {
         wordsToConsider.add(words.get(i));
@@ -269,7 +270,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Check if to consider last word.
       PdfWord lastWord = words.get(words.size() - 1);
       if (lastWord != null) {
-        Matcher m = formulaLabelPattern.matcher(lastWord.getUnicode());
+        Matcher m = FORMULA_LABEL_PATTERN.matcher(lastWord.getUnicode());
         if (!m.matches()) {
           wordsToConsider.add(lastWord);
         }
@@ -454,11 +455,11 @@ public class PdfXYCutParser implements PdfExtendedParser {
       List<PdfArea> result) {
     // Try to split the area vertically.
     List<PdfArea> areas = splitVertically(area, rule);
-
+    
     if (areas.isEmpty()) {
       // The area couldn't be separated vertically. Try it horizontally.
       areas = splitHorizontally(area, rule);
-      
+          
       if (areas.isEmpty()) {
         // The area couldn't also be separated horizontally.
         // Add the area to result.
@@ -594,7 +595,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (rect != null) {
       // Identify the vertical split lane.
       Rectangle lane = identifyHorizontalLane(area, rule);
-      
+            
       if (lane != null) {        
         List<Rectangle> subRects = rect.splitHorizontally(lane.getYMidpoint());
         for (Rectangle subRect : subRects) {
@@ -685,7 +686,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    */
   protected Rectangle identifyHorizontalLane(PdfArea area, BlockifyRule rule) {
     Rectangle rect = area.getRectangle();
-        
+            
     if (rect != null) {
       // Determine the sweep direction.
       HorizontalSweepDirection dir = rule.getHorizontalLaneSweepDirection();
@@ -715,9 +716,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
             
       // Sweep the lane through the bounding box.
       while (pos >= rect.getMinY() && pos <= rect.getMaxY() - ruleLaneHeight) {
-        
         ruleLane.moveTo(ruleLane.getMinX(), pos);
-                   
+                          
         if (rule.isValidHorizontalLane(area, ruleLane)) {
           if (invalidLaneAlreadySeen) {
             // Expand the lane.
