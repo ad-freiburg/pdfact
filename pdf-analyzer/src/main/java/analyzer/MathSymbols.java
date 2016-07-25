@@ -90,7 +90,8 @@ public class MathSymbols {
     MATH_SYMBOLS.add("↦");
     MATH_SYMBOLS.add("⊧");
     MATH_SYMBOLS.add("⊢");
-
+    MATH_SYMBOLS.add("κ");
+    
     // Brackets
     MATH_SYMBOLS.add("{");
     MATH_SYMBOLS.add("}");
@@ -105,7 +106,11 @@ public class MathSymbols {
     MATH_SYMBOLS.add("⟨");
     MATH_SYMBOLS.add("⟩");
     MATH_SYMBOLS.add("|");
-
+    MATH_SYMBOLS.add("");
+    MATH_SYMBOLS.add("");
+    MATH_SYMBOLS.add("");
+    MATH_SYMBOLS.add("");
+    
     // Other non-letter symbols
     MATH_SYMBOLS.add("*");
     MATH_SYMBOLS.add("∝");
@@ -153,7 +158,8 @@ public class MathSymbols {
     MATH_SYMBOLS.add("⋊");
     MATH_SYMBOLS.add("⋈");
     MATH_SYMBOLS.add("ℤ");
-
+    MATH_SYMBOLS.add("");
+    
     MATH_SYMBOLS.add("α");
     MATH_SYMBOLS.add("β");
     MATH_SYMBOLS.add("γ");
@@ -173,6 +179,7 @@ public class MathSymbols {
     MATH_SYMBOLS.add("Φ");
     MATH_SYMBOLS.add("ω");
     MATH_SYMBOLS.add("Ω");
+    MATH_SYMBOLS.add("θ");
     
     // Words
     MATH_SYMBOLS.add("const");

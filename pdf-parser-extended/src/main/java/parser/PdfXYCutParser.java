@@ -1,10 +1,11 @@
 package parser;
 
+import static model.Patterns.FORMULA_LABEL_PATTERN;
+import static model.Patterns.ITEMIZE_START_PATTERN;
 import static model.SweepDirection.HorizontalSweepDirection.BOTTOM_TO_TOP;
 import static model.SweepDirection.HorizontalSweepDirection.TOP_TO_BOTTOM;
 import static model.SweepDirection.VerticalSweepDirection.LEFT_TO_RIGHT;
 import static model.SweepDirection.VerticalSweepDirection.RIGHT_TO_LEFT;
-import static model.Patterns.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,6 @@ import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
 import model.Comparators;
 import model.DimensionStatistics;
-import model.Patterns;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfDocument;
@@ -129,9 +129,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
     PdfArea area = new PdfXYCutArea(page, page.getElements());
     
     area.setColumnXRange(identifyReliableXRange(area));
-    
+    b = true;
     List<PdfArea> blocks = blockify(area, this.blockifyPageRule);
-    
+    b = false;
     // TODO: Move it.
     for (PdfArea block : blocks) {
       for (PdfElement element : block.getElements()) {
@@ -147,9 +147,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
    */
   protected List<PdfNonTextParagraph> identifyNonTextParagraphs(PdfPage page) {
     PdfXYCutArea area = new PdfXYCutArea(page, page.getNonTextElements());
-    b = true;
     List<PdfArea> paraAreas = blockify(area, this.blockifyNonTextPageRule);
-    b = false;
     List<PdfNonTextParagraph> paras = toNonTextParagraphs(page, paraAreas);
             
     return paras;
@@ -474,6 +472,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // The area was split vertically.
       for (PdfArea subarea : areas) {
         Line xRange = identifyReliableXRange(subarea);
+                
         if (xRange != null) {
           subarea.setColumnXRange(xRange);
         }
@@ -549,7 +548,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   }
   
   // ___________________________________________________________________________
-
+  
   /**
    * Tries to split the given area vertically.
    */
@@ -562,7 +561,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Identify the vertical split lane.
       Rectangle lane = identifyVerticalLane(area, rule);
 
-      if (lane != null) {
+      if (lane != null) {        
         List<Rectangle> subRects = rect.splitVertically(lane.getXMidpoint());
         for (Rectangle subRect : subRects) {
           List<PdfElement> subs = area.getElementsOverlapping(subRect, 0.75f);

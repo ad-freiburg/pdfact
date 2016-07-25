@@ -1,16 +1,16 @@
 package merge;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import model.PdfDocument;
 import model.PdfPage;
 import model.PdfRole;
+import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
-import model.PdfWord;
 
 public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
+  protected boolean isParagraphSplitterInBetween = false;
 
   @Override
   public void mergeBodyText(PdfDocument document) {
@@ -27,9 +27,7 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
       return;
     }
     
-    List<PdfTextParagraph> revisedParagraphs = new ArrayList<>();
     PdfTextParagraph prevBodyTextParagraph = null;
-    
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
@@ -44,51 +42,59 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
         if (paragraph == null) {
           continue;
         }
-        
-        PdfRole paragraphRole = paragraph.getRole();
-        if (paragraphRole == null) {
-          continue;
-        }
-        
-        if (appendToPrevBodyTextParagraph(paragraph, prevBodyTextParagraph)) {
+                  
+        if (appendToPrevParagraph(paragraph, prevBodyTextParagraph)) {
           prevBodyTextParagraph.addTextLines(paragraph.getTextLines());
           paragraph.setIgnore(true);
-        } else {
-          revisedParagraphs.add(paragraph);
-        }
-        
-        if (paragraphRole == PdfRole.BODY_TEXT) {
+        } else if (paragraph.getRole() == PdfRole.BODY_TEXT) {
           prevBodyTextParagraph = paragraph;
         }
       }
     }
   }
   
-  protected boolean appendToPrevBodyTextParagraph(PdfTextParagraph paragraph, 
+  protected boolean appendToPrevParagraph(PdfTextParagraph paragraph, 
       PdfTextParagraph prevBodyTextParagraph) {
     if (paragraph == null || prevBodyTextParagraph == null) {
       return false;
     }
     
-    if (paragraph.getRole() != PdfRole.BODY_TEXT) {
+    PdfRole paraRole = paragraph.getRole();
+        
+    if (paraRole == PdfRole.FORMULA
+        || paraRole == PdfRole.SECTION_HEADING
+        || paraRole == PdfRole.ABSTRACT_HEADING
+        || paraRole == PdfRole.REFERENCES_HEADING) {
+      this.isParagraphSplitterInBetween = true;
       return false;
     }
     
+    if (paraRole != PdfRole.BODY_TEXT) {
+      return false;
+    }
+    
+    if (this.isParagraphSplitterInBetween) {
+      this.isParagraphSplitterInBetween = false;
+      return false;
+    }
+    
+    this.isParagraphSplitterInBetween = false;
+        
     PdfTextLine lastTextLine = prevBodyTextParagraph.getLastTextLine();
     if (lastTextLine == null) {
       return false;
     }
     
-    PdfWord lastWord = lastTextLine.getLastWord();
-    if (lastWord == null) {
+    PdfTextLine firstTextLine = paragraph.getFirstTextLine();
+    if (firstTextLine == null) {
       return false;
     }
-    
-    String lastWordText = lastWord.getText(true, true, true);
-    if (lastWordText == null) {
-      return false;
+        
+    if (firstTextLine.getAlignment() == PdfTextAlignment.JUSTIFIED
+        || firstTextLine.getAlignment() == PdfTextAlignment.LEFT) {
+      return true;
     }
     
-    return lastWordText.endsWith("-");
+    return false;
   }
 }

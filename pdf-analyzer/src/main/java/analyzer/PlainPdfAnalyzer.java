@@ -515,25 +515,31 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           continue;
         }
 
-        float numNonMathWords = 0;
-        float numMathWords = 0;
+        if (page.getPageNumber() == 14) {
+          System.out.println(paragraph);
+        }
+        
+        float numNonMathChars = 0;
+        float numMathChars = 0;
 
         for (PdfTextLine line : paragraph.getTextLines()) {
           for (PdfWord word : line.getWords()) {
-            String str = word.getUnicode().toLowerCase().trim();
-
+            // TODO: Use StringUtils.normalize.
+            String str = word.getUnicode().toLowerCase().trim().replaceAll("[\\.,]", "");
+            
             if (line.getAlignment() == PdfTextAlignment.LEFT) {
-              numNonMathWords++;
+              numNonMathChars++;
             } else if (isMathSymbol(str) || containsMathSymbol(str)
                 || word.containsSubScript() || word.containsSuperScript()) {
-              numMathWords++;
+              numMathChars += word.getTextCharacters().size();
             } else {
-              numNonMathWords++;
+              numNonMathChars += word.getTextCharacters().size();
             }
           }
         }
 
-        float mathWordsRatio = numMathWords / (numMathWords + numNonMathWords);
+        float mathWordsRatio = numMathChars / (numMathChars + numNonMathChars);
+                
         if (mathWordsRatio > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;

@@ -3,7 +3,6 @@ package model;
 import java.util.List;
 
 import de.freiburg.iif.counter.FloatCounter;
-import de.freiburg.iif.counter.IntCounter;
 import de.freiburg.iif.model.Rectangle;
 
 /**
