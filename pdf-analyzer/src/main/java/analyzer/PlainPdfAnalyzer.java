@@ -514,10 +514,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         if (paragraph.getRole() != PdfRole.UNKNOWN) {
           continue;
         }
-
-        if (page.getPageNumber() == 14) {
-          System.out.println(paragraph);
-        }
         
         float numNonMathChars = 0;
         float numMathChars = 0;
@@ -546,16 +542,18 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
         
         String text = paragraph.getText(true, true, true);
-              
-        Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
-        // As before, mathWordRatio must exceed a given threshold such that 
-        // lines like "After a few manipulations, we now obtain with (35)" 
-        // aren't classified as formula
-        // formula.
-                
-        if (m.find() && mathWordsRatio > 0.5f) {
-          paragraph.setRole(PdfRole.FORMULA);
-          continue;
+             
+        if (text != null) {
+          Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
+          // As before, mathWordRatio must exceed a given threshold such that 
+          // lines like "After a few manipulations, we now obtain with (35)" 
+          // aren't classified as formula
+          // formula.
+                  
+          if (m.find() && mathWordsRatio > 0.5f) {
+            paragraph.setRole(PdfRole.FORMULA);
+            continue;
+          }
         }
       }
     }

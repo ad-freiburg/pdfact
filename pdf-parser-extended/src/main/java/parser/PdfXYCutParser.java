@@ -810,13 +810,14 @@ public class PdfXYCutParser implements PdfExtendedParser {
       for (int i = 0; i < areas.size(); i++) {
         PdfArea area = areas.get(i);
         PdfXYCutWord word = new PdfXYCutWord(area.getPage(), area);
-
+        
         for (PdfCharacter character : word.getTextCharacters()) {
           // Compute subscripts and superscripts.
           if (Characters.isPunctuationMark(character)) {
             character.setIsPunctuationMark(true);
             word.setContainsPunctuationMark(true);
           }
+              
           if (isSubscript(line, character)) {
             character.setIsSubScript(true);
             word.setContainsSubScript(true);
@@ -912,7 +913,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (character == null) {
       return false;
     }
-    
+        
     if (Characters.isPunctuationMark(character)) {
       return false;
     }
@@ -937,7 +938,22 @@ public class PdfXYCutParser implements PdfExtendedParser {
         float meanLineY = meanLine.getStartY();
         boolean isBelowMeanLine = MathUtils.isSmaller(maxY, meanLineY, 0.5f);
         
-        return isBelowBaseLine && isBelowMeanLine;
+        if (isBelowBaseLine && isBelowMeanLine) {
+          return true;
+        }
+        
+        // Handle Special Case: "-" as a sub- or superscript.
+        boolean isMinYOnBaseLine = MathUtils.isEqual(minY, baseLineY, 1f);
+        boolean isMaxYOnBaseLine = MathUtils.isEqual(maxY, baseLineY, 1f);
+        if (isMinYOnBaseLine && isMaxYOnBaseLine) {
+          return true;
+        }
+        
+        boolean isMinYOnMeanLine = MathUtils.isEqual(minY, meanLineY, 1f);
+        boolean isMaxYOnMeanLine = MathUtils.isEqual(maxY, meanLineY, 1f);
+        if (isMinYOnMeanLine && isMaxYOnMeanLine) {
+          return true;
+        }
       }
     }
     return false;

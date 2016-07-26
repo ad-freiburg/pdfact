@@ -39,8 +39,8 @@ public class Characters {
     PUNCTUATION_MARKS.add('!');
     PUNCTUATION_MARKS.add(':');
     PUNCTUATION_MARKS.add(';');
-    PUNCTUATION_MARKS.add('-');
-    PUNCTUATION_MARKS.add('—');
+//    PUNCTUATION_MARKS.add('-');
+//    PUNCTUATION_MARKS.add('—');
     PUNCTUATION_MARKS.add(',');
     PUNCTUATION_MARKS.add('\'');
     PUNCTUATION_MARKS.add('"');

@@ -106,13 +106,23 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       boolean includeSubscripts, boolean includeSuperscripts) {
     StringBuilder result = new StringBuilder();
 
+    String prevText = null;
     for (PdfCharacter character : getTextCharacters()) {
       if (character != null && !character.ignore()) {        
         String text = character.getText(includePunctuationMarks,
             includeSubscripts, includeSuperscripts);
         if (text != null) {
-          result.append(character.toString());
+          // Sub- and superscripts are replaced by whitespaces. Append a white-
+          // space only if the previous characters is a non-whitespace.
+          if (" ".equals(text)) {
+            if (prevText != null && !" ".equals(prevText)) {
+              result.append(text);
+            }
+          } else {
+            result.append(text);
+          }
         }
+        prevText = text;
       }
     }
 

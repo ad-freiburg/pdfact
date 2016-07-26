@@ -75,12 +75,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     for (PdfTextLine line : page.getTextLines()) {
-//      if (line.getMeanLine() != null) {
-//        drawer.drawLine(line.getMeanLine(), line.getPage().getPageNumber(), Color.BLUE);
-//      }
-//      if (line.getBaseLine() != null) {
-//        drawer.drawLine(line.getBaseLine(), line.getPage().getPageNumber(), Color.RED);
-//      }
+      if (line.getMeanLine() != null) {
+        drawer.drawLine(line.getMeanLine(), line.getPage().getPageNumber(), Color.BLUE);
+      }
+      if (line.getBaseLine() != null) {
+        drawer.drawLine(line.getBaseLine(), line.getPage().getPageNumber(), Color.RED);
+      }
       drawer.drawLine(line.getColumnXRange(), line.getPage().getPageNumber());
     }
     

@@ -258,7 +258,7 @@ public class PdfParserCommandLine {
     analyze(document);
     
     // Revise the document.
-    revise(document);
+//    revise(document);
     
     // Serialize the document.
     serialize(document);

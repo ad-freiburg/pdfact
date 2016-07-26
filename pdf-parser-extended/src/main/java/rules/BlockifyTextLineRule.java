@@ -3,9 +3,12 @@ package rules;
 import java.util.Collections;
 import java.util.List;
 
+import com.sun.security.auth.callback.TextCallbackHandler;
+
 import de.freiburg.iif.counter.FloatCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
+import model.Characters;
 import model.Comparators;
 import model.PdfArea;
 import model.PdfCharacter;
@@ -46,6 +49,17 @@ public class BlockifyTextLineRule implements BlockifyRule {
   
   @Override
   public boolean isValidVerticalLane(PdfArea area, Rectangle lane) { 
+//    List<PdfCharacter> overlapChars = area.getTextCharactersOverlapping(lane);
+//    
+//    // Lane is allowed to overlap "valid" characters.
+//    for (PdfCharacter character : overlapChars) {
+//      // TODO: Define valid characters.
+//      if (!Characters.isPunctuationMark(character)) {
+//        return false;
+//      }
+//    }
+//    
+//    return true;
     return area.getTextCharactersOverlapping(lane).isEmpty();
   }
   
