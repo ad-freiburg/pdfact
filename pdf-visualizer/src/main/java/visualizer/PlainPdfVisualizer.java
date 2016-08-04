@@ -76,15 +76,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     for (PdfTextLine line : page.getTextLines()) {
-      if (line.getMeanLine() != null) {
-        drawer.drawLine(line.getMeanLine(), line.getPage().getPageNumber(), Color.BLUE);
-      }
-      if (line.getBaseLine() != null) {
-        drawer.drawLine(line.getBaseLine(), line.getPage().getPageNumber(), Color.RED);
-      }
+//      if (line.getMeanLine() != null) {
+//        drawer.drawLine(line.getMeanLine(), line.getPage().getPageNumber(), Color.BLUE);
+//      }
+//      if (line.getBaseLine() != null) {
+//        drawer.drawLine(line.getBaseLine(), line.getPage().getPageNumber(), Color.RED);
+//      }
 //      drawer.drawLine(line.getColumnXRange(), line.getPage().getPageNumber());
 //      drawer.drawRectangle(line.getRectangle(), line.getPage().getPageNumber());
-      drawer.drawText(" " + line.getIndentLevel(), line.getPage().getPageNumber(), line.getRectangle().getLowerRight(), Color.BLACK, 5);
+//      drawer.drawText(" " + line.getIndentLevel(), line.getPage().getPageNumber(), line.getRectangle().getLowerRight(), Color.BLACK, 5);
     }
     
     //    if (page.getRects() != null) {
@@ -93,10 +93,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     //      }
     //    }
 
-        for (PdfTextParagraph block : page.getParagraphs()) {
-          drawer.drawText("" + block.getRole(), page.getPageNumber(), block.getRectangle().getLowerRight(),
-              Color.BLACK);     
-        }   
+//        for (PdfTextParagraph block : page.getParagraphs()) {
+//          drawer.drawText("" + block.getRole(), page.getPageNumber(), block.getRectangle().getLowerRight(),
+//              Color.BLACK);     
+//        }   
 
 //    drawer.drawRectangle(new SimpleRectangle(285.49875f,367.94885f,306.49875f,398.34326f), 7, Color.MAGENTA);
 //    drawer.drawRectangle(new SimpleRectangle(172.908f,667.54803f,444.46802f,668.54803f), 18);
