@@ -1,7 +1,6 @@
 package parser;
 
 import static model.Patterns.FORMULA_LABEL_PATTERN;
-import static model.Patterns.ITEMIZE_START_PATTERN;
 import static model.SweepDirection.HorizontalSweepDirection.BOTTOM_TO_TOP;
 import static model.SweepDirection.HorizontalSweepDirection.TOP_TO_BOTTOM;
 import static model.SweepDirection.VerticalSweepDirection.LEFT_TO_RIGHT;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,6 +27,7 @@ import de.freiburg.iif.model.simple.SimpleRectangle;
 import model.Characters;
 import model.Comparators;
 import model.DimensionStatistics;
+import model.Patterns;
 import model.PdfArea;
 import model.PdfCharacter;
 import model.PdfDocument;
@@ -51,6 +52,7 @@ import rules.BlockifyTextBlockRule;
 import rules.BlockifyTextLineRule;
 import rules.BlockifyTextPageRule;
 import rules.ParagraphifyRule;
+import statistics.TextLineStatistician;
 
 /**
  * Implementation of a PdfAnalyzer mainly based on the xy-cut algorithm.
@@ -179,30 +181,29 @@ public class PdfXYCutParser implements PdfExtendedParser {
     
     // TODO: Move it.
     for (int i = 0; i < lines.size(); i++) {
+      PdfTextLine prevprevLine = i > 1 ? lines.get(i - 2) : null;
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
             
-      line.setAlignment(computeLineAlignment(textBlock, prevLine, line, 
-          nextLine));
+      line.setAlignment(computeLineAlignment(textBlock, prevprevLine, prevLine, 
+          line, nextLine));
     }
   }
   
   protected PdfTextAlignment computeLineAlignment(PdfArea block, 
-      PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
-    PdfTextAlignment alignment = computeLineAlignment(block, line);
+      PdfTextLine prevprevLine, PdfTextLine prevLine, PdfTextLine line, 
+      PdfTextLine nextLine) {
+    PdfTextAlignment alignment = computeLineAlignment(block, prevLine, line);
     
     if (prevLine != null) {
-      Rectangle prevBoundingBox = computeBoundingBoxToConsider(prevLine);
+      Rectangle prevBoundingBox = computeBoundingBoxToConsider(prevprevLine, prevLine);
       float prevMinX = MathUtils.round(prevBoundingBox.getMinX(), 1);
-      Rectangle boundingBox = computeBoundingBoxToConsider(line);
+      Rectangle boundingBox = computeBoundingBoxToConsider(prevLine, line);
       float minX = MathUtils.round(boundingBox.getMinX(), 1);
-           
-      PdfTextAlignment prevAlignment = prevLine.getAlignment();
-      
+                 
       // If line.minX == prevLine.minX, take the alignment of prevLine.
-      if (prevAlignment != PdfTextAlignment.CENTERED 
-          && MathUtils.isEqual(prevMinX, minX, 0.1f)) {
+      if (MathUtils.isEqual(prevMinX, minX, 0.1f)) {
         return prevLine.getAlignment();
       }
     }
@@ -211,9 +212,9 @@ public class PdfXYCutParser implements PdfExtendedParser {
   }
     
   protected PdfTextAlignment computeLineAlignment(PdfArea block,
-      PdfTextLine line) {
+      PdfTextLine prevLine, PdfTextLine line) {
     if (line != null) {   
-      Rectangle boundingBox = computeBoundingBoxToConsider(line);
+      Rectangle boundingBox = computeBoundingBoxToConsider(prevLine, line);
       Line columnXRange = line.getColumnXRange();
       
       if (columnXRange != null) {
@@ -227,17 +228,29 @@ public class PdfXYCutParser implements PdfExtendedParser {
         
         DimensionStatistics stats = block.getDimensionStatistics();
         float tolerance = 0.5f * stats.getMostCommonWidth();
-                
-        if (leftMargin > tolerance && rightMargin > tolerance) {
+          
+        line.setIndentationLevel((int) ((lineMinX - columnMinX) / stats.getMostCommonWidth()));
+        
+        if (MathUtils.isEqual(leftMargin, rightMargin, 1f)
+            && leftMargin > tolerance) {
           return PdfTextAlignment.CENTERED;
         }
-        
+                
         if (leftMargin < tolerance && rightMargin < tolerance) {
           return PdfTextAlignment.JUSTIFIED;
         }
         
-        if (leftMargin > tolerance) {
+        if (leftMargin > tolerance && leftMargin < 10 * tolerance) {
+          line.setIsIntended(true);
+          return PdfTextAlignment.LEFT;
+        }
+        
+        if (rightMargin < tolerance) { 
           return PdfTextAlignment.RIGHT;
+        }
+        
+        if (leftMargin > tolerance && rightMargin > tolerance) {
+          return PdfTextAlignment.CENTERED;
         }
         
         return PdfTextAlignment.LEFT;
@@ -246,7 +259,8 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return null;
   }
   
-  protected Rectangle computeBoundingBoxToConsider(PdfTextLine line) {
+  protected Rectangle computeBoundingBoxToConsider(PdfTextLine prevLine,
+      PdfTextLine line) {
     List<PdfWord> words = line.getWords();   
     List<PdfWord> wordsToConsider = new ArrayList<>();
     
@@ -254,8 +268,32 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Check if to consider first word.        
       PdfWord firstWord = words.get(0);
       if (firstWord != null) {
-        Matcher m = ITEMIZE_START_PATTERN.matcher(firstWord.getUnicode());
-        if (!m.matches()) {
+        // Check if the line is a heading or itemize (i.e. preceded by a 
+        // numbering). 
+        List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS; 
+        
+        boolean matches = false;
+        for (Pattern pattern : itemizeStartPatterns) {
+          Matcher m = pattern.matcher(firstWord.getUnicode());
+          if (m.matches() && !m.group(1).isEmpty() && words.size() > 1) {
+            matches = true;
+            break;
+          }
+        }
+          
+        // "Normal" lines could be started by a numbering, too. So, take also 
+        // the line pitch into account (headings and itemizes must have a 
+        // larger linepitch to previous line.
+        PdfDocument doc = line.getPdfDocument();
+        float mcPitch = doc.getTextLineStatistics().getMostCommonLinePitch();
+        float linePitch = Float.MAX_VALUE;
+        if (prevLine != null) {
+          linePitch = TextLineStatistician.computeLinePitch(prevLine, line);
+        }
+        
+        // Consider the word, if no numbering is available or if line pitch is
+        // normal.
+        if (!matches || MathUtils.isSmallerOrEqual(linePitch, mcPitch, 1f)) {
           wordsToConsider.add(firstWord);
         }
       }
@@ -537,12 +575,13 @@ public class PdfXYCutParser implements PdfExtendedParser {
     int numMostFrequentMinX = minXCounter.getMostFrequentFloatCount();
     int numMostFrequentMaxX = maxXCounter.getMostFrequentFloatCount();
     int numMinYValues = minYCounter.size();
-    int minXThreshold = Math.min(numMostFrequentMinX / 2, numMinYValues / 2);
+    int minXThreshold = 2;
+    // It is more likely, that a line exceeds the column boundaries at the 
+    // end of line.
     int maxXThreshold = Math.min(numMostFrequentMaxX / 2, numMinYValues / 2);
-    int threshold = Math.min(minXThreshold, maxXThreshold);
-    
-    xRange.setStartX(minXCounter.getSmallestFloatOccuringAtLeast(threshold));
-    xRange.setEndX(maxXCounter.getLargestFloatOccuringAtLeast(threshold));
+        
+    xRange.setStartX(minXCounter.getSmallestFloatOccuringAtLeast(minXThreshold));
+    xRange.setEndX(maxXCounter.getLargestFloatOccuringAtLeast(maxXThreshold));
         
     return xRange;
   }
@@ -857,26 +896,30 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return result;
   }
           
+  float prevDistanceBaseMeanLine = 0;
+  
   public void computeBaseAndMeanLine(PdfTextLine line) {
     Line meanLine = null;
     FloatCounter maxYCounter = new FloatCounter();
     
+    Rectangle lineRect = line.getRectangle();
     TextStatistics stats = line.getTextStatistics();
-    float fontSize = MathUtils.round(stats.getMostCommonFontsize(), 1);
-    
+    float fontSize = MathUtils.round(stats.getAverageFontsize(), 1);
+            
     for (PdfCharacter character : line.getTextCharacters()) {
-      float charFontsize = MathUtils.round(character.getFontsize(), 1);
+      float charFontsize = MathUtils.round(character.getFontsize(), 1);  
+      Rectangle rect = character.getRectangle();
       if (Characters.isMeanlineCharacter(character)
-          && fontSize == charFontsize) {
-        float maxY = MathUtils.round(character.getRectangle().getMaxY(), 1);
-        maxYCounter.add(maxY);
+          && charFontsize >= fontSize) {    
+        maxYCounter.add(MathUtils.round(rect.getMaxY(), 1));
       }
     }
     
     if (!maxYCounter.isEmpty()) {
       float mostCommonMaxY = maxYCounter.getMostFrequentFloat();
-      meanLine = new SimpleLine(line.getRectangle().getMinX(), mostCommonMaxY,
-          line.getRectangle().getMaxX(), mostCommonMaxY);
+      meanLine = new SimpleLine(
+          lineRect.getMinX(), mostCommonMaxY,
+          lineRect.getMaxX(), mostCommonMaxY);
     }
     
     Line baseLine = null;
@@ -884,17 +927,18 @@ public class PdfXYCutParser implements PdfExtendedParser {
     
     for (PdfCharacter character : line.getTextCharacters()) {
       float charFontsize = MathUtils.round(character.getFontsize(), 1);
+      Rectangle rect = character.getRectangle();
       if (Characters.isBaselineCharacter(character)
-          && fontSize == charFontsize) {
-        float minY = MathUtils.round(character.getRectangle().getMinY(), 1);
-        minYCounter.add(minY);
+          && charFontsize >= fontSize) {
+        minYCounter.add(MathUtils.round(rect.getMinY(), 1));
       }
     }
     
     if (!minYCounter.isEmpty()) {
       float mostCommonMinY = minYCounter.getMostFrequentFloat();
-      baseLine = new SimpleLine(line.getRectangle().getMinX(), mostCommonMinY,
-          line.getRectangle().getMaxX(), mostCommonMinY);
+      baseLine = new SimpleLine(
+          lineRect.getMinX(), mostCommonMinY,
+          lineRect.getMaxX(), mostCommonMinY);
     }
     
     // Check if the baseline and meanLine are valid
@@ -902,9 +946,26 @@ public class PdfXYCutParser implements PdfExtendedParser {
       if (baseLine.getStartY() < meanLine.getStartY()) {
         line.setBaseLine(baseLine);
         line.setMeanLine(meanLine);
-      }
-    } else {
+        prevDistanceBaseMeanLine = meanLine.getStartY() - baseLine.getStartY();
+        return;
+      } 
+    }
+    
+    // Estimate base-/meanline based on previous values.
+    if (line != null && lineRect != null) {
+      List<PdfElement> elements = line.getElements();
+      Collections.sort(elements, new Comparators.MinXComparator());
+      
+      baseLine = new SimpleLine(lineRect.getMinX(),
+          elements.get(0).getRectangle().getMinY(),
+          lineRect.getMaxX(),
+          elements.get(0).getRectangle().getMinY());
       line.setBaseLine(baseLine);
+      
+      meanLine = new SimpleLine(baseLine.getStartX(),
+          baseLine.getStartY() + prevDistanceBaseMeanLine,
+          baseLine.getEndX(),
+          baseLine.getEndY() + prevDistanceBaseMeanLine);
       line.setMeanLine(meanLine);
     }
   }
@@ -914,10 +975,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
       return false;
     }
         
-    if (Characters.isPunctuationMark(character)) {
+    if (Characters.isBaselinePunctuationMark(character)) {
       return false;
     }
-    
+        
     Rectangle rect = character.getRectangle();
     float minY = rect.getMinY();
     float maxY = rect.getMaxY();
@@ -929,8 +990,18 @@ public class PdfXYCutParser implements PdfExtendedParser {
       float baseLineY = baseLine.getStartY();
       boolean isBelowBaseLine = MathUtils.isSmaller(minY, baseLineY, 0.5f);
       
-      if (isBelowBaseLine && Characters.isLatinLetterOrDigit(character) 
-          && !Characters.isDescender(character)) {
+      if (isBelowBaseLine) {
+        if (Characters.isLatinLetterOrDigit(character) 
+            && !Characters.isDescender(character)) {
+          return true;
+        }
+      }
+      
+      // If punctuation marks like "," overlaps the meanline, it is a 
+      // superscript TODO: Instead of checking for punctuation mark analyze the
+      // surrounding chars if they are superscripts.
+      if (Characters.isMeanlinePunctuationMark(character) 
+          && rect.overlapsVertically(baseLine)) {
         return true;
       }
       
@@ -964,10 +1035,10 @@ public class PdfXYCutParser implements PdfExtendedParser {
       return false;
     }
     
-    if (Characters.isPunctuationMark(character)) {
+    if (Characters.isMeanlinePunctuationMark(character)) {
       return false;
     }
-    
+        
     Rectangle rect = character.getRectangle();
     float minY = rect.getMinY();
     float maxY = rect.getMaxY();
@@ -978,9 +1049,19 @@ public class PdfXYCutParser implements PdfExtendedParser {
     if (meanLine != null) {
       float meanLineY = meanLine.getStartY();
       boolean isAboveMeanLine = MathUtils.isLarger(maxY, meanLineY, 0.5f);
+            
+      if (isAboveMeanLine) {
+        if (Characters.isLatinLetterOrDigit(character)
+            && !Characters.isAscender(character)) {
+          return true;
+        }
+      }
       
-      if (isAboveMeanLine && Characters.isLatinLetterOrDigit(character) 
-          && !Characters.isAscender(character)) {
+      // If punctuation marks like "," overlaps the meanline, it is a 
+      // superscript TODO: Instead of checking for punctuation mark analyze the
+      // surrounding chars if they are superscripts.
+      if (Characters.isBaselinePunctuationMark(character) 
+          && rect.overlapsVertically(meanLine)) {
         return true;
       }
       

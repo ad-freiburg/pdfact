@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.omg.CORBA.UNKNOWN;
 
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
@@ -29,6 +32,8 @@ import model.PdfTextLine;
 import model.PdfTextParagraph;
 import model.PdfWord;
 import model.TextStatistics;
+import statistics.TextLineStatistician;
+import statistics.TextStatistician;
 
 /**
  * The concrete implementation of a Pdf Analyzer.
@@ -54,6 +59,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     analyzeForPageHeadersAndFooters(document, characteristics);
     analyzeForTables(document, characteristics);
     analyzeForFigures(document, characteristics);
+    analyzeForItemizes(document, characteristics);
     analyzeForSeparatedFormulas(document, characteristics);
     analyzeForAbstract(document, characteristics);
     analyzeForOtherHeaderFields(document, characteristics);
@@ -212,7 +218,10 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     PdfFont docFont = document.getTextStatistics().getMostCommonFont();
 
     for (PdfPage page : document.getPages()) {
-      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+      for (int i = 0; i < page.getParagraphs().size(); i++) {
+        PdfTextParagraph prevParagraph = i > 0 ? page.getParagraphs().get(i - 1) : null;
+        PdfTextParagraph paragraph = page.getParagraphs().get(i);
+        
         if (paragraph.getRole() != PdfRole.UNKNOWN) {
           continue;
         }
@@ -222,6 +231,23 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
                 
         String sectionHeadingMarkup = characteristics.getSectionHeadingMarkup();
         PdfFont sectionHeadingFont = characteristics.getSectionHeadingFont();
+        
+        PdfTextLine firstLine = paragraph.getFirstTextLine();
+        float linePitch = Float.MAX_VALUE;
+        if (prevParagraph != null) {
+          PdfTextLine lastLine = prevParagraph.getLastTextLine();
+          
+          if (lastLine != null) {
+            linePitch = TextLineStatistician.computeLinePitch(lastLine, firstLine);
+          }
+        }
+        
+        // Section headings must have a larger line pitch.
+        float mcLinePitch = paragraph.getPdfDocument().getTextLineStatistics().getMostCommonLinePitch();
+        
+        if (MathUtils.isSmallerOrEqual(linePitch, mcLinePitch, 2f)) {
+          continue;
+        }
         
         if (characteristics.isAbstractHeading(paragraph)) {
           paragraph.setRole(PdfRole.ABSTRACT_HEADING);
@@ -254,8 +280,19 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         // Experimental: Identify headings of (subsub-) sections where the font
         // isn't equal to sectionHeadingFont.
         String text = paragraph.getUnicode();
-        Matcher matcher = Patterns.ITEMIZE_START_PATTERN.matcher(text);
-        if (matcher.find() && paraFont != docFont) {
+        
+        List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
+        
+        boolean matches = false;
+        for (Pattern pattern : itemizeStartPatterns) {
+          Matcher matcher = pattern.matcher(text);
+          if (matcher.find() && !matcher.group(1).isEmpty()) {
+            matches = true;
+            break;
+          }
+        }
+          
+        if (matches && paraFont != docFont) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
         }
       }
@@ -518,7 +555,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         float numNonMathChars = 0;
         float numMathChars = 0;
 
+        boolean isCentered = true;
         for (PdfTextLine line : paragraph.getTextLines()) {
+          if (line.getAlignment() != PdfTextAlignment.CENTERED) {
+            isCentered = false;
+          }
+          
           for (PdfWord word : line.getWords()) {
             // TODO: Use StringUtils.normalize.
             String str = word.getUnicode().toLowerCase().trim().replaceAll("[\\.,]", "");
@@ -526,7 +568,8 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
             if (line.getAlignment() == PdfTextAlignment.LEFT) {
               numNonMathChars++;
             } else if (isMathSymbol(str) || containsMathSymbol(str)
-                || word.containsSubScript() || word.containsSuperScript()) {
+                || word.containsSubScript() || word.containsSuperScript()
+                || word.getTextCharacters().size() == 1) {
               numMathChars += word.getTextCharacters().size();
             } else {
               numNonMathChars += word.getTextCharacters().size();
@@ -535,14 +578,14 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
 
         float mathWordsRatio = numMathChars / (numMathChars + numNonMathChars);
-                
+                   
         if (mathWordsRatio > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;
         }
         
         String text = paragraph.getText(true, true, true);
-             
+                     
         if (text != null) {
           Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
           // As before, mathWordRatio must exceed a given threshold such that 
@@ -550,7 +593,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           // aren't classified as formula
           // formula.
                   
-          if (m.find() && mathWordsRatio > 0.5f) {
+          if ((isCentered || m.find()) && mathWordsRatio >= 0.5f) {
             paragraph.setRole(PdfRole.FORMULA);
             continue;
           }
@@ -593,13 +636,95 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
   /**
    * Returns true if we suppose that the given paragraph is an abstract.
    */
+  protected void analyzeForItemizes(PdfDocument document,
+      PdfParagraphCharacteristics characteristics) {
+    PdfTextParagraph prevParagraph = null;
+    for (PdfPage page : document.getPages()) {
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+        // Ignore all paragraphs that doesn't belong to body.
+        if (paragraph.getRole() == PdfRole.FORMULA
+            || paragraph.getRole() == PdfRole.PAGE_HEADER
+            || paragraph.getRole() == PdfRole.PAGE_FOOTER
+            || paragraph.getRole() == PdfRole.FIGURE
+            || paragraph.getRole() == PdfRole.FIGURE_CAPTION
+            || paragraph.getRole() == PdfRole.FOOTNOTE
+            || paragraph.getRole() == PdfRole.TABLE
+            || paragraph.getRole() == PdfRole.TABLE_CAPTION) {
+          // Ignore Formulas within itemizes.
+          continue;
+        }
+        
+        // Abort if references are reached.
+        if (paragraph.getRole() == PdfRole.REFERENCES_HEADING) {
+          return;
+        }
+        
+        if (paragraph.getRole() != PdfRole.UNKNOWN) {
+          prevParagraph = paragraph;
+          continue;
+        }
+                
+        PdfTextLine firstLine = paragraph.getFirstTextLine();
+                 
+        // If a itemize item consists of multiple paragraphs.
+        if (prevParagraph != null 
+            && prevParagraph.getRole() == PdfRole.ITEMIZE_ITEM 
+            && prevParagraph.getLastTextLine().getIndentLevel()
+            == paragraph.getFirstTextLine().getIndentLevel()) {
+          paragraph.setRole(PdfRole.ITEMIZE_ITEM);
+          prevParagraph = paragraph;
+          continue;
+        }
+          
+        List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
+        boolean matches = false;
+        for (Pattern pattern : itemizeStartPatterns) {
+          Matcher m = pattern.matcher(firstLine.getFirstWord().getUnicode());
+              
+          if (m.matches() && !m.group(1).isEmpty() && firstLine.getWords().size() > 1) {
+            matches = true;
+            break;
+          }
+        }
+                  
+        if (!matches) {
+          prevParagraph = paragraph;
+          continue;
+        }
+          
+        float linePitch = Float.MAX_VALUE;
+        if (prevParagraph != null) {
+          PdfTextLine lastLine = prevParagraph.getLastTextLine();
+          if (lastLine != null) {
+            linePitch = TextLineStatistician.computeLinePitch(lastLine, firstLine);
+          }
+        }
+        
+        // "Normal" lines could be started by a numbering, too. So, take 
+        // also the line pitch into account (headings and itemizes must 
+        // have a larger linepitch to previous line.
+        PdfDocument doc = firstLine.getPdfDocument();
+        float mcPitch = doc.getTextLineStatistics().getMostCommonLinePitch();
+              
+        if (MathUtils.isLarger(linePitch, mcPitch, 1f)) {
+          paragraph.setRole(PdfRole.ITEMIZE_ITEM);
+        }
+        
+        prevParagraph = paragraph;
+      }
+    }
+  }
+  
+  /**
+   * Returns true if we suppose that the given paragraph is an abstract.
+   */
   protected void analyzeForAbstract(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
     for (PdfPage page : document.getPages()) {
       PdfTextParagraph prevParagraph = null;
       for (PdfTextParagraph paragraph : page.getParagraphs()) {          
         Threeway t = isAbstract(prevParagraph, paragraph);
-                
+                 
         switch (t) {
           case TRUE:
             paragraph.setRole(PdfRole.ABSTRACT);

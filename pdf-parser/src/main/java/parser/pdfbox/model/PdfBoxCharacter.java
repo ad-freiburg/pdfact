@@ -443,7 +443,7 @@ public class PdfBoxCharacter extends PdfBoxArea implements PdfCharacter {
     if ((!includePunctuationMarks && isPunctuationMark())
         || (!includeSubscripts && isSubScript())
         || (!includeSuperscripts && isSuperScript())) {
-      return " ";
+      return null;
     }
     return getUnicode();
   }

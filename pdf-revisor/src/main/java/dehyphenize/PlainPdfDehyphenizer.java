@@ -36,20 +36,24 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
 
     for (PdfPage page : document.getPages()) {
       List<PdfWord> words = page.getWords();
-      for (PdfWord word : words) {        
+      for (PdfWord word : words) {
         // Ignore stopwords.
         if (isStopWord(word)) {
           continue;
         }
 
         String wordText = normalize(word);
-        
+
         // Find all indexes of hyphens.
         List<Integer> hyphenIndexes = StringUtils.indexesOf(wordText, HYPHENS);
 
         // If there are no hyphens, the word is a non-hyphenated words.
         if (hyphenIndexes.isEmpty()) {
-          noHyphenWords.add(wordText);
+          // Consider only words with most common font. Formula element "(cIR"
+          // affects "cir-cumstance".
+          if (word.getFont().equals(document.getTextStatistics().getMostCommonFont())) {
+            noHyphenWords.add(wordText);
+          }
         } else {
           // There are hyphens. Get the prefixes.
           for (int indexOfHyphen : hyphenIndexes) {
@@ -85,7 +89,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
         PdfTextLine prevLineByRole = prevLinesPerRole.get(line.getRole());
         if (prevLineByRole != null) {
           PdfWord prevWord = prevLineByRole.getLastWord();
-          
+
           if (prevWord != null) {
             PdfCharacter prevCharacter = prevWord.getLastTextCharacter();
 
@@ -93,7 +97,7 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
             if (isHyphen(prevCharacter)) {
               // The last line ends with a hyphen. 
               PdfWord word = line.getFirstWord();
-
+              
               boolean ignoreHyphen = isIgnoreHyphen(prevWord, word,
                   noHyphenWords, hyphenPrefixes);
               
@@ -130,62 +134,65 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
     String normalizedPrefix = normalize(prefix);
     String noHyphen = normalizedPrefix + wordText;
     String normalizedNoHyphen = normalize(noHyphen);
-        
+
     int prefixNum = prefixes.getCount(normalizedPrefix);
     int withoutHyphenNum = noHyphenWords.getCount(normalizedNoHyphen);
-                
+
     if (prefixNum == 0 && withoutHyphenNum == 0) {
       // Neither 'noHyphenWords' nor 'prefixes' knows the word(s).
-      
+
       if (normalizedPrefix.length() < 2) {
         return false;
       }
-      
+
       // If prefix contains hyphens, assume that is a composed word, like
       // "state-of-the-art".
       if (StringUtils.containsAny(normalizedPrefix, HYPHENS)) {
         return false;
       }
-      
+
       if (StringUtils.isStopWord(normalizedPrefix)) {
         return true;
       }
-      
+
       char charBeforeHyphen = prefix.charAt(normalizedPrefix.length() - 1);
       char charAfterHyphen = wordText.charAt(0);
-            
+
       if (!Character.isAlphabetic(charBeforeHyphen)) {
         return false;
       }
-      
+
       if (Character.isDigit(charBeforeHyphen)) {
         return false;
       }
-      
+
       if (Character.isUpperCase(charBeforeHyphen)) {
         return false;
       }
-      
+
       if (!Character.isAlphabetic(charAfterHyphen)) {
         return false;
       }
-      
+
       if (Character.isDigit(charAfterHyphen)) {
         return false;
       }
-      
+
       if (Character.isUpperCase(charAfterHyphen)) {
         return false;
       }
-            
+
       // Don't ignore the hyphen if the prefix is a "well-known" word.
-      if (normalizedPrefix.length() > 2 && noHyphenWords.getCount(normalizedPrefix) > 0) {
+      if (normalizedPrefix.length() > 2
+          && noHyphenWords.getCount(normalizedPrefix) > 0) {
+        System.out.println(normalizedPrefix + " "
+            + (noHyphenWords.getCount(normalizedPrefix)));
         return false;
       }
-      
+
       return true;
     }
-            
+
     if (withoutHyphenNum >= prefixNum) {
       return true;
     }

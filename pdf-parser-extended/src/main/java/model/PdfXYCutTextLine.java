@@ -29,6 +29,10 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
   
   protected int extractionOrderNumber;
   
+  protected boolean isIntended;
+  
+  protected int indentationLevel;
+  
   /**
    * The default constructor.
    */
@@ -199,5 +203,22 @@ public class PdfXYCutTextLine extends PdfXYCutArea implements PdfTextLine {
    */
   public void setExtractionOrderNumber(int extractionOrderNumber) {
     this.extractionOrderNumber = extractionOrderNumber;
+  }
+
+  public void setIsIntended(boolean isIntended) {
+    this.isIntended = isIntended;
+  }
+  
+  @Override
+  public boolean isIndented() {
+    return this.isIntended;
+  }
+
+  public void setIndentationLevel(int level) {
+    this.indentationLevel = level;
+  }
+
+  public int getIndentLevel() {
+    return this.indentationLevel;
   }
 }

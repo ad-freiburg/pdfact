@@ -15,6 +15,7 @@ import model.PdfFeature;
 import model.PdfPage;
 import model.PdfRole;
 import model.PdfTextElement;
+import model.PdfTextParagraph;
 
 /**
  * Serializes a PdfDocument to txt format.
@@ -124,6 +125,7 @@ public class TxtPdfSerializer implements PdfSerializer {
     List<String> serializedElements = new ArrayList<>();
     for (PdfElement element : elements) {
       // Serialize the element only if its role is included in the given roles.
+      
       if (getRolesToSerialize().contains(element.getRole())) {
         String serialized = serializeElement(element);
         if (serialized != null && !serialized.isEmpty()) {
@@ -164,7 +166,7 @@ public class TxtPdfSerializer implements PdfSerializer {
 
     String text = element.getText(getSerializePunctuationMarks(),
         getSerializeSubscripts(), getSerializeSuperscripts());
-
+    
     if (text == null || text.trim().isEmpty()) {
       return null;
     }

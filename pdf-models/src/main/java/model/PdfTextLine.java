@@ -59,4 +59,24 @@ public interface PdfTextLine extends PdfTextElement {
    * Sets the alignment of this line.
    */
   public void setAlignment(PdfTextAlignment computeLineAlignment);
+  
+  /**
+   * Sets is intended flag.
+   */
+  public abstract void setIsIntended(boolean isIntended);
+  
+  /**
+   * Returns true if this line is intended.
+   */
+  public abstract boolean isIndented();
+  
+  /**
+   * Sets the indentation level.
+   */
+  public void setIndentationLevel(int level);
+  
+  /**
+   * Returns the indentation level.
+   */
+  public int getIndentLevel();
 }

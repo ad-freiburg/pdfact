@@ -1,5 +1,9 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import statistics.DimensionStatistician;
 import statistics.TextStatistician;
 
@@ -33,9 +37,9 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
    * The role.
    */
   protected PdfRole role = PdfRole.UNKNOWN;
-  
+
   protected int extractionOrderNumber;
-  
+
   /**
    * The default constructor.
    */
@@ -105,30 +109,201 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   public String getText(boolean includePunctuationMarks,
       boolean includeSubscripts, boolean includeSuperscripts) {
     StringBuilder result = new StringBuilder();
-
-    String prevText = null;
-    for (PdfCharacter character : getTextCharacters()) {
-      if (character != null && !character.ignore()) {        
-        String text = character.getText(includePunctuationMarks,
-            includeSubscripts, includeSuperscripts);
-        if (text != null) {
-          // Sub- and superscripts are replaced by whitespaces. Append a white-
-          // space only if the previous characters is a non-whitespace.
-          if (" ".equals(text)) {
-            if (prevText != null && !" ".equals(prevText)) {
-              result.append(text);
+                  
+    // Put all the subscripts and all the superscripts in an individual
+    // string builder to avoid to mix up both types.
+    List<PdfCharacter> subScriptText = new ArrayList<>();
+    List<PdfCharacter> superScriptText = new ArrayList<>();
+    List<PdfCharacter> normalScriptText = new ArrayList<>();
+       
+    for (PdfCharacter character : getTextCharacters()) {      
+      if (character == null) {
+        continue;
+      }
+      
+      if (character.ignore()) {
+        continue;
+      }
+      
+      if (character.isSuperScript()) {
+        superScriptText.add(character);
+        continue;
+      }
+      
+      if (character.isSubScript()) {
+        subScriptText.add(character);
+        continue;
+      }
+                  
+      if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
+        boolean introduceWhitespace = true;
+        if (!superScriptText.isEmpty()) {
+          boolean includeSuperScript = includeSuperScripts(normalScriptText, subScriptText, superScriptText);
+          if (includeSuperScript) {
+            for (PdfCharacter superChar : superScriptText) {
+              result.append(superChar.getUnicode());  
             }
-          } else {
-            result.append(text);
+            introduceWhitespace = false;
           }
         }
-        prevText = text;
+        
+        if (!subScriptText.isEmpty()) {
+          boolean includeSubScript = includeSubScripts(normalScriptText, subScriptText, superScriptText);
+          if (includeSubScript) {
+            for (PdfCharacter subChar : subScriptText) {
+              result.append(subChar.getUnicode());  
+            }
+          }
+          introduceWhitespace = false;
+        }
+        
+        if (introduceWhitespace) {
+          // If word is "H²O" and superscript should be ignored, don't merge
+          // the word to H0, but to "H 0".
+          result.append(" ");
+        }
+        
+        normalScriptText.clear();
+      }
+
+      result.append(character.getUnicode());
+      normalScriptText.add(character);
+      subScriptText.clear();
+      superScriptText.clear();
+    }
+        
+    if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
+      boolean introduceWhitespace = true;
+      if (!superScriptText.isEmpty()) {
+        if (includeSuperScripts(normalScriptText, subScriptText, superScriptText)) {
+          for (PdfCharacter superChar : superScriptText) {
+            result.append(superChar.getUnicode());  
+          }
+          introduceWhitespace = false;
+        }
+      }
+        
+      if (!subScriptText.isEmpty()) {
+        if (includeSubScripts(normalScriptText, subScriptText, superScriptText)) {
+          for (PdfCharacter subChar : subScriptText) {
+            result.append(subChar.getUnicode());  
+          }
+          introduceWhitespace = false;
+        }
+      }    
+       
+      if (introduceWhitespace) {
+        // If word is "H²O" and superscript should be ignored, don't merge
+        // the word to HO, but to "H O".
+        result.append(" ");
       }
     }
-
+    
     return result.length() > 0 ? result.toString() : null;
   }
 
+  protected boolean includeSuperScripts(List<PdfCharacter> normalScripts, 
+      List<PdfCharacter> subScripts, List<PdfCharacter> superScripts) {
+    if (normalScripts == null) {
+      return false;
+    }
+    
+    // Don't include the superscript if it is placed "behind" subscript.
+    if (!normalScripts.isEmpty() && !subScripts.isEmpty() 
+        && !superScripts.isEmpty()) {
+      Collections.sort(subScripts, new Comparators.MinXComparator());
+      Collections.sort(superScripts, new Comparators.MinXComparator());
+      
+      PdfCharacter lastSubChar = subScripts.get(subScripts.size() - 1);
+      PdfCharacter firstSuperChar = superScripts.get(0);
+      
+      float lastSubCharMaxX = lastSubChar.getRectangle().getMaxX();
+      float firstSuperCharMinX = firstSuperChar.getRectangle().getMinX();
+            
+      if (firstSuperCharMinX >= lastSubCharMaxX) {
+        return false;
+      }
+    }
+    
+    if (normalScripts.size() < 3) {
+      return true;
+    }
+            
+    // Include superscripts in formulas.
+    if (getRole() == PdfRole.FORMULA) {
+      return true;
+    }
+    
+    float numChars = normalScripts.size();
+    float numLatinChars = 0;
+    
+    // Count the number of lowercase characters with the most common font.
+    for (PdfCharacter character : normalScripts) {      
+      if (!Characters.isLatinLetter(character)
+          && !Characters.isPunctuationMark(character)) {
+        continue;
+      }
+      
+      numLatinChars++;
+    }
+    
+    if (numLatinChars == numChars) {
+      return false;
+    }
+       
+    return true;
+  }
+  
+  protected boolean includeSubScripts(List<PdfCharacter> normalScripts, 
+      List<PdfCharacter> subScripts, List<PdfCharacter> superScripts) {
+    if (normalScripts == null) {
+      return false;
+    }
+    // Don't include the subscript if subscript is placed "behind" superscript.
+    if (!normalScripts.isEmpty() && !subScripts.isEmpty() 
+        && !superScripts.isEmpty()) {
+      Collections.sort(subScripts, new Comparators.MinXComparator());
+      Collections.sort(superScripts, new Comparators.MinXComparator());
+      
+      PdfCharacter firstSubChar = subScripts.get(0);
+      PdfCharacter lastSuperChar = superScripts.get(superScripts.size() - 1);
+      
+      float firstSubCharMinX = firstSubChar.getRectangle().getMinX();
+      float lastSuperCharMaxX = lastSuperChar.getRectangle().getMaxX();
+      
+      if (firstSubCharMinX >= lastSuperCharMaxX) {
+        return false;
+      }
+    }
+    
+    if (normalScripts.size() < 3) {
+      return true;
+    }
+            
+    // Include superscripts in formulas.
+    if (getRole() == PdfRole.FORMULA) {
+      return true;
+    }
+    
+    float numChars = normalScripts.size();
+    float numLatinChars = 0;
+    
+    // Count the number of lowercase characters with the most common font.
+    for (PdfCharacter character : normalScripts) {      
+      if (!Characters.isLatinLetter(character)
+          && !Characters.isPunctuationMark(character)) {
+        continue;
+      }
+      
+      numLatinChars++;
+    }
+    
+    if (numLatinChars == numChars) {
+      return false;
+    }    
+    return true;
+  }
+  
   @Override
   public boolean isAscii() {
     for (PdfCharacter character : getTextCharacters()) {
@@ -206,7 +381,7 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
   public PdfRole getRole() {
     return role;
   }
-  
+
   /**
    * Returns the extraction order number of this character.
    */

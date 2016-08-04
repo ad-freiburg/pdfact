@@ -1,19 +1,14 @@
 package parser.pdfbox.model;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.fontbox.util.BoundingBox;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDSimpleFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
-import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
 
 import de.freiburg.iif.path.LineReader;
-import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfFont;
 
@@ -101,6 +96,7 @@ public class PdfBoxFont implements PdfFont  {
   protected PdfBoxFont(PDFont font) {
     this();
     this.font = font;
+    
     this.name = font.getName();
     this.basename = computeBasename(font);
     this.isType3Font = font instanceof PDType3Font;
@@ -112,7 +108,7 @@ public class PdfBoxFont implements PdfFont  {
     this.basename = this.basename.replaceAll(" ", "")
         .replaceAll(",", "")
         .replaceAll("-", "");
-
+    
     int length1 = this.basename.length();
     this.basename = this.basename.replaceAll("extrabold", "")
         .replaceAll("bold", "")
@@ -124,7 +120,7 @@ public class PdfBoxFont implements PdfFont  {
         .replaceAll("oblique", "");
     length1 = this.basename.length();
     this.isItalic = length1 < length2;
-
+    
     this.basename = this.basename
         .replaceAll("condensed", "")
         .replaceAll("medium", "")
@@ -140,7 +136,7 @@ public class PdfBoxFont implements PdfFont  {
     if (font == null) {
       return null;
     }
-        
+           
     if (afmMap.isEmpty()) {
       readAfmMapFromFile();
     }

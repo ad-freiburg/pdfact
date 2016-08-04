@@ -1,17 +1,18 @@
 package analyzer;
 
-import static model.Patterns.ITEMIZE_START_PATTERN;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import de.freiburg.iif.text.StringUtils;
 import model.Comparators;
+import model.Patterns;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
@@ -183,8 +184,8 @@ public class PdfParagraphCharacteristics {
       return;
     }
 
-    List<PdfTextParagraph> potentialPageHeaders = new ArrayList<>();
-    List<PdfTextParagraph> potentialPageFooters = new ArrayList<>();
+    List<Rectangle> potentialPageHeaders = new ArrayList<>();
+    List<Rectangle> potentialPageFooters = new ArrayList<>();
 
     int numPagesToConsider = 0;
     
@@ -194,26 +195,34 @@ public class PdfParagraphCharacteristics {
       if (paragraphs != null && !paragraphs.isEmpty()) {
         float minMinY = Float.MAX_VALUE;
         float maxMaxY = -Float.MAX_VALUE;
-        PdfTextParagraph topMost = null;
-        PdfTextParagraph lowerMost = null;
+        Rectangle topMost = null;
+        Rectangle lowerMost = null;
 
         // Find lower most and top most paragraph.
         for (PdfTextParagraph paragraph : paragraphs) {
-          if (paragraph.getRectangle().getMinY() < minMinY) {
+          if (paragraph.getRectangle().getMinY() < minMinY
+              && paragraph.getTextLines().size() < 3) {
             minMinY = paragraph.getRectangle().getMinY();
-            lowerMost = paragraph;
+            lowerMost = new SimpleRectangle(paragraph.getRectangle());
           }
-          if (paragraph.getRectangle().getMaxY() > maxMaxY) {
+          if (paragraph.getRectangle().getMaxY() > maxMaxY
+              && paragraph.getTextLines().size() < 3) {
             maxMaxY = paragraph.getRectangle().getMaxY();
-            topMost = paragraph;
+            topMost = new SimpleRectangle(paragraph.getRectangle());
           }
         }
         
-        if (topMost.getTextLines().size() < 3) {
+        if (topMost != null) {
+          // Extend the area over whole page width.
+          topMost.getRectangle().setMinX(page.getRectangle().getMinX());
+          topMost.getRectangle().setMaxX(page.getRectangle().getMaxX());          
           potentialPageHeaders.add(topMost);
         }
 
-        if (lowerMost.getTextLines().size() < 3) {
+        if (lowerMost != null) {
+          // Extend the area over whole page width.
+          lowerMost.getRectangle().setMinX(page.getRectangle().getMinX());
+          lowerMost.getRectangle().setMaxX(page.getRectangle().getMaxX());
           potentialPageFooters.add(lowerMost);
         }
 
@@ -252,12 +261,11 @@ public class PdfParagraphCharacteristics {
       Collections.sort(potentialPageHeaders,
           Collections.reverseOrder(new Comparators.MaxYComparator()));
 
-      Rectangle pageHeaderArea = potentialPageHeaders.get(0).getRectangle();
+      Rectangle pageHeaderArea = potentialPageHeaders.get(0);
       int numPageHeaderMembers = 1;
 
       for (int i = 1; i < potentialPageHeaders.size(); i++) {
-        PdfTextParagraph potentialPageHeader = potentialPageHeaders.get(i);
-        Rectangle potentialPageHeaderRect = potentialPageHeader.getRectangle();
+        Rectangle potentialPageHeaderRect = potentialPageHeaders.get(i);
         if (pageHeaderArea.overlaps(potentialPageHeaderRect)
             && MathUtils.isEqual(potentialPageHeaderRect.getHeight(),
                 pageHeaderArea.getHeight(),
@@ -269,20 +277,25 @@ public class PdfParagraphCharacteristics {
         }
       }
 
-      if (numPageHeaderMembers > 0.75f * numPagesToConsider) {
-        this.pageHeaderArea = pageHeaderArea;
+      if (pages.size() < 5) {
+        if (numPageHeaderMembers > 0.75f * numPagesToConsider) {
+          this.pageHeaderArea = pageHeaderArea;
+        }
+      } else {
+        if (numPageHeaderMembers > 0.5f * numPagesToConsider) {
+          this.pageHeaderArea = pageHeaderArea;
+        }
       }
     }
 
     if (!potentialPageFooters.isEmpty()) {
       Collections.sort(potentialPageFooters, new Comparators.MaxYComparator());
 
-      Rectangle pageFooterArea = potentialPageFooters.get(0).getRectangle();
+      Rectangle pageFooterArea = potentialPageFooters.get(0);
       int numPageFooterMembers = 1;
 
       for (int i = 1; i < potentialPageFooters.size(); i++) {
-        PdfTextParagraph potentialPageFooter = potentialPageFooters.get(i);
-        Rectangle potentialPageFooterRect = potentialPageFooter.getRectangle();
+        Rectangle potentialPageFooterRect = potentialPageFooters.get(i);
         
         if (pageFooterArea.overlaps(potentialPageFooterRect)
             && MathUtils.isEqual(potentialPageFooterRect.getHeight(), 
@@ -293,8 +306,14 @@ public class PdfParagraphCharacteristics {
         }
       }
       
-      if (numPageFooterMembers > 0.75f * numPagesToConsider) {
-        this.pageFooterArea = pageFooterArea;
+      if (pages.size() < 5) {
+        if (numPageFooterMembers > 0.75f * numPagesToConsider) {
+          this.pageFooterArea = pageFooterArea;
+        }
+      } else {
+        if (numPageFooterMembers > 0.5f * numPagesToConsider) {
+          this.pageFooterArea = pageFooterArea;
+        }
       }
     }
 
@@ -315,12 +334,16 @@ public class PdfParagraphCharacteristics {
       return false;
     }
     
-    // Remove roman numerals.
-    text = ITEMIZE_START_PATTERN.matcher(text).replaceFirst("");
+    List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
+    
+    for (Pattern pattern : itemizeStartPatterns) {
+      // Remove roman numerals.
+      text = pattern.matcher(text).replaceFirst("");
+    }
     
     // Remove numbers, remove whitespaces and transform to lowercases.
     text = StringUtils.normalize(text, true, true, true);
-    
+        
     return WELL_KNOWN_SECTION_HEADINGS.contains(text);
   }
 
@@ -340,7 +363,7 @@ public class PdfParagraphCharacteristics {
 
     // Remove numbers, remove whitespaces and transform to lowercases.
     text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
-
+    
     return ABSTRACT_HEADINGS.contains(text);
   }
 

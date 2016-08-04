@@ -30,6 +30,7 @@ public enum PdfRole {
   TABLE("table"),
   TABLE_CAPTION("table-caption"),
   TITLE("title"),
+  ITEMIZE_ITEM("itemize-item"),
   // Role for all elements that belongs to the header (but we don't know the 
   // actual role).
   HEADER_OTHER("header-other"),

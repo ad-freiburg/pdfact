@@ -11,7 +11,10 @@ public class Characters {
   /**
    * The punctuation marks.
    */
-  public static final HashSet<Character> PUNCTUATION_MARKS = new HashSet<>();
+  public static final HashSet<Character> BASELINE_PUNCTUATION_MARKS =
+      new HashSet<>();
+  public static final HashSet<Character> MEANLINE_PUNCTUATION_MARKS =
+      new HashSet<>();
   /**
    * The characters that aren't aligned to the baseline of a text line.
    */
@@ -32,23 +35,28 @@ public class Characters {
    * The math character.
    */
   public static final HashSet<String> MATH_SYMBOLS = new HashSet<>();
-  
+  /**
+   * The math operators (all symbols that must be surrounded by whitespaces).
+   */
+  public static final HashSet<String> MATH_OPERATORS = new HashSet<>();
+
   static {
-    PUNCTUATION_MARKS.add('.');
-    PUNCTUATION_MARKS.add('?');
-    PUNCTUATION_MARKS.add('!');
-    PUNCTUATION_MARKS.add(':');
-    PUNCTUATION_MARKS.add(';');
-//    PUNCTUATION_MARKS.add('-');
-//    PUNCTUATION_MARKS.add('—');
-    PUNCTUATION_MARKS.add(',');
-    PUNCTUATION_MARKS.add('\'');
-    PUNCTUATION_MARKS.add('"');
-    PUNCTUATION_MARKS.add('`');
-    PUNCTUATION_MARKS.add('´');
-    PUNCTUATION_MARKS.add('”');
-    PUNCTUATION_MARKS.add('’');
-    
+    BASELINE_PUNCTUATION_MARKS.add('.');
+    BASELINE_PUNCTUATION_MARKS.add('?');
+    BASELINE_PUNCTUATION_MARKS.add('!');
+    BASELINE_PUNCTUATION_MARKS.add(':');
+    BASELINE_PUNCTUATION_MARKS.add(';');
+    //    PUNCTUATION_MARKS.add('-');
+    //    PUNCTUATION_MARKS.add('—');
+    BASELINE_PUNCTUATION_MARKS.add(',');
+    MEANLINE_PUNCTUATION_MARKS.add('\'');
+    MEANLINE_PUNCTUATION_MARKS.add('"');
+    MEANLINE_PUNCTUATION_MARKS.add('“');
+    MEANLINE_PUNCTUATION_MARKS.add('”');
+    MEANLINE_PUNCTUATION_MARKS.add('`');
+    MEANLINE_PUNCTUATION_MARKS.add('´');
+    MEANLINE_PUNCTUATION_MARKS.add('’');
+
     DESCENDERS.add('g');
     DESCENDERS.add('j');
     DESCENDERS.add('p');
@@ -125,7 +133,7 @@ public class Characters {
     BASELINE_CHARACTERS.add('8');
     BASELINE_CHARACTERS.add('9');
     BASELINE_CHARACTERS.add('0');
-    
+
     MEANLINE_CHARACTERS.add('a');
     MEANLINE_CHARACTERS.add('c');
     MEANLINE_CHARACTERS.add('e');
@@ -143,28 +151,29 @@ public class Characters {
     MEANLINE_CHARACTERS.add('x');
     MEANLINE_CHARACTERS.add('y');
     MEANLINE_CHARACTERS.add('z');
-    
- // Basic symbols
-    MATH_SYMBOLS.add("+");
-    MATH_SYMBOLS.add("−");
-    MATH_SYMBOLS.add("±");
-    MATH_SYMBOLS.add("∓");
-    MATH_SYMBOLS.add("×");
-    MATH_SYMBOLS.add("⋅");
-    MATH_SYMBOLS.add("·");
-    MATH_SYMBOLS.add("÷");
-    MATH_SYMBOLS.add("/");
-    MATH_SYMBOLS.add("⁄");
+
+    // Basic symbols
+    MATH_OPERATORS.add("+");
+    MATH_OPERATORS.add("-");
+    MATH_OPERATORS.add("−");
+    MATH_OPERATORS.add("±");
+    MATH_OPERATORS.add("∓");
+    MATH_OPERATORS.add("×");
+    MATH_OPERATORS.add("⋅");
+    MATH_OPERATORS.add("·");
+    MATH_OPERATORS.add("÷");
+    MATH_OPERATORS.add("/");
+    MATH_OPERATORS.add("⁄");
     MATH_SYMBOLS.add("√");
     MATH_SYMBOLS.add("∑");
     MATH_SYMBOLS.add("∫");
     MATH_SYMBOLS.add("∮");
-    MATH_SYMBOLS.add("∴");
-    MATH_SYMBOLS.add("∵");
+    MATH_OPERATORS.add("∴");
+    MATH_OPERATORS.add("∵");
     MATH_SYMBOLS.add("¬");
     MATH_SYMBOLS.add("˜");
     MATH_SYMBOLS.add("∝");
-    MATH_SYMBOLS.add("∞");
+    MATH_OPERATORS.add("∞");
     MATH_SYMBOLS.add("■");
     MATH_SYMBOLS.add("□");
     MATH_SYMBOLS.add("∎");
@@ -182,45 +191,45 @@ public class Characters {
     MATH_SYMBOLS.add("8");
     MATH_SYMBOLS.add("9");
     MATH_SYMBOLS.add("0");
-    
+
     // Symbols based on equality.
-    MATH_SYMBOLS.add("=");
-    MATH_SYMBOLS.add("≠");
-    MATH_SYMBOLS.add("≈");
-    MATH_SYMBOLS.add("~");
-    MATH_SYMBOLS.add("≡");
-    MATH_SYMBOLS.add("≜");
-    MATH_SYMBOLS.add("≝");
-    MATH_SYMBOLS.add("≐");
-    MATH_SYMBOLS.add("≅");
-    MATH_SYMBOLS.add("≡");
-    MATH_SYMBOLS.add("⇔");
-    MATH_SYMBOLS.add("↔");
+    MATH_OPERATORS.add("=");
+    MATH_OPERATORS.add("≠");
+    MATH_OPERATORS.add("≈");
+    MATH_OPERATORS.add("~");
+    MATH_OPERATORS.add("≡");
+    MATH_OPERATORS.add("≜");
+    MATH_OPERATORS.add("≝");
+    MATH_OPERATORS.add("≐");
+    MATH_OPERATORS.add("≅");
+    MATH_OPERATORS.add("≡");
+    MATH_OPERATORS.add("⇔");
+    MATH_OPERATORS.add("↔");
 
     // Symbols that point left or right
-    MATH_SYMBOLS.add("<");
-    MATH_SYMBOLS.add(">");
-    MATH_SYMBOLS.add("≪");
-    MATH_SYMBOLS.add("≫");
-    MATH_SYMBOLS.add("≤");
-    MATH_SYMBOLS.add("≥");
-    MATH_SYMBOLS.add("≦");
-    MATH_SYMBOLS.add("≧");
-    MATH_SYMBOLS.add("≺");
-    MATH_SYMBOLS.add("≻");
-    MATH_SYMBOLS.add("◅");
-    MATH_SYMBOLS.add("▻");
-    MATH_SYMBOLS.add("⇒");
-    MATH_SYMBOLS.add("→");
-    MATH_SYMBOLS.add("⊃");
-    MATH_SYMBOLS.add("⊆");
-    MATH_SYMBOLS.add("⊂");
-    MATH_SYMBOLS.add("⊇");
-    MATH_SYMBOLS.add("⊃");
-    MATH_SYMBOLS.add("→");
-    MATH_SYMBOLS.add("↦");
-    MATH_SYMBOLS.add("⊧");
-    MATH_SYMBOLS.add("⊢");
+    MATH_OPERATORS.add("<");
+    MATH_OPERATORS.add(">");
+    MATH_OPERATORS.add("≪");
+    MATH_OPERATORS.add("≫");
+    MATH_OPERATORS.add("≤");
+    MATH_OPERATORS.add("≥");
+    MATH_OPERATORS.add("≦");
+    MATH_OPERATORS.add("≧");
+    MATH_OPERATORS.add("≺");
+    MATH_OPERATORS.add("≻");
+    MATH_OPERATORS.add("◅");
+    MATH_OPERATORS.add("▻");
+    MATH_OPERATORS.add("⇒");
+    MATH_OPERATORS.add("→");
+    MATH_OPERATORS.add("⊃");
+    MATH_OPERATORS.add("⊆");
+    MATH_OPERATORS.add("⊂");
+    MATH_OPERATORS.add("⊇");
+    MATH_OPERATORS.add("⊃");
+    MATH_OPERATORS.add("→");
+    MATH_OPERATORS.add("↦");
+    MATH_OPERATORS.add("⊧");
+    MATH_OPERATORS.add("⊢");
 
     // Brackets
     MATH_SYMBOLS.add("{");
@@ -238,23 +247,23 @@ public class Characters {
     MATH_SYMBOLS.add("|");
 
     // Other non-letter symbols
-    MATH_SYMBOLS.add("*");
-    MATH_SYMBOLS.add("∝");
-    MATH_SYMBOLS.add("∖");
-    MATH_SYMBOLS.add("∤");
-    MATH_SYMBOLS.add("∥");
-    MATH_SYMBOLS.add("∦");
-    MATH_SYMBOLS.add("⋕");
-    MATH_SYMBOLS.add("#");
-    MATH_SYMBOLS.add("≀");
-    MATH_SYMBOLS.add("↯");
-    MATH_SYMBOLS.add("※");
-    MATH_SYMBOLS.add("⊕");
-    MATH_SYMBOLS.add("⊻");
-    MATH_SYMBOLS.add("□");
+    MATH_OPERATORS.add("*");
+    MATH_OPERATORS.add("∝");
+    MATH_OPERATORS.add("∖");
+    MATH_OPERATORS.add("∤");
+    MATH_OPERATORS.add("∥");
+    MATH_OPERATORS.add("∦");
+    MATH_OPERATORS.add("⋕");
+    MATH_OPERATORS.add("#");
+    MATH_OPERATORS.add("≀");
+    MATH_OPERATORS.add("↯");
+    MATH_OPERATORS.add("※");
+    MATH_OPERATORS.add("⊕");
+    MATH_OPERATORS.add("⊻");
+    MATH_OPERATORS.add("□");
 
     // Letter-based-symbols
-    MATH_SYMBOLS.add("•");
+    MATH_OPERATORS.add("•");
     MATH_SYMBOLS.add("∀");
     MATH_SYMBOLS.add("ℂ");
     MATH_SYMBOLS.add("𝔠");
@@ -272,17 +281,17 @@ public class Characters {
     MATH_SYMBOLS.add("ǫ");
     MATH_SYMBOLS.add("ℝ");
     MATH_SYMBOLS.add("†");
-    MATH_SYMBOLS.add("⊤");
-    MATH_SYMBOLS.add("⊥");
-    MATH_SYMBOLS.add("∪");
-    MATH_SYMBOLS.add("∩");
-    MATH_SYMBOLS.add("∨");
-    MATH_SYMBOLS.add("∧");
-    MATH_SYMBOLS.add("×");
-    MATH_SYMBOLS.add("⊗");
-    MATH_SYMBOLS.add("⋉");
-    MATH_SYMBOLS.add("⋊");
-    MATH_SYMBOLS.add("⋈");
+    MATH_OPERATORS.add("⊤");
+    MATH_OPERATORS.add("⊥");
+    MATH_OPERATORS.add("∪");
+    MATH_OPERATORS.add("∩");
+    MATH_OPERATORS.add("∨");
+    MATH_OPERATORS.add("∧");
+    MATH_OPERATORS.add("×");
+    MATH_OPERATORS.add("⊗");
+    MATH_OPERATORS.add("⋉");
+    MATH_OPERATORS.add("⋊");
+    MATH_OPERATORS.add("⋈");
     MATH_SYMBOLS.add("ℤ");
 
     MATH_SYMBOLS.add("α");
@@ -304,122 +313,209 @@ public class Characters {
     MATH_SYMBOLS.add("Φ");
     MATH_SYMBOLS.add("ω");
     MATH_SYMBOLS.add("Ω");
+    
+    MATH_OPERATORS.add("sin");
+    MATH_OPERATORS.add("cos");
+    MATH_OPERATORS.add("tan");
+    MATH_OPERATORS.add("exp");
+    MATH_OPERATORS.add("log");
+    MATH_OPERATORS.add("ln");
+    MATH_OPERATORS.add("sec");
+    MATH_OPERATORS.add("csc");
+    MATH_OPERATORS.add("cot");
+    MATH_OPERATORS.add("arcsin");
+    MATH_OPERATORS.add("arccos");
+    MATH_OPERATORS.add("arctan");
+    MATH_OPERATORS.add("arcsec");
+    MATH_OPERATORS.add("arccsc");
+    MATH_OPERATORS.add("arccot");
+    MATH_OPERATORS.add("sinh");
+    MATH_OPERATORS.add("cosh");
+    MATH_OPERATORS.add("tanh");
+    MATH_OPERATORS.add("coth");
+    MATH_OPERATORS.add("mod");
+    MATH_OPERATORS.add("min");
+    MATH_OPERATORS.add("max");
+    MATH_OPERATORS.add("inf");
+    MATH_OPERATORS.add("sup");
+    MATH_OPERATORS.add("lim");
+    MATH_OPERATORS.add("lim inf");
+    MATH_OPERATORS.add("lim sup");
+    MATH_OPERATORS.add("arg");
+    MATH_OPERATORS.add("sgn");
+    MATH_OPERATORS.add("deg");
+    MATH_OPERATORS.add("dim");
+    MATH_OPERATORS.add("hom");
+    MATH_OPERATORS.add("ker");
+    MATH_OPERATORS.add("gcd");
+    MATH_OPERATORS.add("det");
+    MATH_OPERATORS.add("Pr");
   }
-  
+
   public static boolean isLetter(PdfCharacter character) {
     return isLetter(character.getUnicode());
   }
-  
+
   public static boolean isLetter(String character) {
     return isLetter(character.charAt(0));
   }
-  
+
   public static boolean isLetter(char character) {
     return Character.isLetter(character);
   }
-  
+
   public static boolean isLatinLetter(PdfCharacter character) {
     return isLatinLetter(character.getUnicode());
   }
-  
+
   public static boolean isLatinLetter(String character) {
     return isLatinLetter(character.charAt(0));
   }
-  
+
   public static boolean isLatinLetter(char ch) {
     return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
   }
-  
+
   public static boolean isLetterOrDigit(PdfCharacter character) {
     return isLetterOrDigit(character.getUnicode());
   }
-  
+
   public static boolean isLetterOrDigit(String character) {
     return isLetterOrDigit(character.charAt(0));
   }
-  
+
   public static boolean isLetterOrDigit(char character) {
     return Character.isLetterOrDigit(character);
   }
-  
+
   public static boolean isLatinLetterOrDigit(PdfCharacter character) {
     return isLatinLetterOrDigit(character.getUnicode());
   }
-  
+
   public static boolean isLatinLetterOrDigit(String character) {
     return isLatinLetterOrDigit(character.charAt(0));
   }
-  
+
   public static boolean isLatinLetterOrDigit(char character) {
     return isLatinLetter(character) || Character.isDigit(character);
   }
-  
+
   public static boolean isPunctuationMark(PdfCharacter character) {
     return isPunctuationMark(character.getUnicode());
   }
-  
+
   public static boolean isPunctuationMark(String character) {
     return isPunctuationMark(character.charAt(0));
   }
-  
+
   public static boolean isPunctuationMark(char character) {
-    return PUNCTUATION_MARKS.contains(character);
+    return BASELINE_PUNCTUATION_MARKS.contains(character)
+        || MEANLINE_PUNCTUATION_MARKS.contains(character);
+  }
+
+  public static boolean isMeanlinePunctuationMark(PdfCharacter character) {
+    return isMeanlinePunctuationMark(character.getUnicode());
+  }
+
+  public static boolean isMeanlinePunctuationMark(String character) {
+    return isMeanlinePunctuationMark(character.charAt(0));
+  }
+
+  public static boolean isMeanlinePunctuationMark(char character) {
+    return MEANLINE_PUNCTUATION_MARKS.contains(character);
+  }
+  
+  public static boolean isBaselinePunctuationMark(PdfCharacter character) {
+    return isBaselinePunctuationMark(character.getUnicode());
+  }
+
+  public static boolean isBaselinePunctuationMark(String character) {
+    return isBaselinePunctuationMark(character.charAt(0));
+  }
+
+  public static boolean isBaselinePunctuationMark(char character) {
+    return BASELINE_PUNCTUATION_MARKS.contains(character);
   }
   
   public static boolean isDescender(PdfCharacter character) {
     return isDescender(character.getUnicode());
   }
-  
+
   public static boolean isDescender(String character) {
     return isDescender(character.charAt(0));
   }
-  
+
   public static boolean isDescender(char character) {
     return DESCENDERS.contains(character);
   }
-  
+
   public static boolean isAscender(PdfCharacter character) {
     return isAscender(character.getUnicode());
   }
-  
+
   public static boolean isAscender(String character) {
     return isAscender(character.charAt(0));
   }
-  
+
   public static boolean isAscender(char character) {
-    return Character.isUpperCase(character) || Character.isDigit(character) 
+    return Character.isUpperCase(character) || Character.isDigit(character)
         || ASCENDERS.contains(character);
   }
-  
+
   public static boolean isMeanlineCharacter(PdfCharacter character) {
     return isMeanlineCharacter(character.getUnicode());
   }
-  
+
   public static boolean isMeanlineCharacter(String character) {
     return isMeanlineCharacter(character.charAt(0));
   }
-  
+
   public static boolean isMeanlineCharacter(char character) {
     return MEANLINE_CHARACTERS.contains(character);
   }
-  
+
   public static boolean isBaselineCharacter(PdfCharacter character) {
     return isBaselineCharacter(character.getUnicode());
   }
-  
+
   public static boolean isBaselineCharacter(String character) {
     return isBaselineCharacter(character.charAt(0));
   }
-  
+
   public static boolean isBaselineCharacter(char character) {
     return BASELINE_CHARACTERS.contains(character);
   }
-  
+
+  public static boolean isUppercase(PdfCharacter character) {
+    return isUppercase(character.getUnicode());
+  }
+
+  public static boolean isUppercase(String character) {
+    return isUppercase(character.charAt(0));
+  }
+
+  public static boolean isUppercase(char character) {
+    return Character.isUpperCase(character);
+  }
+
+  public static boolean isLowercase(PdfCharacter character) {
+    return isLowercase(character.getUnicode());
+  }
+
+  public static boolean isLowercase(String character) {
+    return isLowercase(character.charAt(0));
+  }
+
+  public static boolean isLowercase(char character) {
+    return Character.isLowerCase(character);
+  }
+
   public static boolean isMathSymbol(PdfCharacter character) {
     return isMathSymbol(character.getUnicode());
   }
-  
+
   public static boolean isMathSymbol(String character) {
-    return MATH_SYMBOLS.contains(character);
+    return MATH_SYMBOLS.contains(character)
+        || MATH_OPERATORS.contains(character);
   }
 }

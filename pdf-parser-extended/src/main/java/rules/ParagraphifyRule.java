@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.freiburg.iif.counter.FloatCounter;
 import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.HasRectangle;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.text.StringUtils;
+import model.Characters;
+import model.Patterns;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
@@ -65,13 +67,23 @@ public class ParagraphifyRule {
     }
     
     if (haveSameSpecialFontFace(paragraph, line)) {
-      log(12);
+      log(4);
       return false;
     }
 
+    if (isItemizeStart(block, paragraph, line)) {
+      log(5);
+      return true;
+    }
+    
+    if (differInAlignment(block, paragraph, line)) {
+      log(6);
+      return true;
+    }
+    
     // TODO: Doesn't work if text is not justified.
     if (prevLineIsTooShort(block, line, prevLine)) {
-      log(4);
+      log(7);
       return true;
     }
 
@@ -79,13 +91,8 @@ public class ParagraphifyRule {
 //      return true;
 //    }
     
-    if (differInAlignment(block, paragraph, line)) {
-      log(5);
-      return true;
-    }
-
     if (prevAndCurrentLineStartsWithReferenceAnchor(prevLine, line)) {
-      log(6);
+      log(8);
       return true;
     }
 
@@ -120,11 +127,11 @@ public class ParagraphifyRule {
 
     // TODO: Experimental. Identify page numbers.
     if (isProbablyPageNumber(line)) {
-      log(12);
+      log(11);
       return true;
     }
     
-    log(11);
+    log(12);
     return false;
   }
 
@@ -202,11 +209,35 @@ public class ParagraphifyRule {
     TextStatistics blockStats = block.getTextStatistics();
     PdfFont mostCommonBlockFont = blockStats.getMostCommonFont();
     float mostCommonBlockFontsize = blockStats.getMostCommonFontsize();
-        
+    
     if (mostCommonLineFont == mostCommonBlockFont
         && mostCommonLineFontsize == mostCommonBlockFontsize) {
-      return mostCommonLineFont != mostCommonDocFont 
-          && mostCommonLineFontsize > mostCommonDocFontsize;
+      
+      if (mostCommonLineFont != mostCommonDocFont 
+          && mostCommonLineFontsize > mostCommonDocFontsize) {
+        return true;
+      }
+      
+      // Check, if block and line are printed in uppercase letters.
+      boolean isBlockUpperCase = true;
+      for (PdfCharacter character : block.getTextCharacters()) {
+        if (Characters.isLatinLetter(character) &&
+            !Characters.isUppercase(character)) {
+          isBlockUpperCase = false;
+          break;
+        }
+      }
+      
+      boolean isLineUpperCase = true;
+      for (PdfCharacter character : line.getTextCharacters()) {
+        if (Characters.isLatinLetter(character) &&
+            !Characters.isUppercase(character)) {
+          isLineUpperCase = false;
+          break;
+        }
+      }
+      
+      return isBlockUpperCase && isLineUpperCase;
     }
     return false;
   }
@@ -234,22 +265,23 @@ public class ParagraphifyRule {
     if (lastLine == null) {
       return false;
     }
-           
+              
+    if (!lastLine.isIndented() && line.isIndented()) {
+      return true;
+    }
+    
     if (lastLine.getAlignment() == PdfTextAlignment.CENTERED 
         && line.getAlignment() != PdfTextAlignment.CENTERED) {
-      log("A");
       return true;
     }
     
     if (line.getAlignment() == PdfTextAlignment.CENTERED 
         && lastLine.getAlignment() != PdfTextAlignment.CENTERED) {
-      log("B: " + line + " " + lastLine);
       return true;
     }
     
     if (line.getAlignment() == PdfTextAlignment.RIGHT 
         && lastLine.getAlignment() != PdfTextAlignment.RIGHT) {
-      log("C");
       return true;
     }
     return false;
@@ -453,6 +485,45 @@ public class ParagraphifyRule {
       float rightMargin = pageRect.getMaxX() - paraRect.getMaxX();
             
       return MathUtils.isEqual(leftMargin, rightMargin, 5f);
+    }
+    
+    return false;
+  }
+  
+  protected static boolean isItemizeStart(PdfArea block, 
+      PdfTextParagraph paragraph, PdfTextLine line) {
+    // Check if the line is a heading or itemize (i.e. preceded by a 
+    // numbering). 
+    
+    List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
+    
+    boolean matches = false;
+    for (Pattern pattern : itemizeStartPatterns) {
+      Matcher m = pattern.matcher(line.getFirstWord().getUnicode());
+        
+      if (m.matches() && !m.group(1).isEmpty() && line.getWords().size() > 1) {
+        matches = true;
+        break;
+      }
+    }
+    
+    if (!matches) {
+      return false;
+    }
+        
+    if (paragraph != null) {
+      // "Normal" lines could be started by a numbering, too. So, take also 
+      // the line pitch into account (headings and itemizes must have a 
+      // larger linepitch to previous line.
+      PdfDocument doc = line.getPdfDocument();
+      float mcPitch = doc.getTextLineStatistics().getMostCommonLinePitch();
+      float linePitch = Float.MAX_VALUE;
+      PdfTextLine prevLine = paragraph.getLastTextLine();
+      if (prevLine != null) {
+        linePitch = TextLineStatistician.computeLinePitch(prevLine, line);  
+      }
+                
+      return MathUtils.isLarger(linePitch, mcPitch, 1f);
     }
     
     return false;

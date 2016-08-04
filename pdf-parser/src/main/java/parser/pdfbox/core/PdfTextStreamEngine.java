@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.fontbox.afm.CharMetric;
@@ -75,6 +76,7 @@ import parser.pdfbox.core.operator.text.ShowTextWithIndividualGlyphPositioning;
 import parser.pdfbox.model.PdfBoxCharacter;
 import parser.pdfbox.model.PdfBoxColor;
 import parser.pdfbox.model.PdfBoxFont;
+import parser.pdfbox.model.PdfBoxFontDictionary;
 
 /**
  * Extension of PDFStreamEngine for advanced processing of text, images, lines
@@ -160,6 +162,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   PdfBoxCharacter prevCharacter = null;
   PdfBoxCharacter prePrevCharacter = null;
   
+  
+  HashSet<String> xxx = new HashSet<>();
   @Override
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
@@ -199,7 +203,26 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     unicode = font.toUnicode(code, glyphList);
 
     boolean hasEncoding = unicode != null;
-          
+         
+    // Obtain the glyph name.
+    // TODO: Move to PdfBoxFont.
+    String glyphName = ".notdef";
+    if (font instanceof PDType1CFont) {
+      PDType1CFont cFont = (PDType1CFont) font;
+      glyphName = cFont.codeToName(code);
+    } else if (font instanceof PDSimpleFont) { 
+      PDSimpleFont simpleFont = (PDSimpleFont) font;
+      glyphName = simpleFont.getGlyphList().codePointToName(code);
+    }
+    
+    // From time to time (if font is embedded), there could be glyphs that were
+    // redefined by a type3 font file (a custom path to draw to print the glyph)
+    // In such cases, we don't know the semantic meaning of the glpyh. Try to
+    // derive it from the glyph name.
+    if (PdfBoxFontDictionary.hasGlyphForName(glyphName)) {
+      unicode = PdfBoxFontDictionary.getGlyphForName(glyphName);
+    }
+        
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it
@@ -207,7 +230,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     if (unicode == null) {
       if (font instanceof PDSimpleFont) { 
         PDSimpleFont simpleFont = (PDSimpleFont) font;
-        
+                
         char c = (char) code;
         unicode = new String(new char[] { c });
 
@@ -233,6 +256,24 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
     
+    // In case of an italic font, the maxX of the bounding box is usually too
+    // small, so extend it by a given amount.
+    if (pdfFont.isItalic()) {
+      char l = unicode.charAt(0);
+      
+      // List all characters whose upper right is equal to the maxX of 
+      // characters bounding box. TODO
+      if (l == 'V' 
+          || l == 'W' 
+          || l == 'v' 
+          || l == 'w'
+          || l == 'T'
+          || l == 'U'
+          || l == 'τ') {
+        boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
+      }
+    }
+    
     PdfBoxCharacter character = new PdfBoxCharacter(currentPage, unicode);
     character.setCharCode(code);
     character.setRectangle(boundingBox);
@@ -241,7 +282,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     character.setFontsize(fontsize);
     character.setColor(color);
     character.setHasEncoding(hasEncoding);
-    
+       
     // Handle diacritic characters:
     // In most cases, diacritic characters are represented in its decomposed 
     // form. For example, "è" may be represented as the two characters "'e" or 

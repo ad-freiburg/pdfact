@@ -258,7 +258,7 @@ public class PdfParserCommandLine {
     analyze(document);
     
     // Revise the document.
-//    revise(document);
+    revise(document);
     
     // Serialize the document.
     serialize(document);
@@ -310,9 +310,9 @@ public class PdfParserCommandLine {
 
       pdfSerializer.setFeatures(this.features);
       pdfSerializer.setRoles(this.roles);
-      pdfSerializer.setSerializePunctuationMarks(true);
-      pdfSerializer.setSerializeSuperscripts(false);
-      pdfSerializer.setSerializeSubscripts(false);
+//      pdfSerializer.setSerializePunctuationMarks(true);
+//      pdfSerializer.setSerializeSuperscripts(false);
+//      pdfSerializer.setSerializeSubscripts(false);
       
       OutputStream stream = Files.newOutputStream(serializationFile);
       pdfSerializer.serialize(document, stream);
