@@ -240,7 +240,8 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
     // Count the number of lowercase characters with the most common font.
     for (PdfCharacter character : normalScripts) {      
       if (!Characters.isLatinLetter(character)
-          && !Characters.isPunctuationMark(character)) {
+          && !Characters.isPunctuationMark(character)
+          && character.getUnicode().charAt(0) != '-') {
         continue;
       }
       
@@ -285,22 +286,22 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       return true;
     }
     
-    float numChars = normalScripts.size();
-    float numLatinChars = 0;
-    
-    // Count the number of lowercase characters with the most common font.
-    for (PdfCharacter character : normalScripts) {      
-      if (!Characters.isLatinLetter(character)
-          && !Characters.isPunctuationMark(character)) {
-        continue;
-      }
-      
-      numLatinChars++;
-    }
-    
-    if (numLatinChars == numChars) {
-      return false;
-    }    
+//    float numChars = normalScripts.size();
+//    float numLatinChars = 0;
+//    
+//    // Count the number of lowercase characters with the most common font.
+//    for (PdfCharacter character : normalScripts) {      
+//      if (!Characters.isLatinLetter(character)
+//          && !Characters.isPunctuationMark(character)) {
+//        continue;
+//      }
+//      
+//      numLatinChars++;
+//    }
+//    
+//    if (numLatinChars == numChars) {
+//      return false;
+//    }    
     return true;
   }
   

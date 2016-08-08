@@ -3,7 +3,6 @@ package parser.pdfbox.core;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -162,8 +161,6 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   PdfBoxCharacter prevCharacter = null;
   PdfBoxCharacter prePrevCharacter = null;
   
-  
-  HashSet<String> xxx = new HashSet<>();
   @Override
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
@@ -222,7 +219,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     if (PdfBoxFontDictionary.hasGlyphForName(glyphName)) {
       unicode = PdfBoxFontDictionary.getGlyphForName(glyphName);
     }
-        
+           
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it
@@ -269,7 +266,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
           || l == 'w'
           || l == 'T'
           || l == 'U'
-          || l == 'τ') {
+          || l == 'τ'
+          || l == 'N') {
         boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
       }
     }

@@ -180,31 +180,66 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
   protected void analyzeForPageHeadersAndFooters(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
-    for (PdfPage page : document.getPages()) {
-      for (PdfTextParagraph paragraph : page.getParagraphs()) {
-        if (paragraph.getRole() != PdfRole.UNKNOWN) {
-          continue;
-        }
 
-        Rectangle rect = paragraph.getRectangle();
-        Rectangle pageHeaderArea = characteristics.getPageHeaderArea();
-        Rectangle pageFooterArea = characteristics.getPageFooterArea();
+    Rectangle pageHeaderArea = characteristics.getPageHeaderArea();
+    Rectangle pageFooterArea = characteristics.getPageFooterArea();
         
-        if (pageHeaderArea != null) {
-          if (rect.overlaps(pageHeaderArea)
-              && MathUtils.isEqual(rect.getHeight(), pageHeaderArea.getHeight(),
-                  0.1f * pageHeaderArea.getHeight())) {
-            paragraph.setRole(PdfRole.PAGE_HEADER);
-          }
-        }
+    for (PdfPage page : document.getPages()) {
+      List<PdfTextParagraph> paragraphs = page.getParagraphs();
+      
+      if (paragraphs != null && !paragraphs.isEmpty()) {
+        PdfTextParagraph firstParagraph = paragraphs.get(0);
 
-        if (pageFooterArea != null) {
-          if (rect.overlaps(pageFooterArea)
-              && MathUtils.isEqual(rect.getHeight(), pageFooterArea.getHeight(),
-                  0.1f * pageFooterArea.getHeight())) {
-            paragraph.setRole(PdfRole.PAGE_FOOTER);
+        if (firstParagraph.getRole() == PdfRole.UNKNOWN) {
+          Rectangle rect = firstParagraph.getRectangle();
+          
+          if (pageHeaderArea != null) {
+            float ratio = rect.computeOverlap(pageHeaderArea);
+            if (ratio > 0.9f) {
+              firstParagraph.setRole(PdfRole.PAGE_HEADER);
+            }
+          }
+          
+          // Check, if the paragraph is page-centered.
+          float minX = firstParagraph.getRectangle().getMinX();
+          float maxX = firstParagraph.getRectangle().getMaxX();
+          float pageMinX = page.getRectangle().getMinX();
+          float pageMaxX = page.getRectangle().getMaxX();
+          
+          float leftMargin = minX - pageMinX;
+          float rightMargin = pageMaxX - maxX;
+          
+          boolean isPageCentered = MathUtils.isEqual(leftMargin, rightMargin, 5f);
+          if (isPageCentered && StringUtils.isInteger(firstParagraph.getUnicode())) {
+            firstParagraph.setRole(PdfRole.PAGE_HEADER);
           }
         }
+        
+        PdfTextParagraph lastParagraph = paragraphs.get(paragraphs.size() - 1);
+        if (lastParagraph.getRole() == PdfRole.UNKNOWN) {
+          Rectangle rect = lastParagraph.getRectangle();
+          
+          if (pageFooterArea != null) {
+            float ratio = rect.computeOverlap(pageFooterArea);
+            if (ratio > 0.9f) {
+              lastParagraph.setRole(PdfRole.PAGE_FOOTER);
+            }
+          }
+          
+          // Check, if the paragraph is page-centered.
+          float minX = lastParagraph.getRectangle().getMinX();
+          float maxX = lastParagraph.getRectangle().getMaxX();
+          float pageMinX = page.getRectangle().getMinX();
+          float pageMaxX = page.getRectangle().getMaxX();
+          
+          float leftMargin = minX - pageMinX;
+          float rightMargin = pageMaxX - maxX;
+          
+          boolean isPageCentered = MathUtils.isEqual(leftMargin, rightMargin, 5f);
+          if (isPageCentered && StringUtils.isInteger(lastParagraph.getUnicode())) {
+            lastParagraph.setRole(PdfRole.PAGE_FOOTER);
+          }
+        }   
       }
     }
   }
@@ -556,12 +591,12 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         float numMathChars = 0;
 
         boolean isCentered = true;
-        for (PdfTextLine line : paragraph.getTextLines()) {
+        for (PdfTextLine line : paragraph.getTextLines()) {          
           if (line.getAlignment() != PdfTextAlignment.CENTERED) {
             isCentered = false;
           }
           
-          for (PdfWord word : line.getWords()) {
+          for (PdfWord word : line.getWords()) {            
             // TODO: Use StringUtils.normalize.
             String str = word.getUnicode().toLowerCase().trim().replaceAll("[\\.,]", "");
             
@@ -578,7 +613,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
 
         float mathWordsRatio = numMathChars / (numMathChars + numNonMathChars);
-                   
+                           
         if (mathWordsRatio > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;

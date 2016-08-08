@@ -71,12 +71,12 @@ public class BlockifyTextBlockRule implements BlockifyRule {
 
     // Decide if the given lane is a valid lane based on overlapping elements.
     List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
-
+    
     debug(area, lane.getRectangle() + " " + overlappingElements);
 
     if (equals(prevOverlappingElements, overlappingElements)) {
       // The set of current overlapping elements is equal to the previous 
-      // overlapping elements.
+      // overlapping elements.      
       return handleEqualOverlappingElements(area, lane, overlappingElements);
     } else if (overlappingElements.isEmpty()) {
       // The set of current overlapping elements is empty.
@@ -133,22 +133,40 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     // characters (because they prefer to exceed line boundaries).
     boolean hasOnlyCriticalElements = hasOnlyAscendersDescenders(elements) 
         || hasOnlySmallCharacters(area, elements);
-
+    
     if (hasOnlyCriticalElements) {
       // The current overlapping elements consist only of ascenders and
       // descenders. If also the previous overlapping elements consist only of 
       // ascenders/descenders and the set of current elements is a subset
       // of the previous overlapping elements, return the previous computed 
       // result.
+      
+      if (prevOverlappingElements == null || prevOverlappingElements.isEmpty()) {
+        this.prevOverlappingElements = elements;
+        this.prevIsValidHorizontalLane = false;
+        this.prevHasOnlyCriticalElements = true;
+        return prevIsValidHorizontalLane;
+      }
+      
       if (this.prevHasOnlyCriticalElements) {
         if (isSubSet(elements, prevOverlappingElements)) {
           this.prevOverlappingElements = elements;
           this.prevHasOnlyCriticalElements = true;
           // No need to update this.prevIsValidHorizontalLane
 
-          debug(area, prevIsValidHorizontalLane + " (3)");
+          debug(area, prevIsValidHorizontalLane + " (3a)");
 
           return this.prevIsValidHorizontalLane;
+        } else {
+          if (haveNoElementsInCommon(prevOverlappingElements, elements)) {
+            this.prevOverlappingElements = elements;
+            this.prevIsValidHorizontalLane = !splitsAssociatedElements(area, lane);
+            this.prevHasOnlyCriticalElements = true;
+  
+            debug(area, prevIsValidHorizontalLane + " (4)");
+              
+            return prevIsValidHorizontalLane;
+          }
         }
       }
 
@@ -218,6 +236,29 @@ public class BlockifyTextBlockRule implements BlockifyRule {
 
   // ---------------------------------------------------------------------------
 
+  /**
+   * Returns true, if the two given lists have no elements in common.
+   */
+  protected boolean haveNoElementsInCommon(List<PdfElement> els1, 
+      List<PdfElement> els2) {
+    if (els1 == null || els2 == null) {
+      return false;
+    }
+
+    if (els1.isEmpty() && els2.isEmpty()) {
+      return true;
+    }
+    
+    Set<PdfElement> els2Set = new HashSet<>(els2);
+    for (PdfElement el : els1) {
+      if (els2Set.contains(el)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  
   /**
    * Returns true, if the two given lists constains the same elements.
    */

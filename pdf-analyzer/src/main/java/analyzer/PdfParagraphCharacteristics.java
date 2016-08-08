@@ -8,16 +8,22 @@ import java.util.regex.Pattern;
 
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.math.MathUtils;
+import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimpleLine;
 import de.freiburg.iif.model.simple.SimpleRectangle;
+import de.freiburg.iif.rtree.RTree;
+import de.freiburg.iif.rtree.SimpleRTree;
 import de.freiburg.iif.text.StringUtils;
 import model.Comparators;
+import model.DimensionStatistics;
 import model.Patterns;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
 import model.PdfTextParagraph;
 import model.PdfWord;
+import model.TextStatistics;
 
 /**
  * Class to compute some characteristics about the paragraphs of a pdf document.
@@ -197,7 +203,7 @@ public class PdfParagraphCharacteristics {
         float maxMaxY = -Float.MAX_VALUE;
         Rectangle topMost = null;
         Rectangle lowerMost = null;
-
+        
         // Find lower most and top most paragraph.
         for (PdfTextParagraph paragraph : paragraphs) {
           if (paragraph.getRectangle().getMinY() < minMinY
@@ -215,7 +221,7 @@ public class PdfParagraphCharacteristics {
         if (topMost != null) {
           // Extend the area over whole page width.
           topMost.getRectangle().setMinX(page.getRectangle().getMinX());
-          topMost.getRectangle().setMaxX(page.getRectangle().getMaxX());          
+          topMost.getRectangle().setMaxX(page.getRectangle().getMaxX());
           potentialPageHeaders.add(topMost);
         }
 

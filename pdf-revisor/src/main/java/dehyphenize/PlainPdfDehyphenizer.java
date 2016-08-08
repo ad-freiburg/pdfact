@@ -185,8 +185,6 @@ public class PlainPdfDehyphenizer implements PdfDehyphenizer {
       // Don't ignore the hyphen if the prefix is a "well-known" word.
       if (normalizedPrefix.length() > 2
           && noHyphenWords.getCount(normalizedPrefix) > 0) {
-        System.out.println(normalizedPrefix + " "
-            + (noHyphenWords.getCount(normalizedPrefix)));
         return false;
       }
 

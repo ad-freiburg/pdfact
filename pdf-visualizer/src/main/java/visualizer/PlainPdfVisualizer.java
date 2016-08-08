@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.freiburg.iif.model.HasRectangle;
+import de.freiburg.iif.model.simple.SimpleLine;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import drawer.PdfDrawer;
 import drawer.pdfbox.PdfBoxDrawer;
 import model.PdfDocument;
@@ -75,7 +77,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       visualizeFeature(page, feature, drawer);
     }
 
-    for (PdfTextLine line : page.getTextLines()) {
+    for (int i = 0; i < page.getTextLines().size(); i++) {
+      PdfTextLine line = page.getTextLines().get(i);
+
 //      if (line.getMeanLine() != null) {
 //        drawer.drawLine(line.getMeanLine(), line.getPage().getPageNumber(), Color.BLUE);
 //      }
@@ -84,7 +88,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 //      }
 //      drawer.drawLine(line.getColumnXRange(), line.getPage().getPageNumber());
 //      drawer.drawRectangle(line.getRectangle(), line.getPage().getPageNumber());
-//      drawer.drawText(" " + line.getIndentLevel(), line.getPage().getPageNumber(), line.getRectangle().getLowerRight(), Color.BLACK, 5);
+      drawer.drawText(" " + line.getRole(), line.getPage().getPageNumber(), line.getRectangle().getLowerRight(), Color.BLACK, 5);
     }
     
     //    if (page.getRects() != null) {
@@ -98,8 +102,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 //              Color.BLACK);     
 //        }   
 
-//    drawer.drawRectangle(new SimpleRectangle(285.49875f,367.94885f,306.49875f,398.34326f), 7, Color.MAGENTA);
-//    drawer.drawRectangle(new SimpleRectangle(172.908f,667.54803f,444.46802f,668.54803f), 18);
+//    drawer.drawRectangle(new SimpleRectangle(53.99893f,447.35f,468.0186f,736.9837f), page.getPageNumber(), Color.MAGENTA);
+//    drawer.drawRectangle(new SimpleRectangle(299.27985f,34.31979f,310.80078f,42.48001f), page.getPageNumber(), Color.MAGENTA);
+//    drawer.drawLine(new SimpleLine(54.000046f,621.81165f,299.3169f,621.9116f), 9);
   }
 
   // ___________________________________________________________________________
