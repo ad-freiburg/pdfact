@@ -231,43 +231,53 @@ public class PdfBoxPage extends PdfBoxArea implements PdfPage {
     return alignmentCounter.getMostFrequentObject();
   }
   
-  Rectangle prevRect = null;
-  Rectangle rect = null;
+  PdfCharacter prevAscender = null;
+  PdfCharacter prevDescender = null;
   
   @Override
   public void addTextCharacter(PdfCharacter character) {
     super.addTextCharacter(character);
     
-//    if (rect == null || !character.getRectangle().overlapsVertically(rect)) {
-//      if (rect != null && prevRect != null) {
-//        int pitch = (int) (prevRect.getMinY() - rect.getMaxY());
-//        verticalCharacterPitchesCounter.add(pitch);
-//      }
-//      
-//      prevRect = rect;
-//      rect = new SimpleRectangle(character.getRectangle());
-//    } else {
-//      rect = rect.union(character.getRectangle());
-//    }
-    
-    if (prevTextCharacter != null) {
-      Rectangle rect = character.getRectangle();
-      Rectangle prevRect = prevTextCharacter.getRectangle();
-      if (!rect.overlapsVertically(prevRect) 
-          && rect.getMinX() < prevRect.getMinX()) {
-        // TODO: Math symbols pollute the vertical pitch. Find a good method
-        // to ignore math symbols.
-        if (Characters.isLatinLetter(prevTextCharacter) 
-            && Characters.isLatinLetter(character)) {
+    if (Characters.isAscender(character)) {
+      if (prevDescender != null) {
+        Rectangle rect = character.getRectangle();
+        Rectangle prevRect = prevDescender.getRectangle();
+        
+        if (!rect.overlapsVertically(prevRect) 
+            && rect.getMinX() < prevRect.getMinX()) {
+          // TODO: Math symbols pollute the vertical pitch. Find a good method
+          // to ignore math symbols.
           float maxY = MathUtils.round(rect.getMaxY(), 0);
           float prevMinY = MathUtils.round(prevRect.getMinY(), 0);
           float pitch = Math.abs(maxY - prevMinY);
           verticalCharacterPitchesCounter.add(pitch);
         }
       }
+      
+      prevAscender = character;
+    } else if (Characters.isDescender(character)) {
+      prevDescender = character;
     }
-        
-    this.prevTextCharacter = character;
+    
+//    if (prevTextCharacter != null) {
+//      Rectangle rect = character.getRectangle();
+//      Rectangle prevRect = prevTextCharacter.getRectangle();
+//      
+//      
+//      if (!rect.overlapsVertically(prevRect) 
+//          && rect.getMinX() < prevRect.getMinX()) {
+//        // TODO: Math symbols pollute the vertical pitch. Find a good method
+//        // to ignore math symbols.
+//        if (Characters.isLatinLetter(prevTextCharacter) 
+//            && Characters.isLatinLetter(character)) {
+//          float maxY = MathUtils.round(rect.getMaxY(), 0);
+//          float prevMinY = MathUtils.round(prevRect.getMinY(), 0);
+//          float pitch = Math.abs(maxY - prevMinY);
+//          verticalCharacterPitchesCounter.add(pitch);
+//        }
+//      }
+//    }
+//    prevTextCharacter = character;
   }
   
   public FloatCounter getEstimatedLinePitchCounter() {

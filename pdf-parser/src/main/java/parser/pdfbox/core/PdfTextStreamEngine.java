@@ -260,14 +260,18 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       
       // List all characters whose upper right is equal to the maxX of 
       // characters bounding box. TODO
-      if (l == 'V' 
+      if (l == 'B'
+          || l == 'V' 
           || l == 'W' 
           || l == 'v' 
           || l == 'w'
           || l == 'T'
           || l == 'U'
           || l == 'τ'
-          || l == 'N') {
+          || l == 'M'
+          || l == 'N'
+          || l == 'f'
+          || l == 'P') {
         boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
       }
     }

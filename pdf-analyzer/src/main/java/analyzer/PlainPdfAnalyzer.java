@@ -64,6 +64,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     analyzeForAbstract(document, characteristics);
     analyzeForOtherHeaderFields(document, characteristics);
     analyzeForReferences(document, characteristics);
+    analyzeForAppendix(document, characteristics);
     analyzeForBody(document, characteristics);
   }
 
@@ -292,6 +293,11 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
         if (characteristics.isReferencesHeading(paragraph)) {
           paragraph.setRole(PdfRole.REFERENCES_HEADING);
+          continue;
+        }
+        
+        if (characteristics.isAppendixHeading(paragraph)) {
+          paragraph.setRole(PdfRole.APPENDIX_HEADING);
           continue;
         }
         
@@ -875,7 +881,8 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     for (PdfPage page : document.getPages()) {
       for (PdfTextParagraph paragraph : page.getParagraphs()) {
         if (referencesHeaderAlreadySeen) {
-          if (paragraph.getRole() == PdfRole.SECTION_HEADING) {
+          if (paragraph.getRole() == PdfRole.SECTION_HEADING
+              || paragraph.getRole() == PdfRole.APPENDIX_HEADING) {
             return;
           }
 
@@ -886,6 +893,31 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
 
         if (paragraph.getRole() == PdfRole.REFERENCES_HEADING) {
           referencesHeaderAlreadySeen = true;
+        }
+      }
+    }
+  }
+  
+  /**
+   * Returns true if we suppose that the given paragraph belongs to appendix.
+   */
+  protected void analyzeForAppendix(PdfDocument document,
+      PdfParagraphCharacteristics characteristics) {
+    boolean appendixHeaderAlreadySeen = false;
+    for (PdfPage page : document.getPages()) {
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+        if (appendixHeaderAlreadySeen) {
+          if (paragraph.getRole() == PdfRole.SECTION_HEADING) {
+            return;
+          }
+
+          if (paragraph.getRole() == PdfRole.UNKNOWN) {
+            paragraph.setRole(PdfRole.APPENDIX);
+          }
+        }
+
+        if (paragraph.getRole() == PdfRole.APPENDIX_HEADING) {
+          appendixHeaderAlreadySeen = true;
         }
       }
     }

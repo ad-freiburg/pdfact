@@ -683,7 +683,7 @@ public class PdfXYCutArea implements PdfArea {
    * Computes the dimension statistics.
    */
   protected DimensionStatistics computeDimensionStatistics() {
-    return DimensionStatistician.compute(getElements());
+    return DimensionStatistician.compute(getTextCharacters());
   }
 
   /**

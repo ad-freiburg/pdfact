@@ -48,9 +48,14 @@ public class PdfParagraphCharacteristics {
   static final HashSet<String> REFERENCES_HEADINGS = new HashSet<>();
 
   /**
-   * All (normalized) headings for the ACKNOWLEDGEMENT.
+   * All (normalized) headings for the acknowledgment.
    */
   static final HashSet<String> ACKNOWLEDGEMENT_HEADINGS = new HashSet<>();
+  
+  /**
+   * All (normalized) headings for the appendix.
+   */
+  static final HashSet<String> APPENDIX_HEADINGS = new HashSet<>();
   
   /**
    * A lot of math symbols.
@@ -73,6 +78,10 @@ public class PdfParagraphCharacteristics {
     WELL_KNOWN_SECTION_HEADINGS.add("concludingremarks");
 
     ABSTRACT_HEADINGS.add("abstract");
+    
+    APPENDIX_HEADINGS.add("appendix");
+    APPENDIX_HEADINGS.add("tables");
+    APPENDIX_HEADINGS.add("figures");
 
     REFERENCES_HEADINGS.add("reference");
     REFERENCES_HEADINGS.add("references");
@@ -391,6 +400,26 @@ public class PdfParagraphCharacteristics {
     text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
 
     return REFERENCES_HEADINGS.contains(text);
+  }
+  
+  /**
+   * Returns true, if the given paragraph is the heading of an appendix.
+   */
+  public boolean isAppendixHeading(PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return false;
+    }
+
+    String text = paragraph.getUnicode();
+
+    if (text == null) {
+      return false;
+    }
+
+    // Remove numbers, remove whitespaces and transform to lowercases.
+    text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
+
+    return APPENDIX_HEADINGS.contains(text);
   }
   
   /**

@@ -13,7 +13,10 @@ import model.PdfRole;
 import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
+import model.TextLineStatistics;
 import statistics.TextLineStatistician;
+
+// TODO: This class uses most of the methods from ParagraphifyRule. Merge them.
 
 public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
   protected boolean isParagraphSplitterInBetween = false;
@@ -125,6 +128,14 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
       return false;
     }
     
+    if (lastTextLine.getPage().getPageNumber() 
+        == firstTextLine.getPage().getPageNumber()
+        && lastTextLine.getColumnXRange() 
+        == firstTextLine.getColumnXRange()
+        && linepitchIsTooLarge(paragraph, lastTextLine, firstTextLine)) {
+      return false;
+    }
+    
     if (!firstTextLine.isIndented()) {
       return true;
     }
@@ -190,5 +201,42 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
     float blockMaxX = prevLine.getColumnXRange().getEndX();
         
     return MathUtils.isSmaller(prevLineMaxX, blockMaxX, 5 * tolerance);
+  }
+  
+  /**
+   * Analyzes the linepitch and returns true, if the linepitch is too large.
+   */
+  protected static boolean linepitchIsTooLarge(PdfTextParagraph paragraph,
+      PdfTextLine prevLine, PdfTextLine line) {
+    PdfPage page = line.getPage();
+
+    float pitch = TextLineStatistician.computeLinePitch(prevLine, line);
+    float basePitch = TextLineStatistician.computeBaseLinePitch(prevLine, line);
+
+    TextLineStatistics pageLineStatistics = page.getTextLineStatistics();
+    float pageLinePitch = pageLineStatistics.getSmallestSignificantLinepitch();
+    float pageBaselinePitch =
+        pageLineStatistics.getSmallestSignificantBaselinepitch();
+
+    if (MathUtils.isLarger(pitch, pageLinePitch, pageLinePitch)
+        && MathUtils.isLarger(basePitch, pageBaselinePitch, 2f)) {
+
+      return true;
+    }
+
+    if (paragraph.getTextLines().size() > 1) {
+      TextLineStatistics paraStatistics = paragraph.getTextLineStatistics();
+      float paragraphPitch = paraStatistics.getMostCommonLinePitch();
+      float paragraphBasePitch = paraStatistics.getMostCommonBaselinePitch();
+
+      // The line introduces a new paragraph, if the pitch to the previous line
+      // is larger than the most common line pitch in the paragraph.
+      if (MathUtils.isLarger(pitch, paragraphPitch, 0.5f * paragraphPitch)
+          && MathUtils.isLarger(basePitch, paragraphBasePitch, 2f)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

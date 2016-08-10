@@ -16,6 +16,8 @@ import java.util.Set;
 public enum PdfRole {
   ABSTRACT("abstract"),
   ABSTRACT_HEADING("abstract-heading"),
+  APPENDIX("appendix"),
+  APPENDIX_HEADING("appendix-heading"),
   BODY_TEXT("body-text"),
   FIGURE("figure"),
   FIGURE_CAPTION("figure-caption"),

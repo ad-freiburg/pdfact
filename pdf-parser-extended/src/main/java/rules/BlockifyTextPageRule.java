@@ -108,11 +108,11 @@ public class BlockifyTextPageRule implements BlockifyRule {
     }
 
     // TODO: Do we need this piece of code?
-//    // The lane is valid, if it is larger than "the default width" 
-//    // (see getVerticalLaneWidth).
-//    if (MathUtils.isLarger(lane.getWidth(), 0.1f, 0.01f)) {
-//      return true;
-//    }
+    //    // The lane is valid, if it is larger than "the default width" 
+    //    // (see getVerticalLaneWidth).
+    //    if (MathUtils.isLarger(lane.getWidth(), 0.1f, 0.01f)) {
+    //      return true;
+    //    }
 
     // The lane doesn't overlap elements and is of default width. Check if it
     // separates consecutive characters.   
@@ -135,13 +135,25 @@ public class BlockifyTextPageRule implements BlockifyRule {
     // System.out.println(Math.max(docHeights, pageHeights) + " " +
     // doc.getEstimatedLinePitch());
 
-    return 1.5f * doc.getEstimatedLinePitch();
+    return 2f * doc.getEstimatedLinePitch();
     // return 1.5f * Math.max(docHeights, pageHeights);
   }
 
   @Override
   public boolean isValidHorizontalLane(PdfArea area, Rectangle lane) {
-    return area.getElementsOverlapping(lane).isEmpty();
+    return area.getTextCharactersOverlapping(lane).isEmpty();
+    
+//    List<PdfCharacter> chars = area.getTextCharactersOverlapping(lane);
+//
+//    for (PdfCharacter character : chars) {
+//      if (Characters.isLatinLetter(character)
+//          && !Characters.isAscender(character)
+//          && !Characters.isDescender(character)) {
+//        return false;
+//      }
+//    }
+//
+//    return true;
   }
 
   // ===========================================================================
@@ -203,7 +215,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
     float numNonMathWords = 0;
     float numMathWords = 0;
-    
+
     for (PdfCharacter character : rightHalfChars) {
       if (Characters.isMathSymbol(character) || character.isSubScript()
           || character.isSuperScript()) {
@@ -215,7 +227,7 @@ public class BlockifyTextPageRule implements BlockifyRule {
 
     return numMathWords / (numNonMathWords + numMathWords);
   }
-  
+
   /**
    * Returns true if the given lane separates consecutive characters. 
    * 

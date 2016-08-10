@@ -134,7 +134,7 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
         subScriptText.add(character);
         continue;
       }
-                  
+             
       if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
         boolean introduceWhitespace = true;
         if (!superScriptText.isEmpty()) {
@@ -171,7 +171,7 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       subScriptText.clear();
       superScriptText.clear();
     }
-        
+            
     if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
       boolean introduceWhitespace = true;
       if (!superScriptText.isEmpty()) {

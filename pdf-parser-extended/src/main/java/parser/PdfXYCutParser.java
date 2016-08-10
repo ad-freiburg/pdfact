@@ -1057,12 +1057,13 @@ public class PdfXYCutParser implements PdfExtendedParser {
         }
       }
       
-      // If punctuation marks like "," overlaps the meanline, it is a 
+      // If punctuation marks like "," lies above baseline, it is a 
       // superscript TODO: Instead of checking for punctuation mark analyze the
       // surrounding chars if they are superscripts.
-      if (Characters.isBaselinePunctuationMark(character) 
-          && rect.overlapsVertically(meanLine)) {
-        return true;
+      if (Characters.isBaselinePunctuationMark(character)) {
+        if (MathUtils.isLarger(minY, baseLine.getStartY(), 0.5f)) {
+          return true;
+        }
       }
       
       if (baseLine != null) {
