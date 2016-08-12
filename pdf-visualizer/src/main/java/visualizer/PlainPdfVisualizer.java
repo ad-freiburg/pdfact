@@ -102,7 +102,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 //              Color.BLACK);     
 //        }   
 
-//    drawer.drawRectangle(new SimpleRectangle(100f,100f,150f,110f), page.getPageNumber(), Color.MAGENTA);
+//    drawer.drawRectangle(new SimpleRectangle(99.719666f,231.2512f,483.85175f,261.44653f), page.getPageNumber(), Color.MAGENTA);
 //    drawer.drawRectangle(new SimpleRectangle(100f,87f,150f,97f), page.getPageNumber(), Color.MAGENTA);
 //    drawer.drawLine(new SimpleLine(54.000046f,621.81165f,299.3169f,621.9116f), 9);
   }

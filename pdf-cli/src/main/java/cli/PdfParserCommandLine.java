@@ -88,12 +88,7 @@ public class PdfParserCommandLine {
    * The extended pdf parser to extract words, lines and paragraphs.
    */
   protected PdfExtendedParser extendedPdfParser;
-
-  /**
-   * The pdf analyzer to identify the roles of paragraphs.
-   */
-  protected PdfAnalyzer pdfAnalyzer;
-  
+ 
   /**
    * The pdf revisor.
    */
@@ -201,7 +196,6 @@ public class PdfParserCommandLine {
     this.pdfParser = new PdfBoxParser();
     this.extendedPdfParser = new PdfXYCutParser();
 //    this.extendedPdfParser = new NewPdfXYCutParser();
-    this.pdfAnalyzer = new PlainPdfAnalyzer();
     this.pdfRevisor = new PdfRevisor();
     this.pdfVisualizer = new PlainPdfVisualizer();
 
@@ -282,7 +276,7 @@ public class PdfParserCommandLine {
    * Analyzes the given document.
    */
   protected void analyze(PdfDocument document) throws IOException {
-    pdfAnalyzer.analyze(document);
+    new PlainPdfAnalyzer(document).analyze();
   }
 
   /**

@@ -42,14 +42,25 @@ import statistics.TextStatistician;
  *
  */
 public class PlainPdfAnalyzer implements PdfAnalyzer {
+  /** The document to process. */
+  protected PdfDocument document;
   /** Flag to indicate whether the heading of abstract was found. */
   protected boolean abstractHeadingFound;
   /** Flag to indicate whether the abstract was found. */
   protected boolean abstractFound;
   
+  protected PdfTextParagraph referencesHeading;
+  protected PdfTextParagraph tableOfContentsHeading;
+  
+  /**
+   * The default constructor.
+   */
+  public PlainPdfAnalyzer(PdfDocument document) {
+    this.document = document;
+  }
   
   @Override
-  public void analyze(PdfDocument document) {
+  public void analyze() {
     PdfParagraphCharacteristics characteristics =
         new PdfParagraphCharacteristics(document);
 
@@ -57,6 +68,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     analyzeForKeywords(document, characteristics);
     analyzeForSectionHeadings(document, characteristics);
     analyzeForPageHeadersAndFooters(document, characteristics);
+    analyzeForTableOfContents(document, characteristics);
     analyzeForTables(document, characteristics);
     analyzeForFigures(document, characteristics);
     analyzeForItemizes(document, characteristics);
@@ -258,10 +270,19 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         PdfTextParagraph prevParagraph = i > 0 ? page.getParagraphs().get(i - 1) : null;
         PdfTextParagraph paragraph = page.getParagraphs().get(i);
         
+        if (paragraph == null) {
+          continue;
+        }
+        
         if (paragraph.getRole() != PdfRole.UNKNOWN) {
           continue;
         }
  
+        String text = paragraph.getUnicode();
+        if (text == null || text.isEmpty()) {
+          continue;
+        }
+        
         // TODO: Move this method to external class.
         String markup = PdfParagraphCharacteristics.getMarkup(paragraph);
                 
@@ -292,7 +313,18 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
 
         if (characteristics.isReferencesHeading(paragraph)) {
+          // A reference heading may be found in a table of contents 
+          // (as in cond-mat0001207). So take the las reference heading in 
+          // document.
+          
+          // If a references heading was already found, reset the role of
+          // this paragraph.
+          if (this.referencesHeading != null) {
+            this.referencesHeading.setRole(PdfRole.UNKNOWN);
+          }
+          
           paragraph.setRole(PdfRole.REFERENCES_HEADING);
+          this.referencesHeading = paragraph;
           continue;
         }
         
@@ -306,11 +338,25 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           continue;
         }
         
+        if (characteristics.isTableOfContentsHeading(paragraph)) {
+          paragraph.setRole(PdfRole.TABLE_OF_CONTENTS_HEADING);
+          this.tableOfContentsHeading = paragraph;
+          continue;
+        }
+        
+        // FIXME: Don't allow numbers at the end of section heading. If the 
+        // heading ends with a number, we assume that the heading belongs
+        // to table of contents. Solve it with regex.
+        char lastChar = text.charAt(text.length() - 1);
+        if (Character.isDigit(lastChar)) {
+          continue;
+        }
+        
         if (markup != null && markup.equals(sectionHeadingMarkup)) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
           continue;
         }
-
+        
         PdfFont paraFont = paragraph.getFont();
         // Identify headings of subsections.
         if (sectionHeadingFont != docFont && paraFont == sectionHeadingFont) {
@@ -320,8 +366,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         
         // Experimental: Identify headings of (subsub-) sections where the font
         // isn't equal to sectionHeadingFont.
-        String text = paragraph.getUnicode();
-        
+                
         List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
         
         boolean matches = false;
@@ -340,6 +385,35 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     }
   }
 
+  /**
+   * Annotates all paragraphs between the heading of table of contents and 
+   * next section headings as "table of content".
+   */
+  protected void analyzeForTableOfContents(PdfDocument document,
+      PdfParagraphCharacteristics characteristics) {
+    boolean tableOfContentsHeaderAlreadySeen = false;
+    for (PdfPage page : document.getPages()) {
+      for (PdfTextParagraph paragraph : page.getParagraphs()) {
+        if (tableOfContentsHeaderAlreadySeen) {
+          if (paragraph.getRole() == PdfRole.SECTION_HEADING
+              || paragraph.getRole() == PdfRole.APPENDIX_HEADING
+              || paragraph.getRole() == PdfRole.ABSTRACT_HEADING) {
+            return;
+          }
+
+          if (paragraph.getRole() == PdfRole.UNKNOWN) {
+            paragraph.setRole(PdfRole.TABLE_OF_CONTENTS);
+          }
+        }
+
+        if (tableOfContentsHeading != null 
+            && paragraph == tableOfContentsHeading) {
+          tableOfContentsHeaderAlreadySeen = true;
+        }
+      }
+    }
+  }
+  
   /**
    * Returns true if we suppose that the given paragraph is a figure caption.
    */
@@ -619,7 +693,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
 
         float mathWordsRatio = numMathChars / (numMathChars + numNonMathChars);
-                           
+                
         if (mathWordsRatio > 0.75f) {
           paragraph.setRole(PdfRole.FORMULA);
           continue;
@@ -633,7 +707,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           // lines like "After a few manipulations, we now obtain with (35)" 
           // aren't classified as formula
           // formula.
-                  
+                    
           if ((isCentered || m.find()) && mathWordsRatio >= 0.5f) {
             paragraph.setRole(PdfRole.FORMULA);
             continue;
@@ -891,7 +965,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           }
         }
 
-        if (paragraph.getRole() == PdfRole.REFERENCES_HEADING) {
+        if (referencesHeading != null && paragraph == referencesHeading) {
           referencesHeaderAlreadySeen = true;
         }
       }

@@ -110,7 +110,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         // page.addParagraphs(textBlock.getParagraphs());
       }
     }
-    
+        
     for (PdfPage page : document.getPages()) {      
       for (PdfArea textBlock : page.getBlocks()) {
         identifyLineAlignments(textBlock);
@@ -131,9 +131,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
     PdfArea area = new PdfXYCutArea(page, page.getElements());
     
     area.setColumnXRange(identifyReliableXRange(area));
-    b = true;
     List<PdfArea> blocks = blockify(area, this.blockifyPageRule);
-    b = false;
     // TODO: Move it.
     for (PdfArea block : blocks) {
       for (PdfElement element : block.getElements()) {
@@ -155,14 +153,14 @@ public class PdfXYCutParser implements PdfExtendedParser {
     return paras;
   }
   
-  boolean b = false;
+   boolean b = false;
   
   /**
    * Identifies text lines in the given list of blocks.
    */
   protected List<PdfXYCutTextLine> identifyLines(PdfArea textBlock) {
-    List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);
-        
+    List<PdfArea> lineAreas = blockify(textBlock, this.blockifyBlockRule);   
+    
     List<PdfXYCutTextLine> lines =  new ArrayList<>(toTextLines(lineAreas));
     
     // TODO: Move it.
@@ -178,7 +176,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
   
   protected void identifyLineAlignments(PdfArea textBlock) {
     List<PdfTextLine> lines = textBlock.getTextLines();
-    
+        
     // TODO: Move it.
     for (int i = 0; i < lines.size(); i++) {
       PdfTextLine prevprevLine = i > 1 ? lines.get(i - 2) : null;
@@ -230,7 +228,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         float tolerance = 0.5f * stats.getMostCommonWidth();
           
         line.setIndentationLevel((int) ((lineMinX - columnMinX) / stats.getMostCommonWidth()));
-        
+                
         if (MathUtils.isEqual(leftMargin, rightMargin, 1f)
             && leftMargin > tolerance) {
           return PdfTextAlignment.CENTERED;
@@ -239,7 +237,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         if (leftMargin < tolerance && rightMargin < tolerance) {
           return PdfTextAlignment.JUSTIFIED;
         }
-        
+                        
         if (leftMargin > tolerance && leftMargin < 10 * tolerance) {
           line.setIsIntended(true);
           return PdfTextAlignment.LEFT;
@@ -636,6 +634,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
             
       if (lane != null) {        
         List<Rectangle> subRects = rect.splitHorizontally(lane.getYMidpoint());
+        
         for (Rectangle subRect : subRects) {
 //          PdfArea subarea = new PdfXYCutArea(area, subRect);
 //          subarea.setColumnXRange(area.getColumnXRange());
@@ -755,7 +754,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
       // Sweep the lane through the bounding box.
       while (pos >= rect.getMinY() && pos <= rect.getMaxY() - ruleLaneHeight) {
         ruleLane.moveTo(ruleLane.getMinX(), pos);
-                          
+        
         if (rule.isValidHorizontalLane(area, ruleLane)) {
           if (invalidLaneAlreadySeen) {
             // Expand the lane.

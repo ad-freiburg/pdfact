@@ -29,6 +29,8 @@ public enum PdfRole {
   REFERENCE("reference"),
   REFERENCES_HEADING("reference-heading"),
   SECTION_HEADING("section-heading"),
+  TABLE_OF_CONTENTS_HEADING("table-of-contents-heading"),
+  TABLE_OF_CONTENTS("table-of-contents"),
   TABLE("table"),
   TABLE_CAPTION("table-caption"),
   TITLE("title"),

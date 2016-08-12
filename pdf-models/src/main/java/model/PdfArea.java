@@ -76,6 +76,12 @@ public interface PdfArea extends HasPdfDocument, HasPdfPage, HasRectangle,
   public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object);
 
   /**
+   * Returns the list of all elements which overlap the given rectangle.
+   */
+  public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object, 
+      float overlapRatio);
+  
+  /**
    * Sets the text characters of this area.
    */
   public void setTextCharacters(List<? extends PdfCharacter> characters);

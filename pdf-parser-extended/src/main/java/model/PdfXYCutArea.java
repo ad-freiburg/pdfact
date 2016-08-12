@@ -371,6 +371,12 @@ public class PdfXYCutArea implements PdfArea {
   }
 
   @Override
+  public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object, 
+      float overlapRatio) {
+    return charactersIndex.overlappedBy(object.getRectangle(), overlapRatio);
+  }
+  
+  @Override
   public void setTextCharacters(List<? extends PdfCharacter> characters) {
     this.charactersIndex.clear();
     addTextCharacters(characters);

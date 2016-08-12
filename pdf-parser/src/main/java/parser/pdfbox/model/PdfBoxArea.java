@@ -379,6 +379,15 @@ public class PdfBoxArea implements PdfArea {
     }
     return this.charactersIndex.overlappedBy(object.getRectangle());
   }
+  
+  @Override
+  public List<PdfCharacter> getTextCharactersOverlapping(HasRectangle object, 
+      float overlapRatio) {
+    if (object == null) {
+      return new ArrayList<>();
+    }
+    return this.charactersIndex.overlappedBy(object.getRectangle(), overlapRatio);
+  }
 
   @Override
   public void setTextCharacters(List<? extends PdfCharacter> characters) {

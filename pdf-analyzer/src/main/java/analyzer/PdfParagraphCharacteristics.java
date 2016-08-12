@@ -8,22 +8,16 @@ import java.util.regex.Pattern;
 
 import de.freiburg.iif.counter.ObjectCounter;
 import de.freiburg.iif.math.MathUtils;
-import de.freiburg.iif.model.Line;
 import de.freiburg.iif.model.Rectangle;
-import de.freiburg.iif.model.simple.SimpleLine;
 import de.freiburg.iif.model.simple.SimpleRectangle;
-import de.freiburg.iif.rtree.RTree;
-import de.freiburg.iif.rtree.SimpleRTree;
 import de.freiburg.iif.text.StringUtils;
 import model.Comparators;
-import model.DimensionStatistics;
 import model.Patterns;
 import model.PdfDocument;
 import model.PdfFont;
 import model.PdfPage;
 import model.PdfTextParagraph;
 import model.PdfWord;
-import model.TextStatistics;
 
 /**
  * Class to compute some characteristics about the paragraphs of a pdf document.
@@ -56,6 +50,11 @@ public class PdfParagraphCharacteristics {
    * All (normalized) headings for the appendix.
    */
   static final HashSet<String> APPENDIX_HEADINGS = new HashSet<>();
+  
+  /**
+   * All (normalized) headings for the table of contents.
+   */
+  static final HashSet<String> TABLE_OF_CONTENTS_HEADINGS = new HashSet<>();
   
   /**
    * A lot of math symbols.
@@ -93,6 +92,10 @@ public class PdfParagraphCharacteristics {
     ACKNOWLEDGEMENT_HEADINGS.add("acknowledgments");
     ACKNOWLEDGEMENT_HEADINGS.add("acknowlegement");
     ACKNOWLEDGEMENT_HEADINGS.add("acknowlegements");
+    
+    TABLE_OF_CONTENTS_HEADINGS.add("content");
+    TABLE_OF_CONTENTS_HEADINGS.add("contents");
+    TABLE_OF_CONTENTS_HEADINGS.add("tableofcontents");
     
     MATH_SYMBOLS.add("+");
     MATH_SYMBOLS.add("-");
@@ -442,6 +445,26 @@ public class PdfParagraphCharacteristics {
     return ACKNOWLEDGEMENT_HEADINGS.contains(text);
   }
 
+  /**
+   * Returns true, if the given paragraph is the heading of table of contents.
+   */
+  public boolean isTableOfContentsHeading(PdfTextParagraph paragraph) {
+    if (paragraph == null) {
+      return false;
+    }
+
+    String text = paragraph.getUnicode();
+
+    if (text == null) {
+      return false;
+    }
+
+    // Remove numbers, remove whitespaces and transform to lowercases.
+    text = StringUtils.normalize(paragraph.getUnicode(), true, true, true);
+
+    return TABLE_OF_CONTENTS_HEADINGS.contains(text);
+  }
+  
   // ___________________________________________________________________________
   // Static methods.
 

@@ -8,6 +8,7 @@ import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Rectangle;
 import model.Characters;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfElement;
 import model.SweepDirection.HorizontalSweepDirection;
 import model.SweepDirection.VerticalSweepDirection;
@@ -21,7 +22,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   /** 
    * The overlapping elements of previous lane. 
    */
-  protected List<PdfElement> prevOverlappingElements;
+  protected List<PdfCharacter> prevOverlappingElements;
 
   /** 
    * The flag to indicate whether the previous lane is valid.
@@ -70,20 +71,20 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     }
 
     // Decide if the given lane is a valid lane based on overlapping elements.
-    List<PdfElement> overlappingElements = area.getElementsOverlapping(lane);
-    
-    debug(area, lane.getRectangle() + " " + overlappingElements);
-
-    if (equals(prevOverlappingElements, overlappingElements)) {
+    // Don't use getElementsWithin here, because of paper cond-mat0001207, page
+    // 47, where the figure overlaps the text (altough not visible).
+    List<PdfCharacter> overlappingChars = area.getTextCharactersOverlapping(lane);
+           
+    if (equals(prevOverlappingElements, overlappingChars)) {
       // The set of current overlapping elements is equal to the previous 
       // overlapping elements.      
-      return handleEqualOverlappingElements(area, lane, overlappingElements);
-    } else if (overlappingElements.isEmpty()) {
+      return handleEqualOverlappingElements(area, lane, overlappingChars);
+    } else if (overlappingChars.isEmpty()) {
       // The set of current overlapping elements is empty.
-      return handleEmptyOverlappingElements(area, lane, overlappingElements);
+      return handleEmptyOverlappingElements(area, lane, overlappingChars);
     } else {
       // The set of current overlapping elements is *not* empty.
-      return handleNonEmptyOverlappingElements(area, lane, overlappingElements);
+      return  handleNonEmptyOverlappingElements(area, lane, overlappingChars);
     }
   }
 
@@ -94,7 +95,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * overlapping elements is equal to the previous overlapping elements.
    */
   protected boolean handleEqualOverlappingElements(PdfArea area, Rectangle lane,
-      List<PdfElement> elements) {
+      List<PdfCharacter> elements) {
     this.prevOverlappingElements = elements;
     // Obtain if the elements contains only ascenders, descenders and small
     // characters (because they prefer to exceed line boundaries).
@@ -112,7 +113,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * overlap any elements.
    */
   protected boolean handleEmptyOverlappingElements(PdfArea area, Rectangle lane,
-      List<PdfElement> elements) {
+      List<PdfCharacter> elements) {
     this.prevOverlappingElements = elements;
     this.prevHasOnlyCriticalElements = true; // (elements is empty)
     // The lane is valid if it *doesn't* split associated elements.
@@ -128,7 +129,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * overlap any elements.
    */
   protected boolean handleNonEmptyOverlappingElements(PdfArea area,
-      Rectangle lane, List<PdfElement> elements) {
+      Rectangle lane, List<PdfCharacter> elements) {
     // Obtain if the elements contains only ascenders, descenders and small
     // characters (because they prefer to exceed line boundaries).
     boolean hasOnlyCriticalElements = hasOnlyAscendersDescenders(elements) 
@@ -210,10 +211,14 @@ public class BlockifyTextBlockRule implements BlockifyRule {
     List<Rectangle> subRectangles = rectangle.splitHorizontally(midpoint);
 
     Rectangle upperHalf = subRectangles.get(0);
-    List<PdfElement> upperElements = area.getElementsWithin(upperHalf);
+    // Don't use getElementsWithin here, because of paper cond-mat0001207, page
+    // 47, where the figure overlaps the text (altough not visible).
+    List<PdfCharacter> upperElements = area.getTextCharactersWithin(upperHalf);
 
     Rectangle lowerHalf = subRectangles.get(1);
-    List<PdfElement> lowerElements = area.getElementsWithin(lowerHalf);
+    // Don't use getElementsWithin here, because of paper cond-mat0001207, page
+    // 47, where the figure overlaps the text (altough not visible).
+    List<PdfCharacter> lowerElements = area.getTextCharactersWithin(lowerHalf);
 
     // Find the element with highest extraction order number in upper half.
     int highestUpperElementNum = -1;
@@ -239,8 +244,8 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   /**
    * Returns true, if the two given lists have no elements in common.
    */
-  protected boolean haveNoElementsInCommon(List<PdfElement> els1, 
-      List<PdfElement> els2) {
+  protected boolean haveNoElementsInCommon(List<PdfCharacter> els1, 
+      List<PdfCharacter> els2) {
     if (els1 == null || els2 == null) {
       return false;
     }
@@ -249,7 +254,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       return true;
     }
     
-    Set<PdfElement> els2Set = new HashSet<>(els2);
+    Set<PdfCharacter> els2Set = new HashSet<>(els2);
     for (PdfElement el : els1) {
       if (els2Set.contains(el)) {
         return false;
@@ -262,7 +267,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   /**
    * Returns true, if the two given lists constains the same elements.
    */
-  protected boolean equals(List<PdfElement> els1, List<PdfElement> els2) {
+  protected boolean equals(List<PdfCharacter> els1, List<PdfCharacter> els2) {
     if (els1 == null || els2 == null) {
       return false;
     }
@@ -271,7 +276,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
       return false;
     }
 
-    Set<PdfElement> els2Set = new HashSet<>(els2);
+    Set<PdfCharacter> els2Set = new HashSet<>(els2);
     for (PdfElement el : els1) {
       if (!els2Set.contains(el)) {
         return false;
@@ -284,13 +289,13 @@ public class BlockifyTextBlockRule implements BlockifyRule {
   /**
    * Returns true, if elements1 is a subset if elements2.
    */
-  protected boolean isSubSet(List<PdfElement> elements1,
-      List<PdfElement> elements2) {
+  protected boolean isSubSet(List<PdfCharacter> elements1,
+      List<PdfCharacter> elements2) {
     if (elements1 == null || elements2 == null) {
       return false;
     }
 
-    HashSet<PdfElement> elements2Set = new HashSet<>(elements2);
+    HashSet<PdfCharacter> elements2Set = new HashSet<>(elements2);
     for (PdfElement element : elements1) {
       if (!elements2Set.contains(element)) {
         return false;
@@ -303,7 +308,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * Returns true, if the given elements consists only of ascenders and 
    * descenders.
    */
-  protected boolean hasOnlyAscendersDescenders(List<PdfElement> els) {
+  protected boolean hasOnlyAscendersDescenders(List<PdfCharacter> els) {
     for (PdfElement element : els) {
       String string = element.toString();
 
@@ -327,7 +332,7 @@ public class BlockifyTextBlockRule implements BlockifyRule {
    * descenders.
    */
   protected boolean hasOnlySmallCharacters(PdfArea area,
-      List<PdfElement> els) {
+      List<PdfCharacter> els) {
     float mcFontsize =
         MathUtils.round(area.getTextStatistics().getMostCommonFontsize(), 0);
     for (PdfElement element : els) {

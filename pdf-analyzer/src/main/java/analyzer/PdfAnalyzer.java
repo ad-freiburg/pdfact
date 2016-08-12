@@ -1,7 +1,5 @@
 package analyzer;
 
-import model.PdfDocument;
-
 /**
  * The interface for a pdf analyzer.
  *
@@ -10,8 +8,6 @@ import model.PdfDocument;
 public interface PdfAnalyzer {
   /**
    * Analyzes the given document.
-   * 
-   * @param document
    */
-  public void analyze(PdfDocument document);
+  public void analyze();
 }

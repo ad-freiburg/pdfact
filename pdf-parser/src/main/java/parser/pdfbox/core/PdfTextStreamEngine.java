@@ -165,7 +165,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   public void showGlyph(String unicode, int code, PDFont font, Matrix trm)
     throws IOException {
     super.showGlyph(unicode, code, font, trm);
-
+    
     Rectangle boundingBox = null;
     if (font instanceof PDType3Font) {
       processType3Stream(((PDType3Font) font).getCharProc(code), trm);
@@ -271,7 +271,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
           || l == 'M'
           || l == 'N'
           || l == 'f'
-          || l == 'P') {
+          || l == 'P'
+          || l == 'F') {
         boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
       }
     }
@@ -311,13 +312,22 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       // Compare the horizontal overlaps with the diacritic.
       float overlap1 = prevRectangle.computeHorizontalOverlap(prePrevRectangle);
       float overlap2 = prevRectangle.computeHorizontalOverlap(boundingBox);
+      
+      // Obtain if the diacritic overlaps vertically with padded rectangles..
+      Rectangle paddedPrePrevRectangle = new SimpleRectangle(prePrevRectangle);
+      paddedPrePrevRectangle.setMinY(prePrevRectangle.getMinY() - 0.5f * prePrevRectangle.getHeight());
+      paddedPrePrevRectangle.setMaxY(prePrevRectangle.getMaxY() + 0.5f * prePrevRectangle.getHeight());
+      
+      Rectangle paddedBoundingBox = new SimpleRectangle(boundingBox);
+      paddedBoundingBox.setMinY(boundingBox.getMinY() - 0.5f * boundingBox.getHeight());
+      paddedBoundingBox.setMaxY(boundingBox.getMaxY() + 0.5f * boundingBox.getHeight());
             
       if (overlap1 < 0.01f && overlap2 < 0.01) {
         prevCharacter.setIsDiacritic(false);
-      } else if (overlap1 >= overlap2) {
+      } else if (overlap1 >= overlap2 && prevRectangle.overlaps(paddedPrePrevRectangle)) {
         prePrevCharacter.mergeDiacritic(prevCharacter);
         prevCharacter.setIsDiacritic(true);
-      } else {
+      } else if (prevRectangle.overlaps(paddedBoundingBox)) {
         character.mergeDiacritic(prevCharacter);
         prevCharacter.setIsDiacritic(true);
       }

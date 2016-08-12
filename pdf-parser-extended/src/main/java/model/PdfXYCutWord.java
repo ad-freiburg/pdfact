@@ -135,6 +135,10 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
         continue;
       }
              
+//      if (getPage().getPageNumber() == 5) {
+//        System.out.println(normalScriptText + " " + superScriptText + " " + subScriptText);
+//      }
+      
       if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
         boolean introduceWhitespace = true;
         if (!superScriptText.isEmpty()) {
@@ -172,6 +176,10 @@ public class PdfXYCutWord extends PdfXYCutArea implements PdfWord {
       superScriptText.clear();
     }
             
+//    if (getPage().getPageNumber() == 5) {
+//      System.out.println(normalScriptText + " " + superScriptText + " " + subScriptText);
+//    }
+    
     if (!superScriptText.isEmpty() || !subScriptText.isEmpty()) {
       boolean introduceWhitespace = true;
       if (!superScriptText.isEmpty()) {
