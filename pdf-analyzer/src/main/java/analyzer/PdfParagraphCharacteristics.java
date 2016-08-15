@@ -63,8 +63,10 @@ public class PdfParagraphCharacteristics {
   
   static {
     WELL_KNOWN_SECTION_HEADINGS.add("introduction");
+    WELL_KNOWN_SECTION_HEADINGS.add("introductionandsummary");
     WELL_KNOWN_SECTION_HEADINGS.add("relatedwork");
     WELL_KNOWN_SECTION_HEADINGS.add("references");
+    WELL_KNOWN_SECTION_HEADINGS.add("summary");
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgements");
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgement");
     WELL_KNOWN_SECTION_HEADINGS.add("acknowledgment");

@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.util.Vector;
 
+import de.freiburg.iif.math.MathUtils;
 import de.freiburg.iif.model.Point;
 import de.freiburg.iif.model.Rectangle;
 import de.freiburg.iif.model.simple.SimplePoint;
@@ -178,10 +179,21 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     if (boundingBox == null) {
       boundingBox = getDefaultBoundingBox(code, font, trm);
     } else {
-      boundingBox.setMinX(defaultBoundingBox.getMinX());
-      boundingBox.setMaxX(defaultBoundingBox.getMaxX());
+      // Bounding boces nned some adjustments.
+      if (MathUtils.isEqual(defaultBoundingBox.getWidth(), 0, 0.1f)) {
+        // Don't adjust bounding box if the width is 0.
+        boundingBox.setMinX(defaultBoundingBox.getMinX());
+        boundingBox.setMaxX(defaultBoundingBox.getMaxX());      
+      } else if (MathUtils.isLarger(defaultBoundingBox.getWidth(), 0, 0.1f)) {
+        if (defaultBoundingBox.getMinX() < boundingBox.getMinX()) {
+          boundingBox.setMinX(defaultBoundingBox.getMinX());
+        }
+        if (defaultBoundingBox.getMaxX() > boundingBox.getMaxX()) {
+          boundingBox.setMaxX(defaultBoundingBox.getMaxX());
+        }
+      }
     }
-
+    
     // In some pdfs, fontsize is equal to '1.0' for every character. 
     // In this case, multiplying it with the scaling factor gives the correct 
     // fontsize. In other pdfs, the fontsizes are correct and multiplying it 
@@ -195,7 +207,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     if (fontsize != scaleFactorX) {
       fontsize *= scaleFactorX;
     }
-        
+            
     // Use our additional glyph list for Unicode mapping
     unicode = font.toUnicode(code, glyphList);
 
@@ -211,7 +223,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       PDSimpleFont simpleFont = (PDSimpleFont) font;
       glyphName = simpleFont.getGlyphList().codePointToName(code);
     }
-    
+        
     // From time to time (if font is embedded), there could be glyphs that were
     // redefined by a type3 font file (a custom path to draw to print the glyph)
     // In such cases, we don't know the semantic meaning of the glpyh. Try to
@@ -246,36 +258,34 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
         return;
       }
     }
-    
-
-    
+        
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
     
-    // In case of an italic font, the maxX of the bounding box is usually too
-    // small, so extend it by a given amount.
-    if (pdfFont.isItalic()) {
-      char l = unicode.charAt(0);
-      
-      // List all characters whose upper right is equal to the maxX of 
-      // characters bounding box. TODO
-      if (l == 'B'
-          || l == 'V' 
-          || l == 'W' 
-          || l == 'v' 
-          || l == 'w'
-          || l == 'T'
-          || l == 'U'
-          || l == 'τ'
-          || l == 'M'
-          || l == 'N'
-          || l == 'f'
-          || l == 'P'
-          || l == 'F') {
-        boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
-      }
-    }
+//    // In case of an italic font, the maxX of the bounding box is usually too
+//    // small, so extend it by a given amount.
+//    if (pdfFont.isItalic()) {
+//      char l = unicode.charAt(0);
+//      
+//      // List all characters whose upper right is equal to the maxX of 
+//      // characters bounding box. TODO
+//      if (l == 'B'
+//          || l == 'V' 
+//          || l == 'W' 
+//          || l == 'v' 
+//          || l == 'w'
+//          || l == 'T'
+//          || l == 'U'
+//          || l == 'τ'
+//          || l == 'M'
+//          || l == 'N'
+//          || l == 'f'
+//          || l == 'P'
+//          || l == 'F') {
+//        boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
+//      }
+//    }
     
     PdfBoxCharacter character = new PdfBoxCharacter(currentPage, unicode);
     character.setCharCode(code);
@@ -332,7 +342,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
         prevCharacter.setIsDiacritic(true);
       }
     }
-    
+        
     // Return the character only if it is no diacritic.
     // TODO: There could be characters that are actually diacritics but have
     // a special encoding (and hence a different meaning). That's the case for
@@ -509,7 +519,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       Matrix trm) {
     if (rect != null && font != null) {
       Matrix fontMatrix = font.getFontMatrix();
-
+      float italicAngle = font.getFontDescriptor().getItalicAngle();
+      
       Point ll = new SimplePoint(rect.getLowerLeftX(), rect.getLowerLeftY());
       Point ur = new SimplePoint(rect.getUpperRightX(), rect.getUpperRightY());
 
@@ -520,7 +531,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       // text space -> device space
       transform(ll, trm);
       transform(ur, trm);
-
+      
       return new SimpleRectangle(ll, ur);
     }
     return null;

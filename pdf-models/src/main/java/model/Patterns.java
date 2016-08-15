@@ -78,6 +78,13 @@ public class Patterns {
       Pattern.compile("^\\(([A-Z0-9])\\)(\\s+\\w|$)",
           Pattern.CASE_INSENSITIVE);
 
+  /** 
+   * A pattern same to #4 but with Uppercase letters. Needed to distinguish 
+   * between section headings and author names like "A. Meyer".
+   */
+  public static final Pattern ITEMIZE_START_PATTERN_6 =
+      Pattern.compile("^([A-Z0-9])\\.(\\s+\\w|$)");
+  
   public static final List<Pattern> ITEMIZE_START_PATTERNS = Arrays.asList(
       ITEMIZE_START_PATTERN_1,
       ITEMIZE_START_PATTERN_2,

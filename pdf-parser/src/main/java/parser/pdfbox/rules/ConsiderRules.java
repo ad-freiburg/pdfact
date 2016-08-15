@@ -56,6 +56,7 @@ public class ConsiderRules {
       return false;
     }
     
+    
     return true;
   }
   

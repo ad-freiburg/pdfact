@@ -7,6 +7,7 @@ import static model.Patterns.FORMULA_LABEL_PATTERN;
 import static model.Patterns.TABLE_CAPTION_PATTERN;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -77,6 +78,10 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     analyzeForOtherHeaderFields(document, characteristics);
     analyzeForReferences(document, characteristics);
     analyzeForAppendix(document, characteristics);
+    // Analyze for subsection headings, that allows headings like "A. Foo bar".
+    // Do this after analyze for other header fields, because names are like
+    // to be written "A. Meyer".
+    analyzeForSubsectionHeadings(document, characteristics);
     analyzeForBody(document, characteristics);
   }
 
@@ -171,25 +176,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
       }
     }
   }
-
-  // protected void analyzeForPageHeadersAndFooters(PdfDocument document,
-  // PdfParagraphCharacteristics characteristics) {
-  // for (PdfPage page : document.getPages()) {
-  // for (PdfTextParagraph paragraph : page.getParagraphs()) {
-  // if (paragraph.getRole() != null) {
-  // continue;
-  // }
-  //
-  // Rectangle rect = paragraph.getRectangle();
-  //
-  // if (rect.overlaps(characteristics.getPageHeaderArea())) {
-  // paragraph.setRole(PdfRole.PAGE_HEADER);
-  // } else if (rect.overlaps(characteristics.getPageFooterArea())) {
-  // paragraph.setRole(PdfRole.PAGE_FOOTER);
-  // }
-  // }
-  // }
-  // }
 
   protected void analyzeForPageHeadersAndFooters(PdfDocument document,
       PdfParagraphCharacteristics characteristics) {
@@ -287,7 +273,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         String markup = PdfParagraphCharacteristics.getMarkup(paragraph);
                 
         String sectionHeadingMarkup = characteristics.getSectionHeadingMarkup();
-        PdfFont sectionHeadingFont = characteristics.getSectionHeadingFont();
         
         PdfTextLine firstLine = paragraph.getFirstTextLine();
         float linePitch = Float.MAX_VALUE;
@@ -357,7 +342,9 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           continue;
         }
         
+        PdfFont sectionHeadingFont = characteristics.getSectionHeadingFont();
         PdfFont paraFont = paragraph.getFont();
+        
         // Identify headings of subsections.
         if (sectionHeadingFont != docFont && paraFont == sectionHeadingFont) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
@@ -367,7 +354,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         // Experimental: Identify headings of (subsub-) sections where the font
         // isn't equal to sectionHeadingFont.
                 
+        // Don't use the 4th pattern, becuae it allows "A. Meyer" as section 
+        // heading.
         List<Pattern> itemizeStartPatterns = Patterns.ITEMIZE_START_PATTERNS;
+        
+        if (text == null || text.isEmpty()) {
+          continue;
+        }
         
         boolean matches = false;
         for (Pattern pattern : itemizeStartPatterns) {
@@ -377,7 +370,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
             break;
           }
         }
-          
+                  
         if (matches && paraFont != docFont) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
         }
@@ -385,6 +378,52 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     }
   }
 
+  protected void analyzeForSubsectionHeadings(PdfDocument document,
+      PdfParagraphCharacteristics characteristics) {
+    if (document == null) {
+      return;
+    }
+    
+    PdfFont docFont = document.getTextStatistics().getMostCommonFont();
+
+    for (PdfPage page : document.getPages()) {
+      for (int i = 0; i < page.getParagraphs().size(); i++) {
+        PdfTextParagraph prevParagraph = i > 0 ? page.getParagraphs().get(i - 1) : null;
+        PdfTextParagraph paragraph = page.getParagraphs().get(i);
+        
+        if (paragraph == null) {
+          continue;
+        }
+        
+        if (paragraph.getRole() != PdfRole.UNKNOWN) {
+          continue;
+        }
+         
+        // Don't allow section headings with more than 2 line.
+        if (paragraph.getTextLines().size() > 2) {
+          continue;
+        }
+        
+        // Experimental: Identify headings of (subsub-) sections where the font
+        // isn't equal to sectionHeadingFont.
+                        
+        String text = paragraph.getUnicode();
+        if (text == null || text.isEmpty()) {
+          continue;
+        }
+        
+        Matcher matcher = Patterns.ITEMIZE_START_PATTERN_6.matcher(text);
+        boolean matches = matcher.find() && !matcher.group(1).isEmpty();
+          
+        PdfFont paraFont = paragraph.getFont();
+        
+        if (matches && paraFont != docFont) {
+          paragraph.setRole(PdfRole.SECTION_HEADING);
+        }
+      }
+    }
+  }
+  
   /**
    * Annotates all paragraphs between the heading of table of contents and 
    * next section headings as "table of content".
