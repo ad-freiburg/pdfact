@@ -1,5 +1,6 @@
 package parser.pdfbox.core;
 
+import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import org.apache.pdfbox.util.Matrix;
 
 import de.freiburg.iif.model.Point;
 import de.freiburg.iif.model.Rectangle;
+import de.freiburg.iif.model.simple.SimpleRectangle;
 import de.freiburg.iif.path.PathUtils;
 import parser.pdfbox.core.operator.OperatorProcessor;
 import parser.pdfbox.model.PdfBoxDocument;
@@ -64,7 +66,7 @@ public class PdfStreamEngine {
   /** The current page. */
   protected PdfBoxPage currentPage;
   /** The current page number. */
-  protected int currentPageNumber;
+  public int currentPageNumber;
   /** The rectangle of the page. */
   protected PDRectangle pageSize;
   /** The resources. */
@@ -573,6 +575,23 @@ public class PdfStreamEngine {
    */
   public void setCurrentTransformationMatrix(Matrix matrix) {
     getGraphicsState().setCurrentTransformationMatrix(matrix);
+  }
+  
+  /**
+   * Returns the current clipping path.
+   */
+  public Rectangle getCurrentClippingPath() {
+    PDGraphicsState graphicsState = getGraphicsState();
+    if (graphicsState != null) {
+      Area clippingPath = graphicsState.getCurrentClippingPath();
+      if (clippingPath != null) {
+        java.awt.Rectangle bounds = clippingPath.getBounds();
+        if (bounds != null) {
+          return new SimpleRectangle(bounds);
+        }
+      }
+    }
+    return null;
   }
   
   // ___________________________________________________________________________

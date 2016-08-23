@@ -96,7 +96,7 @@ public class PdfBoxParser extends PdfTextStreamEngine implements PdfParser {
   public void showShape(PdfBoxShape shape) {
     super.showShape(shape);
         
-    if (ConsiderRules.considerPdfShape(shape)) {
+    if (ConsiderRules.considerPdfShape(shape, getCurrentClippingPath())) {
       shape.setExtractionOrderNumber(this.currentExtractionOrderNumber++);
       this.page.addShape(shape);
     }

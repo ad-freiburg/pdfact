@@ -5,14 +5,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.freiburg.iif.math.MathUtils;
+import de.freiburg.iif.text.StringUtils;
+import model.Characters;
 import model.Patterns;
 import model.PdfArea;
+import model.PdfCharacter;
 import model.PdfDocument;
 import model.PdfPage;
 import model.PdfRole;
 import model.PdfTextAlignment;
 import model.PdfTextLine;
 import model.PdfTextParagraph;
+import model.PdfWord;
 import model.TextLineStatistics;
 import statistics.TextLineStatistician;
 
@@ -71,7 +75,7 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
     
     PdfRole paraRole = paragraph.getRole();
     PdfRole prevParaRole = prevBodyTextParagraph.getRole();
-        
+          
     if (paraRole == PdfRole.FORMULA
         || paraRole == PdfRole.SECTION_HEADING
         || paraRole == PdfRole.ABSTRACT_HEADING
@@ -124,10 +128,35 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
       return false;
     }
     
-    if (prevLineIsTooShort(paragraph, lastTextLine, firstTextLine)) {
+    if (firstTextLine.isIndented()) {
       return false;
     }
     
+    if (lastTextLine.isIndented()
+        && lastTextLine.getIndentLevel() == firstTextLine.getIndentLevel()) {
+      return true;
+    }
+    
+    String lastLineText = lastTextLine.getText(true, false, false);
+    if (lastLineText != null) {
+      // Append the paragraph to prevParagraph, if the prev paragraph
+      // doesn't end with a punctuation mark.
+      if (!StringUtils.endsWith(lastLineText, ".", "?", "!")) {
+        return true; 
+      }
+    }
+    
+    String firstLineText = firstTextLine.getText(true, false, false);
+    if (firstLineText != null && !firstLineText.isEmpty()) {
+      // Append the paragraph to prevParagraph, if the paragraph
+      // starts with a lowercase letter.
+      if (Character.isLowerCase(firstLineText.charAt(0))) {
+        return true;
+      }
+    }
+    
+    // TODO: For what reason this criterion was introduced? It yields to 
+    // troubles on inline graphics, e.g. cond-mat0001246.
     if (lastTextLine.getPage().getPageNumber() 
         == firstTextLine.getPage().getPageNumber()
         && lastTextLine.getColumnXRange() 
@@ -136,15 +165,7 @@ public class PlainPdfBodyTextMerger implements PdfBodyTextMerger {
       return false;
     }
     
-    if (!firstTextLine.isIndented()) {
-      return true;
-    }
-    
-    if (lastTextLine.isIndented()
-        && lastTextLine.getIndentLevel() == firstTextLine.getIndentLevel()) {
-      return true;
-    }
-    return false;
+    return true;
   }
   
   protected boolean isItemizeStart(PdfTextLine prevLine, PdfTextLine line) {

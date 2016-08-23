@@ -3,7 +3,6 @@ package parser.pdfbox.core;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.fontbox.afm.CharMetric;
@@ -262,31 +261,7 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     PDColor nonStrokingColor = getGraphicsState().getNonStrokingColor();
     PdfBoxColor color = PdfBoxColor.create(nonStrokingColor);
     PdfBoxFont pdfFont = PdfBoxFont.create(font);
-    
-//    // In case of an italic font, the maxX of the bounding box is usually too
-//    // small, so extend it by a given amount.
-//    if (pdfFont.isItalic()) {
-//      char l = unicode.charAt(0);
-//      
-//      // List all characters whose upper right is equal to the maxX of 
-//      // characters bounding box. TODO
-//      if (l == 'B'
-//          || l == 'V' 
-//          || l == 'W' 
-//          || l == 'v' 
-//          || l == 'w'
-//          || l == 'T'
-//          || l == 'U'
-//          || l == 'τ'
-//          || l == 'M'
-//          || l == 'N'
-//          || l == 'f'
-//          || l == 'P'
-//          || l == 'F') {
-//        boundingBox.setMaxX(boundingBox.getMaxX() + 0.25f * boundingBox.getWidth());
-//      }
-//    }
-    
+        
     PdfBoxCharacter character = new PdfBoxCharacter(currentPage, unicode);
     character.setCharCode(code);
     character.setRectangle(boundingBox);
@@ -519,7 +494,6 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
       Matrix trm) {
     if (rect != null && font != null) {
       Matrix fontMatrix = font.getFontMatrix();
-      float italicAngle = font.getFontDescriptor().getItalicAngle();
       
       Point ll = new SimplePoint(rect.getLowerLeftX(), rect.getLowerLeftY());
       Point ur = new SimplePoint(rect.getUpperRightX(), rect.getUpperRightY());
@@ -585,11 +559,8 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
   }
 
   /**
-   * A method provided as an event interface to allow a subclass to perform some
-   * specific functionality when text needs to be processed.
-   * 
-   * @param character
-   *          The character to be processed.
+   * A method provided as an event interface to allow a subclass to perform 
+   * some specific functionality when text needs to be processed.
    */
   protected void showPdfTextCharacter(PdfBoxCharacter character) {
     // subclasses can override to provide specific functionality

@@ -296,7 +296,7 @@ public class PdfParagraphCharacteristics {
           break;
         }
       }
-
+      
       if (pages.size() < 5) {
         if (numPageHeaderMembers > 0.75f * numPagesToConsider) {
           this.pageHeaderArea = pageHeaderArea;

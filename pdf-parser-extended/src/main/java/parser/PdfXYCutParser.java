@@ -228,7 +228,7 @@ public class PdfXYCutParser implements PdfExtendedParser {
         float tolerance = 0.5f * stats.getMostCommonWidth();
           
         line.setIndentationLevel((int) ((lineMinX - columnMinX) / stats.getMostCommonWidth()));
-                
+                      
         if (MathUtils.isEqual(leftMargin, rightMargin, 1f)
             && leftMargin > tolerance) {
           return PdfTextAlignment.CENTERED;

@@ -1,5 +1,6 @@
 package parser.pdfbox.rules;
 
+import de.freiburg.iif.model.Rectangle;
 import model.PdfCharacter;
 import model.PdfColor;
 import model.PdfFigure;
@@ -70,17 +71,27 @@ public class ConsiderRules {
   /**
    * Returns true, if the given shape should be considered on extraction.
    */
-  public static boolean considerPdfShape(PdfShape shape) {
+  public static boolean considerPdfShape(PdfShape shape, 
+      Rectangle clippingPath) {
     if (shape == null) {
       return false;
     }
-    
+        
     PdfColor color = shape.getColor();
-    
+        
     if (color == null) {
       return false;
     }
-        
-    return !color.isWhite(); 
+    
+    if (color.isWhite()) {
+      return false;
+    }
+    
+    // If the clipping path is given, it must contain the shape.
+    if (clippingPath != null) {
+      return clippingPath.overlaps(shape.getRectangle());
+    }
+    
+    return true; 
   }
 }

@@ -319,7 +319,7 @@ public class ParagraphifyRule {
     if (prevLine != null) {
       Rectangle prevRectangle = prevLine.getRectangle();
       prevAreas = page.getNonTextElementsOverlapping(prevRectangle);
-
+      
       List<? extends HasRectangle> areas = null;
       if (line != null) {
         Rectangle rectangle = line.getRectangle();
@@ -327,7 +327,7 @@ public class ParagraphifyRule {
 
         areas.retainAll(prevAreas);
 
-        if (!areas.isEmpty()) {
+        if (!areas.isEmpty()) {          
           return true;
         }
       }

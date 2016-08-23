@@ -24,15 +24,17 @@ import parser.pdfbox.model.PdfBoxShape;
  * @author Claudius Korzen
  */
 public final class StrokePath extends OperatorProcessor {
+  Rectangle x = new SimpleRectangle(320.984f,151.998f,468.708f,724.328f);
+  
   @Override
   public void process(Operator operator, List<COSBase> operands)
     throws IOException {
-
+    
     int windingRule = -1;
     if (operands.size() > 0) {
       windingRule = ((COSNumber) operands.get(0)).intValue();
     }
-
+    
     // Compute the bounding box of path to stroke.
     float minX = Float.MAX_VALUE;
     float minY = Float.MAX_VALUE;
@@ -96,7 +98,7 @@ public final class StrokePath extends OperatorProcessor {
           shape.setRectangle(rect);
           shape.setColor(color);
           context.showShape(shape);
-
+          
           context.setLinePathPosition(curveEnd);
           break;
         case PathIterator.SEG_LINETO:
@@ -141,7 +143,7 @@ public final class StrokePath extends OperatorProcessor {
           shape.setRectangle(rect);
           shape.setColor(color);
           context.showShape(shape);
-
+          
           context.setLinePathPosition(quadEnd);
           break;
         default:

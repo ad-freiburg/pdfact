@@ -122,7 +122,10 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         int sumOcurrences = 0;
         float numWords = paragraph.getWords().size();
 
-        if (numWords > 0) {
+        // There must be at least 2 words (introduced to avoid to identify
+        // page numbers as titles). TODO: If this condition is too tight,
+        // analyze the textual content (numbers vs. characters)
+        if (numWords > 1) { 
           for (PdfWord word : paragraph.getWords()) {
             String wordStr = word.getUnicode();
             wordStr = StringUtils.normalize(wordStr, false, false, true);
@@ -138,7 +141,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           }
         }
       }
-      
+
       if (titleParagraph != null) {
         titleParagraph.setRole(PdfRole.TITLE);
         return;
@@ -184,61 +187,69 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     Rectangle pageFooterArea = characteristics.getPageFooterArea();
         
     for (PdfPage page : document.getPages()) {
-      List<PdfTextParagraph> paragraphs = page.getParagraphs();
       
-      if (paragraphs != null && !paragraphs.isEmpty()) {
-        PdfTextParagraph firstParagraph = paragraphs.get(0);
-
-        if (firstParagraph.getRole() == PdfRole.UNKNOWN) {
-          Rectangle rect = firstParagraph.getRectangle();
+      if (pageHeaderArea != null) {
+        // Obtain the paragraphs that overlaps the page header area.
+        List<PdfTextParagraph> headerParas = 
+            page.getParagraphsOverlapping(pageHeaderArea);
+      
+        for (PdfTextParagraph para : headerParas) {
+          if (para.getRole() != PdfRole.UNKNOWN) {
+            continue;
+          }
           
-          if (pageHeaderArea != null) {
-            float ratio = rect.computeOverlap(pageHeaderArea);
-            if (ratio > 0.9f) {
-              firstParagraph.setRole(PdfRole.PAGE_HEADER);
-            }
+          Rectangle rect = para.getRectangle();
+          float ratio = rect.computeOverlap(pageHeaderArea);
+          if (ratio > 0.9f) {
+            para.setRole(PdfRole.PAGE_HEADER);
           }
           
           // Check, if the paragraph is page-centered.
-          float minX = firstParagraph.getRectangle().getMinX();
-          float maxX = firstParagraph.getRectangle().getMaxX();
+          float minX = para.getRectangle().getMinX();
+          float maxX = para.getRectangle().getMaxX();
           float pageMinX = page.getRectangle().getMinX();
           float pageMaxX = page.getRectangle().getMaxX();
           
-          float leftMargin = minX - pageMinX;
-          float rightMargin = pageMaxX - maxX;
+          float lMargin = minX - pageMinX;
+          float rMargin = pageMaxX - maxX;
           
-          boolean isPageCentered = MathUtils.isEqual(leftMargin, rightMargin, 5f);
-          if (isPageCentered && StringUtils.isInteger(firstParagraph.getUnicode())) {
-            firstParagraph.setRole(PdfRole.PAGE_HEADER);
+          boolean isPageCentered = MathUtils.isEqual(lMargin, rMargin, 5f);
+          if (isPageCentered && StringUtils.isInteger(para.getUnicode())) {
+            para.setRole(PdfRole.PAGE_HEADER);
           }
         }
+      }
         
-        PdfTextParagraph lastParagraph = paragraphs.get(paragraphs.size() - 1);
-        if (lastParagraph.getRole() == PdfRole.UNKNOWN) {
-          Rectangle rect = lastParagraph.getRectangle();
-          
-          if (pageFooterArea != null) {
-            float ratio = rect.computeOverlap(pageFooterArea);
-            if (ratio > 0.9f) {
-              lastParagraph.setRole(PdfRole.PAGE_FOOTER);
-            }
+      if (pageFooterArea != null) {
+        // Obtain the paragraphs that overlaps the page footer area.
+        List<PdfTextParagraph> footerParas = 
+            page.getParagraphsOverlapping(pageFooterArea);
+      
+        for (PdfTextParagraph para : footerParas) {
+          if (para.getRole() != PdfRole.UNKNOWN) {
+            continue;
+          }
+        
+          Rectangle rect = para.getRectangle();
+          float ratio = rect.computeOverlap(pageFooterArea);
+          if (ratio > 0.9f) {
+            para.setRole(PdfRole.PAGE_FOOTER);
           }
           
           // Check, if the paragraph is page-centered.
-          float minX = lastParagraph.getRectangle().getMinX();
-          float maxX = lastParagraph.getRectangle().getMaxX();
+          float minX = para.getRectangle().getMinX();
+          float maxX = para.getRectangle().getMaxX();
           float pageMinX = page.getRectangle().getMinX();
           float pageMaxX = page.getRectangle().getMaxX();
           
-          float leftMargin = minX - pageMinX;
-          float rightMargin = pageMaxX - maxX;
+          float lMargin = minX - pageMinX;
+          float rMargin = pageMaxX - maxX;
           
-          boolean isPageCentered = MathUtils.isEqual(leftMargin, rightMargin, 5f);
-          if (isPageCentered && StringUtils.isInteger(lastParagraph.getUnicode())) {
-            lastParagraph.setRole(PdfRole.PAGE_FOOTER);
+          boolean isPageCentered = MathUtils.isEqual(lMargin, rMargin, 5f);
+          if (isPageCentered && StringUtils.isInteger(para.getUnicode())) {
+            para.setRole(PdfRole.PAGE_FOOTER);
           }
-        }   
+        }
       }
     }
   }
@@ -383,14 +394,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
     if (document == null) {
       return;
     }
-    
+        
     PdfFont docFont = document.getTextStatistics().getMostCommonFont();
 
     for (PdfPage page : document.getPages()) {
       for (int i = 0; i < page.getParagraphs().size(); i++) {
-        PdfTextParagraph prevParagraph = i > 0 ? page.getParagraphs().get(i - 1) : null;
         PdfTextParagraph paragraph = page.getParagraphs().get(i);
-        
+                
         if (paragraph == null) {
           continue;
         }
@@ -414,9 +424,9 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         
         Matcher matcher = Patterns.ITEMIZE_START_PATTERN_6.matcher(text);
         boolean matches = matcher.find() && !matcher.group(1).isEmpty();
-          
+                
         PdfFont paraFont = paragraph.getFont();
-        
+                
         if (matches && paraFont != docFont) {
           paragraph.setRole(PdfRole.SECTION_HEADING);
         }
@@ -714,12 +724,13 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           if (line.getAlignment() != PdfTextAlignment.CENTERED) {
             isCentered = false;
           }
-          
+                  
           for (PdfWord word : line.getWords()) {            
             // TODO: Use StringUtils.normalize.
             String str = word.getUnicode().toLowerCase().trim().replaceAll("[\\.,]", "");
-            
-            if (line.getAlignment() == PdfTextAlignment.LEFT) {
+                      
+            if (line.getAlignment() == PdfTextAlignment.LEFT 
+                && line.getFont() == document.getTextStatistics().getMostCommonFont()) {
               numNonMathChars++;
             } else if (isMathSymbol(str) || containsMathSymbol(str)
                 || word.containsSubScript() || word.containsSuperScript()
@@ -739,7 +750,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
         }
         
         String text = paragraph.getText(true, true, true);
-                     
+        
         if (text != null) {
           Matcher m = FORMULA_LABEL_PATTERN.matcher(text);
           // As before, mathWordRatio must exceed a given threshold such that 
@@ -878,7 +889,7 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
       PdfTextParagraph prevParagraph = null;
       for (PdfTextParagraph paragraph : page.getParagraphs()) {          
         Threeway t = isAbstract(prevParagraph, paragraph);
-                 
+                      
         switch (t) {
           case TRUE:
             paragraph.setRole(PdfRole.ABSTRACT);
@@ -889,7 +900,6 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
           case CONTINUE:
           default:
             continue;
-            
         }
                         
         prevParagraph = paragraph;
@@ -908,16 +918,29 @@ public class PlainPdfAnalyzer implements PdfAnalyzer {
       return Threeway.FALSE;
     }
     
+    // Abstract usually don't follow any section headings.
+    if (paragraph.getRole() == PdfRole.SECTION_HEADING) {
+      return Threeway.FALSE;
+    }
+    
     // Don't overwrite existing roles. 
     if (paragraph.getRole() != PdfRole.UNKNOWN) {
-      return Threeway.CONTINUE;
+      if (this.abstractFound) {
+        // Abort if there is already a role for given paragraph and an abstract
+        // was already found.
+        return Threeway.FALSE;
+      } else {
+        // Continue if there is already a role for given paragraph and an 
+        // abstract was not found yet.
+        return Threeway.CONTINUE;
+      }
     }
     
-    // Ignore paragrpahs with less than 50 characters.
-    if (paragraph.getWords().size() < 50) {
+    // Ignore paragrpahs with less than 30 characters.
+    if (paragraph.getWords().size() < 30) {
       return Threeway.CONTINUE;
     }
-    
+        
     if (prevParagraph != null) {
       if (prevParagraph.getRole() == PdfRole.ABSTRACT_HEADING) {
         return Threeway.TRUE;

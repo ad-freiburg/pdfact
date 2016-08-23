@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageTree;
@@ -85,7 +86,22 @@ public class PdfBoxDrawer implements PdfDrawer {
   public PdfBoxDrawer(PDDocument pdDocument) throws IOException {
     this.pdDocument = pdDocument;
 
-    PDPageTree pages = pdDocument.getDocumentCatalog().getPages();
+    if (pdDocument == null) {
+      throw new IllegalArgumentException("No pd document given");
+    }
+    
+    PDDocumentCatalog catalog = pdDocument.getDocumentCatalog();
+    
+    if (catalog == null) {
+      throw new IllegalArgumentException("No document catalog given.");
+    }
+    
+    PDPageTree pages = catalog.getPages();
+    
+    if (pages == null) {
+      throw new IllegalArgumentException("No pages given.");
+    }
+    
     this.pageStreams.add(null); // Add dummy, because pageNumbers are 1-based.
     this.pageBoundingBoxes.add(null);
     // Preallocate the list of streams.
