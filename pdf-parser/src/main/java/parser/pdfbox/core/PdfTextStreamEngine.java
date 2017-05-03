@@ -33,6 +33,12 @@ import parser.pdfbox.core.operator.color.SetNonStrokingColorSpace;
 import parser.pdfbox.core.operator.color.SetNonStrokingDeviceCMYKColor;
 import parser.pdfbox.core.operator.color.SetNonStrokingDeviceGrayColor;
 import parser.pdfbox.core.operator.color.SetNonStrokingDeviceRGBColor;
+import parser.pdfbox.core.operator.color.SetStrokingColor;
+import parser.pdfbox.core.operator.color.SetStrokingColorN;
+import parser.pdfbox.core.operator.color.SetStrokingColorSpace;
+import parser.pdfbox.core.operator.color.SetStrokingDeviceCMYKColor;
+import parser.pdfbox.core.operator.color.SetStrokingDeviceGrayColor;
+import parser.pdfbox.core.operator.color.SetStrokingDeviceRGBColor;
 import parser.pdfbox.core.operator.graphics.AppendRectangleToPath;
 import parser.pdfbox.core.operator.graphics.BeginInlineImage;
 import parser.pdfbox.core.operator.graphics.ClipEvenOddRule;
@@ -146,6 +152,13 @@ public class PdfTextStreamEngine extends PdfStreamEngine {
     addOperator(new SetNonStrokingDeviceCMYKColor());
     addOperator(new SetNonStrokingDeviceGrayColor());
     addOperator(new SetNonStrokingDeviceRGBColor());
+    
+    addOperator(new SetStrokingColor());
+    addOperator(new SetStrokingColorN());
+    addOperator(new SetStrokingColorSpace());
+    addOperator(new SetStrokingDeviceCMYKColor());
+    addOperator(new SetStrokingDeviceGrayColor());
+    addOperator(new SetStrokingDeviceRGBColor());
 
     // load additional glyph list for Unicode mapping
     String path = "org/apache/pdfbox/resources/glyphlist/additional.txt";
