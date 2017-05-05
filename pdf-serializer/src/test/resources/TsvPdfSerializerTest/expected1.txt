@@ -1,9 +1,0 @@
-feature	text	page	minX	minY	maxX	maxY	mostCommonFont	mostCommonFontsize	mostCommonColor	startFont	startFontsize	startColor	endFont	endFontsize	endColor	role
-character	a	1	0.0	0.0	5.0	5.0	font-1	12.0	color-1	font-1	12.0	color-1	font-1	12.0	color-1	unknown
-character	b	1	5.0	2.5	7.2	3.7	font-1	10.5	color-2	font-1	10.5	color-2	font-1	10.5	color-2	unknown
-figure	0.0	0.0	5.0	5.0		figure
-shape	5.0	2.5	7.2	3.7	color-2	figure
-figure	5.0	2.5	7.2	3.7		figure
-font	font-1	arial	0	0	0
-color	color-1	0.0	0.0	0.0
-color	color-2	0.0	0.0	0.0
