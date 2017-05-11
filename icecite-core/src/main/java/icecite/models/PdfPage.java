@@ -7,32 +7,7 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfPage {
-  /**
-   * Returns the characters in this page.
-   * 
-   * @return The list of characters in this page.
-   */
-  List<PdfCharacter> getCharacters();
-
-  /**
-   * Sets the characters of this page.
-   * 
-   * @param characters
-   *        The list of characters to set.
-   */
-  void setCharacters(List<PdfCharacter> characters);
-
-  /**
-   * Adds the given character to this page.
-   * 
-   * @param character
-   *        The character to add.
-   */
-  void addCharacter(PdfCharacter character);
-
-  // ==========================================================================
-  
+public interface PdfPage extends HasCharacters {
   /**
    * Returns the figures in this page.
    * 
@@ -55,9 +30,9 @@ public interface PdfPage {
    *        The figure to add.
    */
   void addFigure(PdfFigure figure);
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the shapes in this page.
    * 
@@ -80,7 +55,7 @@ public interface PdfPage {
    *        The shape to add.
    */
   void addShape(PdfShape shape);
-  
+
   // ==========================================================================
 
   /**
@@ -97,4 +72,80 @@ public interface PdfPage {
    *        The page number.
    */
   void setPageNumber(int pageNumber);
+
+  // ==========================================================================
+
+  /**
+   * Returns the identified text blocks in this page.
+   * 
+   * @return The list of text blocks in this page.
+   */
+  List<PdfTextBlock> getTextBlocks();
+
+  /**
+   * Sets the text blocks of this page.
+   * 
+   * @param blocks
+   *        The list of text blocks to set.
+   */
+  void setTextBlocks(List<PdfTextBlock> blocks);
+
+  /**
+   * Adds the given text block to this page.
+   * 
+   * @param block
+   *        The text block to add.
+   */
+  void addTextBlock(PdfTextBlock block);
+
+  // ==========================================================================
+
+  /**
+   * Returns the identified paragraphs in this page.
+   * 
+   * @return The list of paragraphs in this page.
+   */
+  List<PdfParagraph> getParagraphs();
+
+  /**
+   * Sets the paragraphs of this page.
+   * 
+   * @param paragraphs
+   *        The list of paragraphs to set.
+   */
+  void setParagraphs(List<PdfParagraph> paragraphs);
+
+  /**
+   * Adds the given paragraph to this page.
+   * 
+   * @param paragraph
+   *        The paragraph to add.
+   */
+  void addParagraph(PdfParagraph paragraph);
+
+  // ==========================================================================
+
+  /**
+   * The factory to creates instances of {@link PdfPage}.
+   * 
+   * @author Claudius Korzen
+   */
+  public interface PdfPageFactory {
+    /**
+     * Creates a new PDF page.
+     * 
+     * @return An instance of {@link PdfPage}.
+     */
+    PdfPage create();
+
+    /**
+     * Creates a new PDF page.
+     * 
+     * @param pageNum
+     *        The number of the page in the PDF document.
+     * 
+     * @return An instance of {@link PdfPage}.
+     */
+    PdfPage create(int pageNum);
+  }
 }

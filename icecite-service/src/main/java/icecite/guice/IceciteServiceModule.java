@@ -2,10 +2,15 @@ package icecite.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 
 import icecite.drawer.PdfDrawer;
 import icecite.drawer.PdfDrawerFactory;
 import icecite.drawer.pdfbox.PdfBoxDrawer;
+import icecite.serializer.JsonPdfSerializer;
+import icecite.serializer.PdfSerializer;
+import icecite.serializer.TxtPdfSerializer;
+import icecite.serializer.XmlPdfSerializer;
 import icecite.visualizer.PdfVisualizer;
 import icecite.visualizer.PlainPdfVisualizer;
 
@@ -17,8 +22,17 @@ import icecite.visualizer.PlainPdfVisualizer;
 public class IceciteServiceModule extends AbstractModule {
   @Override
   protected void configure() {
+    // Bind the serializers.
+    bind(PdfSerializer.class).annotatedWith(Names.named("txt"))
+        .to(TxtPdfSerializer.class);
+    bind(PdfSerializer.class).annotatedWith(Names.named("xml"))
+        .to(XmlPdfSerializer.class);
+    bind(PdfSerializer.class).annotatedWith(Names.named("json"))
+        .to(JsonPdfSerializer.class);
+
+    // Bind the visualizer.
     bind(PdfVisualizer.class).to(PlainPdfVisualizer.class);
-    
+
     fac(PdfDrawer.class, PdfDrawerFactory.class, PdfBoxDrawer.class);
   }
 

@@ -8,11 +8,9 @@ import com.google.inject.Inject;
 
 import icecite.drawer.PdfDrawer;
 import icecite.drawer.PdfDrawerFactory;
-import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
-import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
 
 /**
  * The default implementation of a PdfVisualizer.
@@ -151,14 +149,17 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       throws IOException {
     if (page != null) {
       int pageNumber = page.getPageNumber();
-      for (PdfCharacter character : page.getCharacters()) {
-        drawer.drawBoundingBox(character, pageNumber, Color.BLUE);
-      }
-      for (PdfFigure figure : page.getFigures()) {
-        drawer.drawBoundingBox(figure, pageNumber, Color.RED);
-      }
-      for (PdfShape shape : page.getShapes()) {
-        drawer.drawBoundingBox(shape, pageNumber, Color.GREEN);
+//      for (PdfCharacter character : page.getCharacters()) {
+//        drawer.drawBoundingBox(character, pageNumber, Color.BLUE);
+//      }
+//      for (PdfFigure figure : page.getFigures()) {
+//        drawer.drawBoundingBox(figure, pageNumber, Color.RED);
+//      }
+//      for (PdfShape shape : page.getShapes()) {
+//        drawer.drawBoundingBox(shape, pageNumber, Color.GREEN);
+//      }
+      for (PdfTextBlock block : page.getTextBlocks()) {
+        drawer.drawBoundingBox(block, pageNumber, Color.RED);
       }
     }
   }

@@ -70,4 +70,9 @@ public class PlainPdfCharacter extends PlainPdfElement
   public float getFontSize() {
     return this.fontsize;
   }
+  
+  @Override
+  public String toString() {
+    return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
+  }
 }

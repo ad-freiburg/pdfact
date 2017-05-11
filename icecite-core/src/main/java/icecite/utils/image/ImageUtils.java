@@ -6,7 +6,7 @@ import java.io.IOException;
 import com.google.inject.Inject;
 
 import icecite.models.PdfColor;
-import icecite.models.PdfColorFactory;
+import icecite.models.PdfColor.PdfColorFactory;
 import icecite.utils.color.ColorUtils;
 
 /**

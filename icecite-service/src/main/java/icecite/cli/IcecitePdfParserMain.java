@@ -10,12 +10,17 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 import icecite.guice.IceciteBaseModule;
 import icecite.guice.IceciteServiceModule;
 import icecite.models.PdfDocument;
 import icecite.parser.PdfParser;
-import icecite.parser.pdfbox.core.guice.OperatorProcessorModule;
+import icecite.parser.PdfParser.PdfParserFactory;
+import icecite.parser.stream.pdfbox.guice.OperatorProcessorModule;
+import icecite.serializer.PdfSerializer;
+import icecite.tokenizer.PdfTextTokenizer;
 import icecite.visualizer.PdfVisualizer;
 
 /**
@@ -80,14 +85,20 @@ public class IcecitePdfParserMain {
         new OperatorProcessorModule(), new IceciteServiceModule());
 
     // Create an instance of PdfParser.
-    PdfParser parser = injector.getInstance(PdfParser.class);
+    PdfParserFactory factory = injector.getInstance(PdfParserFactory.class);
     PdfVisualizer visualizer = injector.getInstance(PdfVisualizer.class);
+    PdfSerializer serializer = injector
+        .getInstance(Key.get(PdfSerializer.class, Names.named("xml")));
+    System.out.println(serializer);
+    PdfParser pdfParser = factory.create();
+    PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
     
-    PdfDocument document = parser.parsePdf(inputPdf);
+    PdfDocument document = pdfParser.parsePdf(inputPdf);
+    tokenizer.tokenizeText(document);
     
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {
-      visualizer.visualize(document, stream);  
+      visualizer.visualize(document, stream);
     }
   }
 }

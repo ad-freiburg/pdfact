@@ -108,7 +108,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     this.pdDocument = pdDocument;
 
     if (pdDocument == null) {
-      throw new IllegalArgumentException("No pd document given");
+      throw new IllegalArgumentException("No PD document given");
     }
 
     PDDocumentCatalog catalog = pdDocument.getDocumentCatalog();
