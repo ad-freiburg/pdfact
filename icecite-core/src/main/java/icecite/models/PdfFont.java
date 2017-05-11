@@ -6,9 +6,6 @@ package icecite.models;
  * @author Claudius Korzen
  */
 public interface PdfFont extends PdfResource {
-
-  // ==========================================================================
-
   /**
    * The factory to create instances of {@link PdfFont}.
    * 

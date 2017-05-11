@@ -14,7 +14,7 @@ import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 /**
  * gs: Set the specified parameters in the graphics state. dictName shall be
  * the name of a graphics state parameter dictionary in the ExtGState
- * subdictionary of the current resource dictionary.
+ * sub-dictionary of the current resource dictionary.
  * 
  * @author Claudius Korzen
  */

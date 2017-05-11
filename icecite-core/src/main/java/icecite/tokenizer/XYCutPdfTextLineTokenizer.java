@@ -48,6 +48,8 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     return cut(characters);
   }
 
+  // ==========================================================================
+
   @Override
   public float getVerticalLaneWidth(PdfCharacterSet characters) {
     // TODO Auto-generated method stub
@@ -60,6 +62,8 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     return 0;
   }
 
+  // ==========================================================================
+
   @Override
   public boolean isValidVerticalLane(PdfCharacterSet overlapping) {
     // TODO Auto-generated method stub
@@ -71,6 +75,8 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     // TODO Auto-generated method stub
     return false;
   }
+
+  // ==========================================================================
 
   @Override
   public PdfTextLine pack(PdfCharacterSet characters) {

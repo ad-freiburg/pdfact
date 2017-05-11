@@ -53,14 +53,10 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    */
   protected PdfCharacterSetFactory pdfCharacterSetFactory;
 
-  // ==========================================================================
-
   /**
    * The PDF document.
    */
   protected PdfDocument pdfDocument;
-
-  // ==========================================================================
 
   /**
    * All characters of the current PDF document.
@@ -77,8 +73,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    */
   protected Set<PdfShape> shapesOfPdfDocument;
 
-  // ==========================================================================
-
   /**
    * The characters of the current PDF page.
    */
@@ -93,8 +87,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    * The shapes of the current PDF page.
    */
   protected Set<PdfShape> shapesOfPdfPage;
-
-  // ==========================================================================
 
   /**
    * The predecessor of the current character (needed to resolve diacritics).

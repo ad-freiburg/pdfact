@@ -7,7 +7,7 @@ import icecite.models.PdfDocument;
 
 /**
  * The interface for all concrete implementations to visualize the features of
- * a pdf text document.
+ * a PDF text document.
  *
  * @author Claudius Korzen
  */

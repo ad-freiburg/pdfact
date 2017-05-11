@@ -57,7 +57,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawLine(Line line, int pageNum, Color color, float thickness)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given line on the given page.
@@ -76,7 +76,8 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawLine(Line line, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft) throws IOException;
+      boolean originInUpperLeft)
+    throws IOException;
 
   /**
    * Draws the given line in the given color on the given page.
@@ -98,7 +99,7 @@ public interface PdfDrawer {
    */
   void drawLine(Line line, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given line with given color and given thickness on the given
@@ -123,7 +124,7 @@ public interface PdfDrawer {
    */
   void drawLine(Line line, int pageNum, Color color, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   // ==========================================================================
 
@@ -152,7 +153,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawRectangle(Rectangle rect, int pageNum, Color color)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given rectangle with given color and given thickness on the
@@ -170,7 +171,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawRectangle(Rectangle rect, int pageNum, Color color, float thickness)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given rectangle on the given page.
@@ -191,7 +192,7 @@ public interface PdfDrawer {
    */
   void drawRectangle(Rectangle rectangle, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given rectangle in the given color on the given page.
@@ -214,7 +215,7 @@ public interface PdfDrawer {
    */
   void drawRectangle(Rectangle rect, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given rectangle with given color and given thickness on the
@@ -240,7 +241,7 @@ public interface PdfDrawer {
    */
   void drawRectangle(Rectangle rect, int pageNum, Color color, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   // ==========================================================================
 
@@ -255,7 +256,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawBoundingBox(HasBoundingBox rectangle, int pageNum)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws a bounding box in the given color on the given page.
@@ -270,7 +271,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws a bounding box with given color and given thickness on the given
@@ -288,7 +289,8 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
-      float thickness) throws IOException;
+      float thickness)
+    throws IOException;
 
   /**
    * Draws a bounding box on the given page.
@@ -309,7 +311,7 @@ public interface PdfDrawer {
    */
   void drawBoundingBox(HasBoundingBox rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws a bounding box in the given color on the given page.
@@ -332,7 +334,7 @@ public interface PdfDrawer {
    */
   void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws a bounding box with given color and given thickness on the given
@@ -358,7 +360,7 @@ public interface PdfDrawer {
    */
   void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   // ==========================================================================
 
@@ -403,7 +405,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, Point pos, Color color)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given text in the given color and given fontsize at the given
@@ -423,7 +425,8 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, Point pos, Color color,
-      float fontsize) throws IOException;
+      float fontsize)
+    throws IOException;
 
   /**
    * Draws the given text on the given page.
@@ -442,7 +445,8 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft) throws IOException;
+      boolean originInUpperLeft)
+    throws IOException;
 
   /**
    * Draws the given text at the given position in the page.
@@ -464,7 +468,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given text in the given color at the given position in the page.
@@ -488,7 +492,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   /**
    * Draws the given text in the given color and given fontsize at the given
@@ -515,7 +519,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos, Color color,
       float fontsize, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException;
+    throws IOException;
 
   // ==========================================================================
 

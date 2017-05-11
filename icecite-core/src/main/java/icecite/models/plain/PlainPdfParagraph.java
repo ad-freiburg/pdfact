@@ -33,6 +33,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   protected String text;
 
   // ==========================================================================
+  // Constructors.
 
   /**
    * Creates a new paragraph.

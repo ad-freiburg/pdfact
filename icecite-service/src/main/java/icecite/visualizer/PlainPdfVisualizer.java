@@ -16,7 +16,6 @@ import icecite.models.PdfTextBlock;
  * The default implementation of a PdfVisualizer.
  *
  * @author Claudius Korzen
- *
  */
 public class PlainPdfVisualizer implements PdfVisualizer {
   /**
@@ -37,7 +36,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   @Override
   public void visualize(PdfDocument pdf, OutputStream stream)
-      throws IOException {
+    throws IOException {
     PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
 
     for (PdfPage page : pdf.getPages()) {
@@ -79,7 +78,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *         If the drawing failed.
    */
   protected void visualizePage(PdfPage page, PdfDrawer drawer)
-      throws IOException {
+    throws IOException {
 
     // for (PdfFeature feature : features) {
     // visualizeFeature(page, feature, drawer);
@@ -146,18 +145,18 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *         If the drawing failed.
    */
   protected void visualizeCharacters(PdfPage page, PdfDrawer drawer)
-      throws IOException {
+    throws IOException {
     if (page != null) {
       int pageNumber = page.getPageNumber();
-//      for (PdfCharacter character : page.getCharacters()) {
-//        drawer.drawBoundingBox(character, pageNumber, Color.BLUE);
-//      }
-//      for (PdfFigure figure : page.getFigures()) {
-//        drawer.drawBoundingBox(figure, pageNumber, Color.RED);
-//      }
-//      for (PdfShape shape : page.getShapes()) {
-//        drawer.drawBoundingBox(shape, pageNumber, Color.GREEN);
-//      }
+      //      for (PdfCharacter character : page.getCharacters()) {
+      //        drawer.drawBoundingBox(character, pageNumber, Color.BLUE);
+      //      }
+      //      for (PdfFigure figure : page.getFigures()) {
+      //        drawer.drawBoundingBox(figure, pageNumber, Color.RED);
+      //      }
+      //      for (PdfShape shape : page.getShapes()) {
+      //        drawer.drawBoundingBox(shape, pageNumber, Color.GREEN);
+      //      }
       for (PdfTextBlock block : page.getTextBlocks()) {
         drawer.drawBoundingBox(block, pageNumber, Color.RED);
       }

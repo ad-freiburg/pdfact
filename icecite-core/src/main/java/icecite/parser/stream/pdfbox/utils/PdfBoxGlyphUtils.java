@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
 
+// TODO: Check if this works as suggested.
+
 /**
  * A collection of some utility methods to manage and process additional
  * glyphs.

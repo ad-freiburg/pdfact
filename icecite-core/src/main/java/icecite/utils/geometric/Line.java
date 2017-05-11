@@ -95,4 +95,15 @@ public abstract class Line extends Geometric {
    *        The y coordinate of the end point.
    */
   public abstract void setEndY(float y);
+
+  // ==========================================================================
+
+  /**
+   * The factory to create instances of {@link Line}.
+   * 
+   * @author Claudius Korzen
+   */
+  public interface LineFactory {
+
+  }
 }

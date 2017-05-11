@@ -14,7 +14,7 @@ import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 
 /**
- * An implementation of {@link PdfElementSet} based on a
+ * An implementation of {@link PdfElementSet} based on
  * {@link PlainPdfElementSet}.
  * 
  * @author Claudius Korzen

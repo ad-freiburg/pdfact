@@ -39,6 +39,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   protected PdfParagraphTokenizer paragraphTokenizer;
 
   // ==========================================================================
+  // Constructors.
 
   /**
    * Creates a new text tokenizer.

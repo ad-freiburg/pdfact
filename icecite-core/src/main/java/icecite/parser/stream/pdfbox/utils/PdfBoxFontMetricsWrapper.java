@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.afm.FontMetrics;
 
+// TODO: Check if this works as suggested.
+
 /**
  * Wrapper for FontMetrics class to get access to the included CharMetrics.
  *

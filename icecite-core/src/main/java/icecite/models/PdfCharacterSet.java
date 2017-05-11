@@ -3,7 +3,7 @@ package icecite.models;
 import java.util.Collection;
 
 /**
- * A set of PDF character.
+ * A set of PDF characters.
  * 
  * @author Claudius Korzen
  */
@@ -14,8 +14,6 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
    * @return The most common font over all characters in this set.
    */
   PdfFont getMostCommonFont();
-
-  // ==========================================================================
 
   /**
    * Returns the most common color over all characters in this set.
@@ -39,6 +37,8 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
    * @return The average font size over all characters in this set.
    */
   float getAverageFontsize();
+
+  // ==========================================================================
 
   /**
    * The factory to create instances of {@link PdfCharacterSet}.

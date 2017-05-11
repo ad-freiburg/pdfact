@@ -19,6 +19,8 @@ public interface PdfStreamParser {
    */
   void parsePdf(File pdf) throws IOException;
 
+  // ==========================================================================
+
   /**
    * The factory to create instances of PdfStreamParser.
    * 

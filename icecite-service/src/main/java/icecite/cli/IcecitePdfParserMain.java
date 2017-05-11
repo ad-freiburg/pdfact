@@ -23,6 +23,8 @@ import icecite.serializer.PdfSerializer;
 import icecite.tokenizer.PdfTextTokenizer;
 import icecite.visualizer.PdfVisualizer;
 
+// TODO: Write a usable main method.
+
 /**
  * The main class to manage the Icecite parser from the command line.
  * 
@@ -30,7 +32,7 @@ import icecite.visualizer.PdfVisualizer;
  */
 public class IcecitePdfParserMain {
   /**
-   * The input pdf file.
+   * The input PDF file.
    */
   protected static Path inputPdf;
 
@@ -92,10 +94,10 @@ public class IcecitePdfParserMain {
     System.out.println(serializer);
     PdfParser pdfParser = factory.create();
     PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
-    
+
     PdfDocument document = pdfParser.parsePdf(inputPdf);
     tokenizer.tokenizeText(document);
-    
+
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {
       visualizer.visualize(document, stream);

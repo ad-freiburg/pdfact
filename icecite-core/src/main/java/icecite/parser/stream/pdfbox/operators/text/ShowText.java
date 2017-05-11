@@ -41,9 +41,9 @@ import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.parser.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parser.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import icecite.utils.geometric.Point;
-import icecite.utils.geometric.PointFactory;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.RectangleFactory;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.math.MathUtils;
 
 /**

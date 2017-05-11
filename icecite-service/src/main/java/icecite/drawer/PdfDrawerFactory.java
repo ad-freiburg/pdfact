@@ -13,7 +13,7 @@ public interface PdfDrawerFactory {
    * Creates a new PdfDrawer.
    * 
    * @param pdf
-   *        The pdf file to depaint.
+   *        The PDF file to process.
    * 
    * @return A new instance of {@link PdfDrawer}.
    */
@@ -23,7 +23,7 @@ public interface PdfDrawerFactory {
    * Creates a new PdfDrawer.
    * 
    * @param pdf
-   *        The pdf file to depaint.
+   *        The PDF file to process.
    * 
    * @return A new instance of {@link PdfDrawer}.
    */

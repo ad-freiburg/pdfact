@@ -5,9 +5,11 @@ import java.io.OutputStream;
 
 import icecite.models.PdfDocument;
 
+// TODO: Implement the TXT serializer.
+
 /**
  * An implementation of PdfSerializer that serializes a PDF document to plain
- * txt format.
+ * TXT format.
  *
  * @author Claudius Korzen
  */
@@ -22,7 +24,7 @@ public class TxtPdfSerializer implements PdfSerializer {
   public String getOutputFormat() {
     return "txt";
   }
-  
+
   // ==========================================================================
 
 }

@@ -39,6 +39,8 @@ public interface PdfParser {
    */
   PdfDocument parsePdf(File pdf) throws IOException;
 
+  // ==========================================================================
+
   /**
    * The factory to create instance of {@link PdfParser}.
    * 

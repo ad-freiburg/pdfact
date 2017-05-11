@@ -156,35 +156,36 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawLine(Line line, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft) throws IOException {
+      boolean originInUpperLeft)
+    throws IOException {
     this.drawLine(line, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color)
-      throws IOException {
+    throws IOException {
     this.drawLine(line, pageNum, color, false, false);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawLine(line, pageNum, color, DEFAULT_LINE_THICKNESS,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color, float thickness)
-      throws IOException {
+    throws IOException {
     drawLine(line, pageNum, color, thickness, false, false);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     PDPageContentStream stream = getPdPageContentStream(pageNum);
     Line adapted = adaptLine(line, pageNum, relativeToUpperLeft,
         originInUpperLeft);
@@ -206,40 +207,41 @@ public class PdfBoxDrawer implements PdfDrawer {
   @Override
   public void drawRectangle(Rectangle rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(rect, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(rect, pageNum, color, false, false);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(rect, pageNum, color, DEFAULT_LINE_THICKNESS,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
-      float thickness) throws IOException {
+      float thickness)
+    throws IOException {
     drawRectangle(rect, pageNum, color, thickness, false, false);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     if (rect == null) {
       return;
     }
     PDPageContentStream stream = getPdPageContentStream(pageNum);
-    
+
     Rectangle adapted = adaptRectangle(rect, pageNum, relativeToUpperLeft,
         originInUpperLeft);
 
@@ -258,42 +260,43 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, color);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, color,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
-      float thickness) throws IOException {
+      float thickness)
+    throws IOException {
     drawRectangle(box.getBoundingBox(), pageNum, color, thickness);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     drawRectangle(box.getBoundingBox(), pageNum, color, thickness,
         relativeToUpperLeft, originInUpperLeft);
   }
@@ -307,49 +310,51 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawText(String text, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft) throws IOException {
+      boolean originInUpperLeft)
+    throws IOException {
     this.drawText(text, pageNum, new PlainPoint(0, 0), relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point)
-      throws IOException {
+    throws IOException {
     this.drawText(text, pageNum, point, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawText(text, pageNum, point, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color)
-      throws IOException {
+    throws IOException {
     this.drawText(text, pageNum, point, color, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     this.drawText(text, pageNum, point, color, DEFAULT_FONT_SIZE,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
-      float fontsize) throws IOException {
+      float fontsize)
+    throws IOException {
     drawText(text, pageNum, point, color, fontsize, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
       float fontsize, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+    throws IOException {
     PDPageContentStream stream = getPdPageContentStream(pageNum);
 
     Point adapted = adaptPoint(point, pageNum, relativeToUpperLeft,

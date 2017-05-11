@@ -5,6 +5,8 @@ import java.io.OutputStream;
 
 import icecite.models.PdfDocument;
 
+// TODO: Implement the XML serializer.
+
 /**
  * An implementation of PdfSerializer that serializes a PDF document to JSON 
  * format.
@@ -22,7 +24,4 @@ public class XmlPdfSerializer implements PdfSerializer {
   public String getOutputFormat() {
     return "xml";
   }
-  
-  // ==========================================================================
-
 }
