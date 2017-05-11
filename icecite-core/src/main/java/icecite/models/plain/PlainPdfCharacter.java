@@ -30,6 +30,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
    */
   protected PdfColor color;
 
+  // ==========================================================================
+
   @Override
   public PdfColor getColor() {
     return this.color;
@@ -39,6 +41,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   public void setColor(PdfColor color) {
     this.color = color;
   }
+
+  // ==========================================================================
 
   @Override
   public PdfFont getFont() {
@@ -50,6 +54,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
     this.font = font;
   }
 
+  // ==========================================================================
+
   @Override
   public void setText(String text) {
     this.text = text;
@@ -60,6 +66,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
     return this.text;
   }
 
+  // ==========================================================================
+
   @Override
   public void setFontSize(float fontsize) {
     this.fontsize = fontsize;
@@ -69,6 +77,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   public float getFontSize() {
     return this.fontsize;
   }
+
+  // ==========================================================================
 
   @Override
   public String toString() {

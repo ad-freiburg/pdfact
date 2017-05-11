@@ -14,7 +14,7 @@ import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 
 /**
  * Tf: Set the text font to font and the text font size to size. font shall be
- * the name of a font resource in the Font subdictionary of the current
+ * the name of a font resource in the Font sub-dictionary of the current
  * resource dictionary; size shall be a number representing a scale factor.
  * 
  * @author Claudius Korzen

@@ -14,6 +14,8 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
    */
   protected PdfColor color;
 
+  // ==========================================================================
+
   @Override
   public PdfColor getColor() {
     return this.color;

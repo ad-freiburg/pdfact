@@ -18,6 +18,9 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
    */
   protected float[] rgb;
 
+  // ==========================================================================
+  // Constructors
+
   /**
    * Creates a new color.
    */
@@ -36,6 +39,8 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   public PlainPdfColor(@Assisted float[] rgb) {
     this.rgb = rgb;
   }
+
+  // ==========================================================================
 
   @Override
   public void setRGB(float[] rgb) {

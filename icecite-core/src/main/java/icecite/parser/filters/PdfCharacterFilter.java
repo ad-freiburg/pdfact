@@ -45,7 +45,6 @@ public class PdfCharacterFilter {
     if (text == null || text.trim().isEmpty()) {
       return true;
     }
-
     return false;
   }
 }

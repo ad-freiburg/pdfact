@@ -53,6 +53,7 @@ public class PlainPdfPage implements PdfPage {
   protected List<PdfParagraph> paragraphs;
 
   // ==========================================================================
+  // Constructors.
 
   /**
    * Creates a new PDF page.

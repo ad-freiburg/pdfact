@@ -6,7 +6,7 @@ import icecite.models.HasBoundingBox;
 import icecite.utils.geometric.Rectangle;
 
 /**
- * A comparator that compares rectangle by their maxX values.
+ * A comparator that compares rectangles by their maxX values.
  * 
  * @author Claudius Korzen
  */

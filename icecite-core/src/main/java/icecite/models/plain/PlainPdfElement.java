@@ -14,6 +14,8 @@ public class PlainPdfElement implements PdfElement {
    */
   protected Rectangle boundingBox;
 
+  // ==========================================================================
+
   @Override
   public Rectangle getBoundingBox() {
     return this.boundingBox;

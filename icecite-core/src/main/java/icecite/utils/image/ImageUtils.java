@@ -18,7 +18,7 @@ public class ImageUtils {
   /**
    * The factory to create instances of {@link PdfColor}.
    */
-  // TODO: This won't work.
+  // TODO: This won't work (because it's static).
   @Inject
   protected static PdfColorFactory pdfColorFactory;
 

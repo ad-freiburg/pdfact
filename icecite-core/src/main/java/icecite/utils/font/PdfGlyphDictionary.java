@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A dictionary that maps glyph names to its unicode string. This dict was
- * introduced because in case of embedded fonts, there could be glyphs (codes)
- * that were redefined with a custom shape. For example, in paper
+ * A dictionary that maps glyph names to its unicode string. This dictionary
+ * was introduced because in case of embedded fonts, there could be glyphs
+ * (codes) that were redefined with a custom shape. For example, in paper
  * "cond-mat0001220", the glyph "ǫ" is redefined by "ϵ". But we actually know
  * the path to draw the "ϵ", but we don't now its semantic meaning.
  * Nevertheless, in most of the cases we have a name for the glyph, given from

@@ -14,6 +14,8 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import icecite.utils.font.PdfFontUtils;
 import icecite.utils.path.PathUtils;
 
+// TODO: Check if this works as suggested.
+
 /**
  * A collection of utility methods to manage and process AFM files.
  * 

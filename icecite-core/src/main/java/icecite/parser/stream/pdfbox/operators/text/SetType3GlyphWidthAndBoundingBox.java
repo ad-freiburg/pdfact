@@ -16,7 +16,7 @@ import icecite.utils.geometric.plain.PlainRectangle;
 
 /**
  * d1: Set width and bounding box information for the glyph and declare that
- * the glyph description specifies only shape, not colour.
+ * the glyph description specifies only shape, not color.
  * 
  * Arguments: wx wy llx lly urx ur.
  * 

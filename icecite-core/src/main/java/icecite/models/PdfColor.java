@@ -33,6 +33,8 @@ public interface PdfColor extends PdfResource {
    */
   float[] getRGB();
 
+  // ==========================================================================
+
   /**
    * The factory to create instances of {@link PdfColor}.
    * 

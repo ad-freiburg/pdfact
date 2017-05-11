@@ -21,6 +21,8 @@ public interface PdfCharacter extends PdfElement, HasColor, HasFont, HasText {
    */
   void setFontSize(float fontsize);
 
+  // ==========================================================================
+
   /**
    * The factory to create instances of {@link PdfCharacter}.
    * 

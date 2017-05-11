@@ -72,6 +72,8 @@ public interface PdfElementSet<T extends PdfElement> extends Set<T> {
    */
   float getMostCommonMaxY();
 
+  // ==========================================================================
+
   /**
    * The factory to create instances of {@link PdfElementSet}.
    * 

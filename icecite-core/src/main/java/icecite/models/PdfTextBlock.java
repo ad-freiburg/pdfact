@@ -17,7 +17,6 @@ public interface PdfTextBlock extends PdfElement, HasCharacters, HasText {
      * 
      * @param characters
      *        The characters of this text block.
-     * 
      * @return An instance of {@link PdfTextBlock}.
      */
     PdfTextBlock create(PdfCharacterSet characters);
