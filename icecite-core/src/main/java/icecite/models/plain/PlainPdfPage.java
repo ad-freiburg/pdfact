@@ -2,12 +2,15 @@ package icecite.models.plain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacterSet;
+import icecite.models.PdfColor;
 import icecite.models.PdfFigure;
+import icecite.models.PdfFont;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
@@ -27,12 +30,12 @@ public class PlainPdfPage implements PdfPage {
   /**
    * The figures in this page.
    */
-  protected List<PdfFigure> figures;
+  protected Set<PdfFigure> figures;
 
   /**
    * The shapes in this page.
    */
-  protected List<PdfShape> shapes;
+  protected Set<PdfShape> shapes;
 
   /**
    * The number of this page in the PDF document.
@@ -56,8 +59,6 @@ public class PlainPdfPage implements PdfPage {
    */
   @AssistedInject
   public PlainPdfPage() {
-    this.figures = new ArrayList<>();
-    this.shapes = new ArrayList<>();
     this.paragraphs = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
   }
@@ -88,35 +89,25 @@ public class PlainPdfPage implements PdfPage {
   // ==========================================================================
 
   @Override
-  public List<PdfFigure> getFigures() {
+  public Set<PdfFigure> getFigures() {
     return this.figures;
   }
 
   @Override
-  public void setFigures(List<PdfFigure> figures) {
+  public void setFigures(Set<PdfFigure> figures) {
     this.figures = figures;
-  }
-
-  @Override
-  public void addFigure(PdfFigure figure) {
-    this.figures.add(figure);
   }
 
   // ==========================================================================
 
   @Override
-  public List<PdfShape> getShapes() {
+  public Set<PdfShape> getShapes() {
     return this.shapes;
   }
 
   @Override
-  public void setShapes(List<PdfShape> shapes) {
+  public void setShapes(Set<PdfShape> shapes) {
     this.shapes = shapes;
-  }
-
-  @Override
-  public void addShape(PdfShape shape) {
-    this.shapes.add(shape);
   }
 
   // ==========================================================================
@@ -163,5 +154,47 @@ public class PlainPdfPage implements PdfPage {
   @Override
   public void addParagraph(PdfParagraph paragraph) {
     this.paragraphs.add(paragraph);
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfFont getMostCommonFont() {
+    return this.characters.getMostCommonFont();
+  }
+
+  @Override
+  public PdfColor getMostCommonColor() {
+    return this.characters.getMostCommonColor();
+  }
+
+  @Override
+  public float getMostCommonFontsize() {
+    return this.characters.getMostCommonFontsize();
+  }
+
+  @Override
+  public float getAverageFontsize() {
+    return this.characters.getAverageFontsize();
+  }
+
+  @Override
+  public float getMostCommonHeight() {
+    return this.characters.getMostCommonHeight();
+  }
+
+  @Override
+  public float getAverageHeight() {
+    return this.characters.getAverageHeight();
+  }
+
+  @Override
+  public float getMostCommonWidth() {
+    return this.characters.getMostCommonWidth();
+  }
+
+  @Override
+  public float getAverageWidth() {
+    return this.characters.getAverageWidth();
   }
 }

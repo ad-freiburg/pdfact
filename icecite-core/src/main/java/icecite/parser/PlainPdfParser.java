@@ -3,8 +3,8 @@ package icecite.parser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -52,26 +52,49 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    * The factory to create instances of PdfCharacterSet.
    */
   protected PdfCharacterSetFactory pdfCharacterSetFactory;
-  
+
+  // ==========================================================================
+
   /**
    * The PDF document.
    */
   protected PdfDocument pdfDocument;
 
+  // ==========================================================================
+
+  /**
+   * All characters of the current PDF document.
+   */
+  protected PdfCharacterSet charactersOfPdfDocument;
+
+  /**
+   * All figures of the current PDF document.
+   */
+  protected Set<PdfFigure> figuresOfPdfDocument;
+
+  /**
+   * All shapes of the current PDF document.
+   */
+  protected Set<PdfShape> shapesOfPdfDocument;
+  
+  // ==========================================================================
+  
   /**
    * The characters of the current PDF page.
    */
-  protected PdfCharacterSet currentPdfPageCharacters;
-  
+  protected PdfCharacterSet charactersOfPdfPage;
+
   /**
    * The figures of the current PDF page.
    */
-  protected List<PdfFigure> currentPdfPageFigures;
-  
+  protected Set<PdfFigure> figuresOfPdfPage;
+
   /**
    * The shapes of the current PDF page.
    */
-  protected List<PdfShape> currentPdfPageShapes;
+  protected Set<PdfShape> shapesOfPdfPage;
+
+  // ==========================================================================
   
   /**
    * The predecessor of the current character (needed to resolve diacritics).
@@ -106,7 +129,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    *        The factory to create instances of PdfDocument.
    * @param pdfPageFactory
    *        The factory to create instances of PdfPage.
-   * @param characterSetFactory 
+   * @param characterSetFactory
    *        The factory to create instances of PdfCharacterSet.
    */
   @AssistedInject
@@ -126,7 +149,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    *        The factory to create instances of PdfDocument.
    * @param pdfPageFactory
    *        The factory to create instances of PdfPage.
-   * @param characterSetFactory 
+   * @param characterSetFactory
    *        The factory to create instances of PdfCharacterSet.
    * @param resolveLigatures
    *        The boolean flag to indicate whether ligatures should be resolved
@@ -196,32 +219,41 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   public void handlePdfFileStart(File pdf) {
     // Create a new PDF document.
     this.pdfDocument = this.pdfDocumentFactory.create(pdf);
+    
+    // Initialize the list for the elements of PDF document.
+    this.charactersOfPdfDocument = this.pdfCharacterSetFactory.create();
+    this.figuresOfPdfDocument = new HashSet<>();
+    this.shapesOfPdfDocument = new HashSet<>();
   }
 
   @Override
   public void handlePdfFileEnd(File pdf) {
-    // Nothing to do so far.
+    // Set the elements of PDF document.
+    this.pdfDocument.setCharacters(this.charactersOfPdfDocument);
+    this.pdfDocument.setFigures(this.figuresOfPdfDocument);
+    this.pdfDocument.setShapes(this.shapesOfPdfDocument);
   }
 
   @Override
   public void handlePdfPageStart(int pageNum) {
-    this.currentPdfPageCharacters = this.pdfCharacterSetFactory.create();
-    this.currentPdfPageFigures = new ArrayList<PdfFigure>();
-    this.currentPdfPageShapes = new ArrayList<PdfShape>();
+    // Initialize the list for the elements of the page. 
+    this.charactersOfPdfPage = this.pdfCharacterSetFactory.create();
+    this.figuresOfPdfPage = new HashSet<>();
+    this.shapesOfPdfPage = new HashSet<>();
   }
 
   @Override
   public void handlePdfPageEnd(int pageNum) {
     // Create a new PDF page.
     PdfPage page = this.pdfPageFactory.create(pageNum);
-    
+
     // Set the characters of the page.
-    page.setCharacters(this.currentPdfPageCharacters);
+    page.setCharacters(this.charactersOfPdfPage);
     // Set the figures of the page.
-    page.setFigures(this.currentPdfPageFigures);
+    page.setFigures(this.figuresOfPdfPage);
     // Set the shapes of the page.
-    page.setShapes(this.currentPdfPageShapes);
-    
+    page.setShapes(this.shapesOfPdfPage);
+
     // Add the page to the PDF document.
     this.pdfDocument.addPage(page);
   }
@@ -252,7 +284,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     }
 
     if (!PdfCharacterFilter.filterPdfCharacter(character)) {
-      this.currentPdfPageCharacters.add(character);
+      this.charactersOfPdfPage.add(character);
+      this.charactersOfPdfDocument.add(character);
     }
 
     this.prevPrevCharacter = this.prevCharacter;
@@ -262,14 +295,16 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   @Override
   public void handlePdfFigure(PdfFigure figure) {
     if (!PdfFigureFilter.filterPdfFigure(figure)) {
-      this.currentPdfPageFigures.add(figure);
+      this.figuresOfPdfPage.add(figure);
+      this.figuresOfPdfDocument.add(figure);
     }
   }
 
   @Override
   public void handlePdfShape(PdfShape shape) {
     if (!PdfShapeFilter.filterPdfShape(shape)) {
-      this.currentPdfPageShapes.add(shape);
+      this.shapesOfPdfPage.add(shape);
+      this.shapesOfPdfDocument.add(shape);
     }
   }
 }
