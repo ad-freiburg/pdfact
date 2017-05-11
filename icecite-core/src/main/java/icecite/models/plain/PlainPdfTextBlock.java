@@ -23,9 +23,9 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    * The text of this text block.
    */
   protected String text;
-  
+
   // ==========================================================================
-  
+
   /**
    * Creates a new text block.
    * 
@@ -36,7 +36,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public PlainPdfTextBlock(@Assisted PdfCharacterSet characters) {
     this.characters = characters;
   }
-    
+
   // ==========================================================================
 
   @Override
@@ -50,7 +50,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   }
 
   // ==========================================================================
-  
+
   @Override
   public String getText() {
     return this.text;
@@ -60,9 +60,9 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public void setText(String text) {
     this.text = text;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

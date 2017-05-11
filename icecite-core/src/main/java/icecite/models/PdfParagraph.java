@@ -3,7 +3,7 @@ package icecite.models;
 import java.util.List;
 
 /**
- * A text paragraph in a PDF document. 
+ * A text paragraph in a PDF document.
  * 
  * @author Claudius Korzen
  */

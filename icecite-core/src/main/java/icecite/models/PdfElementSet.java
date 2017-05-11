@@ -87,7 +87,7 @@ public interface PdfElementSet<T extends PdfElement> extends Set<T> {
      * @return An instance of {@link PdfElementSet}.
      */
     PdfElementSet<T> create();
-    
+
     /**
      * Creates a PdfElementSet.
      * 

@@ -85,9 +85,9 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   public void setText(String text) {
     this.text = text;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

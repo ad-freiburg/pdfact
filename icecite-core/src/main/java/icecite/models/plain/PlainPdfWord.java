@@ -60,9 +60,9 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   public void setCharacters(PdfCharacterSet characters) {
     this.characters = characters;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

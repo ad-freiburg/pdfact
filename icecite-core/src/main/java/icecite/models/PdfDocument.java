@@ -64,9 +64,9 @@ public interface PdfDocument extends HasCharacters, HasFigures, HasShapes {
    *        The file on which the PDF document is based on.
    */
   void setPath(Path path);
-  
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfDocument}.
    * 

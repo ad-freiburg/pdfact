@@ -106,12 +106,12 @@ public class DiacriticsTranslator {
     if (diacriticText == null || baseText == null) {
       return;
     }
-    
+
     // TODO
     if (DIACRITICS.containsKey(diacriticText.codePointAt(0))) {
       diacriticText = DIACRITICS.get(diacriticText.codePointAt(0));
     }
-    
+
     // Merge the diacritic with the base character.
     String mergedText = Normalizer
         .normalize(baseText + diacriticText, Normalizer.Form.NFC).trim();
@@ -166,7 +166,7 @@ public class DiacriticsTranslator {
     DIACRITICS.put(0x02D6, "\u031F");
     DIACRITICS.put(0x02D7, "\u0320");
     DIACRITICS.put(0x02B2, "\u0321");
-    DIACRITICS.put(0x02CC, "\u0329"); 
+    DIACRITICS.put(0x02CC, "\u0329");
     DIACRITICS.put(0x02B7, "\u032B");
     DIACRITICS.put(0x02CD, "\u0331");
     DIACRITICS.put(0x005F, "\u0332");

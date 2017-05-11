@@ -22,7 +22,7 @@ public class MinYComparator implements Comparator<HasBoundingBox> {
     if (box2 == null) {
       return -1;
     }
-    
+
     Rectangle rect1 = box1.getBoundingBox();
     Rectangle rect2 = box2.getBoundingBox();
     if (rect1 == null && rect2 == null) {
@@ -34,7 +34,7 @@ public class MinYComparator implements Comparator<HasBoundingBox> {
     if (rect2 == null) {
       return -1;
     }
-    
+
     return Float.compare(rect1.getMinY(), rect2.getMinY());
   }
 }

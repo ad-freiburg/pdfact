@@ -16,13 +16,12 @@ import icecite.models.PdfTextLine;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraph extends PlainPdfElement
-    implements PdfParagraph {  
+public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   /**
    * The characters of this page.
    */
   protected PdfCharacterSet characters;
-  
+
   /**
    * The text lines of this paragraph.
    */
@@ -45,9 +44,9 @@ public class PlainPdfParagraph extends PlainPdfElement
   public PlainPdfParagraph(@Assisted List<PdfTextLine> textLines) {
     this.textLines = textLines;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfCharacterSet getCharacters() {
     return this.characters;
@@ -57,7 +56,7 @@ public class PlainPdfParagraph extends PlainPdfElement
   public void setCharacters(PdfCharacterSet characters) {
     this.characters = characters;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -76,7 +75,7 @@ public class PlainPdfParagraph extends PlainPdfElement
   }
 
   // ==========================================================================
-  
+
   @Override
   public String getText() {
     return this.text;
@@ -86,9 +85,9 @@ public class PlainPdfParagraph extends PlainPdfElement
   public void setText(String text) {
     this.text = text;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

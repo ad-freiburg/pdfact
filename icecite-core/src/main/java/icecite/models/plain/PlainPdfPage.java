@@ -21,7 +21,7 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfPage implements PdfPage {  
+public class PlainPdfPage implements PdfPage {
   /**
    * The characters of this page.
    */
@@ -155,9 +155,9 @@ public class PlainPdfPage implements PdfPage {
   public void addParagraph(PdfParagraph paragraph) {
     this.paragraphs.add(paragraph);
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

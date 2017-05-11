@@ -127,8 +127,8 @@ public class FloatCounter extends TFloatIntHashMap {
   }
 
   // ==========================================================================
-  // Discount methods. 
-  
+  // Discount methods.
+
   /**
    * Discounts 1 from the counts of all given floats.
    * 
@@ -188,7 +188,7 @@ public class FloatCounter extends TFloatIntHashMap {
     put(f, Math.max(0, count - freq));
     this.isStatisticsOutdated = true;
   }
-  
+
   // ==========================================================================
 
   /**

@@ -8,7 +8,7 @@ package icecite.models;
 public interface PdfShape extends PdfElement, HasColor {
 
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfShape}.
    * 

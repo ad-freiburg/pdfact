@@ -76,9 +76,9 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    * All shapes of the current PDF document.
    */
   protected Set<PdfShape> shapesOfPdfDocument;
-  
+
   // ==========================================================================
-  
+
   /**
    * The characters of the current PDF page.
    */
@@ -95,7 +95,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   protected Set<PdfShape> shapesOfPdfPage;
 
   // ==========================================================================
-  
+
   /**
    * The predecessor of the current character (needed to resolve diacritics).
    */
@@ -219,7 +219,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   public void handlePdfFileStart(File pdf) {
     // Create a new PDF document.
     this.pdfDocument = this.pdfDocumentFactory.create(pdf);
-    
+
     // Initialize the list for the elements of PDF document.
     this.charactersOfPdfDocument = this.pdfCharacterSetFactory.create();
     this.figuresOfPdfDocument = new HashSet<>();
@@ -236,7 +236,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
   @Override
   public void handlePdfPageStart(int pageNum) {
-    // Initialize the list for the elements of the page. 
+    // Initialize the list for the elements of the page.
     this.charactersOfPdfPage = this.pdfCharacterSetFactory.create();
     this.figuresOfPdfPage = new HashSet<>();
     this.shapesOfPdfPage = new HashSet<>();

@@ -94,14 +94,14 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     // Tokenize the given page into text blocks.
     List<PdfTextBlock> blocks = tokenizeIntoTextBlocks(page);
     page.setTextBlocks(blocks);
-//    // Tokenize the text blocks into text lines.
-//    List<PdfTextLine> lines = tokenizeIntoTextLines(blocks);
-//    // Tokenize the text lines into words.
-//    for (PdfTextLine line : lines) {
-//      line.setWords(tokenizeIntoWords(line));
-//    }
-//    // Tokenize the text lines into paragraphs.
-//    page.setParagraphs(tokenizeIntoParagraphs(lines));
+    // // Tokenize the text blocks into text lines.
+    // List<PdfTextLine> lines = tokenizeIntoTextLines(blocks);
+    // // Tokenize the text lines into words.
+    // for (PdfTextLine line : lines) {
+    // line.setWords(tokenizeIntoWords(line));
+    // }
+    // // Tokenize the text lines into paragraphs.
+    // page.setParagraphs(tokenizeIntoParagraphs(lines));
   }
 
   /**
@@ -124,8 +124,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * 
    * @return The list of identified text lines from all text blocks.
    */
-  protected List<PdfTextLine> tokenizeIntoTextLines(
-      List<PdfTextBlock> blocks) {
+  protected List<PdfTextLine> tokenizeIntoTextLines(List<PdfTextBlock> blocks) {
     // The text lines of all blocks.
     List<PdfTextLine> textLines = new ArrayList<>();
 

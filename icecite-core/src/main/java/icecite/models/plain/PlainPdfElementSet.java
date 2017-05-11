@@ -130,7 +130,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   public boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
   public void clear() {
     super.clear();
@@ -168,10 +168,10 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
       this.minXCounter.discount(e.getBoundingBox().getMinX());
       this.minYCounter.discount(e.getBoundingBox().getMinY());
       this.maxXCounter.discount(e.getBoundingBox().getMaxX());
-      this.maxYCounter.discount(e.getBoundingBox().getMaxY()); 
+      this.maxYCounter.discount(e.getBoundingBox().getMaxY());
     }
   }
-  
+
   /**
    * Clears the counters of this set.
    */

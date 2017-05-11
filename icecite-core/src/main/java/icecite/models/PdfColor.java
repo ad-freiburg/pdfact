@@ -32,7 +32,7 @@ public interface PdfColor extends PdfResource {
    * @return The rgb value given as array of three float values in [0,1].
    */
   float[] getRGB();
-  
+
   /**
    * The factory to create instances of {@link PdfColor}.
    * 

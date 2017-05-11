@@ -8,7 +8,7 @@ package icecite.models;
 public interface PdfFont extends PdfResource {
 
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfFont}.
    * 

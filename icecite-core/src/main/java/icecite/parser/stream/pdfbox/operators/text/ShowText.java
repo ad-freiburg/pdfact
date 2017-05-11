@@ -127,7 +127,7 @@ public class ShowText extends OperatorProcessor {
         int code = font.readCode(in);
         int codeLength = before - in.available();
         String unicode = font.toUnicode(code);
-        
+
         // Word spacing shall be applied to every occurrence of the single-byte
         // character code 32 in a string when using a simple font or a
         // composite font that defines code 32 as a single-byte code.
@@ -138,8 +138,7 @@ public class ShowText extends OperatorProcessor {
 
         // Define the text rendering matrix (text space -> device space)
         Matrix ctm = state.getCurrentTransformationMatrix();
-        Matrix trm = params.multiply(this.engine.getTextMatrix())
-            .multiply(ctm);
+        Matrix trm = params.multiply(this.engine.getTextMatrix()).multiply(ctm);
 
         // get glyph's position vector if this is vertical text
         // changes to vertical text should be tested with PDFBOX-2294 and
@@ -167,8 +166,7 @@ public class ShowText extends OperatorProcessor {
           tx = 0;
           ty = w.getY() * fontSize + charSpacing + wordSpacing;
         } else {
-          tx = (w.getX() * fontSize + charSpacing + wordSpacing)
-              * horizScaling;
+          tx = (w.getX() * fontSize + charSpacing + wordSpacing) * horizScaling;
           ty = 0;
         }
 
@@ -330,8 +328,8 @@ public class ShowText extends OperatorProcessor {
    * @throws IOException
    *         if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeGlyphBoundingBox(int code, PDFont font,
-      Matrix trm) throws IOException {
+  protected Rectangle computeGlyphBoundingBox(int code, PDFont font, Matrix trm)
+      throws IOException {
     if (font instanceof PDType3Font) {
       // The font is a Type3 font. We have to compute the bounding box by
       // parsing the Type3 stream.

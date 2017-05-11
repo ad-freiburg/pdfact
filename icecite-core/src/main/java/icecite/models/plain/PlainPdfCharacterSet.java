@@ -114,7 +114,7 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
   public boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
   public void clear() {
     super.clear();
@@ -148,10 +148,10 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
       PdfCharacter c = (PdfCharacter) o;
       this.colorCounter.discount(c.getColor());
       this.fontCounter.discount(c.getFont());
-      this.fontsizeCounter.discount(c.getFontSize());  
+      this.fontsizeCounter.discount(c.getFontSize());
     }
   }
-  
+
   /**
    * Clears the counters of this set.
    */

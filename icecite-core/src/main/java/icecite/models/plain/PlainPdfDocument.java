@@ -37,17 +37,17 @@ public class PlainPdfDocument implements PdfDocument {
    * The characters of this PDF document.
    */
   protected PdfCharacterSet characters;
-  
+
   /**
    * The figures of this PDF document.
    */
   protected Set<PdfFigure> figures;
-  
+
   /**
    * The shapes of this PDF document.
    */
   protected Set<PdfShape> shapes;
-  
+
   // ==========================================================================
   // Constructors.
 
@@ -121,7 +121,7 @@ public class PlainPdfDocument implements PdfDocument {
   public void setPath(Path path) {
     this.path = path;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -133,7 +133,7 @@ public class PlainPdfDocument implements PdfDocument {
   public void setCharacters(PdfCharacterSet characters) {
     this.characters = characters;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -145,7 +145,7 @@ public class PlainPdfDocument implements PdfDocument {
   public void setFigures(Set<PdfFigure> figures) {
     this.figures = figures;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -159,7 +159,7 @@ public class PlainPdfDocument implements PdfDocument {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfFont getMostCommonFont() {
     return this.characters.getMostCommonFont();

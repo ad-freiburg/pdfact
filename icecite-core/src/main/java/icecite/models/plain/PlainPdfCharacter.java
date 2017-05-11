@@ -9,8 +9,7 @@ import icecite.models.PdfFont;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfCharacter extends PlainPdfElement
-    implements PdfCharacter {
+public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
    * The text of this character.
    */
@@ -70,7 +69,7 @@ public class PlainPdfCharacter extends PlainPdfElement
   public float getFontSize() {
     return this.fontsize;
   }
-  
+
   @Override
   public String toString() {
     return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";

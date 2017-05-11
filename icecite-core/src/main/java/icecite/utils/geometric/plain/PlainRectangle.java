@@ -355,8 +355,7 @@ public class PlainRectangle extends Rectangle {
    * @return True if the point is inside this rectangle.
    */
   public boolean contains(float x, float y) { // TODO: Use Geometric.
-    return x >= getMinX() && x <= getMaxX() && y >= getMinY()
-        && y <= getMaxY();
+    return x >= getMinX() && x <= getMaxX() && y >= getMinY() && y <= getMaxY();
   }
 
   @Override

@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextLine extends PdfElement, HasCharacters, HasText {  
+public interface PdfTextLine extends PdfElement, HasCharacters, HasText {
   /**
    * Returns the words of this text line.
    * 

@@ -122,8 +122,8 @@ public class IntCounter extends TIntIntHashMap {
   }
 
   // ==========================================================================
-  // Discount methods. 
-  
+  // Discount methods.
+
   /**
    * Discounts 1 from the counts of all given ints.
    * 
@@ -151,8 +151,8 @@ public class IntCounter extends TIntIntHashMap {
   }
 
   /**
-   * Discounts the associated frequency from the count of each int in the
-   * given counter.
+   * Discounts the associated frequency from the count of each int in the given
+   * counter.
    * 
    * @param counter
    *        The counter to process.
@@ -183,7 +183,7 @@ public class IntCounter extends TIntIntHashMap {
     put(i, Math.max(0, count - freq));
     this.isStatisticsOutdated = true;
   }
-  
+
   // ==========================================================================
 
   /**

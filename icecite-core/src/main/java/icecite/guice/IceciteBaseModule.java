@@ -65,6 +65,9 @@ import icecite.utils.geometric.plain.PlainLine;
 import icecite.utils.geometric.plain.PlainPoint;
 import icecite.utils.geometric.plain.PlainRectangle;
 
+// TODO: Find out how to dynamically update bindings (needed for the parser,
+// where PdfBox needs extra bindings.
+
 /**
  * A module that defines the basic Guice bindings for Icecite.
  * 
@@ -99,8 +102,8 @@ public class IceciteBaseModule extends AbstractModule {
     fc(PdfTextLine.class, PdfTextLineFactory.class, PlainPdfTextLine.class);
     fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
 
-//    fc(PdfElementSet.class, PdfElementSetFactory.class,
-//        PlainPdfElementSet.class);
+    // fc(PdfElementSet.class, PdfElementSetFactory.class,
+    // PlainPdfElementSet.class);
     fc(PdfCharacterSet.class, PdfCharacterSetFactory.class,
         PlainPdfCharacterSet.class);
 

@@ -14,32 +14,32 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
    * @return The most common font over all characters in this set.
    */
   PdfFont getMostCommonFont();
-    
+
   // ==========================================================================
-  
+
   /**
    * Returns the most common color over all characters in this set.
    * 
    * @return The most common color over all characters in this set.
    */
   PdfColor getMostCommonColor();
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the most common font size over all characters in this set.
    * 
    * @return The most common font size over all characters in this set.
    */
   float getMostCommonFontsize();
-  
+
   /**
    * Returns the average font size over all characters in this set.
    * 
    * @return The average font size over all characters in this set.
    */
   float getAverageFontsize();
-  
+
   /**
    * The factory to create instances of {@link PdfCharacterSet}.
    * 

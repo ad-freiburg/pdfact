@@ -113,8 +113,8 @@ public class ObjectCounter<K> extends TObjectIntHashMap<K> {
   }
 
   // ==========================================================================
-  // Discount methods. 
-  
+  // Discount methods.
+
   /**
    * Discounts 1 from the counts of all given objects.
    * 
@@ -174,7 +174,7 @@ public class ObjectCounter<K> extends TObjectIntHashMap<K> {
     put(object, Math.max(0, count - freq));
     this.isStatisticsOutdated = true;
   }
-    
+
   // ==========================================================================
 
   /**

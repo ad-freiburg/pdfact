@@ -6,9 +6,9 @@ package icecite.models;
  * @author Claudius Korzen
  */
 public interface PdfFigure extends PdfElement {
-  
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfFigure}.
    * 

@@ -62,9 +62,8 @@ public interface RectangleFactory {
    * 
    * @return An instance of Rectangle.
    */
-  Rectangle create(@Assisted("minX") double minX,
-      @Assisted("minY") double minY, @Assisted("maxX") double maxX,
-      @Assisted("maxY") double maxY);
+  Rectangle create(@Assisted("minX") double minX, @Assisted("minY") double minY,
+      @Assisted("maxX") double maxX, @Assisted("maxY") double maxY);
 
   /**
    * Creates a new Rectangle.
