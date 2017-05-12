@@ -30,17 +30,17 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
   /**
    * The counter for the colors of the characters.
    */
-  protected ObjectCounter<PdfColor> colorCounter;
+  protected ObjectCounter<PdfColor, PdfCharacter> colorCounter;
 
   /**
    * The counter for the fonts of the characters.
    */
-  protected ObjectCounter<PdfFont> fontCounter;
+  protected ObjectCounter<PdfFont, PdfCharacter> fontCounter;
 
   /**
    * The counter for the font sizes of the characters.
    */
-  protected FloatCounter fontsizeCounter;
+  protected FloatCounter<PdfCharacter> fontsizeCounter;
 
   // ==========================================================================
   // Constructors.
@@ -56,7 +56,7 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
     super(rectangleFactory);
     this.colorCounter = new ObjectCounter<>();
     this.fontCounter = new ObjectCounter<>();
-    this.fontsizeCounter = new FloatCounter();
+    this.fontsizeCounter = new FloatCounter<>();
   }
 
   /**
@@ -84,9 +84,9 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
    */
   protected void addToCounters(PdfCharacter e) {
     super.addToCounters(e);
-    this.colorCounter.add(e.getColor());
-    this.fontCounter.add(e.getFont());
-    this.fontsizeCounter.add(e.getFontSize());
+    this.colorCounter.add(e.getColor(), e);
+    this.fontCounter.add(e.getFont(), e);
+    this.fontsizeCounter.add(e.getFontSize(), e);
   }
 
   /**
@@ -99,9 +99,9 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
     super.removeFromCounters(o);
     if (o instanceof PdfCharacter) {
       PdfCharacter c = (PdfCharacter) o;
-      this.colorCounter.discount(c.getColor());
-      this.fontCounter.discount(c.getFont());
-      this.fontsizeCounter.discount(c.getFontSize());
+      this.colorCounter.remove(c.getColor(), c);
+      this.fontCounter.remove(c.getFont(), c);
+      this.fontsizeCounter.remove(c.getFontSize(), c);
     }
   }
 

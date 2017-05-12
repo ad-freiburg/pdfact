@@ -30,32 +30,32 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   /**
    * The counter for the heights of the elements.
    */
-  protected FloatCounter heightCounter;
+  protected FloatCounter<PdfElement> heightCounter;
 
   /**
    * The counter for the widths of the elements.
    */
-  protected FloatCounter widthCounter;
+  protected FloatCounter<PdfElement> widthCounter;
 
   /**
    * The counter for the minX values of the elements.
    */
-  protected FloatCounter minXCounter;
+  protected FloatCounter<PdfElement> minXCounter;
 
   /**
    * The counter for the minY values of the elements.
    */
-  protected FloatCounter minYCounter;
+  protected FloatCounter<PdfElement> minYCounter;
 
   /**
    * The counter for the maxX values of the elements.
    */
-  protected FloatCounter maxXCounter;
+  protected FloatCounter<PdfElement> maxXCounter;
 
   /**
    * The counter for the maxY values of the elements.
    */
-  protected FloatCounter maxYCounter;
+  protected FloatCounter<PdfElement> maxYCounter;
 
   /**
    * The factory to create instances of {@Rectangle}.
@@ -84,12 +84,12 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   @AssistedInject
   public PlainPdfElementSet(RectangleFactory rectangleFactory) {
     this.rectangleFactory = rectangleFactory;
-    this.heightCounter = new FloatCounter();
-    this.widthCounter = new FloatCounter();
-    this.minXCounter = new FloatCounter();
-    this.minYCounter = new FloatCounter();
-    this.maxXCounter = new FloatCounter();
-    this.maxYCounter = new FloatCounter();
+    this.heightCounter = new FloatCounter<>();
+    this.widthCounter = new FloatCounter<>();
+    this.minXCounter = new FloatCounter<>();
+    this.minYCounter = new FloatCounter<>();
+    this.maxXCounter = new FloatCounter<>();
+    this.maxYCounter = new FloatCounter<>();
   }
 
   /**
@@ -148,12 +148,12 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
    *        The element to add.
    */
   protected void addToCounters(T e) {
-    this.heightCounter.add(e.getBoundingBox().getHeight());
-    this.widthCounter.add(e.getBoundingBox().getWidth());
-    this.minXCounter.add(e.getBoundingBox().getMinX());
-    this.minYCounter.add(e.getBoundingBox().getMinY());
-    this.maxXCounter.add(e.getBoundingBox().getMaxX());
-    this.maxYCounter.add(e.getBoundingBox().getMaxY());
+    this.heightCounter.add(e.getBoundingBox().getHeight(), e);
+    this.widthCounter.add(e.getBoundingBox().getWidth(), e);
+    this.minXCounter.add(e.getBoundingBox().getMinX(), e);
+    this.minYCounter.add(e.getBoundingBox().getMinY(), e);
+    this.maxXCounter.add(e.getBoundingBox().getMaxX(), e);
+    this.maxYCounter.add(e.getBoundingBox().getMaxY(), e);
     this.isBoundingBoxOutdated = true;
   }
 
@@ -166,12 +166,12 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   protected void removeFromCounters(Object o) {
     if (o instanceof PdfElement) {
       PdfElement e = (PdfElement) o;
-      this.heightCounter.discount(e.getBoundingBox().getHeight());
-      this.widthCounter.discount(e.getBoundingBox().getWidth());
-      this.minXCounter.discount(e.getBoundingBox().getMinX());
-      this.minYCounter.discount(e.getBoundingBox().getMinY());
-      this.maxXCounter.discount(e.getBoundingBox().getMaxX());
-      this.maxYCounter.discount(e.getBoundingBox().getMaxY());
+      this.heightCounter.remove(e.getBoundingBox().getHeight(), e);
+      this.widthCounter.remove(e.getBoundingBox().getWidth(), e);
+      this.minXCounter.remove(e.getBoundingBox().getMinX(), e);
+      this.minYCounter.remove(e.getBoundingBox().getMinY(), e);
+      this.maxXCounter.remove(e.getBoundingBox().getMaxX(), e);
+      this.maxYCounter.remove(e.getBoundingBox().getMaxY(), e);
       this.isBoundingBoxOutdated = true;
     }
   }

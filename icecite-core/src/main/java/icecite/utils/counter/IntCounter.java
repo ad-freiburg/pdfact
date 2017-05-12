@@ -1,61 +1,68 @@
 package icecite.utils.counter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
- * A class that takes integer values and computes some statistics about them.
+ * A class that groups objects by associated integer values and computes some
+ * statistics.
+ * 
+ * @param <T>
+ *        The type of the objects to group.
  * 
  * @author Claudius Korzen
  */
-public class IntCounter extends TIntIntHashMap {
+public class IntCounter<T> extends TIntObjectHashMap<Set<T>> {
   /**
    * Flag that indicates whether the statistics need to be recomputed.
    */
-  protected boolean isStatisticsOutdated = true;
+  protected boolean isStatisticOutdated = true;
 
   /**
-   * The largest value in this set of integers.
+   * The largest int value.
    */
   protected int largestInt = -Integer.MAX_VALUE;
 
   /**
-   * The smallest value in the set of integers.
+   * The smallest int value.
    */
   protected int smallestInt = Integer.MAX_VALUE;
 
   /**
-   * (One of) the most frequent integer(s).
+   * (One of) the most frequent int values.
    */
   protected int mostFrequentInt = -Integer.MAX_VALUE;
 
   /**
-   * All most frequent integers.
+   * All most frequent int values.
    */
   protected int[] allMostFrequentInts;
 
   /**
-   * The frequency of the most frequent integer.
+   * The frequency of the most frequent int value.
    */
-  protected int mostFrequentIntCount = -Integer.MAX_VALUE;
+  protected int mostFrequentIntFrequency = -Integer.MAX_VALUE;
 
   /**
-   * (One of) the least frequent integer(s).
+   * (One of) the least frequent int values.
    */
   protected int leastFrequentInt = Integer.MAX_VALUE;
 
   /**
-   * All least frequent integers.
+   * All least frequent int values.
    */
   protected int[] allLeastFrequentInts;
 
   /**
-   * The frequency of the least frequent integer.
+   * The frequency of the least frequent int value.
    */
-  protected int leastFrequentIntCount = Integer.MAX_VALUE;
+  protected int leastFrequentIntFrequency = Integer.MAX_VALUE;
 
   /**
-   * The average value over all integers.
+   * The average value over all int values.
    */
   protected int averageValue = Integer.MAX_VALUE;
 
@@ -63,128 +70,79 @@ public class IntCounter extends TIntIntHashMap {
   // Add methods.
 
   /**
-   * Adds all given integers to this counter.
-   * 
-   * @param ints
-   *        The integers to add.
-   */
-  public void addAll(int[] ints) {
-    if (ints == null) {
-      return;
-    }
-
-    for (int i : ints) {
-      add(i);
-    }
-  }
-
-  /**
-   * Adds the given integer to this counter.
+   * Adds the given object with the given int value.
    * 
    * @param i
-   *        The integer to add.
+   *        The int value to associate with the given object.
+   * @param object
+   *        The object to group.
    */
-  public void add(int i) {
-    add(i, 1);
+  public void add(int i, T object) {
+    if (!containsKey(i)) {
+      put(i, new HashSet<>());
+    }
+
+    get(i).add(object);
+    this.isStatisticOutdated = true;
   }
 
   /**
-   * Adds the given IntCounter with its associated frequencies to this counter.
+   * Merges this IntCounter with another IntCounter.
    * 
    * @param counter
-   *        The counter to add.
+   *        The counter to merge with this counter.
    */
-  public void add(IntCounter counter) {
+  public void add(IntCounter<T> counter) {
     if (counter == null) {
       return;
     }
-
-    for (int i : counter.getInts()) {
-      add(i, counter.getFrequency(i));
+    if (counter.keys() == null) {
+      return;
     }
-  }
-
-  /**
-   * Adds the given int with the given frequency to this counter.
-   * 
-   * @param i
-   *        The int to add.
-   * @param freq
-   *        The frequency of the integer.
-   */
-  public void add(int i, int freq) {
-    int count = 0;
-    if (containsKey(i)) {
-      count = get(i);
+    for (int i : counter.keys()) {
+      for (T object : counter.get(i)) {
+        add(i, object);
+      }
     }
-    put(i, count + freq);
-    this.isStatisticsOutdated = true;
   }
 
   // ==========================================================================
-  // Discount methods.
+  // Remove methods.
 
   /**
-   * Discounts 1 from the counts of all given ints.
-   * 
-   * @param ints
-   *        The ints to process.
-   */
-  public void discount(int[] ints) {
-    if (ints == null) {
-      return;
-    }
-
-    for (int i : ints) {
-      remove(i);
-    }
-  }
-
-  /**
-   * Discounts 1 from the count of the given int.
+   * Removes the given object with the given int value from this counter.
    * 
    * @param i
-   *        The int to process.
+   *        The int value associated with the given object.
+   * @param object
+   *        The object to remove.
    */
-  public void discount(int i) {
-    discount(i, 1);
+  public void remove(int i, T object) {
+    this.isStatisticOutdated = containsKey(i) && get(i).remove(object);
   }
 
   /**
-   * Discounts the associated frequency from the count of each int in the given
-   * counter.
+   * Removes the given IntCounter from this counter.
    * 
    * @param counter
-   *        The counter to process.
+   *        The counter to remove.
    */
-  public void discount(IntCounter counter) {
+  public void remove(IntCounter<T> counter) {
     if (counter == null) {
       return;
     }
-
-    for (int i : counter.getInts()) {
-      discount(i, counter.getFrequency(i));
+    if (counter.keys() == null) {
+      return;
     }
-  }
-
-  /**
-   * Discounts the given frequency from the count of the given int.
-   * 
-   * @param i
-   *        The int to process.
-   * @param freq
-   *        The frequency of the int.
-   */
-  public void discount(int i, int freq) {
-    int count = 0;
-    if (containsKey(i)) {
-      count = get(i);
+    for (int i : counter.keys()) {
+      for (T object : counter.get(i)) {
+        remove(i, object);
+      }
     }
-    put(i, Math.max(0, count - freq));
-    this.isStatisticsOutdated = true;
   }
 
   // ==========================================================================
+  // Clear methods.
 
   /**
    * Resets (clears) this counter.
@@ -193,122 +151,193 @@ public class IntCounter extends TIntIntHashMap {
     clear();
     resetComputedValues();
   }
+  
+  /**
+   * Resets the internal counters.
+   */
+  protected void resetComputedValues() {
+    this.largestInt = -Integer.MAX_VALUE;
+    this.smallestInt = Integer.MAX_VALUE;
+    this.mostFrequentInt = -Integer.MAX_VALUE;
+    this.allMostFrequentInts = null;
+    this.mostFrequentIntFrequency = -Integer.MAX_VALUE;
+    this.leastFrequentInt = Integer.MAX_VALUE;
+    this.allLeastFrequentInts = null;
+    this.leastFrequentIntFrequency = Integer.MAX_VALUE;
+    this.averageValue = Integer.MAX_VALUE;
+  }
 
   // ==========================================================================
   // Getter methods.
 
   /**
-   * Returns all different integers (that are the keys) in this counter.
+   * Returns (one of) the most frequent int values.
    * 
-   * @return The array of integers.
-   */
-  public int[] getInts() {
-    return keys();
-  }
-
-  /**
-   * Returns the frequency of the given integer.
-   * 
-   * @param i
-   *        The int to process.
-   * @return The frequency of the given integer.
-   */
-  public int getFrequency(int i) {
-    return containsKey(i) ? get(i) : 0;
-  }
-
-  /**
-   * Returns the frequency of the most frequent integer.
-   * 
-   * @return The frequency of the most frequent integer.
-   */
-  public int getMostFrequentIntFrequency() {
-    if (this.isStatisticsOutdated) {
-      count();
-    }
-    return this.mostFrequentIntCount;
-  }
-
-  /**
-   * Returns (one of) the most frequent integer.
-   * 
-   * @return (One of) the most frequent integer.
+   * @return (One of) the most frequent int values.
    */
   public int getMostFrequentInt() {
-    if (this.isStatisticsOutdated) {
+    if (this.isStatisticOutdated) {
       count();
     }
     return this.mostFrequentInt;
   }
 
   /**
-   * Returns all most frequent integers in an array.
+   * Returns the frequency of the most frequent int value.
    * 
-   * @return All most frequent integers in an array.
+   * @return The frequency of the most frequent int value.
    */
-  public int[] getAllMostFrequentIntegers() {
-    if (this.isStatisticsOutdated) {
+  public int getMostFrequentIntFrequency() {
+    if (this.isStatisticOutdated) {
+      count();
+    }
+    return this.mostFrequentIntFrequency;
+  }
+
+  /**
+   * Returns the objects that are associated with the most frequent int in this
+   * counter.
+   * 
+   * @return The objects that are associated with the most frequent int in this
+   *         counter.
+   */
+  public Set<T> getObjectsWithMostFrequentInt() {
+    return get(getMostFrequentInt());
+  }
+
+  // ==========================================================================
+
+  /**
+   * Returns all most frequent int values.
+   * 
+   * @return All most frequent int values.
+   */
+  public int[] getAllMostFrequentInts() {
+    if (this.isStatisticOutdated) {
       count();
     }
     return this.allMostFrequentInts;
   }
 
   /**
-   * Returns the frequency of the least frequent integer.
+   * Returns all objects that are associated with all most frequent int values
+   * in this counter.
    * 
-   * @return The frequency of the least frequent integer.
+   * @return all objects that are associated with all most frequent int values
+   *         in this counter.
    */
-  public int getLeastFrequentIntegerFrequency() {
-    if (this.isStatisticsOutdated) {
-      count();
+  public Set<T> getAllObjectsWithMostFrequentInts() {
+    Set<T> allObjects = new HashSet<>();
+    for (int i : getAllMostFrequentInts()) {
+      allObjects.addAll(get(i));
     }
-    return this.leastFrequentIntCount;
+    return allObjects;
   }
 
+  // ==========================================================================
+
   /**
-   * Returns the least frequent integer.
+   * Returns the least frequent int value.
    * 
-   * @return The least frequent integer.
+   * @return The least frequent int value.
    */
-  public int getLeastFrequentInteger() {
-    if (this.isStatisticsOutdated) {
+  public int getLeastFrequentInt() {
+    if (this.isStatisticOutdated) {
       count();
     }
     return this.leastFrequentInt;
   }
 
   /**
-   * Returns all least frequent integers in an array.
+   * Returns the frequency of the least frequent int value.
    * 
-   * @return All least frequent integers in an array.
+   * @return The frequency of the least frequent int value.
    */
-  public int[] getAllLeastFrequentIntegers() {
-    if (this.isStatisticsOutdated) {
+  public int getLeastFrequentIntFrequency() {
+    if (this.isStatisticOutdated) {
+      count();
+    }
+    return this.leastFrequentIntFrequency;
+  }
+
+  /**
+   * Returns the objects that are associated with the least frequent int in
+   * this counter.
+   * 
+   * @return The objects that are associated with the least frequent int in
+   *         this counter.
+   */
+  public Set<T> getObjectsWithLeastFrequentInt() {
+    return get(getLeastFrequentInt());
+  }
+
+  // ==========================================================================
+
+  /**
+   * Returns all least frequent int values in this counter.
+   * 
+   * @return All least frequent int values in this counter.
+   */
+  public int[] getAllLeastFrequentInts() {
+    if (this.isStatisticOutdated) {
       count();
     }
     return this.allLeastFrequentInts;
   }
 
   /**
-   * Returns the average integer.
+   * Returns all objects that are associated with all least frequent int values
+   * in this counter.
    * 
-   * @return The average integer.
+   * @return all objects that are associated with all least frequent int values
+   *         in this counter.
+   */
+  public Set<T> getAllObjectsWithLeastFrequentInts() {
+    Set<T> allObjects = new HashSet<>();
+    for (int i : getAllMostFrequentInts()) {
+      allObjects.addAll(get(i));
+    }
+    return allObjects;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Returns the average value over all int values.
+   * 
+   * @return The average value over all int values.
    */
   public int getAverageValue() {
-    if (this.isStatisticsOutdated) {
+    if (this.isStatisticOutdated) {
       count();
     }
     return this.averageValue;
   }
+
+  // ==========================================================================
 
   /**
    * Returns the smallest int value.
    * 
    * @return The smallest int value.
    */
-  public int getSmallestInteger() {
+  public int getSmallestInt() {
+    if (this.isStatisticOutdated) {
+      count();
+    }
     return this.smallestInt;
   }
+
+  /**
+   * Returns the objects that are associated with the smallest int value.
+   * 
+   * @return The objects that are associated with the smallest int value.
+   */
+  public Set<T> getObjectsWithSmallestInt() {
+    return get(getSmallestInt());
+  }
+
+  // ==========================================================================
 
   /**
    * Returns the smallest int value that occurs at least 'freq'-times.
@@ -317,15 +346,30 @@ public class IntCounter extends TIntIntHashMap {
    *        The frequency.
    * @return The smallest int value that occurs at least 'freq'-times.
    */
-  public int getSmallestIntegerOccuringAtLeast(int freq) {
-    int smallestInteger = Integer.MAX_VALUE;
+  public int getSmallestIntOccuringAtLeast(int freq) {
+    int smallestInt = Integer.MAX_VALUE;
     for (int i : keys()) {
-      if (get(i) >= freq && i < smallestInteger) {
-        smallestInteger = i;
+      if (get(i).size() >= freq && i < smallestInt) {
+        smallestInt = i;
       }
     }
-    return smallestInteger;
+    return smallestInt;
   }
+
+  /**
+   * Returns the objects that are associated with the smallest int value that
+   * occurs at least 'freq'-times.
+   * 
+   * @param freq
+   *        The frequency.
+   * @return The objects that are associated with the smallest int value that
+   *         occurs at least 'freq'-times.
+   */
+  public Set<T> getObjectsWithSmallestIntOccuringAtLeast(int freq) {
+    return get(getSmallestIntOccuringAtLeast(freq));
+  }
+
+  // ==========================================================================
 
   /**
    * Returns the smallest int value that occurs at most 'freq'-times.
@@ -334,24 +378,53 @@ public class IntCounter extends TIntIntHashMap {
    *        The frequency.
    * @return The smallest int value that occurs at most 'freq'-times.
    */
-  public int getSmallestIntegerOccuringAtMost(int freq) {
-    int smallestInteger = Integer.MAX_VALUE;
+  public int getSmallestIntOccuringAtMost(int freq) {
+    int smallestInt = Integer.MAX_VALUE;
     for (int i : keys()) {
-      if (get(i) <= freq && i < smallestInteger) {
-        smallestInteger = i;
+      if (get(i).size() <= freq && i < smallestInt) {
+        smallestInt = i;
       }
     }
-    return smallestInteger;
+    return smallestInt;
   }
+
+  /**
+   * Returns the objects that are associated with the smallest int value that
+   * occurs at most 'freq'-times.
+   * 
+   * @param freq
+   *        The frequency.
+   * @return The objects that are associated with the smallest int value that
+   *         occurs at most 'freq'-times.
+   */
+  public Set<T> getObjectsWithSmallestIntOccuringAtMost(int freq) {
+    return get(getSmallestIntOccuringAtMost(freq));
+  }
+
+  // ==========================================================================
 
   /**
    * Returns the largest int value.
    * 
    * @return The largest int value.
    */
-  public int getLargestInteger() {
+  public int getLargestInt() {
+    if (this.isStatisticOutdated) {
+      count();
+    }
     return this.largestInt;
   }
+
+  /**
+   * Returns the objects that are associated with the largest int value.
+   * 
+   * @return The objects that are associated with the largest int value.
+   */
+  public Set<T> getObjectWithLargestInt() {
+    return get(getLargestInt());
+  }
+
+  // ==========================================================================
 
   /**
    * Returns the largest int value that occurs at most 'freq'-times.
@@ -360,15 +433,30 @@ public class IntCounter extends TIntIntHashMap {
    *        The frequency.
    * @return The largest int value that occurs at most 'freq'-times.
    */
-  public int getLargestIntegerOccuringAtMost(int freq) {
-    int largestInteger = -Integer.MAX_VALUE;
+  public int getLargestIntOccuringAtMost(int freq) {
+    int largestInt = -Integer.MAX_VALUE;
     for (int i : keys()) {
-      if (get(i) <= freq && i > largestInteger) {
-        largestInteger = i;
+      if (get(i).size() <= freq && i > largestInt) {
+        largestInt = i;
       }
     }
-    return largestInteger;
+    return largestInt;
   }
+
+  /**
+   * Returns the objects that are associated with the largest int value that
+   * occurs at most 'freq'-times.
+   * 
+   * @param freq
+   *        The frequency.
+   * @return The objects that are associated with the largest int value that
+   *         occurs at most 'freq'-times.
+   */
+  public Set<T> getObjectsWithLargestIntOccuringAtMost(int freq) {
+    return get(getLargestIntOccuringAtMost(freq));
+  }
+
+  // ==========================================================================
 
   /**
    * Returns the largest int value that occurs at least 'freq'-times.
@@ -377,18 +465,33 @@ public class IntCounter extends TIntIntHashMap {
    *        The frequency.
    * @return The largest int value that occurs at least 'freq'-times.
    */
-  public int getLargestIntegerOccuringAtLeast(int freq) {
-    int largestInteger = -Integer.MAX_VALUE;
+  public int getLargestIntOccuringAtLeast(int freq) {
+    int largestInt = -Integer.MAX_VALUE;
     for (int i : keys()) {
-      if (get(i) >= freq && i > largestInteger) {
-        largestInteger = i;
+      if (get(i).size() >= freq && i > largestInt) {
+        largestInt = i;
       }
     }
-    return largestInteger;
+    return largestInt;
   }
 
   /**
-   * Counts the frequencies of the integers.
+   * Returns the objects that are associated with the largest int value that
+   * occurs at least 'freq'-times.
+   * 
+   * @param freq
+   *        The frequency.
+   * @return The objects that are associated with the largest int value that
+   *         occurs at least 'freq'-times.
+   */
+  public Set<T> getObjectsWithLargestIntOccuringAtLeast(int freq) {
+    return get(getLargestIntOccuringAtLeast(freq));
+  }
+
+  // ==========================================================================
+
+  /**
+   * Counts the frequencies of the ints.
    */
   protected void count() {
     resetComputedValues();
@@ -399,12 +502,12 @@ public class IntCounter extends TIntIntHashMap {
     TIntArrayList allLeastFrequentIntegers = new TIntArrayList();
 
     for (int f : keys()) {
-      int count = get(f);
+      int count = get(f).size();
 
       if (count == 0) {
         continue;
       }
-      
+
       if (f > this.largestInt) {
         this.largestInt = f;
       }
@@ -413,25 +516,25 @@ public class IntCounter extends TIntIntHashMap {
         this.smallestInt = f;
       }
 
-      if (count > this.mostFrequentIntCount) {
+      if (count > this.mostFrequentIntFrequency) {
         this.mostFrequentInt = f;
-        this.mostFrequentIntCount = count;
+        this.mostFrequentIntFrequency = count;
         allMostFrequentIntegers.clear();
         allMostFrequentIntegers.add(f);
       }
 
-      if (count == this.mostFrequentIntCount) {
+      if (count == this.mostFrequentIntFrequency) {
         allMostFrequentIntegers.add(f);
       }
 
-      if (count < this.mostFrequentIntCount) {
+      if (count < this.mostFrequentIntFrequency) {
         this.leastFrequentInt = f;
-        this.leastFrequentIntCount = count;
+        this.leastFrequentIntFrequency = count;
         allLeastFrequentIntegers.clear();
         allMostFrequentIntegers.add(f);
       }
 
-      if (count == this.leastFrequentIntCount) {
+      if (count == this.leastFrequentIntFrequency) {
         allLeastFrequentIntegers.add(f);
       }
 
@@ -443,21 +546,18 @@ public class IntCounter extends TIntIntHashMap {
     this.allMostFrequentInts = allMostFrequentIntegers.toArray();
     this.allLeastFrequentInts = allLeastFrequentIntegers.toArray();
 
-    this.isStatisticsOutdated = false;
+    this.isStatisticOutdated = false;
   }
 
-  /**
-   * Resets the internal counters.
-   */
-  protected void resetComputedValues() {
-    this.largestInt = -Integer.MAX_VALUE;
-    this.smallestInt = Integer.MAX_VALUE;
-    this.mostFrequentInt = -Integer.MAX_VALUE;
-    this.allMostFrequentInts = null;
-    this.mostFrequentIntCount = -Integer.MAX_VALUE;
-    this.leastFrequentInt = Integer.MAX_VALUE;
-    this.allLeastFrequentInts = null;
-    this.leastFrequentIntCount = Integer.MAX_VALUE;
-    this.averageValue = Integer.MAX_VALUE;
+  // ==========================================================================
+  // Util methods.
+
+  @Override
+  public Set<T> get(int i) {
+    if (containsKey(i)) {
+      return super.get(i);
+    }
+    // Return an empty list if this counter does not contain the given int.
+    return new HashSet<>();
   }
 }
