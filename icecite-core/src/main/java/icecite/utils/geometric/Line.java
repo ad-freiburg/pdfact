@@ -104,6 +104,11 @@ public abstract class Line extends Geometric {
    * @author Claudius Korzen
    */
   public interface LineFactory {
-
+    /**
+     * Creates a new line.
+     * 
+     * @return An instance of {@PdfLine}.
+     */
+    Line create();
   }
 }

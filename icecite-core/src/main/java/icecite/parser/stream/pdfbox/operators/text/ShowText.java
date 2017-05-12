@@ -334,11 +334,10 @@ public class ShowText extends OperatorProcessor {
       // The font is a Type3 font. We have to compute the bounding box by
       // parsing the Type3 stream.
       return computeType3GlyphBoundingBox(code, font, trm);
-    } else {
-      // The font is *not* a Type3 font. We can compute the bounding box on the
-      // "default" way.
-      return computeNonType3GlyphBoundingBox(code, font, trm);
     }
+    // The font is *not* a Type3 font. We can compute the bounding box on the
+    // "default" way.
+    return computeNonType3GlyphBoundingBox(code, font, trm);
   }
 
   /**

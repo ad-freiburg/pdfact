@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterSet;
 import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
+import icecite.models.PdfDocument;
+import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.tokenizer.xycut.XYCut;
@@ -45,34 +47,38 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   // ==========================================================================
 
   @Override
-  public List<PdfTextBlock> tokenize(PdfCharacterSet characters) {
-    return cut(characters);
+  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
+    return cut(pdf, page, characters);
   }
 
   // ==========================================================================
 
   @Override
-  public float getVerticalLaneWidth(PdfCharacterSet chars) {
-    return 1f;
-    // return 2f * chars.getMostCommonWidth();
+  public float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet chars) {
+    return 1;
+    // return Math.max(pdf.getMostCommonWidth(), chars.getMostCommonWidth());
   }
 
   @Override
-  public boolean isValidVerticalLane(PdfCharacterSet overlapping) {
-    return overlapping.isEmpty();
+  public boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right) {
+    return overlap.isEmpty();
   }
 
   // ==========================================================================
 
   @Override
-  public float getHorizontalLaneHeight(PdfCharacterSet chars) {
-    return 10f;
-    // return 2f * chars.getMostCommonHeight();
+  public float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet chars) {
+    return Math.max(pdf.getMostCommonHeight(), chars.getMostCommonHeight());
   }
 
   @Override
-  public boolean isValidHorizontalLane(PdfCharacterSet overlapping) {
-    return overlapping.isEmpty();
+  public boolean isValidHorizontalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet upper, PdfCharacterSet overlap, PdfCharacterSet lower) {
+    return overlap.isEmpty();
   }
 
   // ==========================================================================

@@ -312,6 +312,9 @@ public class FloatCounter extends TFloatIntHashMap {
    * @return The smallest float value.
    */
   public float getSmallestFloat() {
+    if (this.isStatisticsOutdated) {
+      count();
+    }
     return this.smallestFloat;
   }
 
@@ -355,6 +358,9 @@ public class FloatCounter extends TFloatIntHashMap {
    * @return The largest float value.
    */
   public float getLargestFloat() {
+    if (this.isStatisticsOutdated) {
+      count();
+    }
     return this.largestFloat;
   }
 
@@ -406,6 +412,10 @@ public class FloatCounter extends TFloatIntHashMap {
     for (float f : keys()) {
       int count = get(f);
 
+      if (count == 0) {
+        continue;
+      }
+      
       if (f > this.largestFloat) {
         this.largestFloat = f;
       }

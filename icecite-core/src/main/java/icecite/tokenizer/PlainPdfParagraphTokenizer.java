@@ -2,6 +2,8 @@ package icecite.tokenizer;
 
 import java.util.List;
 
+import icecite.models.PdfDocument;
+import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfTextLine;
 
@@ -13,7 +15,8 @@ import icecite.models.PdfTextLine;
 public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
   @Override
-  public List<PdfParagraph> tokenize(List<PdfTextLine> textLines) {
+  public List<PdfParagraph> tokenize(PdfDocument pdf, PdfPage page,
+      List<PdfTextLine> textLines) {
     // TODO Auto-generated method stub
     return null;
   }

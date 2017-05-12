@@ -289,6 +289,10 @@ public class ObjectCounter<K> extends TObjectIntHashMap<K> {
     for (K object : keySet()) {
       int count = get(object);
 
+      if (count == 0) {
+        continue;
+      }
+      
       if (count > this.mostFrequentObjectCount) {
         this.mostFrequentObject = object;
         this.mostFrequentObjectCount = get(object);

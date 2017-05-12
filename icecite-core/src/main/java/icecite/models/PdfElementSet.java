@@ -11,7 +11,8 @@ import java.util.Set;
  * 
  * @author Claudius Korzen
  */
-public interface PdfElementSet<T extends PdfElement> extends Set<T> {
+public interface PdfElementSet<T extends PdfElement>
+    extends Set<T>, HasBoundingBox {
   /**
    * Returns the most common height over all PDF elements in this set.
    * 

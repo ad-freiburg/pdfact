@@ -16,5 +16,5 @@ public interface PdfTextTokenizer {
    * @param pdf
    *        The PDF document to process.
    */
-  void tokenizeText(PdfDocument pdf);
+  void tokenizePdfDocument(PdfDocument pdf);
 }

@@ -3,6 +3,8 @@ package icecite.tokenizer;
 import java.util.List;
 
 import icecite.models.PdfCharacterSet;
+import icecite.models.PdfDocument;
+import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 
 /**
@@ -14,9 +16,14 @@ public interface PdfTextBlockTokenizer {
   /**
    * Tokenizes the given list of characters into text blocks.
    * 
-   * @param characters
+   * @param pdf
+   *        The PDF document to which the given text lines belong to.
+   * @param page
+   *        The page in which the text lines are located.
+   * @param chars
    *        The characters to tokenize.
-   * @return The list of identified text blocks.
+   * @return The list of identified paragraphs.
    */
-  List<PdfTextBlock> tokenize(PdfCharacterSet characters);
+  List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet chars);
 }

@@ -9,6 +9,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfElement;
 import icecite.models.PdfElementSet;
 import icecite.utils.counter.FloatCounter;
+import icecite.utils.geometric.Rectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * An implementation of {@link PdfElementSet} based on a HashSet.
@@ -55,14 +57,33 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
    */
   protected FloatCounter maxYCounter;
 
+  /**
+   * The factory to create instances of {@Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  /**
+   * A flag to indicate whether the bounding box is outdated.
+   */
+  protected boolean isBoundingBoxOutdated;
+
+  /**
+   * The bounding box around the elements in this set.
+   */
+  protected Rectangle boundingBox;
+  
   // ==========================================================================
   // Constructors.
 
   /**
    * Creates a new set of PDF elements.
+   * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@Rectangle}.
    */
   @AssistedInject
-  public PlainPdfElementSet() {
+  public PlainPdfElementSet(RectangleFactory rectangleFactory) {
+    this.rectangleFactory = rectangleFactory;
     this.heightCounter = new FloatCounter();
     this.widthCounter = new FloatCounter();
     this.minXCounter = new FloatCounter();
@@ -74,12 +95,15 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   /**
    * Creates a new set of PDF elements.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@Rectangle}.
    * @param elements
    *        The elements of this set.
    */
   @AssistedInject
-  public PlainPdfElementSet(@Assisted Collection<T> elements) {
-    this();
+  public PlainPdfElementSet(RectangleFactory rectangleFactory,
+      @Assisted Collection<T> elements) {
+    this(rectangleFactory);
     addAll(elements);
   }
 
@@ -96,32 +120,10 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   }
 
   @Override
-  public boolean addAll(Collection<? extends T> c) {
-    boolean added = super.addAll(c);
-    if (added) {
-      for (T e : c) {
-        addToCounters(e);
-      }
-    }
-    return added;
-  }
-
-  @Override
   public boolean remove(Object o) {
     boolean removed = super.remove(o);
     if (removed) {
       removeFromCounters(o);
-    }
-    return removed;
-  }
-
-  @Override
-  public boolean removeAll(Collection<?> c) {
-    boolean removed = super.removeAll(c);
-    if (removed) {
-      for (Object o : c) {
-        removeFromCounters(o);
-      }
     }
     return removed;
   }
@@ -152,6 +154,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
     this.minYCounter.add(e.getBoundingBox().getMinY());
     this.maxXCounter.add(e.getBoundingBox().getMaxX());
     this.maxYCounter.add(e.getBoundingBox().getMaxY());
+    this.isBoundingBoxOutdated = true;
   }
 
   /**
@@ -169,6 +172,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
       this.minYCounter.discount(e.getBoundingBox().getMinY());
       this.maxXCounter.discount(e.getBoundingBox().getMaxX());
       this.maxYCounter.discount(e.getBoundingBox().getMaxY());
+      this.isBoundingBoxOutdated = true;
     }
   }
 
@@ -182,6 +186,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
     this.minYCounter.clear();
     this.maxXCounter.clear();
     this.maxYCounter.clear();
+    this.isBoundingBoxOutdated = true;
   }
 
   // ==========================================================================
@@ -225,5 +230,24 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   @Override
   public float getMostCommonMaxY() {
     return this.maxYCounter.getMostFrequentFloat();
+  }
+
+  @Override
+  public Rectangle getBoundingBox() {
+    if (this.boundingBox == null || this.isBoundingBoxOutdated) {
+      this.boundingBox = this.rectangleFactory.create();
+      this.boundingBox.setMinX(this.minXCounter.getSmallestFloat());
+      this.boundingBox.setMinY(this.minYCounter.getSmallestFloat());
+      this.boundingBox.setMaxX(this.maxXCounter.getLargestFloat());
+      this.boundingBox.setMaxY(this.maxYCounter.getLargestFloat());
+      this.isBoundingBoxOutdated = false;
+    }
+    return this.boundingBox;
+  }
+
+  @Override
+  public void setBoundingBox(Rectangle boundingBox) {
+    this.boundingBox = boundingBox;
+    this.isBoundingBoxOutdated = false;
   }
 }

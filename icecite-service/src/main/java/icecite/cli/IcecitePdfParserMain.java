@@ -96,7 +96,7 @@ public class IcecitePdfParserMain {
     PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
 
     PdfDocument document = pdfParser.parsePdf(inputPdf);
-    tokenizer.tokenizeText(document);
+    tokenizer.tokenizePdfDocument(document);
 
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {

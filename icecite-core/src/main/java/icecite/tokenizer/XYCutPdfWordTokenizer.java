@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterSet;
+import icecite.models.PdfDocument;
+import icecite.models.PdfPage;
 import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
@@ -44,7 +46,8 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public List<PdfWord> tokenize(PdfCharacterSet characters) {
+  public List<PdfWord> tokenize(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -52,26 +55,30 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public float getVerticalLaneWidth(PdfCharacterSet characters) {
+  public float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public boolean isValidVerticalLane(PdfCharacterSet overlapping) {
+  public boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right) {
     return false;
   }
 
   // ==========================================================================
 
   @Override
-  public float getHorizontalLaneHeight(PdfCharacterSet characters) {
+  public float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public boolean isValidHorizontalLane(PdfCharacterSet overlapping) {
+  public boolean isValidHorizontalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet upper, PdfCharacterSet overlap, PdfCharacterSet lower) {
     // TODO Auto-generated method stub
     return false;
   }

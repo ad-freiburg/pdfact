@@ -401,6 +401,10 @@ public class IntCounter extends TIntIntHashMap {
     for (int f : keys()) {
       int count = get(f);
 
+      if (count == 0) {
+        continue;
+      }
+      
       if (f > this.largestInt) {
         this.largestInt = f;
       }

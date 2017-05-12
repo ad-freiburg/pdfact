@@ -201,15 +201,13 @@ public class PathUtils {
         Path absolutePath = pathEntry.getValue();
         if (!dir2Paths.containsKey(relativePath)) {
           return false;
-        } else {
-          if (!contentEquals(absolutePath, dir2Paths.get(relativePath))) {
-            return false;
-          }
+        }
+        if (!contentEquals(absolutePath, dir2Paths.get(relativePath))) {
+          return false;
         }
       }
       return true;
     }
-
     return false;
   }
 

@@ -12,6 +12,7 @@ import icecite.models.PdfElementSet;
 import icecite.models.PdfFont;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * An implementation of {@link PdfElementSet} based on
@@ -46,10 +47,13 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
 
   /**
    * Creates a new set of characters.
+   * 
+   * @param rectangleFactory
+   *        The factory to create instance of {@Rectangle}.
    */
   @AssistedInject
-  public PlainPdfCharacterSet() {
-    super();
+  public PlainPdfCharacterSet(RectangleFactory rectangleFactory) {
+    super(rectangleFactory);
     this.colorCounter = new ObjectCounter<>();
     this.fontCounter = new ObjectCounter<>();
     this.fontsizeCounter = new FloatCounter();
@@ -58,67 +62,16 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
   /**
    * Creates a new set of characters.
    * 
+   * @param rectangleFactory
+   *        The factory to create instance of {@Rectangle}.
    * @param characters
    *        The characters of the set to create.
    */
   @AssistedInject
-  public PlainPdfCharacterSet(@Assisted Collection<PdfCharacter> characters) {
-    this();
+  public PlainPdfCharacterSet(RectangleFactory rectangleFactory,
+      @Assisted Collection<PdfCharacter> characters) {
+    this(rectangleFactory);
     addAll(characters);
-  }
-
-  // ==========================================================================
-  // Override all methods that changes this set.
-
-  @Override
-  public boolean add(PdfCharacter e) {
-    boolean added = super.add(e);
-    if (added) {
-      addToCounters(e);
-    }
-    return added;
-  }
-
-  @Override
-  public boolean addAll(Collection<? extends PdfCharacter> c) {
-    boolean added = super.addAll(c);
-    if (added) {
-      for (PdfCharacter e : c) {
-        addToCounters(e);
-      }
-    }
-    return added;
-  }
-
-  @Override
-  public boolean remove(Object o) {
-    boolean removed = super.remove(o);
-    if (removed) {
-      removeFromCounters(o);
-    }
-    return removed;
-  }
-
-  @Override
-  public boolean removeAll(Collection<?> c) {
-    boolean removed = super.removeAll(c);
-    if (removed) {
-      for (Object o : c) {
-        removeFromCounters(o);
-      }
-    }
-    return removed;
-  }
-
-  @Override
-  public boolean retainAll(Collection<?> c) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    super.clear();
-    clearCounters();
   }
 
   // ==========================================================================

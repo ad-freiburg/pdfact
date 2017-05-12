@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterSet;
+import icecite.models.PdfDocument;
+import icecite.models.PdfPage;
 import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
@@ -44,20 +46,23 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   // ==========================================================================
 
   @Override
-  public List<PdfTextLine> tokenize(PdfCharacterSet characters) {
-    return cut(characters);
+  public List<PdfTextLine> tokenize(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
+    return cut(pdf, page, characters);
   }
 
   // ==========================================================================
 
   @Override
-  public float getVerticalLaneWidth(PdfCharacterSet characters) {
+  public float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
     // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
-  public float getHorizontalLaneHeight(PdfCharacterSet characters) {
+  public float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet characters) {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -65,13 +70,15 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   // ==========================================================================
 
   @Override
-  public boolean isValidVerticalLane(PdfCharacterSet overlapping) {
+  public boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right) {
     // TODO Auto-generated method stub
     return false;
   }
 
   @Override
-  public boolean isValidHorizontalLane(PdfCharacterSet overlapping) {
+  public boolean isValidHorizontalLane(PdfDocument pdf, PdfPage page,
+      PdfCharacterSet upper, PdfCharacterSet overlap, PdfCharacterSet lower) {
     // TODO Auto-generated method stub
     return false;
   }
