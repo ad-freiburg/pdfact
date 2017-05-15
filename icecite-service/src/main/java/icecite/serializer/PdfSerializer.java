@@ -2,8 +2,10 @@ package icecite.serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import icecite.models.PdfDocument;
+import icecite.models.PdfElement;
 
 /**
  * A serializer to serialize a PDF document in a specific format.
@@ -24,9 +26,18 @@ public interface PdfSerializer {
   void serialize(PdfDocument pdf, OutputStream os) throws IOException;
 
   /**
-   * Returns the output format of this serializer.
-   * 
-   * @return the output format of this serializer
+   * Serializes the given elements of the given PDF document to the given
+   * stream.
+   *
+   * @param pdf
+   *        the PDF document to process.
+   * @param elementTypes
+   *        the types of PDF elements to visualize.
+   * @param os
+   *        the stream to write to.
+   * @throws IOException
+   *         if something went wrong while visualizing.
    */
-  String getOutputFormat();
+  void serialize(PdfDocument pdf, Set<Class<? extends PdfElement>> elementTypes,
+      OutputStream os) throws IOException;
 }

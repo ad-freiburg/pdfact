@@ -14,7 +14,7 @@ import icecite.utils.geometric.Rectangle;
  *
  * @author Claudius Korzen
  */
-public interface PdfDrawer {
+public interface PdfDrawer {  
   /**
    * Draws the given line on the given page.
    * 

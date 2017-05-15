@@ -1,6 +1,7 @@
 package icecite.models.plain;
 
 import icecite.models.PdfElement;
+import icecite.models.PdfPage;
 import icecite.utils.geometric.Rectangle;
 
 /**
@@ -14,6 +15,11 @@ public class PlainPdfElement implements PdfElement {
    */
   protected Rectangle boundingBox;
 
+  /**
+   * The page in which this element is included.
+   */
+  protected PdfPage page;
+  
   // ==========================================================================
 
   @Override
@@ -25,4 +31,16 @@ public class PlainPdfElement implements PdfElement {
   public void setBoundingBox(Rectangle boundingBox) {
     this.boundingBox = boundingBox;
   }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfPage getPage() {
+    return this.page;
+  }
+
+  @Override
+  public void setPage(PdfPage page) {
+    this.page = page;
+  }  
 }

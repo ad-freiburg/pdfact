@@ -93,10 +93,11 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   // ==========================================================================
 
   @Override
-  public PdfTextBlock pack(PdfCharacterSet characters) {
+  public PdfTextBlock pack(PdfPage page, PdfCharacterSet characters) {
     // FIXME
     PdfTextBlock block = this.textBlockFactory.create(characters);
     block.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
+    block.setPage(page);
     return block;
   }
 

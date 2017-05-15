@@ -2,8 +2,10 @@ package icecite.visualizer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 
 import icecite.models.PdfDocument;
+import icecite.models.PdfElement;
 
 /**
  * The interface for all concrete implementations to visualize the features of
@@ -24,15 +26,19 @@ public interface PdfVisualizer {
    */
   void visualize(PdfDocument pdf, OutputStream stream) throws IOException;
 
-  // /**
-  // * Visualizes selected elements of the given PDF document to the given
-  // stream.
-  // *
-  // * @param pdf the PDF document to process.
-  // * @param filters the elements to visualize.
-  // * @param stream the stream to write to.
-  // * @throws IOException if something went wrong while visualizing.
-  // */
-  // public void visualize(PdfDocument pdf, List<Class<PdfElement>> filters,
-  // OutputStream stream) throws IOException;
+  /**
+   * Visualizes the given elements of the given PDF document to the given
+   * stream.
+   *
+   * @param pdf
+   *        the PDF document to process.
+   * @param elementTypes
+   *        the types of PDF elements to visualize.
+   * @param stream
+   *        the stream to write to.
+   * @throws IOException
+   *         if something went wrong while visualizing.
+   */
+  void visualize(PdfDocument pdf, Set<Class<? extends PdfElement>> elementTypes,
+      OutputStream stream) throws IOException;
 }

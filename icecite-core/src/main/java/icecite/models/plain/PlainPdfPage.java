@@ -13,6 +13,7 @@ import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextLine;
 
 /**
  * A plain implementation of {@link PdfPage}.
@@ -41,15 +42,20 @@ public class PlainPdfPage implements PdfPage {
   protected int pageNumber;
 
   /**
-   * The identified text blocks of this page.
-   */
-  protected List<PdfTextBlock> textBlocks;
-
-  /**
    * The identified paragraphs of this page.
    */
   protected List<PdfParagraph> paragraphs;
 
+  /**
+   * The identified text blocks of this page.
+   */
+  protected List<PdfTextBlock> textBlocks;
+  
+  /**
+   * The identified text lines of this page.
+   */
+  protected List<PdfTextLine> textLines;
+  
   // ==========================================================================
   // Constructors.
 
@@ -60,6 +66,7 @@ public class PlainPdfPage implements PdfPage {
   public PlainPdfPage() {
     this.paragraphs = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
+    this.textLines = new ArrayList<>();
   }
 
   /**
@@ -134,10 +141,15 @@ public class PlainPdfPage implements PdfPage {
   }
 
   @Override
-  public void addTextBlock(PdfTextBlock block) {
-    this.textBlocks.add(block);
+  public List<PdfTextLine> getTextLines() {
+    return this.textLines;
   }
 
+  @Override
+  public void setTextLines(List<PdfTextLine> lines) {
+    this.textLines = lines;
+  }
+  
   // ==========================================================================
 
   @Override

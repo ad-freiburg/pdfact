@@ -59,6 +59,11 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   protected PdfDocument pdfDocument;
 
   /**
+   * The current page.
+   */
+  protected PdfPage currentPage;
+  
+  /**
    * All characters of the current PDF document.
    */
   protected PdfCharacterSet charactersOfPdfDocument;
@@ -228,6 +233,9 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
   @Override
   public void handlePdfPageStart(int pageNum) {
+    // Create a new PDF page.
+    this.currentPage = this.pdfPageFactory.create(pageNum);
+    
     // Initialize the list for the elements of the page.
     this.charactersOfPdfPage = this.pdfCharacterSetFactory.create();
     this.figuresOfPdfPage = new HashSet<>();
@@ -236,18 +244,15 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
   @Override
   public void handlePdfPageEnd(int pageNum) {
-    // Create a new PDF page.
-    PdfPage page = this.pdfPageFactory.create(pageNum);
-
     // Set the characters of the page.
-    page.setCharacters(this.charactersOfPdfPage);
+    this.currentPage.setCharacters(this.charactersOfPdfPage);
     // Set the figures of the page.
-    page.setFigures(this.figuresOfPdfPage);
+    this.currentPage.setFigures(this.figuresOfPdfPage);
     // Set the shapes of the page.
-    page.setShapes(this.shapesOfPdfPage);
+    this.currentPage.setShapes(this.shapesOfPdfPage);
 
     // Add the page to the PDF document.
-    this.pdfDocument.addPage(page);
+    this.pdfDocument.addPage(this.currentPage);
   }
 
   @Override
@@ -277,7 +282,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
     if (!PdfCharacterFilter.filterPdfCharacter(character)) {
       character.setExtractionOrderNumber(this.charactersOfPdfPage.size());
-
+      character.setPage(this.currentPage);
+      
       this.charactersOfPdfPage.add(character);
       this.charactersOfPdfDocument.add(character);
     }
@@ -289,6 +295,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   @Override
   public void handlePdfFigure(PdfFigure figure) {
     if (!PdfFigureFilter.filterPdfFigure(figure)) {
+      figure.setPage(this.currentPage);
+      
       this.figuresOfPdfPage.add(figure);
       this.figuresOfPdfDocument.add(figure);
     }
@@ -297,6 +305,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   @Override
   public void handlePdfShape(PdfShape shape) {
     if (!PdfShapeFilter.filterPdfShape(shape)) {
+      shape.setPage(this.currentPage);
+      
       this.shapesOfPdfPage.add(shape);
       this.shapesOfPdfDocument.add(shape);
     }

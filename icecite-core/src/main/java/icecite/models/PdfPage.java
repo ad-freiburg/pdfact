@@ -25,6 +25,7 @@ public interface PdfPage extends HasCharacters, HasFigures, HasShapes {
   void setPageNumber(int pageNumber);
 
   // ==========================================================================
+  // TODO: Remove this getters and setters at any time.
 
   /**
    * Returns the identified text blocks in this page.
@@ -42,12 +43,19 @@ public interface PdfPage extends HasCharacters, HasFigures, HasShapes {
   void setTextBlocks(List<PdfTextBlock> blocks);
 
   /**
-   * Adds the given text block to this page.
+   * Returns the text lines of this page.
    * 
-   * @param block
-   *        The text block to add.
+   * @return The text lines of this page.
    */
-  void addTextBlock(PdfTextBlock block);
+  List<PdfTextLine> getTextLines();
+
+  /**
+   * Sets the text lines of this page.
+   * 
+   * @param lines
+   *        The list of text lines to set.
+   */
+  void setTextLines(List<PdfTextLine> lines);
 
   // ==========================================================================
 

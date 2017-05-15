@@ -43,4 +43,21 @@ public class StringUtils {
       return defaultValue;
     }
   }
+
+  /**
+   * Repeats the given string <repeats>-times.
+   * 
+   * @param string
+   *        The string to repeat.
+   * @param repeats
+   *        The number of repeats.
+   * @return The string containing the given string <repeats>-times.
+   */
+  public static String repeat(String string, int repeats) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < repeats; i++) {
+      sb.append(string);
+    }
+    return sb.toString();
+  }
 }

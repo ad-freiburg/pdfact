@@ -74,7 +74,7 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
     this(rectangleFactory);
     addAll(characters);
   }
-
+  
   // ==========================================================================
 
   /**

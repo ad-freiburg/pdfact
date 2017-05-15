@@ -78,14 +78,14 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
    */
   public interface PdfCharacterSetFactory {
     /**
-     * Creates a PdfCharactersSet.
+     * Creates a PdfCharacterSet.
      * 
      * @return An instance of {@link PdfCharacterSet}.
      */
     PdfCharacterSet create();
 
     /**
-     * Creates a PdfCharactersSet.
+     * Creates a PdfCharacterSet.
      * 
      * @param characters
      *        The characters of the set.

@@ -1,10 +1,14 @@
 package icecite.tokenizer;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.google.inject.Inject;
 
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
+import icecite.models.PdfParagraph.PdfParagraphFactory;
 import icecite.models.PdfTextLine;
 
 /**
@@ -13,12 +17,30 @@ import icecite.models.PdfTextLine;
  * @author Claudius Korzen
  */
 public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
+  /**
+   * The factory to create instances of PdfParagraph.
+   */
+  protected PdfParagraphFactory paragraphFactory;
 
+  /**
+   * Creates a new tokenizer to that tokenizes text lines into paragrahps.
+   * 
+   * @param paragraphFactory
+   *        The factory to create instances of PdfParagraph.
+   */
+  @Inject
+  public PlainPdfParagraphTokenizer(PdfParagraphFactory paragraphFactory) {
+    this.paragraphFactory = paragraphFactory;
+  }
+
+  // ==========================================================================
+  
   @Override
   public List<PdfParagraph> tokenize(PdfDocument pdf, PdfPage page,
       List<PdfTextLine> textLines) {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO:
+    PdfParagraph paragraph = this.paragraphFactory.create(textLines);
+    paragraph.setPage(page);
+    return Arrays.asList(paragraph);
   }
-
 }
