@@ -151,7 +151,7 @@ public class IntCounter<T> extends TIntObjectHashMap<Set<T>> {
     clear();
     resetComputedValues();
   }
-  
+
   /**
    * Resets the internal counters.
    */
@@ -420,7 +420,7 @@ public class IntCounter<T> extends TIntObjectHashMap<Set<T>> {
    * 
    * @return The objects that are associated with the largest int value.
    */
-  public Set<T> getObjectWithLargestInt() {
+  public Set<T> getObjectsWithLargestInt() {
     return get(getLargestInt());
   }
 

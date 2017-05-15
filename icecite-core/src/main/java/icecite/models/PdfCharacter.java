@@ -24,6 +24,23 @@ public interface PdfCharacter extends PdfElement, HasColor, HasFont, HasText {
   // ==========================================================================
 
   /**
+   * Returns the number of this character in the extraction order.
+   *
+   * @return The number of this character in the extraction order.
+   */
+  int getExtractionOrderNumber();
+
+  /**
+   * Sets the number of this character in the extraction order.
+   *
+   * @param num
+   *        The number of this character in the extraction order.
+   */
+  void setExtractionOrderNumber(int num);
+
+  // ==========================================================================
+
+  /**
    * The factory to create instances of {@link PdfCharacter}.
    * 
    * @author Claudius Korzen

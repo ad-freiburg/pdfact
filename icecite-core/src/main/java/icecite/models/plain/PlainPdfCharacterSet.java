@@ -1,6 +1,7 @@
 package icecite.models.plain;
 
 import java.util.Collection;
+import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -135,5 +136,27 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
   @Override
   public float getAverageFontsize() {
     return this.fontsizeCounter.getAverageValue();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Set<PdfCharacter> getLeftMostCharacters() {
+    return this.minXCounter.getObjectsWithSmallestFloat();
+  }
+
+  @Override
+  public Set<PdfCharacter> getRightMostCharacters() {
+    return this.maxXCounter.getObjectsWithLargestFloat();
+  }
+
+  @Override
+  public Set<PdfCharacter> getLowerMostCharacters() {
+    return this.minYCounter.getObjectsWithSmallestFloat();
+  }
+
+  @Override
+  public Set<PdfCharacter> getUpperMostCharacters() {
+    return this.maxYCounter.getObjectsWithLargestFloat();
   }
 }

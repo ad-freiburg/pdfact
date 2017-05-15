@@ -121,7 +121,7 @@ public class FloatCounter<T> extends TFloatObjectHashMap<Set<T>> {
    * @param object
    *        The object to remove.
    */
-  public void remove(float f, T object) {
+  public void remove(float f, Object object) {
     this.isStatisticOutdated = containsKey(f) && get(f).remove(object);
   }
 
@@ -170,7 +170,7 @@ public class FloatCounter<T> extends TFloatObjectHashMap<Set<T>> {
     this.leastFrequentFloatFrequency = Integer.MAX_VALUE;
     this.averageValue = Float.MAX_VALUE;
   }
-  
+
   // ==========================================================================
   // Getter methods.
 
@@ -424,7 +424,7 @@ public class FloatCounter<T> extends TFloatObjectHashMap<Set<T>> {
    * 
    * @return The objects that are associated with the largest float value.
    */
-  public Set<T> getObjectWithLargestFloat() {
+  public Set<T> getObjectsWithLargestFloat() {
     return get(getLargestFloat());
   }
 

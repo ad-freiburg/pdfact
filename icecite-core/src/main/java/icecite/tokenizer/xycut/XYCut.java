@@ -157,14 +157,14 @@ public abstract class XYCut<T extends PdfElement> {
       events.add(new XYCutSweepEvent(character, boundingBox.getMinX(), dir));
       events.add(new XYCutSweepEvent(character, boundingBox.getMaxX(), dir));
     }
-    
+
     // The set of characters that overlap the current lane horizontally.
     PdfCharacterSet overlapping = this.characterSetFactory.create();
     // The set of characters of the left half.
     PdfCharacterSet leftHalf = this.characterSetFactory.create();
     // The set of characters of the right half.
     PdfCharacterSet rightHalf = this.characterSetFactory.create(chars);
-    
+
     while (!events.isEmpty()) {
       // Process the next event, e.g. "(1, B)" in the example above.
       XYCutSweepEvent evt = events.poll();
@@ -203,7 +203,7 @@ public abstract class XYCut<T extends PdfElement> {
         break;
       }
     }
-    
+
     if (rightHalf.isEmpty()) {
       // If the chars could not be cut into two halves, rightHalf is empty.
       // Return only the left half.
@@ -350,11 +350,11 @@ public abstract class XYCut<T extends PdfElement> {
    *        The PDF document to which the characters belong to.
    * @param page
    *        The page in which the characters are located.
-   * @param left 
-   *        The characters to the left of the lane. 
+   * @param left
+   *        The characters to the left of the lane.
    * @param overlap
    *        The characters that overlap the lane.
-   * @param right 
+   * @param right
    *        The characters to the right of the lane.
    * @return True, if the lane that overlaps the given characters is valid;
    *         false otherwise.
@@ -371,10 +371,10 @@ public abstract class XYCut<T extends PdfElement> {
    * @param page
    *        The page in which the characters are located.
    * @param upper
-   *        The characters above the lane. 
+   *        The characters above the lane.
    * @param overlap
    *        The characters that overlap the lane.
-   * @param lower 
+   * @param lower
    *        The characters below the lane.
    * @return True, if the lane that overlaps the given characters is valid;
    *         false otherwise.

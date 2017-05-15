@@ -1,9 +1,11 @@
 package icecite.tokenizer;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterSet;
 import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
 import icecite.models.PdfDocument;
@@ -11,6 +13,7 @@ import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.tokenizer.xycut.XYCut;
+import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.plain.PlainRectangle;
 
 /**
@@ -57,14 +60,18 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   @Override
   public float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
       PdfCharacterSet chars) {
-    return 1;
-    // return Math.max(pdf.getMostCommonWidth(), chars.getMostCommonWidth());
+    float docWidths = pdf.getCharacters().getMostCommonWidth();
+    float pageWidths = page.getCharacters().getMostCommonWidth();
+    return Math.max(docWidths, pageWidths);
   }
 
   @Override
   public boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
       PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right) {
-    return overlap.isEmpty();
+    if (!overlap.isEmpty()) {
+      return false;
+    }
+    return !separatesConsecutiveCharacters(left, right);
   }
 
   // ==========================================================================
@@ -72,7 +79,9 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   @Override
   public float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
       PdfCharacterSet chars) {
-    return Math.max(pdf.getMostCommonHeight(), chars.getMostCommonHeight());
+    float docHeights = pdf.getCharacters().getMostCommonHeight();
+    float pageHeights = page.getCharacters().getMostCommonHeight();
+    return Math.min(docHeights, pageHeights);
   }
 
   @Override
@@ -89,5 +98,46 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
     PdfTextBlock block = this.textBlockFactory.create(characters);
     block.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
     return block;
+  }
+
+  // ==========================================================================
+  // Utility methods.
+
+  /**
+   * Checks if there is a character in the first character set with extraction
+   * order number i and a characters in the second character set with
+   * extraction order number i + 1, where both characters overlap vertically.
+   * 
+   * @param left
+   *        The first character set.
+   * @param right
+   *        The second character set.
+   * @return True if there is such a character pair, false otherwise.
+   */
+  protected boolean separatesConsecutiveCharacters(PdfCharacterSet left,
+      PdfCharacterSet right) {
+    Set<PdfCharacter> leftChars = left.getRightMostCharacters();
+    Set<PdfCharacter> rightChars = right.getLeftMostCharacters();
+
+    for (PdfCharacter leftChar : leftChars) {
+      int leftCharNum = leftChar.getExtractionOrderNumber();
+      Rectangle leftCharBox = leftChar.getBoundingBox();
+      for (PdfCharacter rightChar : rightChars) {
+        int rightCharNum = rightChar.getExtractionOrderNumber();
+        Rectangle rightCharNox = rightChar.getBoundingBox();
+
+        // Check if the characters are consecutive.
+        if (rightCharNum != leftCharNum + 1) {
+          continue;
+        }
+        // Check if the characters overlap.
+        if (!leftCharBox.overlapsVertically(rightCharNox)) {
+          continue;
+        }
+        return true;
+      }
+    }
+
+    return false;
   }
 }

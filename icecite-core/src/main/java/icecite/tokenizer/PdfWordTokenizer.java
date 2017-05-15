@@ -12,7 +12,7 @@ import icecite.models.PdfWord;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWordTokenizer {  
+public interface PdfWordTokenizer {
   /**
    * Tokenizes the given list of characters into words.
    * 

@@ -11,6 +11,11 @@ import icecite.models.PdfFont;
  */
 public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
+   * The extraction order number.
+   */
+  protected int extractionOrderNumber;
+
+  /**
    * The text of this character.
    */
   protected String text;
@@ -81,7 +86,20 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
+  public void setExtractionOrderNumber(int num) {
+    this.extractionOrderNumber = num;
+  }
+
+  @Override
+  public int getExtractionOrderNumber() {
+    return this.extractionOrderNumber;
+  }
+
+  // ==========================================================================
+
+  @Override
   public String toString() {
-    return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
+    return this.text;
+    // return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
   }
 }

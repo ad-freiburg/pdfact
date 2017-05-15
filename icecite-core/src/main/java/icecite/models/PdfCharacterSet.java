@@ -1,6 +1,7 @@
 package icecite.models;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A set of PDF characters.
@@ -37,6 +38,36 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
    * @return The average font size over all characters in this set.
    */
   float getAverageFontsize();
+
+  // ==========================================================================
+
+  /**
+   * Returns all characters with the minimal minX value in this set.
+   *
+   * @return All characters with the minimal minX value in this set.
+   */
+  Set<PdfCharacter> getLeftMostCharacters();
+
+  /**
+   * Returns all characters with the maximal maxX value in this set.
+   *
+   * @return All characters with the maximal maxX value in this set.
+   */
+  Set<PdfCharacter> getRightMostCharacters();
+
+  /**
+   * Returns all characters with the minimal minY value in this set.
+   *
+   * @return All characters with the minimal minY value in this set.
+   */
+  Set<PdfCharacter> getLowerMostCharacters();
+
+  /**
+   * Returns all characters with the maximal maxY value in this set.
+   *
+   * @return All characters with the maximal maxY value in this set.
+   */
+  Set<PdfCharacter> getUpperMostCharacters();
 
   // ==========================================================================
 

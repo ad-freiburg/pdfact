@@ -158,13 +158,13 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * @param doc
    *        The PDF document to which the text blocks belong to.
    * @param page
-   *        The page in which the text blocks are located. 
+   *        The page in which the text blocks are located.
    * @param block
    *        The text block to tokenize.
    * 
    * @return The list of identified text lines.
    */
-  protected List<PdfTextLine> tokenizeIntoTextLines(PdfDocument doc, 
+  protected List<PdfTextLine> tokenizeIntoTextLines(PdfDocument doc,
       PdfPage page, PdfTextBlock block) {
     return this.textLineTokenizer.tokenize(doc, page, block.getCharacters());
   }
@@ -175,13 +175,13 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * @param doc
    *        The PDF document to which the text blocks belong to.
    * @param page
-   *        The page in which the text blocks are located. 
+   *        The page in which the text blocks are located.
    * @param line
    *        The text line to tokenize.
    * @return The list of identified words.
    */
-  protected List<PdfWord> tokenizeIntoWords(PdfDocument doc, 
-      PdfPage page, PdfTextLine line) {
+  protected List<PdfWord> tokenizeIntoWords(PdfDocument doc, PdfPage page,
+      PdfTextLine line) {
     return this.wordTokenizer.tokenize(doc, page, line.getCharacters());
   }
 
@@ -191,12 +191,12 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * @param doc
    *        The PDF document to which the text blocks belong to.
    * @param page
-   *        The page in which the text blocks are located. 
+   *        The page in which the text blocks are located.
    * @param lines
    *        The text lines to process.
    * @return The identified paragraphs.
    */
-  protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc, 
+  protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc,
       PdfPage page, List<PdfTextLine> lines) {
     return this.paragraphTokenizer.tokenize(doc, page, lines);
   }

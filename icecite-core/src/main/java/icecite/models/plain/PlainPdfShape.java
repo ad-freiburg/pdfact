@@ -10,6 +10,11 @@ import icecite.models.PdfShape;
  */
 public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   /**
+   * The extraction order number.
+   */
+  protected int extractionOrderNumber;
+
+  /**
    * The color of this shape.
    */
   protected PdfColor color;

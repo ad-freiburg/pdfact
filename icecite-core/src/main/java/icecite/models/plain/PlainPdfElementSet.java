@@ -30,32 +30,32 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
   /**
    * The counter for the heights of the elements.
    */
-  protected FloatCounter<PdfElement> heightCounter;
+  protected FloatCounter<T> heightCounter;
 
   /**
    * The counter for the widths of the elements.
    */
-  protected FloatCounter<PdfElement> widthCounter;
+  protected FloatCounter<T> widthCounter;
 
   /**
    * The counter for the minX values of the elements.
    */
-  protected FloatCounter<PdfElement> minXCounter;
+  protected FloatCounter<T> minXCounter;
 
   /**
    * The counter for the minY values of the elements.
    */
-  protected FloatCounter<PdfElement> minYCounter;
+  protected FloatCounter<T> minYCounter;
 
   /**
    * The counter for the maxX values of the elements.
    */
-  protected FloatCounter<PdfElement> maxXCounter;
+  protected FloatCounter<T> maxXCounter;
 
   /**
    * The counter for the maxY values of the elements.
    */
-  protected FloatCounter<PdfElement> maxYCounter;
+  protected FloatCounter<T> maxYCounter;
 
   /**
    * The factory to create instances of {@Rectangle}.
@@ -71,7 +71,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
    * The bounding box around the elements in this set.
    */
   protected Rectangle boundingBox;
-  
+
   // ==========================================================================
   // Constructors.
 
