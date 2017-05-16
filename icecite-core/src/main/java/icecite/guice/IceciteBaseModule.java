@@ -1,6 +1,7 @@
 package icecite.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import icecite.models.PdfCharacter;
@@ -9,12 +10,14 @@ import icecite.models.PdfCharacterSet;
 import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
+import icecite.models.PdfColorRegistry;
 import icecite.models.PdfDocument;
 import icecite.models.PdfDocument.PdfDocumentFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFigure.PdfFigureFactory;
 import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
+import icecite.models.PdfFontRegistry;
 import icecite.models.PdfPage;
 import icecite.models.PdfPage.PdfPageFactory;
 import icecite.models.PdfParagraph;
@@ -30,9 +33,11 @@ import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.plain.PlainPdfCharacter;
 import icecite.models.plain.PlainPdfCharacterSet;
 import icecite.models.plain.PlainPdfColor;
+import icecite.models.plain.PlainPdfColorRegistry;
 import icecite.models.plain.PlainPdfDocument;
 import icecite.models.plain.PlainPdfFigure;
 import icecite.models.plain.PlainPdfFont;
+import icecite.models.plain.PlainPdfFontRegistry;
 import icecite.models.plain.PlainPdfPage;
 import icecite.models.plain.PlainPdfParagraph;
 import icecite.models.plain.PlainPdfShape;
@@ -89,18 +94,24 @@ public class IceciteBaseModule extends AbstractModule {
     bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
     bind(PdfParagraphTokenizer.class).to(PlainPdfParagraphTokenizer.class);
 
+    // Bind the registries for PdfColor and PdfFont.
+    bind(PdfColorRegistry.class).to(PlainPdfColorRegistry.class)
+        .in(Singleton.class);
+    bind(PdfFontRegistry.class).to(PlainPdfFontRegistry.class)
+        .in(Singleton.class);
+
     // Bind the PDF model factories.
     fc(PdfCharacter.class, PdfCharacterFactory.class, PlainPdfCharacter.class);
-    fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);
     fc(PdfFigure.class, PdfFigureFactory.class, PlainPdfFigure.class);
-    fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
     fc(PdfPage.class, PdfPageFactory.class, PlainPdfPage.class);
     fc(PdfShape.class, PdfShapeFactory.class, PlainPdfShape.class);
     fc(PdfTextBlock.class, PdfTextBlockFactory.class, PlainPdfTextBlock.class);
     fc(PdfWord.class, PdfWordFactory.class, PlainPdfWord.class);
     fc(PdfTextLine.class, PdfTextLineFactory.class, PlainPdfTextLine.class);
     fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
+    fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
+    fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
 
     // fc(PdfElementSet.class, PdfElementSetFactory.class,
     // PlainPdfElementSet.class);

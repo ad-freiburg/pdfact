@@ -27,7 +27,7 @@ import icecite.visualizer.PdfVisualizer;
 
 /**
  * The main class to manage the Icecite parser from the command line.
- * 
+ *  
  * @author Claudius Korzen
  */
 public class IcecitePdfParserMain {
@@ -91,7 +91,6 @@ public class IcecitePdfParserMain {
     PdfVisualizer visualizer = injector.getInstance(PdfVisualizer.class);
     PdfSerializer serializer = injector
         .getInstance(Key.get(PdfSerializer.class, Names.named("xml")));
-    System.out.println(serializer);
     PdfParser pdfParser = factory.create();
     PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
 
@@ -101,6 +100,11 @@ public class IcecitePdfParserMain {
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {
       visualizer.visualize(document, stream);
+    }
+    
+    Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
+    try (OutputStream stream = Files.newOutputStream(vis2)) {
+      serializer.serialize(document, stream);
     }
   }
 }

@@ -4,6 +4,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacterSet;
+import icecite.models.PdfType;
 import icecite.models.PdfWord;
 
 /**
@@ -57,5 +58,12 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   @Override
   public void setCharacters(PdfCharacterSet characters) {
     this.characters = characters;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfType getType() {
+    return PdfType.WORDS;
   }
 }

@@ -14,15 +14,16 @@ import org.apache.pdfbox.util.Matrix;
 import com.google.inject.Inject;
 
 import icecite.models.PdfColor;
+import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFigure.PdfFigureFactory;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
+import icecite.utils.color.ColorUtils;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.plain.PlainPoint;
 import icecite.utils.geometric.plain.PlainRectangle;
-import icecite.utils.image.ImageUtils;
 
 /**
  * Do: Invoke a named xobject.
@@ -36,6 +37,12 @@ public class Invoke extends OperatorProcessor {
   @Inject
   protected PdfFigureFactory pdfFigureFactory;
 
+  /**
+   * The factory to create instances of {@link PdfColor}.
+   */
+  @Inject
+  protected PdfColorFactory pdfColorFactory;
+  
   /**
    * The factory to create instances of {@link PdfShape}.
    */
@@ -97,11 +104,13 @@ public class Invoke extends OperatorProcessor {
       // boundBox.setMaxY(ctm.getTranslateY() + at.getScaleY() * imageHeight);
 
       // If the image consists of only one color, consider it as a shape.
-      PdfColor exclusiveColor = ImageUtils.getExclusiveColor(image.getImage());
+      float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
       if (exclusiveColor != null) {
+        PdfColor color = this.pdfColorFactory.create();
+        color.setRGB(exclusiveColor);
         PdfShape shape = this.pdfShapeFactory.create();
         shape.setBoundingBox(boundBox);
-        shape.setColor(exclusiveColor);
+        shape.setColor(color);
         this.engine.handlePdfShape(shape);
       } else {
         PdfFigure figure = this.pdfFigureFactory.create();

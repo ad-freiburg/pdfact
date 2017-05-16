@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 
+import com.google.inject.assistedinject.Assisted;
+
 import icecite.models.PdfDocument;
-import icecite.models.PdfElement;
+import icecite.models.PdfRole;
+import icecite.models.PdfType;
 
 /**
  * A serializer to serialize a PDF document in a specific format.
@@ -25,19 +28,40 @@ public interface PdfSerializer {
    */
   void serialize(PdfDocument pdf, OutputStream os) throws IOException;
 
+  // ==========================================================================
+
   /**
-   * Serializes the given elements of the given PDF document to the given
-   * stream.
-   *
-   * @param pdf
-   *        the PDF document to process.
-   * @param elementTypes
-   *        the types of PDF elements to visualize.
-   * @param os
-   *        the stream to write to.
-   * @throws IOException
-   *         if something went wrong while visualizing.
+   * The factory to create instances of PdfSerializer.
+   * 
+   * @author Claudius Korzen
    */
-  void serialize(PdfDocument pdf, Set<Class<? extends PdfElement>> elementTypes,
-      OutputStream os) throws IOException;
+  public interface PdfSerializerFactory {
+    /**
+     * Creates a new PdfSerializer.
+     * 
+     * @return An instance of PdfSerializer.
+     */
+    PdfSerializer create();
+
+    /**
+     * Creates a new PdfSerializer.
+     * 
+     * @param types
+     *        The types of PDF elements to serialize.
+     * @return An instance of PdfSerializer.
+     */
+    PdfSerializer create(@Assisted("types") Set<PdfType> types);
+    
+    /**
+     * Creates a new PdfSerializer.
+     * 
+     * @param types
+     *        The types of PDF elements to serialize.
+     * @param roles
+     *        The roles of PDF elements to serialize.
+     * @return An instance of PdfSerializer.
+     */
+    PdfSerializer create(@Assisted("types") Set<PdfType> types,
+        @Assisted("roles") Set<PdfRole> roles);
+  }
 }

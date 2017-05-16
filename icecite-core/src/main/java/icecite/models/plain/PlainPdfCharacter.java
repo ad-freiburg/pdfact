@@ -3,6 +3,7 @@ package icecite.models.plain;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfFont;
+import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfCharacter}.
@@ -95,6 +96,13 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
     return this.extractionOrderNumber;
   }
 
+  // ==========================================================================
+  
+  @Override
+  public PdfType getType() {
+    return PdfType.CHARACTERS;
+  }
+  
   // ==========================================================================
 
   @Override

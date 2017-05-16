@@ -7,23 +7,6 @@ package icecite.models;
  */
 public interface PdfCharacter extends PdfElement, HasColor, HasFont, HasText {
   /**
-   * Returns the font size of this character.
-   * 
-   * @return The font size of this character.
-   */
-  float getFontSize();
-
-  /**
-   * Sets the font size of this character.
-   * 
-   * @param fontsize
-   *        The font size of this character.
-   */
-  void setFontSize(float fontsize);
-
-  // ==========================================================================
-
-  /**
    * Returns the number of this character in the extraction order.
    *
    * @return The number of this character in the extraction order.

@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.fontbox.afm.CharMetric;
@@ -35,8 +36,10 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
+import icecite.models.PdfColorRegistry;
 import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
+import icecite.models.PdfFontRegistry;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.parser.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parser.stream.pdfbox.utils.PdfBoxGlyphUtils;
@@ -55,33 +58,69 @@ public class ShowText extends OperatorProcessor {
   /**
    * The factory to create instances of {@link PdfCharacterFactory}.
    */
-  @Inject
-  protected PdfCharacterFactory pdfCharacterFactory;
+  protected PdfCharacterFactory characterFactory;
 
   /**
    * The factory to create instances of {@link PdfFont}.
    */
-  @Inject
-  // TODO: Create cache of PdfFonts.
-  protected PdfFontFactory pdfFontFactory;
+  protected PdfFontFactory fontFactory;
+
+  /**
+   * The registry to manage {@link PdfFont} objects.
+   */
+  protected PdfFontRegistry fontRegistry;
 
   /**
    * The factory to create instances of {@link PdfColor}.
    */
-  @Inject
-  protected PdfColorFactory pdfColorFactory;
+  protected PdfColorFactory colorFactory;
+
+  /**
+   * The registry to manage {@link PdfColor} objects.
+   */
+  protected PdfColorRegistry colorRegistry;
 
   /**
    * The factory to create instances of {@link Rectangle}.
    */
-  @Inject
   protected RectangleFactory rectangleFactory;
 
   /**
    * The factory to create instances of {@link Point}.
    */
-  @Inject
   protected PointFactory pointFactory;
+
+  /**
+   * Creates a new OperatorProcessor to process the operation "ShowText".
+   * 
+   * @param characterFactory
+   *        The factory to create instances of {@link PdfCharacterFactory}.
+   * @param fontFactory
+   *        The factory to create instances of {@link PdfFont}.
+   * @param fontRegistry
+   *        The registry to manage {@link PdfFont} objects.
+   * @param colorFactory
+   *        The factory to create instances of {@link PdfColor}.
+   * @param colorRegistry
+   *        The registry to manage {@link PdfColor} objects.
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
+   */
+  @Inject
+  public ShowText(PdfCharacterFactory characterFactory,
+      PdfFontFactory fontFactory, PdfFontRegistry fontRegistry,
+      PdfColorFactory colorFactory, PdfColorRegistry colorRegistry,
+      RectangleFactory rectangleFactory, PointFactory pointFactory) {
+    this.characterFactory = characterFactory;
+    this.fontFactory = fontFactory;
+    this.fontRegistry = fontRegistry;
+    this.colorFactory = colorFactory;
+    this.colorRegistry = colorRegistry;
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
+  }
 
   // ==========================================================================
 
@@ -297,14 +336,28 @@ public class ShowText extends OperatorProcessor {
     PDColorSpace cs = graphicsState.getNonStrokingColorSpace();
     float[] rgb = cs.toRGB(nonStrokingColor.getComponents());
 
-    // TODO set the properties of the font.
-    PdfFont pdfFont = this.pdfFontFactory.create();
-    PdfColor color = this.pdfColorFactory.create(rgb);
+    // TODO set the properties of the color.
+    PdfColor pdfColor = this.colorRegistry.getColor(Arrays.toString(rgb));
+    if (pdfColor == null) {
+      pdfColor = this.colorFactory.create();
+      pdfColor.setName(Arrays.toString(rgb));
+      pdfColor.setRGB(rgb);
+      this.colorRegistry.registerColor(pdfColor);
+    }
+    
+    // TODO set the properties of the font.   
+    String fontName = font.getName();
+    PdfFont pdfFont = this.fontRegistry.getFont(fontName);
+    if (pdfFont == null) {
+      pdfFont = this.fontFactory.create();
+      pdfFont.setName(fontName);
+      this.fontRegistry.registerFont(pdfFont);
+    }
 
-    PdfCharacter character = this.pdfCharacterFactory.create();
+    PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontSize(fontsize);
-    character.setColor(color);
+    character.setColor(pdfColor);
     character.setFont(pdfFont);
     character.setBoundingBox(boundBox);
 

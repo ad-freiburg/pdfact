@@ -1,38 +1,62 @@
 package icecite.serializer;
 
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_CHARACTERS;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_COLORS;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_B;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_G;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_ID;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_COLOR_R;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_COLOR;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_FONT_SIZE;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_X;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_Y;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_X;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_Y;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_PAGE;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_TEXT;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_FIGURES;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_FONTS;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_ID;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_FONT_NAME;
 import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_PAGES;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_PARAGRAPHS;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_SHAPES;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_TEXTLINES;
+import static icecite.serializer.PdfSerializerConstants.CONTEXT_NAME_WORDS;
 import static icecite.serializer.PdfSerializerConstants.INDENT_LENGTH;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
+import icecite.models.HasColor;
+import icecite.models.HasFont;
 import icecite.models.HasText;
 import icecite.models.PdfCharacter;
+import icecite.models.PdfColor;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
+import icecite.models.PdfFont;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfType;
 import icecite.models.PdfWord;
+import icecite.utils.collection.CollectionUtils;
 import icecite.utils.geometric.Rectangle;
-
-// TODO: Implement the JSON serializer.
 
 /**
  * An implementation of PdfSerializer that serializes a PDF document to JSON
@@ -41,44 +65,100 @@ import icecite.utils.geometric.Rectangle;
  * @author Claudius Korzen
  */
 public class JsonPdfSerializer implements PdfSerializer {
-  @Override
-  public void serialize(PdfDocument pdf, OutputStream os) throws IOException {
-    Set<Class<? extends PdfElement>> types = new HashSet<>();
+  /**
+   * The set of types of the PDF elements to serialize.
+   */
+  protected Set<PdfType> types;
 
-    // types.add(PdfParagraph.class);
-    types.add(PdfTextLine.class);
-    // types.add(PdfWord.class);
-    // types.add(PdfCharacter.class);
-    // types.add(PdfFigure.class);
-    // types.add(PdfShape.class);
+  /**
+   * The set of roles of PDF elements to serialize.
+   */
+  protected Set<PdfType> roles;
 
-    serialize(pdf, types, os);
+  /**
+   * The set of utilized fonts while serializing a PDF document.
+   */
+  protected Set<PdfFont> usedFonts;
+
+  /**
+   * The set of utilized colors while serializing a PDF document.
+   */
+  protected Set<PdfColor> usedColors;
+
+  // ==========================================================================
+  // Constructors.
+
+  /**
+   * Creates a new serializer that serializes PDF documents to JSON format.
+   */
+  @AssistedInject
+  public JsonPdfSerializer() {
+    this.types = new HashSet<>();
+    this.roles = new HashSet<>();
   }
 
+  /**
+   * Creates a new serializer that serializes PDF documents to JSON format.
+   * 
+   * @param types
+   *        The types of the PDF elements to serialize.
+   */
+  @AssistedInject
+  public JsonPdfSerializer(Set<PdfType> types) {
+    this.types = types;
+    this.roles = new HashSet<>();
+  }
+
+  /**
+   * Creates a new serializer that serializes PDF documents to JSON format.
+   * 
+   * @param types
+   *        The type of the PDF elements to serialize.
+   * @param roles
+   *        The roles of the PDF elements to serialize.
+   */
+  @AssistedInject
+  public JsonPdfSerializer(@Assisted("types") Set<PdfType> types,
+      @Assisted("roles") Set<PdfType> roles) {
+    this.types = types;
+    this.roles = roles;
+  }
+
+  // ==========================================================================
+
   @Override
-  public void serialize(PdfDocument pdf, Set<Class<? extends PdfElement>> types,
-      OutputStream os) throws IOException {
+  public void serialize(PdfDocument pdf, OutputStream os) throws IOException {
+    if (pdf == null) {
+      return;
+    }
+    if (os == null) {
+      return;
+    }
+    // The used fonts on serializing the PDF document.
+    this.usedFonts = new HashSet<>();
+    // The used colors on serializing the PDF document.
+    this.usedColors = new HashSet<>();
+
+    // The JSON object to fill.
     JSONObject json = new JSONObject();
 
     // Serialize the pages.
-    JSONArray serializedPages = serializePages(pdf, types);
+    JSONArray serializedPages = serializePages(pdf);
     if (serializedPages != null && serializedPages.length() > 0) {
       json.put(CONTEXT_NAME_PAGES, serializedPages);
     }
 
-    // TODO: Serialize the fonts of a PDF document.
-    // // Serialize the fonts.
-    // JSONArray serializedFonts = serializeFonts(pdf);
-    // if (serializedFonts != null && serializedFonts.length() > 0) {
-    // json.put(CONTEXT_NAME_FONTS, serializedFonts);
-    // }
+    // Serialize the fonts.
+    JSONArray serializedFonts = serializeFonts();
+    if (serializedFonts != null && serializedFonts.length() > 0) {
+      json.put(CONTEXT_NAME_FONTS, serializedFonts);
+    }
 
-    // TODO: Serialize the colors of a PDF document.
     // // Serialize the colors.
-    // JSONArray serializedColors = serializeColors(pdf);
-    // if (serializedColors != null && serializedColors.length() > 0) {
-    // json.put(CONTEXT_NAME_COLORS, serializedColors);
-    // }
+    JSONArray serializedColors = serializeColors();
+    if (serializedColors != null && serializedColors.length() > 0) {
+      json.put(CONTEXT_NAME_COLORS, serializedColors);
+    }
 
     // Write the serialization to given stream.
     writeTo(json, os);
@@ -91,25 +171,23 @@ public class JsonPdfSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
-   * @param types
-   *        The types of the PDF elements to serialize.
-   * @return An JSON array representing the serialized PDF document.
+   * @return An JSON array representing the serialized pages of the PDF
+   *         document.
    */
-  protected JSONArray serializePages(PdfDocument pdf,
-      Set<Class<? extends PdfElement>> types) {
+  protected JSONArray serializePages(PdfDocument pdf) {
     if (pdf == null) {
       return null;
     }
 
     List<PdfPage> pages = pdf.getPages();
-
     if (pages == null || pages.isEmpty()) {
       return null;
     }
 
+    // Serialize each single page.
     JSONArray json = new JSONArray();
     for (PdfPage page : pages) {
-      JSONObject serialized = serializePage(page, types);
+      JSONObject serialized = serializePage(page);
       if (serialized != null && serialized.length() > 0) {
         json.put(serialized);
       }
@@ -122,77 +200,103 @@ public class JsonPdfSerializer implements PdfSerializer {
    * 
    * @param page
    *        The page to serialize.
-   * @param types
-   *        The types of PDF elements to serialize.
    * @return A JSON object representing the serialized page.
    */
-  protected JSONObject serializePage(PdfPage page,
-      Set<Class<? extends PdfElement>> types) {
+  protected JSONObject serializePage(PdfPage page) {
     if (page == null) {
       return null;
     }
 
+    // Define a JSON object for the whole pages.
     JSONObject json = new JSONObject();
 
-    // TODO: Use constants.
-    
+    // Define JSON arrays for each PDF element type.
+    JSONArray paragraphs = new JSONArray();
+    JSONArray textLines = new JSONArray();
+    JSONArray words = new JSONArray();
+    JSONArray characters = new JSONArray();
+    JSONArray figures = new JSONArray();
+    JSONArray shapes = new JSONArray();
+
     // Serialize the text elements.
-    if (types.isEmpty() || types.contains(PdfParagraph.class)) {
-      json.put("paragraphs", serializePdfElements(page.getParagraphs()));
-    }
     for (PdfParagraph paragraph : page.getParagraphs()) {
-      if (types.isEmpty() || types.contains(PdfTextLine.class)) {
-        json.put("textlines", serializePdfElements(paragraph.getTextLines()));
+      if (isSerializePdfElement(paragraph)) {
+        JSONObject serializedParagraph = serializePdfElement(paragraph);
+        if (serializedParagraph != null && serializedParagraph.length() > 0) {
+          paragraphs.put(serializedParagraph);
+        }
       }
       for (PdfTextLine line : paragraph.getTextLines()) {
-        if (types.isEmpty() || types.contains(PdfWord.class)) {
-          json.put("words", serializePdfElements(line.getWords()));
+        if (isSerializePdfElement(line)) {
+          JSONObject serializedTextLine = serializePdfElement(line);
+          if (serializedTextLine != null && serializedTextLine.length() > 0) {
+            textLines.put(serializedTextLine);
+          }
         }
         for (PdfWord word : line.getWords()) {
-          if (types.isEmpty() || types.contains(PdfCharacter.class)) {
-            json.put("words", serializePdfElements(word.getCharacters()));
+          if (isSerializePdfElement(word)) {
+            JSONObject serializedTextWord = serializePdfElement(word);
+            if (serializedTextWord != null && serializedTextWord.length() > 0) {
+              words.put(serializedTextWord);
+            }
+          }
+          for (PdfCharacter character : word.getCharacters()) {
+            if (isSerializePdfElement(character)) {
+              JSONObject serializedChar = serializePdfElement(character);
+              if (serializedChar != null && serializedChar.length() > 0) {
+                characters.put(serializedChar);
+              }
+            }
           }
         }
       }
     }
 
     // Serialize the graphical elements.
-    if (types.isEmpty() || types.contains(PdfFigure.class)) {
-      json.put("figures", serializePdfElements(page.getFigures()));
+    for (PdfFigure figure : page.getFigures()) {
+      if (isSerializePdfElement(figure)) {
+        JSONObject serializedFigure = serializePdfElement(figure);
+        if (serializedFigure != null && serializedFigure.length() > 0) {
+          figures.put(serializedFigure);
+        }
+      }
     }
-    if (types.isEmpty() || types.contains(PdfShape.class)) {
-      json.put("shapes", serializePdfElements(page.getShapes()));
+    for (PdfShape shape : page.getShapes()) {
+      if (isSerializePdfElement(shape)) {
+        JSONObject serializedShapes = serializePdfElement(shape);
+        if (serializedShapes != null && serializedShapes.length() > 0) {
+          shapes.put(serializedShapes);
+        }
+      }
     }
 
+    // Add the JSON arrays to the overall JSON object.
+    if (paragraphs.length() > 0) {
+      json.put(CONTEXT_NAME_PARAGRAPHS, paragraphs);
+    }
+    if (textLines.length() > 0) {
+      json.put(CONTEXT_NAME_TEXTLINES, textLines);
+    }
+    if (words.length() > 0) {
+      json.put(CONTEXT_NAME_WORDS, words);
+    }
+    if (characters.length() > 0) {
+      json.put(CONTEXT_NAME_CHARACTERS, characters);
+    }
+    if (figures.length() > 0) {
+      json.put(CONTEXT_NAME_FIGURES, figures);
+    }
+    if (shapes.length() > 0) {
+      json.put(CONTEXT_NAME_SHAPES, shapes);
+    }
+
+    // Add the page number.
     if (json.length() > 0) {
       json.put("id", page.getPageNumber());
       return json;
     }
 
     return null;
-  }
-
-  /**
-   * Serializes the given elements.
-   * 
-   * @param elements
-   *        The elements to serialize.
-   * @return A JSON array representing the serialized PDF elements.
-   */
-  protected JSONArray serializePdfElements(
-      Collection<? extends PdfElement> elements) {
-    if (elements == null) {
-      return null;
-    }
-
-    JSONArray json = new JSONArray();
-    for (PdfElement element : elements) {
-      JSONObject serialized = serializePdfElement(element);
-      if (serialized != null && serialized.length() > 0) {
-        json.put(serialized);
-      }
-    }
-    return json;
   }
 
   /**
@@ -208,47 +312,53 @@ public class JsonPdfSerializer implements PdfSerializer {
     }
 
     JSONObject json = new JSONObject();
-
+    
     if (element instanceof HasText) {
       HasText hasText = (HasText) element;
       String text = hasText.getText();
 
       if (text != null) {
-        json.put(CONTEXT_NAME_ELEMENT_TEXT, JSONObject.quote(text));
+        // Append the text.
+        json.put(CONTEXT_NAME_ELEMENT_TEXT, StringEscapeUtils.escapeJson(text));
       }
     }
 
-    // Serialize font.
-//    if (element instanceof HasFont) {
-//      HasFont hasFont = (HasFont) element;
-//      PdfFont font = hasFont.getFont();
-//
-//      if (font != null) {
-//        // TODO: Serialize font.
-//        json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT, font.getId());
-//        // TODO: Serialize font size.
-//        json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_FONT_SIZE,
-//        element.getFontsize());
-//      }
-//    }
-    
-    // TODO: Serialize color.
-//    if (element instanceof HasColor) {
-//      HasColor hasColor = (HasColor) element;
-//      PdfColor color = hasColor.getColor();
-//
-//      if (color != null) {
-//        json.put(CONTEXT_NAME_ELEMENT_MOST_COMMON_COLOR, color.getId());
-//      }
-//    }
-    
+    if (element instanceof HasFont) {
+      HasFont hasFont = (HasFont) element;
+      PdfFont font = hasFont.getFont();
+
+      if (font != null) {
+        String fontId = font.getId();
+        // Append the id of the font.
+        json.put(CONTEXT_NAME_ELEMENT_FONT, fontId);
+        // Register the font as a utilized font.
+        this.usedFonts.add(font); 
+      }
+      // Append the font size.
+      json.put(CONTEXT_NAME_ELEMENT_FONT_SIZE, hasFont.getFontSize());
+    }
+
+    if (element instanceof HasColor) {
+      HasColor hasColor = (HasColor) element;
+      PdfColor color = hasColor.getColor();
+
+      if (color != null) {
+        // Append the id of the color.
+        json.put(CONTEXT_NAME_ELEMENT_COLOR, color.getId());
+        // Register the color as a utilized color.
+        this.usedColors.add(color);
+      }
+    }
+
     PdfPage page = element.getPage();
     if (page != null) {
+      // Append the page number.
       json.put(CONTEXT_NAME_ELEMENT_PAGE, page.getPageNumber());
     }
 
     Rectangle rect = element.getBoundingBox();
     if (rect != null) {
+      // Append the coordinates of the bounding box.
       json.put(CONTEXT_NAME_ELEMENT_MIN_X, rect.getMinX());
       json.put(CONTEXT_NAME_ELEMENT_MIN_Y, rect.getMinY());
       json.put(CONTEXT_NAME_ELEMENT_MAX_X, rect.getMaxX());
@@ -261,112 +371,108 @@ public class JsonPdfSerializer implements PdfSerializer {
   // ==========================================================================
   // Methods to serialize fonts.
 
-  // /**
-  // * Serializes the fonts of the given PDF document.
-  // *
-  // * @param document
-  // * The PDF document to process.
-  // * @return A JSON array representing the serialized fonts of the PDF
-  // * document.
-  // */
-  // protected JSONArray serializeFonts(PdfDocument document) {
-  // if (document == null) {
-  // return null;
-  // }
-  //
-  // JSONArray json = new JSONArray();
-  // for (PdfFont font : document.getFonts()) {
-  // JSONObject serialized = serializeFont(font);
-  // if (serialized != null && serialized.length() > 0) {
-  // json.put(serialized);
-  // }
-  // }
-  // return json;
-  // }
+  /**
+   * Serializes the utilized fonts on serializing the PDF document.
+   *
+   * @return A JSON array representing the serialized fonts of the PDF
+   *         document.
+   */
+  protected JSONArray serializeFonts() {
+    JSONArray json = new JSONArray();
+    for (PdfFont font : this.usedFonts) {
+      JSONObject serialized = serializeFont(font);
+      if (serialized != null && serialized.length() > 0) {
+        json.put(serialized);
+      }
+    }
+    return json;
+  }
 
-  // /**
-  // * Serializes the given font.
-  // *
-  // * @param font
-  // * The font to serialize.
-  // * @return A JSON object representing the serialized font.
-  // */
-  // protected JSONObject serializeFont(PdfFont font) {
-  // if (font == null) {
-  // return null;
-  // }
-  //
-  // String id = font.getId();
-  // if (id == null) {
-  // return null;
-  // }
-  //
-  // JSONObject json = new JSONObject();
-  // json.put(CONTEXT_NAME_FONT_ID, id);
-  //
-  // String basename = font.getBasename();
-  // if (basename != null) {
-  // json.put(CONTEXT_NAME_FONT_NAME, basename);
-  // }
-  //
-  // json.put(CONTEXT_NAME_FONT_IS_BOLD, font.isBold());
-  // json.put(CONTEXT_NAME_FONT_IS_ITALIC, font.isItalic());
-  // json.put(CONTEXT_NAME_FONT_IS_TYPE3, font.isType3Font());
-  //
-  // return json;
-  // }
+  /**
+   * Serializes the given font.
+   *
+   * @param font
+   *        The font to serialize.
+   * @return A JSON object representing the serialized font.
+   */
+  protected JSONObject serializeFont(PdfFont font) {
+    if (font == null) {
+      return null;
+    }
+
+    String id = font.getId();
+    if (id == null) {
+      return null;
+    }
+
+    JSONObject json = new JSONObject();
+    // Append the id of the font.
+    json.put(CONTEXT_NAME_FONT_ID, id);
+
+    // Append the name of the font.
+    String name = font.getName();
+    if (name != null) {
+      json.put(CONTEXT_NAME_FONT_NAME, name);
+    }
+
+    // TODO: Add more attributes to fonts.
+    // json.put(CONTEXT_NAME_FONT_IS_BOLD, font.isBold());
+    // json.put(CONTEXT_NAME_FONT_IS_ITALIC, font.isItalic());
+    // json.put(CONTEXT_NAME_FONT_IS_TYPE3, font.isType3Font());
+
+    return json;
+  }
 
   // ==========================================================================
   // Methods to serialize colors.
 
-  // /**
-  // * Serializes the colors of the given PDF document.
-  // *
-  // * @param document
-  // * The PDF document to process.
-  // * @return A JSON array representing the serialized colors of the PDF.
-  // */
-  // protected JSONArray serializeColors(PdfDocument document) {
-  // if (document == null) {
-  // return null;
-  // }
-  //
-  // JSONArray json = new JSONArray();
-  // for (PdfColor color : document.getColors()) {
-  // JSONObject serialized = serializeColor(color);
-  // if (serialized != null && serialized.length() > 0) {
-  // json.put(serialized);
-  // }
-  // }
-  // return json;
-  // }
+  /**
+   * Serializes the utilized colors on serializing the PDF document.
+   *
+   * @return A JSON array representing the serialized colors of the PDF.
+   */
+  protected JSONArray serializeColors() {
+    JSONArray json = new JSONArray();
+    for (PdfColor color : this.usedColors) {
+      JSONObject serialized = serializeColor(color);
+      if (serialized != null && serialized.length() > 0) {
+        json.put(serialized);
+      }
+    }
+    return json;
+  }
 
-  // /**
-  // * Serializes the given color.
-  // *
-  // * @param color
-  // * The color to serialize.
-  // * @return A JSON object representing the serialized color.
-  // */
-  // protected JSONObject serializeColor(PdfColor color) {
-  // if (color == null) {
-  // return null;
-  // }
-  //
-  // String id = color.getId();
-  //
-  // if (id == null) {
-  // return null;
-  // }
-  //
-  // JSONObject json = new JSONObject();
-  // json.put(CONTEXT_NAME_COLOR_ID, id);
-  // json.put(CONTEXT_NAME_COLOR_R, color.getR());
-  // json.put(CONTEXT_NAME_COLOR_G, color.getG());
-  // json.put(CONTEXT_NAME_COLOR_B, color.getB());
-  //
-  // return json;
-  // }
+  /**
+   * Serializes the given color.
+   *
+   * @param color
+   *        The color to serialize.
+   * @return A JSON object representing the serialized color.
+   */
+  protected JSONObject serializeColor(PdfColor color) {
+    if (color == null) {
+      return null;
+    }
+
+    String id = color.getId();
+    if (id == null) {
+      return null;
+    }
+
+    JSONObject json = new JSONObject();
+    // Append the id of the color.
+    json.put(CONTEXT_NAME_COLOR_ID, id);
+    
+    float[] rgb = color.getRGB();
+    if (rgb != null && rgb.length == 3) {
+      // Append the RGB values of the color.
+      json.put(CONTEXT_NAME_COLOR_R, rgb[0]);
+      json.put(CONTEXT_NAME_COLOR_G, rgb[1]);
+      json.put(CONTEXT_NAME_COLOR_B, rgb[2]);
+    }
+
+    return json;
+  }
 
   // ==========================================================================
 
@@ -382,5 +488,31 @@ public class JsonPdfSerializer implements PdfSerializer {
    */
   protected void writeTo(JSONObject json, OutputStream os) throws IOException {
     os.write(json.toString(INDENT_LENGTH).getBytes(StandardCharsets.UTF_8));
+  }
+
+  // ==========================================================================
+
+  /**
+   * Checks if the given PDF element should be serialized or not, dependent on
+   * the type and the role of the element.
+   * 
+   * @param element
+   *        The PDF element to check.
+   * @return True, if the given PDF element should be serialized, false
+   *         otherwise.
+   */
+  protected boolean isSerializePdfElement(PdfElement element) {
+    // Check if the type of the given element was registered to be serialized.
+    boolean isTypeGiven = !CollectionUtils.isNullOrEmpty(this.types);
+    if (isTypeGiven && !this.types.contains(element.getType())) {
+      return false;
+    }
+
+    // Check if the role of the given element was registered to be serialized.
+    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(this.roles);
+    if (isRoleGiven && !this.roles.contains(element.getRole())) {
+      return false;
+    }
+    return true;
   }
 }

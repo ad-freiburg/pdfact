@@ -7,6 +7,7 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacterSet;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfType;
 import icecite.models.PdfWord;
 
 /**
@@ -82,5 +83,12 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   @Override
   public void setText(String text) {
     this.text = text;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfType getType() {
+    return PdfType.TEXTLINES;
   }
 }

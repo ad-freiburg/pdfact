@@ -2,6 +2,7 @@ package icecite.models.plain;
 
 import icecite.models.PdfColor;
 import icecite.models.PdfShape;
+import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfShape}.
@@ -29,5 +30,12 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   @Override
   public void setColor(PdfColor color) {
     this.color = color;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfType getType() {
+    return PdfType.SHAPES;
   }
 }

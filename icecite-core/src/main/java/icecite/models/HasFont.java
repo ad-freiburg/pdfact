@@ -20,4 +20,21 @@ public interface HasFont {
    *        The font of the implementing object.
    */
   void setFont(PdfFont font);
+  
+  // ==========================================================================
+  
+  /**
+   * Returns the font size of the implementing object.
+   * 
+   * @return The font size of the implementing object.
+   */
+  float getFontSize();
+
+  /**
+   * Sets the font size of the implementing object.
+   * 
+   * @param fontsize
+   *        The font size of the implementing object.
+   */
+  void setFontSize(float fontsize);
 }

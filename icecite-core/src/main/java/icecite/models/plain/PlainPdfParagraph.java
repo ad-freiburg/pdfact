@@ -8,6 +8,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacterSet;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfParagraph}.
@@ -83,5 +84,12 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void setText(String text) {
     this.text = text;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfType getType() {
+    return PdfType.PARAGRAPHS;
   }
 }

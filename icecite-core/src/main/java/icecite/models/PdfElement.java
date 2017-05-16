@@ -20,4 +20,30 @@ public interface PdfElement extends HasBoundingBox {
    *        The page of this PDF element.
    */
   void setPage(PdfPage page);
+  
+  // ==========================================================================
+  
+  /**
+   * Returns the type of this PDF element.
+   * 
+   * @return The type of this PDF element.
+   */
+  PdfType getType();
+  
+  // ==========================================================================
+  
+  /**
+   * Returns the role of this PDF element.
+   * 
+   * @return The role of this PDF element.
+   */
+  PdfRole getRole();
+
+  /**
+   * Sets the role of this PDF element.
+   * 
+   * @param role
+   *        The role of this PDF element.
+   */
+  void setRole(PdfRole role);
 }

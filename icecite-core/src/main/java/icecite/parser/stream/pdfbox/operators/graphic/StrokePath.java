@@ -17,6 +17,7 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
+import icecite.models.PdfColorRegistry;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
@@ -33,14 +34,35 @@ public class StrokePath extends OperatorProcessor {
   /**
    * The factory to create instances of {@link PdfShape}.
    */
-  @Inject
-  protected PdfShapeFactory pdfShapeFactory;
+  protected PdfShapeFactory shapeFactory;
 
   /**
    * The factory to create instances of {@link PdfColor}.
    */
+  protected PdfColorFactory colorFactory;
+
+  /**
+   * The registry to manage {@link PdfColor} objects.
+   */
+  protected PdfColorRegistry colorRegistry;
+
+  /**
+   * Creates a new OperatorProcessor to process the operation "ShowText".
+   * 
+   * @param colorFactory
+   *        The factory to create instances of {@link PdfColor}.
+   * @param colorRegistry
+   *        The registry to manage {@link PdfColor} objects.
+   * @param shapeFactory
+   *        The factory to create instances of PdfShapeFactory.
+   */
   @Inject
-  protected PdfColorFactory pdfColorFactory;
+  public StrokePath(PdfColorFactory colorFactory,
+      PdfColorRegistry colorRegistry, PdfShapeFactory shapeFactory) {
+    this.colorFactory = colorFactory;
+    this.colorRegistry = colorRegistry;
+    this.shapeFactory = shapeFactory;
+  }
 
   // ==========================================================================
 
@@ -69,7 +91,15 @@ public class StrokePath extends OperatorProcessor {
       rgb = cs.toRGB(c.getComponents());
     }
 
-    PdfColor color = this.pdfColorFactory.create(rgb);
+    // TODO set the properties of the color.
+    PdfColor color = this.colorRegistry.getColor(Arrays.toString(rgb));
+    if (color == null) {
+      color = this.colorFactory.create();
+      color.setName(Arrays.toString(rgb));
+      color.setRGB(rgb);
+      this.colorRegistry.registerColor(color);
+    }
+
     GeneralPath linePath = this.engine.getLinePath();
 
     PathIterator itr;
@@ -116,7 +146,7 @@ public class StrokePath extends OperatorProcessor {
               new PlainPoint(linePathPosition[0], linePathPosition[1]),
               new PlainPoint(curveEnd[0], curveEnd[1]));
 
-          PdfShape shape = this.pdfShapeFactory.create();
+          PdfShape shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
@@ -136,7 +166,7 @@ public class StrokePath extends OperatorProcessor {
               new PlainPoint(linePathPosition[0], linePathPosition[1]),
               new PlainPoint(lineEnd[0], lineEnd[1]));
 
-          shape = this.pdfShapeFactory.create();
+          shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
@@ -161,7 +191,7 @@ public class StrokePath extends OperatorProcessor {
               new PlainPoint(linePathPosition[0], linePathPosition[1]),
               new PlainPoint(quadEnd[0], quadEnd[1]));
 
-          shape = this.pdfShapeFactory.create();
+          shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
