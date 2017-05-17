@@ -12,6 +12,7 @@ import icecite.serializer.PdfSerializer;
 import icecite.serializer.TxtPdfSerializer;
 import icecite.serializer.XmlPdfSerializer;
 import icecite.visualizer.PdfVisualizer;
+import icecite.visualizer.PdfVisualizer.PdfVisualizerFactory;
 import icecite.visualizer.PlainPdfVisualizer;
 
 /**
@@ -31,9 +32,9 @@ public class IceciteServiceModule extends AbstractModule {
         .to(JsonPdfSerializer.class);
 
     // Bind the visualizer.
-    bind(PdfVisualizer.class).to(PlainPdfVisualizer.class);
-
     fac(PdfDrawer.class, PdfDrawerFactory.class, PdfBoxDrawer.class);
+    fac(PdfVisualizer.class, PdfVisualizerFactory.class,
+        PlainPdfVisualizer.class);
   }
 
   /**

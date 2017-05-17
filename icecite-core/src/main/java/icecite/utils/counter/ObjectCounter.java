@@ -57,6 +57,26 @@ public class ObjectCounter<S, T> extends HashMap<S, Set<T>> {
   protected int leastFrequentObjectFrequencyCount = Integer.MAX_VALUE;
 
   // ==========================================================================
+  // The constructors.
+  
+  /**
+   * Creates a new object counter.
+   */
+  public ObjectCounter() {
+    super();
+  }
+
+  /**
+   * Creates a new object counter.
+   * 
+   * @param initialCapacity
+   *        The initial capacity of this counter.
+   */
+  public ObjectCounter(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  // ==========================================================================
   // Add methods.
 
   /**

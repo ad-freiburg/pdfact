@@ -20,6 +20,7 @@ public class SetStrokingColorSpace extends OperatorProcessor {
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSName name = (COSName) args.get(0);
 
+    // TODO: Use PdfColor here.
     PDColorSpace cs = this.engine.getResources().getColorSpace(name);
     this.engine.getGraphicsState().setStrokingColorSpace(cs);
     this.engine.getGraphicsState().setStrokingColor(cs.getInitialColor());

@@ -116,6 +116,7 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   public PdfTextLine pack(PdfPage page, PdfCharacterSet characters) {
     // FIXME
     PdfTextLine line = this.textLineFactory.create(characters);
+    // TODO: Use Guice here.
     line.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
     line.setPage(page);
     return line;

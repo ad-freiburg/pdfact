@@ -96,6 +96,7 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   public PdfTextBlock pack(PdfPage page, PdfCharacterSet characters) {
     // FIXME
     PdfTextBlock block = this.textBlockFactory.create(characters);
+    // TODO: use Guice here.
     block.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
     block.setPage(page);
     return block;

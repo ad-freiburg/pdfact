@@ -21,9 +21,10 @@ import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.color.ColorUtils;
+import icecite.utils.geometric.Point;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.plain.PlainPoint;
-import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * BI: Begin inline image.
@@ -34,20 +35,56 @@ public class BeginInlineImage extends OperatorProcessor {
   /**
    * The factory to create instances of {@link PdfFigure}.
    */
-  @Inject
-  protected PdfFigureFactory pdfFigureFactory;
+  protected PdfFigureFactory figureFactory;
 
   /**
    * The factory to create instances of {@link PdfColor}.
    */
-  @Inject
-  protected PdfColorFactory pdfColorFactory;
-  
+  protected PdfColorFactory colorFactory;
+
   /**
    * The factory to create instances of {@link PdfShape}.
    */
+  protected PdfShapeFactory shapeFactory;
+
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  /**
+   * The factory to create instances of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  // ==========================================================================
+  // Constructors.
+
+  /**
+   * Creates a new OperatorProcessor to process the operation
+   * "BeginInlineImage".
+   * 
+   * @param figureFactory
+   *        The factory to create instances of PdfFigure.
+   * @param colorFactory
+   *        The factory to create instances of PdfColor.
+   * @param shapeFactory
+   *        The factory to create instances of PdfShape.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
+   */
   @Inject
-  protected PdfShapeFactory pdfShapeFactory;
+  public BeginInlineImage(PdfFigureFactory figureFactory,
+      PdfColorFactory colorFactory, PdfShapeFactory shapeFactory,
+      PointFactory pointFactory, RectangleFactory rectangleFactory) {
+    this.figureFactory = figureFactory;
+    this.colorFactory = colorFactory;
+    this.shapeFactory = shapeFactory;
+    this.pointFactory = pointFactory;
+    this.rectangleFactory = rectangleFactory;
+  }
 
   // ==========================================================================
 
@@ -69,23 +106,26 @@ public class BeginInlineImage extends OperatorProcessor {
     // Type3 streams may contain BI operands, but we don't want to consider
     // those.
     if (!this.engine.isType3Stream()) {
-      Rectangle boundBox = PlainRectangle.from2Vertices(
-          new PlainPoint(minX, minY), new PlainPoint(maxX, maxY));
+      Point ll = this.pointFactory.create(minX, minY);
+      Point ur = this.pointFactory.create(maxX, maxY);
+      // TODO: Check if we have to check if ur is indeed the upper right.
+      Rectangle boundBox = this.rectangleFactory.create(ll, ur);
 
       PDImage image = new PDInlineImage(op.getImageParameters(),
           op.getImageData(), this.engine.getResources());
 
       // If the image consists of only one color, consider it as a shape.
+      // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
       if (exclusiveColor != null) {
-        PdfColor color = this.pdfColorFactory.create();
+        PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);
-        PdfShape shape = this.pdfShapeFactory.create();
+        PdfShape shape = this.shapeFactory.create();
         shape.setBoundingBox(boundBox);
         shape.setColor(color);
         this.engine.handlePdfShape(shape);
       } else {
-        PdfFigure figure = this.pdfFigureFactory.create();
+        PdfFigure figure = this.figureFactory.create();
         figure.setBoundingBox(boundBox);
         this.engine.handlePdfFigure(figure);
       }

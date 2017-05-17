@@ -30,6 +30,8 @@ public abstract class SetColor extends OperatorProcessor {
     }
     COSArray array = new COSArray();
     array.addAll(args);
+    
+    // TODO: Use PdfColor here.
     setColor(new PDColor(array, cs));
   }
 

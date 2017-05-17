@@ -21,9 +21,10 @@ import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.color.ColorUtils;
+import icecite.utils.geometric.Point;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.plain.PlainPoint;
-import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * Do: Invoke a named xobject.
@@ -34,21 +35,59 @@ public class Invoke extends OperatorProcessor {
   /**
    * The factory to create instances of {@link PdfFigure}.
    */
-  @Inject
-  protected PdfFigureFactory pdfFigureFactory;
+  protected PdfFigureFactory figureFactory;
 
   /**
    * The factory to create instances of {@link PdfColor}.
    */
-  @Inject
-  protected PdfColorFactory pdfColorFactory;
+  protected PdfColorFactory colorFactory;
   
   /**
    * The factory to create instances of {@link PdfShape}.
    */
+  protected PdfShapeFactory shapeFactory;
+  
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+  
+  /**
+   * The factory to create instances of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+  
+  // ==========================================================================
+  // Constructors.
+  
+  /**
+   * Creates a new OperatorProcessor to process the operation
+   * "Invoke".
+   * 
+   * @param figureFactory
+   *        The factory to create instances of PdfFigure.
+   * @param colorFactory
+   *        The factory to create instances of PdfColor.
+   * @param shapeFactory
+   *        The factory to create instances of PdfShape.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
+   */
   @Inject
-  protected PdfShapeFactory pdfShapeFactory;
-
+  public Invoke(PdfFigureFactory figureFactory,
+      PdfColorFactory colorFactory, PdfShapeFactory shapeFactory,
+      PointFactory pointFactory, RectangleFactory rectangleFactory) {
+    this.figureFactory = figureFactory;
+    this.colorFactory = colorFactory;
+    this.shapeFactory = shapeFactory;
+    this.pointFactory = pointFactory;
+    this.rectangleFactory = rectangleFactory;
+  }
+  
+  // ==========================================================================
+  
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     // Get the name of the PDXOject.
@@ -92,28 +131,27 @@ public class Invoke extends OperatorProcessor {
       ctmAT.scale(1f / imageWidth, 1f / imageHeight);
       Matrix at = new Matrix(ctmAT);
 
-      Rectangle boundBox = PlainRectangle.from2Vertices(
-          new PlainPoint(ctm.getTranslateX(), ctm.getTranslateY()),
-          new PlainPoint(ctm.getTranslateX() + at.getScaleX() * imageWidth,
-              ctm.getTranslateY() + at.getScaleY() * imageHeight));
-
-      // Rectangle boundBox = new SimpleRectangle();
-      // boundBox.setMinX(ctm.getTranslateX());
-      // boundBox.setMinY(ctm.getTranslateY());
-      // boundBox.setMaxX(ctm.getTranslateX() + at.getScaleX() * imageWidth);
-      // boundBox.setMaxY(ctm.getTranslateY() + at.getScaleY() * imageHeight);
-
+      // TODO: Check if ur and ll are indeeed ur and ll.
+      float minX = ctm.getTranslateX();
+      float minY = ctm.getTranslateY();
+      float maxX = minX + at.getScaleX() * imageWidth;
+      float maxY = minY + at.getScaleY() * imageHeight;
+      Point ll = this.pointFactory.create(minX, minY);
+      Point ur = this.pointFactory.create(maxX, maxY);
+      Rectangle boundBox = this.rectangleFactory.create(ll, ur);
+      
       // If the image consists of only one color, consider it as a shape.
+      // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
       if (exclusiveColor != null) {
-        PdfColor color = this.pdfColorFactory.create();
+        PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);
-        PdfShape shape = this.pdfShapeFactory.create();
+        PdfShape shape = this.shapeFactory.create();
         shape.setBoundingBox(boundBox);
         shape.setColor(color);
         this.engine.handlePdfShape(shape);
       } else {
-        PdfFigure figure = this.pdfFigureFactory.create();
+        PdfFigure figure = this.figureFactory.create();
         figure.setBoundingBox(boundBox);
         this.engine.handlePdfFigure(figure);
       }

@@ -7,9 +7,11 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
+import com.google.inject.Inject;
+
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
-import icecite.utils.geometric.plain.PlainPoint;
+import icecite.utils.geometric.Point.PointFactory;
 
 /**
  * c: Append curved segment to path.
@@ -17,6 +19,26 @@ import icecite.utils.geometric.plain.PlainPoint;
  * @author Claudius Korzen
  */
 public class CurveTo extends OperatorProcessor {
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  // ==========================================================================
+
+  /**
+   * Creates a new OperatorProcessor to process the operation "CurveTo".
+   * 
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   */
+  @Inject
+  public CurveTo(PointFactory pointFactory) {
+    this.pointFactory = pointFactory;
+  }
+
+  // ==========================================================================
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x1 = (COSNumber) args.get(0);
@@ -26,9 +48,9 @@ public class CurveTo extends OperatorProcessor {
     COSNumber x3 = (COSNumber) args.get(4);
     COSNumber y3 = (COSNumber) args.get(5);
 
-    Point point1 = new PlainPoint(x1.floatValue(), y1.floatValue());
-    Point point2 = new PlainPoint(x2.floatValue(), y2.floatValue());
-    Point point3 = new PlainPoint(x3.floatValue(), y3.floatValue());
+    Point point1 = this.pointFactory.create(x1.floatValue(), y1.floatValue());
+    Point point2 = this.pointFactory.create(x2.floatValue(), y2.floatValue());
+    Point point3 = this.pointFactory.create(x3.floatValue(), y3.floatValue());
 
     this.engine.transform(point1);
     this.engine.transform(point2);

@@ -1,5 +1,8 @@
 package icecite.utils.geometric.plain;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Rectangle;
@@ -33,6 +36,7 @@ public class PlainLine extends Line {
   /**
    * Creates a new line with start point (0,0) and end point (0,0).
    */
+  @AssistedInject
   public PlainLine() {
     this(0, 0, 0, 0);
   }
@@ -63,7 +67,9 @@ public class PlainLine extends Line {
    * @param endPoint
    *        The end point of this line.
    */
-  public PlainLine(Point startPoint, Point endPoint) {
+  @AssistedInject
+  public PlainLine(@Assisted("start") Point startPoint,
+      @Assisted("end") Point endPoint) {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
     this.boundingBox = new PlainRectangle();

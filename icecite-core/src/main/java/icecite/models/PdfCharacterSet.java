@@ -87,6 +87,16 @@ public interface PdfCharacterSet extends PdfElementSet<PdfCharacter> {
     /**
      * Creates a PdfCharacterSet.
      * 
+     * @param initialCapacity
+     *        The initial capacity.
+     * 
+     * @return An instance of {@link PdfCharacterSet}.
+     */
+    PdfCharacterSet create(int initialCapacity);
+
+    /**
+     * Creates a PdfCharacterSet.
+     * 
      * @param characters
      *        The characters of the set.
      * 

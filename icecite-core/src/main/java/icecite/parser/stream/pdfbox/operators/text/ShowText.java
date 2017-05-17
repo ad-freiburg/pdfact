@@ -354,6 +354,12 @@ public class ShowText extends OperatorProcessor {
       this.fontRegistry.registerFont(pdfFont);
     }
 
+    // TODO: Round the values of boundingbox.
+    boundBox.setMinX(MathUtils.round(boundBox.getMinX(), 1));
+    boundBox.setMinY(MathUtils.round(boundBox.getMinY(), 1));
+    boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
+    boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
+        
     PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontSize(fontsize);

@@ -236,32 +236,35 @@ public class XmlPdfSerializer implements PdfSerializer {
    * 
    * @param page
    *        The page to serialize.
-   * @param level
+   * @param lvl
    *        The current indentation level.
    * @return The serialization string representing the given page.
    */
-  protected List<String> serializePage(PdfPage page, int level) {
+  protected List<String> serializePage(PdfPage page, int lvl) {
     if (page == null) {
       return null;
     }
     
     List<String> lines = new ArrayList<>();
     // Serialize the text elements.
-    for (PdfParagraph para : page.getParagraphs()) {
-      if (isSerializePdfElement(para)) {
-        lines.add(serializePdfElement(para, CONTEXT_NAME_PARAGRAPH, level));
-      }
-      for (PdfTextLine line : para.getTextLines()) {
-        if (isSerializePdfElement(line)) {
-          lines.add(serializePdfElement(line, CONTEXT_NAME_TEXTLINE, level));
+    List<PdfParagraph> paragraphs = page.getParagraphs();
+    if (paragraphs != null) {
+      for (PdfParagraph para : paragraphs) {
+        if (isSerializePdfElement(para)) {
+          lines.add(serializePdfElement(para, CONTEXT_NAME_PARAGRAPH, lvl));
         }
-        for (PdfWord word : line.getWords()) {
-          if (isSerializePdfElement(word)) {
-            lines.add(serializePdfElement(word, CONTEXT_NAME_WORD, level));
+        for (PdfTextLine line : para.getTextLines()) {
+          if (isSerializePdfElement(line)) {
+            lines.add(serializePdfElement(line, CONTEXT_NAME_TEXTLINE, lvl));
           }
-          for (PdfCharacter c : word.getCharacters()) {
-            if (isSerializePdfElement(c)) {
-              lines.add(serializePdfElement(c, CONTEXT_NAME_CHARACTER, level));
+          for (PdfWord word : line.getWords()) {
+            if (isSerializePdfElement(word)) {
+              lines.add(serializePdfElement(word, CONTEXT_NAME_WORD, lvl));
+            }
+            for (PdfCharacter c : word.getCharacters()) {
+              if (isSerializePdfElement(c)) {
+                lines.add(serializePdfElement(c, CONTEXT_NAME_CHARACTER, lvl));
+              }
             }
           }
         }
@@ -271,12 +274,12 @@ public class XmlPdfSerializer implements PdfSerializer {
     // Serialize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
       if (isSerializePdfElement(figure)) {
-        lines.add(serializePdfElement(figure, CONTEXT_NAME_FIGURE, level));
+        lines.add(serializePdfElement(figure, CONTEXT_NAME_FIGURE, lvl));
       }
     }
     for (PdfShape shape : page.getShapes()) {
       if (isSerializePdfElement(shape)) {
-        lines.add(serializePdfElement(shape, CONTEXT_NAME_SHAPE, level));
+        lines.add(serializePdfElement(shape, CONTEXT_NAME_SHAPE, lvl));
       }
     }
 

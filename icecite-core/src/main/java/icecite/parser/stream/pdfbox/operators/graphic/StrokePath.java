@@ -21,9 +21,10 @@ import icecite.models.PdfColorRegistry;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
+import icecite.utils.geometric.Point;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.plain.PlainPoint;
-import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * S: Stroke the path.
@@ -47,7 +48,20 @@ public class StrokePath extends OperatorProcessor {
   protected PdfColorRegistry colorRegistry;
 
   /**
-   * Creates a new OperatorProcessor to process the operation "ShowText".
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  /**
+   * The factory to create instances of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  // ==========================================================================
+  // Constructors.
+
+  /**
+   * Creates a new OperatorProcessor to process the operation "StrokePath".
    * 
    * @param colorFactory
    *        The factory to create instances of {@link PdfColor}.
@@ -55,13 +69,20 @@ public class StrokePath extends OperatorProcessor {
    *        The registry to manage {@link PdfColor} objects.
    * @param shapeFactory
    *        The factory to create instances of PdfShapeFactory.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
    */
   @Inject
   public StrokePath(PdfColorFactory colorFactory,
-      PdfColorRegistry colorRegistry, PdfShapeFactory shapeFactory) {
+      PdfColorRegistry colorRegistry, PdfShapeFactory shapeFactory,
+      PointFactory pointFactory, RectangleFactory rectangleFactory) {
     this.colorFactory = colorFactory;
     this.colorRegistry = colorRegistry;
     this.shapeFactory = shapeFactory;
+    this.pointFactory = pointFactory;
+    this.rectangleFactory = rectangleFactory;
   }
 
   // ==========================================================================
@@ -126,7 +147,7 @@ public class StrokePath extends OperatorProcessor {
         }
       }
 
-      float[] linePathPosition = this.engine.getLinePathPosition();
+      float[] pathPosition = this.engine.getLinePathPosition();
 
       switch (currentSegment) {
         case PathIterator.SEG_CLOSE:
@@ -136,15 +157,10 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_CUBICTO:
           float[] curveEnd = Arrays.copyOfRange(coordinates, 4, 6);
 
-          // Rectangle rect = new SimpleRectangle();
-          // rect.setMinX(Math.min(linePathPosition[0], curveEnd[0]));
-          // rect.setMinY(Math.min(linePathPosition[1], curveEnd[1]));
-          // rect.setMaxX(Math.max(linePathPosition[0], curveEnd[0]));
-          // rect.setMaxY(Math.max(linePathPosition[1], curveEnd[1]));
-
-          Rectangle rect = PlainRectangle.from2Vertices(
-              new PlainPoint(linePathPosition[0], linePathPosition[1]),
-              new PlainPoint(curveEnd[0], curveEnd[1]));
+          // TODO: Check if ll and ur is indeed ll and ur.
+          Point ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
+          Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
+          Rectangle rect = this.rectangleFactory.create(ll, ur);
 
           PdfShape shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
@@ -156,16 +172,11 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_LINETO:
           float[] lineEnd = Arrays.copyOf(coordinates, 2);
 
-          // rect = new SimpleRectangle();
-          // rect.setMinX(Math.min(linePathPosition[0], lineEnd[0]));
-          // rect.setMinY(Math.min(linePathPosition[1], lineEnd[1]));
-          // rect.setMaxX(Math.max(linePathPosition[0], lineEnd[0]));
-          // rect.setMaxY(Math.max(linePathPosition[1], lineEnd[1]));
-
-          rect = PlainRectangle.from2Vertices(
-              new PlainPoint(linePathPosition[0], linePathPosition[1]),
-              new PlainPoint(lineEnd[0], lineEnd[1]));
-
+          // TODO: Check if ll and ur is indeed ll and ur.
+          ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
+          ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
+          rect = this.rectangleFactory.create(ll, ur);
+          
           shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);
@@ -181,16 +192,11 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_QUADTO:
           float[] quadEnd = Arrays.copyOfRange(coordinates, 2, 4);
 
-          // rect = new SimpleRectangle();
-          // rect.setMinX(Math.min(linePathPosition[0], quadEnd[0]));
-          // rect.setMinY(Math.min(linePathPosition[1], quadEnd[1]));
-          // rect.setMaxX(Math.max(linePathPosition[0], quadEnd[0]));
-          // rect.setMaxY(Math.max(linePathPosition[1], quadEnd[1]));
-
-          rect = PlainRectangle.from2Vertices(
-              new PlainPoint(linePathPosition[0], linePathPosition[1]),
-              new PlainPoint(quadEnd[0], quadEnd[1]));
-
+          // TODO: Check if ll and ur is indeed ll and ur.
+          ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
+          ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
+          rect = this.rectangleFactory.create(ll, ur);
+          
           shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);

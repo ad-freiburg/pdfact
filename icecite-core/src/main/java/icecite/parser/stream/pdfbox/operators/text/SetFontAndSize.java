@@ -26,6 +26,7 @@ public class SetFontAndSize extends OperatorProcessor {
       throw new MissingOperandException(op, args);
     }
 
+    // TODO: Use PdfFont here.
     COSName fontName = (COSName) args.get(0);
     float fontSize = ((COSNumber) args.get(1)).floatValue();
     this.engine.getGraphicsState().getTextState().setFontSize(fontSize);

@@ -1,5 +1,7 @@
 package icecite.utils.geometric;
 
+import com.google.inject.assistedinject.Assisted;
+
 /**
  * The interface that declares the methods of a line.
  * 
@@ -110,5 +112,18 @@ public abstract class Line extends Geometric {
      * @return An instance of {@PdfLine}.
      */
     Line create();
+
+    /**
+     * Creates a new line.
+     * 
+     * @param startPoint
+     *        The start point of the line.
+     * @param endPoint
+     *        The end point of the line.
+     * 
+     * @return An instance of {@PdfLine}.
+     */
+    Line create(@Assisted("start") Point startPoint,
+        @Assisted("end") Point endPoint);
   }
 }

@@ -87,6 +87,7 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   public PdfWord pack(PdfPage page, PdfCharacterSet characters) {
     // FIXME
     PdfWord word = this.wordFactory.create(characters);
+    // TODO: Use guice here.
     word.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
     word.setPage(page);
     return word;

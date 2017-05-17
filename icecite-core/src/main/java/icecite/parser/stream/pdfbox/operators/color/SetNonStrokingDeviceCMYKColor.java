@@ -19,6 +19,7 @@ public class SetNonStrokingDeviceCMYKColor extends SetNonStrokingColor {
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     PDResources resources = this.engine.getResources();
+    // TODO: Use PdfColor here.
     PDColorSpace cs = resources.getColorSpace(COSName.DEVICECMYK);
     this.engine.getGraphicsState().setNonStrokingColorSpace(cs);
     super.process(op, args);

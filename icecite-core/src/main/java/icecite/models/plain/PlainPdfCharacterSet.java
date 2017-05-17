@@ -65,6 +65,23 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
    * 
    * @param rectangleFactory
    *        The factory to create instance of {@Rectangle}.
+   * @param initialCapacity
+   *        The initial capacity.
+   */
+  @AssistedInject
+  public PlainPdfCharacterSet(RectangleFactory rectangleFactory,
+      @Assisted int initialCapacity) {
+    super(rectangleFactory, initialCapacity);
+    this.colorCounter = new ObjectCounter<>(initialCapacity);
+    this.fontCounter = new ObjectCounter<>(initialCapacity);
+    this.fontsizeCounter = new FloatCounter<>(initialCapacity);
+  }
+
+  /**
+   * Creates a new set of characters.
+   * 
+   * @param rectangleFactory
+   *        The factory to create instance of {@Rectangle}.
    * @param characters
    *        The characters of the set to create.
    */
@@ -74,7 +91,7 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
     this(rectangleFactory);
     addAll(characters);
   }
-  
+
   // ==========================================================================
 
   /**

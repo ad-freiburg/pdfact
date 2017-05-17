@@ -20,6 +20,7 @@ public class SetNonStrokingColorSpace extends OperatorProcessor {
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSName name = (COSName) args.get(0);
 
+    // TODO: Use PdfColor here.
     PDColorSpace cs = this.engine.getResources().getColorSpace(name);
     this.engine.getGraphicsState().setNonStrokingColorSpace(cs);
     this.engine.getGraphicsState().setNonStrokingColor(cs.getInitialColor());

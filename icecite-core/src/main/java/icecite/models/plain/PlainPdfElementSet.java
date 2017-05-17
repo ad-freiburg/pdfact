@@ -97,13 +97,32 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
    * 
    * @param rectangleFactory
    *        The factory to create instances of {@Rectangle}.
+   * @param initialCapacity The initial capacity.
+   */
+  @AssistedInject
+  public PlainPdfElementSet(RectangleFactory rectangleFactory,
+      @Assisted int initialCapacity) {
+    this.rectangleFactory = rectangleFactory;
+    this.heightCounter = new FloatCounter<>(initialCapacity);
+    this.widthCounter = new FloatCounter<>(initialCapacity);
+    this.minXCounter = new FloatCounter<>(initialCapacity);
+    this.minYCounter = new FloatCounter<>(initialCapacity);
+    this.maxXCounter = new FloatCounter<>(initialCapacity);
+    this.maxYCounter = new FloatCounter<>(initialCapacity);
+  }
+
+  /**
+   * Creates a new set of PDF elements.
+   * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@Rectangle}.
    * @param elements
    *        The elements of this set.
    */
   @AssistedInject
   public PlainPdfElementSet(RectangleFactory rectangleFactory,
       @Assisted Collection<T> elements) {
-    this(rectangleFactory);
+    this(rectangleFactory, elements.size());
     addAll(elements);
   }
 

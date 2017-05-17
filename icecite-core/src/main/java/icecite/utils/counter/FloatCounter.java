@@ -67,6 +67,26 @@ public class FloatCounter<T> extends TFloatObjectHashMap<Set<T>> {
   protected float averageValue = Float.MAX_VALUE;
 
   // ==========================================================================
+  // The constructors.
+
+  /**
+   * Creates a new float counter.
+   */
+  public FloatCounter() {
+    super();
+  }
+
+  /**
+   * Creates a new float counter.
+   * 
+   * @param initialCapacity
+   *        The initial capacity of this counter.
+   */
+  public FloatCounter(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  // ==========================================================================
   // Add methods.
 
   /**

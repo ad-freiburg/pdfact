@@ -20,6 +20,7 @@ public class SetNonStrokingDeviceRGBColor extends SetNonStrokingColor {
   public void process(Operator op, List<COSBase> args) throws IOException {
     PDResources resources = this.engine.getResources();
     PDColorSpace cs = resources.getColorSpace(COSName.DEVICERGB);
+    // TODO: Use PdfColor here.
     this.engine.getGraphicsState().setNonStrokingColorSpace(cs);
     super.process(op, args);
   }

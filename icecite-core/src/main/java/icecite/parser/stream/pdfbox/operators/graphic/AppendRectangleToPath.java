@@ -8,9 +8,11 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
+import com.google.inject.Inject;
+
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
-import icecite.utils.geometric.plain.PlainPoint;
+import icecite.utils.geometric.Point.PointFactory;
 
 /**
  * re: Appends a rectangle to the path.
@@ -18,6 +20,28 @@ import icecite.utils.geometric.plain.PlainPoint;
  * @author Claudius Korzen.
  */
 public class AppendRectangleToPath extends OperatorProcessor {
+  /**
+   * The factory to create instances of Point.
+   */
+  protected PointFactory pointFactory;
+
+  // ==========================================================================
+  // Constructors.
+  
+  /**
+   * Creates a new OperatorProcessor to process the operation
+   * "AppendRectangleToPath".
+   * 
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   */
+  @Inject
+  public AppendRectangleToPath(PointFactory pointFactory) {
+    this.pointFactory = pointFactory;
+  }
+
+  // ==========================================================================
+  
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x = (COSNumber) args.get(0);
@@ -25,22 +49,26 @@ public class AppendRectangleToPath extends OperatorProcessor {
     COSNumber w = (COSNumber) args.get(2);
     COSNumber h = (COSNumber) args.get(3);
 
-    Point lowerLeft = new PlainPoint(x.floatValue(), y.floatValue());
-    Point upperRight = new PlainPoint(w.floatValue() + lowerLeft.getX(),
-        h.floatValue() + lowerLeft.getY());
+    float minX = x.floatValue();
+    float minY = y.floatValue();
+    float maxX = minX + w.floatValue();
+    float maxY = minY + h.floatValue();
+    
+    Point ll = this.pointFactory.create(minX, minY);
+    Point ur = this.pointFactory.create(maxX, maxY);
 
-    this.engine.transform(lowerLeft);
-    this.engine.transform(upperRight);
+    this.engine.transform(ll);
+    this.engine.transform(ur);
 
     // To ensure that the path is created in the right direction,
     // we have to create it by combining single lines instead of
     // creating a simple rectangle
     GeneralPath path = this.engine.getLinePath();
-    path.moveTo(lowerLeft.getX(), lowerLeft.getY());
-    path.lineTo(upperRight.getX(), lowerLeft.getY());
-    path.lineTo(upperRight.getX(), upperRight.getY());
-    path.lineTo(lowerLeft.getX(), upperRight.getY());
-    path.lineTo(lowerLeft.getX(), lowerLeft.getY());
+    path.moveTo(ll.getX(), ll.getY());
+    path.lineTo(ur.getX(), ll.getY());
+    path.lineTo(ur.getX(), ur.getY());
+    path.lineTo(ll.getX(), ur.getY());
+    path.lineTo(ll.getX(), ll.getY());
   }
 
   @Override

@@ -107,7 +107,6 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
 
   @Override
   public String toString() {
-    return this.text;
-    // return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
+    return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
   }
 }

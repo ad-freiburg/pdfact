@@ -6,7 +6,7 @@ package icecite.models;
  *
  * @author Claudius Korzen
  */
-public interface HasCharacters extends HasPdfElements<PdfCharacter> {
+public interface HasCharacters {
   /**
    * Returns the set of characters.
    * 

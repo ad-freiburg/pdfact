@@ -8,11 +8,13 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
+import com.google.inject.Inject;
+
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.plain.PlainPoint;
-import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * d1: Set width and bounding box information for the glyph and declare that
@@ -27,6 +29,37 @@ import icecite.utils.geometric.plain.PlainRectangle;
  * @author Claudius Korzen
  */
 public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  /**
+   * The factory to create instances of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  // ==========================================================================
+  // Constructors.
+
+  /**
+   * Creates a new OperatorProcessor to process the operation
+   * "SetType3GlyphWidthAndBoundingBox".
+   * 
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param rectangleFactory 
+   *        The factory to create instances of Rectangle.
+   */
+  @Inject
+  public SetType3GlyphWidthAndBoundingBox(PointFactory pointFactory,
+      RectangleFactory rectangleFactory) {
+    this.pointFactory = pointFactory;
+    this.rectangleFactory = rectangleFactory;
+  }
+
+  // ==========================================================================
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     if (args.size() < 6) {
@@ -41,19 +74,19 @@ public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
     COSNumber urx = (COSNumber) args.get(4);
     COSNumber ury = (COSNumber) args.get(5);
 
-    Point lowerLeft = new PlainPoint(llx.floatValue(), lly.floatValue());
-    Point upperRight = new PlainPoint(urx.floatValue(), ury.floatValue());
+    Point ll = this.pointFactory.create(llx.floatValue(), lly.floatValue());
+    Point ur = this.pointFactory.create(urx.floatValue(), ury.floatValue());
 
-    this.engine.transform(lowerLeft);
-    this.engine.transform(upperRight);
+    this.engine.transform(ll);
+    this.engine.transform(ur);
 
-    float minX = Math.min(lowerLeft.getX(), upperRight.getX());
-    float minY = Math.min(lowerLeft.getY(), upperRight.getY());
-    float maxX = Math.max(lowerLeft.getX(), upperRight.getX());
-    float maxY = Math.max(lowerLeft.getY(), upperRight.getY());
+    float minX = Math.min(ll.getX(), ur.getX());
+    float minY = Math.min(ll.getY(), ur.getY());
+    float maxX = Math.max(ll.getX(), ur.getX());
+    float maxY = Math.max(ll.getY(), ur.getY());
 
-    Rectangle boundingBox = new PlainRectangle(minX, minY, maxX, maxY);
-    this.engine.setCurrentType3GlyphBoundingBox(boundingBox);
+    Rectangle boundBox = this.rectangleFactory.create(minX, minY, maxX, maxY);
+    this.engine.setCurrentType3GlyphBoundingBox(boundBox);
   }
 
   @Override

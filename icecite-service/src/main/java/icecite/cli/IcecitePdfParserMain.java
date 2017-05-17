@@ -22,12 +22,13 @@ import icecite.parser.stream.pdfbox.guice.OperatorProcessorModule;
 import icecite.serializer.PdfSerializer;
 import icecite.tokenizer.PdfTextTokenizer;
 import icecite.visualizer.PdfVisualizer;
+import icecite.visualizer.PdfVisualizer.PdfVisualizerFactory;
 
 // TODO: Write a usable main method.
 
 /**
  * The main class to manage the Icecite parser from the command line.
- *  
+ * 
  * @author Claudius Korzen
  */
 public class IcecitePdfParserMain {
@@ -88,11 +89,14 @@ public class IcecitePdfParserMain {
 
     // Create an instance of PdfParser.
     PdfParserFactory factory = injector.getInstance(PdfParserFactory.class);
-    PdfVisualizer visualizer = injector.getInstance(PdfVisualizer.class);
+    PdfVisualizerFactory visualizerFactory = injector
+        .getInstance(PdfVisualizerFactory.class);
     PdfSerializer serializer = injector
         .getInstance(Key.get(PdfSerializer.class, Names.named("xml")));
     PdfParser pdfParser = factory.create();
     PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
+
+    PdfVisualizer visualizer = visualizerFactory.create();
 
     PdfDocument document = pdfParser.parsePdf(inputPdf);
     tokenizer.tokenizePdfDocument(document);
@@ -101,7 +105,7 @@ public class IcecitePdfParserMain {
     try (OutputStream stream = Files.newOutputStream(vis)) {
       visualizer.visualize(document, stream);
     }
-    
+
     Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
     try (OutputStream stream = Files.newOutputStream(vis2)) {
       serializer.serialize(document, stream);

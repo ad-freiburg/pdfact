@@ -67,6 +67,26 @@ public class IntCounter<T> extends TIntObjectHashMap<Set<T>> {
   protected int averageValue = Integer.MAX_VALUE;
 
   // ==========================================================================
+  // The constructors.
+
+  /**
+   * Creates a new int counter.
+   */
+  public IntCounter() {
+    super();
+  }
+
+  /**
+   * Creates a new int counter.
+   * 
+   * @param initialCapacity
+   *        The initial capacity of this counter.
+   */
+  public IntCounter(int initialCapacity) {
+    super(initialCapacity);
+  }
+
+  // ==========================================================================
   // Add methods.
 
   /**

@@ -23,11 +23,11 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.drawer.PdfDrawer;
 import icecite.models.HasBoundingBox;
 import icecite.utils.geometric.Line;
+import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
+import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.plain.PlainLine;
-import icecite.utils.geometric.plain.PlainPoint;
-import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * An implementation of PdfVisualizer using PdfBox.
@@ -35,6 +35,21 @@ import icecite.utils.geometric.plain.PlainRectangle;
  * @author Claudius Korzen.
  */
 public class PdfBoxDrawer implements PdfDrawer {
+  /**
+   * The rectangle to create instances of Rectangle.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  /**
+   * The rectangle to create instances of Line.
+   */
+  protected LineFactory lineFactory;
+
+  /**
+   * The rectangle to create instances of Point.
+   */
+  protected PointFactory pointFactory;
+
   /**
    * The default color.
    */
@@ -73,38 +88,68 @@ public class PdfBoxDrawer implements PdfDrawer {
   /**
    * Creates a new visualizer from the given file.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param lineFactory
+   *        The factory to create instances of Line.
    * @param pdfFile
    *        The PDF file to process.
    * @throws IOException
    *         If reading the PDF file failed.
    */
   @AssistedInject
-  public PdfBoxDrawer(@Assisted Path pdfFile) throws IOException {
-    this(pdfFile != null ? pdfFile.toFile() : null);
+  public PdfBoxDrawer(RectangleFactory rectangleFactory,
+      PointFactory pointFactory, LineFactory lineFactory,
+      @Assisted Path pdfFile) throws IOException {
+    this(rectangleFactory, pointFactory, lineFactory,
+        pdfFile != null ? pdfFile.toFile() : null);
   }
 
   /**
    * Creates a new visualizer from the given file.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param lineFactory
+   *        The factory to create instances of Line.
    * @param pdfFile
    *        The PDF file to process.
    * @throws IOException
    *         If reading the PDF file failed.
    */
   @AssistedInject
-  public PdfBoxDrawer(@Assisted File pdfFile) throws IOException {
-    this(pdfFile != null ? PDDocument.load(pdfFile) : null);
+  public PdfBoxDrawer(RectangleFactory rectangleFactory,
+      PointFactory pointFactory, LineFactory lineFactory,
+      @Assisted File pdfFile) throws IOException {
+    this(rectangleFactory, pointFactory, lineFactory,
+        pdfFile != null ? PDDocument.load(pdfFile) : null);
   }
 
   /**
    * Creates a new visualizer from the given PDDocument.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   * @param lineFactory
+   *        The factory to create instances of Line.
    * @param pdDocument
    *        The PDDocument.
    * @throws IOException
    *         If parsing the PDDocument failed.
    */
-  public PdfBoxDrawer(PDDocument pdDocument) throws IOException {
+  @AssistedInject
+  public PdfBoxDrawer(RectangleFactory rectangleFactory,
+      PointFactory pointFactory, LineFactory lineFactory, PDDocument pdDocument)
+      throws IOException {
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
+    this.lineFactory = lineFactory;
     this.pdDocument = pdDocument;
 
     if (pdDocument == null) {
@@ -129,8 +174,8 @@ public class PdfBoxDrawer implements PdfDrawer {
     for (PDPage page : pages) {
       this.pageStreams.add(new PDPageContentStream(pdDocument, page,
           PDPageContentStream.AppendMode.APPEND, true));
-      // TODO: Use guice.
-      Rectangle boundingBox = new PlainRectangle();
+
+      Rectangle boundingBox = this.rectangleFactory.create();
 
       PDRectangle box = page.getCropBox();
       if (box == null) {
@@ -156,36 +201,34 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawLine(Line line, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft)
-    throws IOException {
+      boolean originInUpperLeft) throws IOException {
     this.drawLine(line, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
-  public void drawLine(Line line, int pageNum, Color color)
-    throws IOException {
+  public void drawLine(Line line, int pageNum, Color color) throws IOException {
     this.drawLine(line, pageNum, color, false, false);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawLine(line, pageNum, color, DEFAULT_LINE_THICKNESS,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color, float thickness)
-    throws IOException {
+      throws IOException {
     drawLine(line, pageNum, color, thickness, false, false);
   }
 
   @Override
   public void drawLine(Line line, int pageNum, Color color, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     PDPageContentStream stream = getPdPageContentStream(pageNum);
     Line adapted = adaptLine(line, pageNum, relativeToUpperLeft,
         originInUpperLeft);
@@ -207,36 +250,35 @@ public class PdfBoxDrawer implements PdfDrawer {
   @Override
   public void drawRectangle(Rectangle rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(rect, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(rect, pageNum, color, false, false);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(rect, pageNum, color, DEFAULT_LINE_THICKNESS,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
-      float thickness)
-    throws IOException {
+      float thickness) throws IOException {
     drawRectangle(rect, pageNum, color, thickness, false, false);
   }
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     if (rect == null) {
       return;
     }
@@ -260,43 +302,42 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, color);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawRectangle(box.getBoundingBox(), pageNum, color,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
-      float thickness)
-    throws IOException {
+      float thickness) throws IOException {
     drawRectangle(box.getBoundingBox(), pageNum, color, thickness);
   }
 
   @Override
   public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     drawRectangle(box.getBoundingBox(), pageNum, color, thickness,
         relativeToUpperLeft, originInUpperLeft);
   }
@@ -310,51 +351,49 @@ public class PdfBoxDrawer implements PdfDrawer {
 
   @Override
   public void drawText(String text, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft)
-    throws IOException {
-    this.drawText(text, pageNum, new PlainPoint(0, 0), relativeToUpperLeft,
-        originInUpperLeft);
+      boolean originInUpperLeft) throws IOException {
+    this.drawText(text, pageNum, this.pointFactory.create(0, 0),
+        relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point)
-    throws IOException {
+      throws IOException {
     this.drawText(text, pageNum, point, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawText(text, pageNum, point, DEFAULT_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color)
-    throws IOException {
+      throws IOException {
     this.drawText(text, pageNum, point, color, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     this.drawText(text, pageNum, point, color, DEFAULT_FONT_SIZE,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
-      float fontsize)
-    throws IOException {
+      float fontsize) throws IOException {
     drawText(text, pageNum, point, color, fontsize, false, false);
   }
 
   @Override
   public void drawText(String text, int pageNum, Point point, Color color,
       float fontsize, boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException {
+      throws IOException {
     PDPageContentStream stream = getPdPageContentStream(pageNum);
 
     Point adapted = adaptPoint(point, pageNum, relativeToUpperLeft,
@@ -436,7 +475,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public Point adaptPoint(Point point, int pageNum,
       boolean isRelativeToUpperLeft, boolean isOriginInUpperLeft) {
-    Point copy = new PlainPoint(point.getX(), point.getY());
+    Point copy = this.pointFactory.create(point.getX(), point.getY());
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
       copy.setY(pageBoundingBox.getMaxY() - point.getY());
@@ -448,7 +487,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    * Adapts the given line dependent on whether the coordinates are relative to
    * upper left and whether the origin is in upper left.
    * 
-   * @param line
+   * @param l
    *        The line to adapt.
    * @param pageNum
    *        The number of the page in which the line is located.
@@ -460,13 +499,13 @@ public class PdfBoxDrawer implements PdfDrawer {
    *        left.
    * @return A new instance of Line with adapted coordinates.
    */
-  public Line adaptLine(Line line, int pageNum, boolean isRelativeToUpperLeft,
+  public Line adaptLine(Line l, int pageNum, boolean isRelativeToUpperLeft,
       boolean isOriginInUpperLeft) {
-    Line copy = new PlainLine(line.getStartPoint(), line.getEndPoint());
+    Line copy = this.lineFactory.create(l.getStartPoint(), l.getEndPoint());
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
-      copy.setStartY(pageBoundingBox.getMaxY() - line.getStartY());
-      copy.setEndY(pageBoundingBox.getMaxY() - line.getEndY());
+      copy.setStartY(pageBoundingBox.getMaxY() - l.getStartY());
+      copy.setEndY(pageBoundingBox.getMaxY() - l.getEndY());
     }
     return copy;
   }
@@ -489,7 +528,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public Rectangle adaptRectangle(Rectangle rect, int pageNum,
       boolean isRelativeToUpperLeft, boolean isOriginInUpperLeft) {
-    Rectangle copy = new PlainRectangle(rect);
+    Rectangle copy = this.rectangleFactory.create(rect);
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
       copy.setMinY(pageBoundingBox.getMaxY() - rect.getMinY());

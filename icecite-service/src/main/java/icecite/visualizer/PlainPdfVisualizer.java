@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.drawer.PdfDrawer;
 import icecite.drawer.PdfDrawerFactory;
@@ -16,14 +18,15 @@ import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
+import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfType;
 import icecite.models.PdfWord;
-
-// TODO: Implement roles.
+import icecite.utils.collection.CollectionUtils;
 
 /**
- * The default implementation of a PdfVisualizer.
+ * A plain implementation of PdfVisualizer.
  *
  * @author Claudius Korzen
  */
@@ -34,55 +37,81 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected PdfDrawerFactory pdfDrawerFactory;
 
   /**
+   * The set of types of the PDF elements to serialize.
+   */
+  protected Set<PdfType> types;
+
+  /**
+   * The set of roles of PDF elements to serialize.
+   */
+  protected Set<PdfRole> roles;
+
+  // ==========================================================================
+  // Constructors.
+
+  /**
    * Creates a new PDF visualizer.
    * 
    * @param pdfDrawerFactory
    *        The factory to create instances of {@link PdfDrawerFactory}.
    */
-  @Inject
+  @AssistedInject
   public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory) {
     this.pdfDrawerFactory = pdfDrawerFactory;
+    this.types = new HashSet<>();
+    this.roles = new HashSet<>();
   }
+
+  /**
+   * Creates a new PDF visualizer.
+   * 
+   * @param pdfDrawerFactory
+   *        The factory to create instances of {@link PdfDrawerFactory}.
+   * @param types
+   *        The types of the PDF elements to visualize.
+   */
+  @AssistedInject
+  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory,
+      @Assisted Set<PdfType> types) {
+    this(pdfDrawerFactory);
+    this.types = types;
+    this.roles = new HashSet<>();
+  }
+
+  /**
+   * Creates a new PDF visualizer.
+   * 
+   * @param pdfDrawerFactory
+   *        The factory to create instances of {@link PdfDrawerFactory}.
+   * @param types
+   *        The type of the PDF elements to visualize.
+   * @param roles
+   *        The roles of the PDF elements to visualize.
+   */
+  @AssistedInject
+  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, 
+      @Assisted("types") Set<PdfType> types,
+      @Assisted("roles") Set<PdfRole> roles) {
+    this(pdfDrawerFactory);
+    this.types = types;
+    this.roles = roles;
+  }
+
+  // ==========================================================================
 
   @Override
   public void visualize(PdfDocument pdf, OutputStream stream)
       throws IOException {
-    Set<Class<? extends PdfElement>> types = new HashSet<>();
-    
-//    types.add(PdfParagraph.class);
-    types.add(PdfTextLine.class);
-//    types.add(PdfWord.class);
-//    types.add(PdfCharacter.class);
-//    types.add(PdfFigure.class);
-//    types.add(PdfShape.class);
-    
-    visualize(pdf, types, stream);
-  }
-
-  /**
-   * Visualizes the given PDF elements of the given PDF document.
-   * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param types
-   *        The types of PDF elements to visualize.
-   * @param stream
-   *        The stream to write to.
-   * @throws IOException
-   *         if something went wrong while visualizing.
-   */
-  public void visualize(PdfDocument pdf, Set<Class<? extends PdfElement>> types,
-      OutputStream stream) throws IOException {
     PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
 
     for (PdfPage page : pdf.getPages()) {
-      visualizePage(page, types, drawer);
+      visualizePage(page, drawer);
     }
 
     drawer.writeTo(stream);
   }
 
-  // ___________________________________________________________________________
+  // ==========================================================================
 
   /**
    * Visualizes the given features of the given document using the given
@@ -90,40 +119,36 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @param page
    *        The page to process.
-   * @param types
-   *        The types of the PDF elements to visualize.
    * @param drawer
    *        The drawer to use.
    * @throws IOException
    *         If the drawing failed.
    */
-  protected void visualizePage(PdfPage page,
-      Set<Class<? extends PdfElement>> types, PdfDrawer drawer)
+  protected void visualizePage(PdfPage page, PdfDrawer drawer)
       throws IOException {
     if (page == null) {
       return;
     }
 
-    if (types == null) {
-      return;
-    }
-    
     // Visualize the text elements.
-    for (PdfParagraph paragraph : page.getParagraphs()) {
-      if (types.isEmpty() || types.contains(PdfParagraph.class)) {
-        visualizePdfElement(paragraph, drawer, Color.GREEN);
-      }
-      for (PdfTextLine line : paragraph.getTextLines()) {
-        if (types.isEmpty() || types.contains(PdfTextLine.class)) {
-          visualizePdfElement(line, drawer, Color.BLUE);
+    List<PdfParagraph> paragraphs = page.getParagraphs();
+    if (paragraphs != null) {
+      for (PdfParagraph paragraph : paragraphs) {
+        if (isVisualizePdfElement(paragraph)) {
+          visualizePdfElement(paragraph, drawer, Color.GREEN);
         }
-        for (PdfWord word : line.getWords()) {
-          if (types.isEmpty() || types.contains(PdfWord.class)) {
-            visualizePdfElement(word, drawer, Color.RED);
+        for (PdfTextLine line : paragraph.getTextLines()) {
+          if (isVisualizePdfElement(line)) {
+            visualizePdfElement(line, drawer, Color.BLUE);
           }
-          for (PdfCharacter character : word.getCharacters()) {
-            if (types.isEmpty() || types.contains(PdfCharacter.class)) {
-              visualizePdfElement(character, drawer, Color.GRAY);
+          for (PdfWord word : line.getWords()) {
+            if (isVisualizePdfElement(word)) {
+              visualizePdfElement(word, drawer, Color.RED);
+            }
+            for (PdfCharacter character : word.getCharacters()) {
+              if (isVisualizePdfElement(character)) {
+                visualizePdfElement(character, drawer, Color.GRAY);
+              }
             }
           }
         }
@@ -131,13 +156,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     // Visualize the graphical elements.
-    if (types.isEmpty() || types.contains(PdfFigure.class)) {
-      for (PdfFigure figure : page.getFigures()) {
+    for (PdfFigure figure : page.getFigures()) {
+      if (isVisualizePdfElement(figure)) {
         visualizePdfElement(figure, drawer, Color.CYAN);
       }
     }
-    if (types.isEmpty() || types.contains(PdfShape.class)) {
-      for (PdfShape shape : page.getShapes()) {
+    for (PdfShape shape : page.getShapes()) {
+      if (isVisualizePdfElement(shape)) {
         visualizePdfElement(shape, drawer, Color.MAGENTA);
       }
     }
@@ -158,8 +183,33 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected void visualizePdfElement(PdfElement element, PdfDrawer drawer,
       Color color) throws IOException {
     if (element != null) {
-      PdfPage page = element.getPage();
-      drawer.drawBoundingBox(element, page.getPageNumber(), color);
+      drawer.drawBoundingBox(element, element.getPage().getPageNumber(), color);
     }
+  }
+
+  // ==========================================================================
+
+  /**
+   * Checks if the given PDF element should be visualized or not, dependent on
+   * the type and the role of the element.
+   * 
+   * @param element
+   *        The PDF element to check.
+   * @return True, if the given PDF element should be visalized, false
+   *         otherwise.
+   */
+  protected boolean isVisualizePdfElement(PdfElement element) {
+    // Check if the type of the given element was registered to be serialized.
+    boolean isTypeGiven = !CollectionUtils.isNullOrEmpty(this.types);
+    if (isTypeGiven && !this.types.contains(element.getType())) {
+      return false;
+    }
+
+    // Check if the role of the given element was registered to be serialized.
+    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(this.roles);
+    if (isRoleGiven && !this.roles.contains(element.getRole())) {
+      return false;
+    }
+    return true;
   }
 }

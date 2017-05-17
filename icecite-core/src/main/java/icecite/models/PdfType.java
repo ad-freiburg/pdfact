@@ -23,10 +23,6 @@ public enum PdfType {
    */
   PARAGRAPHS,
   /**
-   * Text blocks.
-   */
-  TEXTBLOCKS,
-  /**
    * Figures.
    */
   FIGURES,

@@ -5,7 +5,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacterSet;
 import icecite.models.PdfTextBlock;
-import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -58,12 +57,5 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @Override
   public void setText(String text) {
     this.text = text;
-  }
-  
-  // ==========================================================================
-  
-  @Override
-  public PdfType getType() {
-    return PdfType.TEXTBLOCKS;
   }
 }

@@ -8,9 +8,11 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
+import com.google.inject.Inject;
+
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
-import icecite.utils.geometric.plain.PlainPoint;
+import icecite.utils.geometric.Point.PointFactory;
 
 /**
  * v: Append curved segment to path with the initial point replicated.
@@ -18,6 +20,27 @@ import icecite.utils.geometric.plain.PlainPoint;
  * @author Claudius Korzen
  */
 public class CurveToReplicateInitialPoint extends OperatorProcessor {
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  // ==========================================================================
+  
+  /**
+   * Creates a new OperatorProcessor to process the operation
+   * "CurveToReplicateInitialPoint".
+   * 
+   * @param pointFactory
+   *        The factory to create instances of Point.
+   */
+  @Inject
+  public CurveToReplicateInitialPoint(PointFactory pointFactory) {
+    this.pointFactory = pointFactory;
+  }
+  
+  // ==========================================================================
+  
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x2 = (COSNumber) args.get(0);
@@ -26,8 +49,8 @@ public class CurveToReplicateInitialPoint extends OperatorProcessor {
     COSNumber y3 = (COSNumber) args.get(3);
 
     Point2D currentPoint = this.engine.getLinePath().getCurrentPoint();
-    Point point2 = new PlainPoint(x2.floatValue(), y2.floatValue());
-    Point point3 = new PlainPoint(x3.floatValue(), y3.floatValue());
+    Point point2 = this.pointFactory.create(x2.floatValue(), y2.floatValue());
+    Point point3 = this.pointFactory.create(x3.floatValue(), y3.floatValue());
 
     this.engine.transform(point2);
     this.engine.transform(point3);
