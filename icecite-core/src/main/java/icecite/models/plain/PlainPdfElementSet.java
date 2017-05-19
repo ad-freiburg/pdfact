@@ -72,7 +72,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
    */
   protected Rectangle boundingBox;
 
-  // ==========================================================================
+  // ========================================================================
   // Constructors.
 
   /**
@@ -126,7 +126,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
     addAll(elements);
   }
 
-  // ==========================================================================
+  // ========================================================================
   // Override all methods that changes this set.
 
   @Override
@@ -158,7 +158,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
     clearCounters();
   }
 
-  // ==========================================================================
+  // ========================================================================
 
   /**
    * Adds the given element to all counters of this set.
@@ -208,7 +208,7 @@ public class PlainPdfElementSet<T extends PdfElement> extends HashSet<T>
     this.isBoundingBoxOutdated = true;
   }
 
-  // ==========================================================================
+  // ========================================================================
   // Getter methods.
 
   @Override

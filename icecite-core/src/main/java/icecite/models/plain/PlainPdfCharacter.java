@@ -1,6 +1,7 @@
 package icecite.models.plain;
 
 import icecite.models.PdfCharacter;
+import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfFont;
 import icecite.models.PdfType;
@@ -97,12 +98,12 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfType getType() {
     return PdfType.CHARACTERS;
   }
-  
+
   // ==========================================================================
 
   @Override

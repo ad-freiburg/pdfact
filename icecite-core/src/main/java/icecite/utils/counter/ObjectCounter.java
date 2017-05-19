@@ -2,359 +2,207 @@ package icecite.utils.counter;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * A class that groups objects by another given key objects and computes some
- * statistics.
+ * A counter to compute some statistics about a collection of objects.
  * 
  * @param <S>
- *        The type of the key objects.
+ *        The type of the keys.
  * @param <T>
- *        The type of the objects to group.
+ *        The type of the values.
  * 
  * @author Claudius Korzen
  */
-public class ObjectCounter<S, T> extends HashMap<S, Set<T>> {
+public class ObjectCounter<S, T> {
   /**
-   * The serial id.
+   * The default initial capacity of this counter.
    */
-  protected static final long serialVersionUID = -3759048794193605026L;
+  protected static final int DEFAULT_INITIAL_CAPACITY = 10;
 
   /**
-   * Flag that indicates whether the statistics need to be recomputed.
+   * The elements, grouped by the individual objects.
    */
-  protected boolean isStatisticOutdated = true;
+  protected Map<S, Set<T>> elements;
 
   /**
-   * (One of) the most frequent key object(s).
+   * A queue that holds the objects by frequency in ascending order.
    */
-  protected S mostFrequentObject = null;
+  protected ObjectPriorityQueue<S> freqsAsc;
 
   /**
-   * All most frequent key objects.
+   * A queue that holds the objects by frequency in descending order.
    */
-  protected Set<S> allMostFrequentObjects = new HashSet<>();
+  protected ObjectPriorityQueue<S> freqsDesc;
 
   /**
-   * The frequency of the most frequent key object.
+   * The number of elements in this counter.
    */
-  protected int mostFrequentObjectFrequency = -Integer.MAX_VALUE;
-
-  /**
-   * (One of) the least frequent key object(s).
-   */
-  protected S leastFrequentObject = null;
-
-  /**
-   * All least frequent key objects.
-   */
-  protected Set<S> allLeastFrequentObjects = new HashSet<>();
-
-  /**
-   * The frequency of the least frequent object.
-   */
-  protected int leastFrequentObjectFrequencyCount = Integer.MAX_VALUE;
-
-  // ==========================================================================
-  // The constructors.
+  protected int numElements;
   
+  // ==========================================================================
+  // Constructors.
+
   /**
-   * Creates a new object counter.
+   * Creates a new ObjectCounter with the default initial capacity.
    */
   public ObjectCounter() {
-    super();
+    this(DEFAULT_INITIAL_CAPACITY);
   }
 
   /**
-   * Creates a new object counter.
+   * Creates a new FloatCounter with the given initial capacity.
    * 
    * @param initialCapacity
-   *        The initial capacity of this counter.
+   *        The initial capacity.
    */
   public ObjectCounter(int initialCapacity) {
-    super(initialCapacity);
+    this.elements = new HashMap<>(initialCapacity);
+    this.freqsAsc = new ObjectPriorityQueue<>(initialCapacity);
+    this.freqsDesc = new ObjectPriorityQueue<>(initialCapacity, true);
   }
 
   // ==========================================================================
-  // Add methods.
+  // Public methods.
 
   /**
-   * Adds the given object to this counter.
-   * 
-   * @param key
-   *        The key object.
-   * @param value
-   *        The object to group.
-   */
-  public void add(S key, T value) {
-    if (!containsKey(key)) {
-      put(key, new HashSet<>());
-    }
-
-    get(key).add(value);
-    this.isStatisticOutdated = true;
-  }
-
-  /**
-   * Merges this ObjectCounter with another ObjectCounter.
-   * 
-   * @param counter
-   *        The counter to merge with this counter.
-   */
-  public void add(ObjectCounter<S, T> counter) {
-    if (counter == null) {
-      return;
-    }
-    if (counter.keySet() == null) {
-      return;
-    }
-    for (S s : counter.keySet()) {
-      for (T object : counter.get(s)) {
-        add(s, object);
-      }
-    }
-  }
-
-  // ==========================================================================
-  // Remove methods.
-
-  /**
-   * Removes the given object with the given int value from this counter.
+   * Adds the given object associated with the given element to this counter.
    * 
    * @param s
-   *        The key object.
-   * @param t
+   *        The object to add.
+   * @param element
+   *        The associated element.
+   */
+  public void add(S s, T element) {
+    if (!this.elements.containsKey(s)) {
+      // Create a new bucket.
+      this.elements.put(s, new HashSet<>());
+    }
+
+    // Extend the existing bucket.
+    Set<T> bucket = this.elements.get(s);
+    boolean added = bucket.add(element);
+    
+    if (added) {
+      // Update the frequencies.
+      float freq = this.freqsAsc.getPriority(s, 0);
+      this.freqsAsc.updatePriority(s, freq + 1);
+      this.freqsDesc.updatePriority(s, freq + 1);
+      // Increment elements counter.
+      this.numElements++;
+    }
+  }
+
+  /**
+   * Removes the given element with the given float from this counter.
+   * 
+   * @param s
    *        The object to remove.
+   * @param element
+   *        The element to remove.
    */
-  public boolean remove(Object s, Object t) {
-    this.isStatisticOutdated = containsKey(s) && get(s).remove(t);
-    return this.isStatisticOutdated;
-  }
-
-  /**
-   * Removes the given ObjectCounter from this counter.
-   * 
-   * @param counter
-   *        The counter to remove.
-   */
-  public void remove(ObjectCounter<S, T> counter) {
-    if (counter == null) {
+  public void remove(S s, Object element) {
+    if (!this.elements.containsKey(s)) {
       return;
     }
-    if (counter.keySet() == null) {
+
+    Set<T> set = this.elements.get(s);
+    if (set == null || set.isEmpty()) {
       return;
     }
-    for (S s : counter.keySet()) {
-      for (T object : counter.get(s)) {
-        remove(s, object);
+    boolean removed = set.remove(element);
+    
+    if (removed) {
+      // Update the frequencies.
+      float freq = this.freqsAsc.getPriority(s, 0);
+      if (freq == 1) {
+        this.freqsAsc.remove(s);
+        this.freqsDesc.remove(s);
+      } else if (freq > 1) {
+        this.freqsAsc.updatePriority(s, freq - 1);
+        this.freqsDesc.updatePriority(s, freq - 1);
       }
+      this.numElements--;
     }
+  }
+
+  /**
+   * Returns the number of elements in this counter.
+   * 
+   * @return The number of elements in this counter.
+   */
+  public int size() {
+    return this.numElements;
+  }
+  
+  /**
+   * Returns true if this counter has no elements.
+   * 
+   * @return True if this counter has no elements, False otherwise.
+   */
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+  
+  // ==========================================================================
+  
+  /**
+   * Clears this counter.
+   */
+  public void clear() {
+    this.elements.clear();
+    this.freqsAsc.clear();
+    this.freqsDesc.clear();
+    this.numElements = 0;
+  }
+  
+  // ==========================================================================
+
+  /**
+   * Returns the most common object in this counter.
+   * 
+   * @return The most common object in this counter or null if the counter
+   *         does not contain any objects.
+   */
+  public S getMostCommonObject() {
+    return !this.freqsDesc.isEmpty() ? this.freqsDesc.peek() : null;
+  }
+
+  /**
+   * Returns the elements associated with the most common object in this
+   * counter.
+   * 
+   * @return The elements associated with the most common object in this counter
+   *         or null if the counter does not contain any objects.
+   */
+  public Set<T> getElementsWithMostCommonObject() {
+    return !this.freqsDesc.isEmpty() ? this.elements.get(this.freqsDesc.peek())
+        : null;
   }
 
   // ==========================================================================
 
   /**
-   * Resets (clears) this counter.
-   */
-  public void reset() {
-    clear();
-    resetComputedValues();
-  }
-
-  /**
-   * Resets the internal counters.
-   */
-  protected void resetComputedValues() {
-    this.mostFrequentObject = null;
-    this.allMostFrequentObjects = new HashSet<>();
-    this.mostFrequentObjectFrequency = -Integer.MAX_VALUE;
-    this.leastFrequentObject = null;
-    this.allLeastFrequentObjects = new HashSet<>();
-    this.leastFrequentObjectFrequencyCount = Integer.MAX_VALUE;
-  }
-
-  // ==========================================================================
-  // Getter methods.
-
-  /**
-   * Returns the most frequent object.
+   * Returns the least common object in this counter.
    * 
-   * @return The most frequent object.
+   * @return The least common object in this counter or null if the counter
+   *         does not contain any objects.
    */
-  public S getMostFrequentObject() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.mostFrequentObject;
+  public S getLeastCommonObject() {
+    return !this.freqsAsc.isEmpty() ? this.freqsAsc.peek() : null;
   }
 
   /**
-   * Returns the frequency of the most frequent object.
+   * Returns the elements associated with the least common objects in this
+   * counter.
    * 
-   * @return The frequency of the most frequent object.
+   * @return The elements associated with the least common object in this
+   *         counter or null if the counter does not contain any objects.
    */
-  public int getMostFrequentObjectFrequency() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.mostFrequentObjectFrequency;
-  }
-
-  /**
-   * Returns the objects that are associated with the most frequent object in
-   * this counter.
-   * 
-   * @return The objects that are associated with the most frequent object in
-   *         this counter.
-   */
-  public Set<T> getObjectsWithMostFrequentObject() {
-    return get(getMostFrequentObject());
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns all most frequent key objects.
-   * 
-   * @return All most frequent objects in a set.
-   */
-  public Set<S> getAllMostFrequentObjects() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.allMostFrequentObjects;
-  }
-
-  /**
-   * Returns all objects that are associated with all most frequent key objects
-   * in this counter.
-   * 
-   * @return all objects that are associated with all most frequent key objects
-   *         in this counter.
-   */
-  public Set<T> getAllObjectsWithMostFrequentObjects() {
-    Set<T> allObjects = new HashSet<>();
-    for (S s : getAllMostFrequentObjects()) {
-      allObjects.addAll(get(s));
-    }
-    return allObjects;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the least frequent object.
-   * 
-   * @return The least frequent object.
-   */
-  public S getLeastFrequentObject() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.leastFrequentObject;
-  }
-
-  /**
-   * Returns the frequency of the least frequent object.
-   * 
-   * @return The frequency of the least frequent object.
-   */
-  public int getLeastFrequentObjectFrequency() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.leastFrequentObjectFrequencyCount;
-  }
-
-  /**
-   * Returns the objects that are associated with the least frequent key object
-   * in this counter.
-   * 
-   * @return The objects that are associated with the least frequent key object
-   *         in this counter.
-   */
-  public Set<T> getObjectsWithLeastFrequentInt() {
-    return get(getLeastFrequentObject());
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns all least frequent objects.
-   * 
-   * @return All least frequent objects.
-   */
-  public Set<S> getAllLeastFrequentObjects() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.allLeastFrequentObjects;
-  }
-
-  /**
-   * Returns all objects that are associated with all least frequent key
-   * objects in this counter.
-   * 
-   * @return all objects that are associated with all least frequent key
-   *         objects in this counter.
-   */
-  public Set<T> getAllObjectsWithLeastFrequentObjects() {
-    Set<T> allObjects = new HashSet<>();
-    for (S s : getAllLeastFrequentObjects()) {
-      allObjects.addAll(get(s));
-    }
-    return allObjects;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Counts the frequencies of the objects.
-   */
-  protected void count() {
-    resetComputedValues();
-
-    for (S object : keySet()) {
-      int count = get(object).size();
-
-      if (count == 0) {
-        continue;
-      }
-
-      if (count > this.mostFrequentObjectFrequency) {
-        this.mostFrequentObject = object;
-        this.mostFrequentObjectFrequency = count;
-        this.allMostFrequentObjects.clear();
-        this.allMostFrequentObjects.add(object);
-      }
-
-      if (count == this.mostFrequentObjectFrequency) {
-        this.allMostFrequentObjects.add(object);
-      }
-
-      if (count < this.leastFrequentObjectFrequencyCount) {
-        this.leastFrequentObject = object;
-        this.leastFrequentObjectFrequencyCount = count;
-        this.allLeastFrequentObjects.clear();
-        this.allLeastFrequentObjects.add(object);
-      }
-
-      if (count == this.leastFrequentObjectFrequencyCount) {
-        this.allLeastFrequentObjects.add(object);
-      }
-    }
-    this.isStatisticOutdated = false;
-  }
-
-  // ==========================================================================
-  // Util methods.
-
-  public Set<T> get(Object o) {
-    if (containsKey(o)) {
-      return super.get(o);
-    }
-    // Return an empty list if this counter does not contain the given object.
-    return new HashSet<>();
+  public Set<T> getElementsWithLeastCommonObject() {
+    return !this.freqsAsc.isEmpty() ? this.elements.get(this.freqsAsc.peek())
+        : null;
   }
 }
+

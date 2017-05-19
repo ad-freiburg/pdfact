@@ -113,7 +113,7 @@ public class PlainPdfCharacterSet extends PlainPdfElementSet<PdfCharacter>
    * @param o
    *        The object to remove.
    */
-  protected void removeFromCounters(Object o) {
+  protected void removeFromCounters(PdfCharacter o) {
     super.removeFromCounters(o);
     if (o instanceof PdfCharacter) {
       PdfCharacter c = (PdfCharacter) o;

@@ -3,585 +3,293 @@ package icecite.utils.counter;
 import java.util.HashSet;
 import java.util.Set;
 
-import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.map.hash.TFloatObjectHashMap;
 
 /**
- * A class that groups objects by associated float values and computes some
- * statistics.
+ * A counter to compute some statistics about a collection of float values.
  * 
  * @param <T>
- *        The type of the objects to group.
+ *        The type of the elements.
  * 
  * @author Claudius Korzen
  */
-public class FloatCounter<T> extends TFloatObjectHashMap<Set<T>> {
+public class FloatCounter<T> {
   /**
-   * Flag that indicates whether the statistics need to be recomputed.
+   * The default initial capacity of this counter.
    */
-  protected boolean isStatisticOutdated = true;
+  protected static final int DEFAULT_INITIAL_CAPACITY = 10;
 
   /**
-   * The largest float value.
+   * The elements, grouped by the individual float values.
    */
-  protected float largestFloat = -Float.MAX_VALUE;
+  protected TFloatObjectHashMap<Set<T>> elements;
 
   /**
-   * The smallest float value.
+   * A queue that holds the floats in ascending order.
    */
-  protected float smallestFloat = Float.MAX_VALUE;
+  protected FloatPriorityQueue asc;
 
   /**
-   * (One of) the most frequent float values.
+   * A queue that holds the floats in descending order.
    */
-  protected float mostFrequentFloat = -Float.MAX_VALUE;
+  protected FloatPriorityQueue desc;
 
   /**
-   * All most frequent float values.
+   * A queue that holds the floats by frequency in ascending order.
    */
-  protected float[] allMostFrequentFloats;
+  protected FloatPriorityQueue freqsAsc;
 
   /**
-   * The frequency of the most frequent float value.
+   * A queue that holds the floats by frequency in descending order.
    */
-  protected int mostFrequentFloatFrequency = -Integer.MAX_VALUE;
+  protected FloatPriorityQueue freqsDesc;
 
   /**
-   * (One of) the least frequent float values.
+   * The average over all float values in this counter.
    */
-  protected float leastFrequentFloat = Float.MAX_VALUE;
+  protected float avgFloat;
 
   /**
-   * All least frequent float values.
+   * The number of elements in this counter.
    */
-  protected float[] allLeastFrequentFloats;
-
-  /**
-   * The frequency of the least frequent float value.
-   */
-  protected int leastFrequentFloatFrequency = Integer.MAX_VALUE;
-
-  /**
-   * The average value over all float values.
-   */
-  protected float averageValue = Float.MAX_VALUE;
-
+  protected int numElements;
+  
   // ==========================================================================
-  // The constructors.
+  // Constructors.
 
   /**
-   * Creates a new float counter.
+   * Creates a new FloatCounter with the default initial capacity.
    */
   public FloatCounter() {
-    super();
+    this(DEFAULT_INITIAL_CAPACITY);
   }
 
   /**
-   * Creates a new float counter.
+   * Creates a new FloatCounter with the given initial capacity.
    * 
    * @param initialCapacity
-   *        The initial capacity of this counter.
+   *        The initial capacity.
    */
   public FloatCounter(int initialCapacity) {
-    super(initialCapacity);
+    this.elements = new TFloatObjectHashMap<>(initialCapacity);
+    this.asc = new FloatPriorityQueue(initialCapacity);
+    this.desc = new FloatPriorityQueue(initialCapacity, true);
+    this.freqsAsc = new FloatPriorityQueue(initialCapacity);
+    this.freqsDesc = new FloatPriorityQueue(initialCapacity, true);
   }
 
   // ==========================================================================
-  // Add methods.
+  // Public methods.
 
   /**
-   * Adds the given object with the given float value.
+   * Adds the given float associated with the given element to this counter.
    * 
    * @param f
-   *        The float value to associate with the given object.
-   * @param object
-   *        The object to group.
+   *        The float to add.
+   * @param element
+   *        The associated element.
    */
-  public void add(float f, T object) {
-    if (Float.isNaN(f)) {
-      return;
+  public void add(float f, T element) {
+    if (!this.elements.containsKey(f)) {
+      // Create a new bucket.
+      this.elements.put(f, new HashSet<>());
     }
 
-    if (!containsKey(f)) {
-      put(f, new HashSet<>());
+    // Extend the existing bucket.
+    Set<T> bucket = this.elements.get(f);
+    boolean added = bucket.add(element);
+    
+    if (added) {
+      // Update the queues.
+      this.asc.insert(f, f);
+      this.desc.insert(f, f);
+      // Update the frequencies.
+      float freq = this.freqsAsc.getPriority(f, 0);
+      this.freqsAsc.updatePriority(f, freq + 1);
+      this.freqsDesc.updatePriority(f, freq + 1);
+      // Update the average value.
+      this.avgFloat += (f - this.avgFloat) / (this.numElements + 1);
+      // Increment elements counter.
+      this.numElements++;
     }
-
-    get(f).add(object);
-    this.isStatisticOutdated = true;
   }
 
   /**
-   * Merges this FloatCounter with another FloatCounter.
-   * 
-   * @param counter
-   *        The counter to merge with this counter.
-   */
-  public void add(FloatCounter<T> counter) {
-    if (counter == null) {
-      return;
-    }
-    if (counter.keys() == null) {
-      return;
-    }
-    for (float f : counter.keys()) {
-      for (T object : counter.get(f)) {
-        add(f, object);
-      }
-    }
-  }
-
-  // ==========================================================================
-  // Remove methods.
-
-  /**
-   * Removes the given object with the given float value from this counter.
+   * Removes the given element with the given float from this counter.
    * 
    * @param f
-   *        The float value associated with the given object.
-   * @param object
-   *        The object to remove.
+   *        The float to remove.
+   * @param element
+   *        The element to remove.
    */
-  public void remove(float f, Object object) {
-    this.isStatisticOutdated = containsKey(f) && get(f).remove(object);
-  }
-
-  /**
-   * Removes the given FloatCounter from this counter.
-   * 
-   * @param counter
-   *        The counter to remove.
-   */
-  public void remove(FloatCounter<T> counter) {
-    if (counter == null) {
+  public void remove(float f, Object element) {
+    if (!this.elements.containsKey(f)) {
       return;
     }
-    if (counter.keys() == null) {
+
+    Set<T> set = this.elements.get(f);
+    if (set == null || set.isEmpty()) {
       return;
     }
-    for (float f : counter.keys()) {
-      for (T object : counter.get(f)) {
-        remove(f, object);
+    boolean removed = set.remove(element);
+    
+    if (removed) {
+      // Update the queues.
+      this.asc.remove(f);
+      this.desc.remove(f);
+      // Update the frequencies.
+      float freq = this.freqsAsc.getPriority(f, 0);
+      if (freq == 1) {
+        this.freqsAsc.remove(f);
+        this.freqsDesc.remove(f);
+      } else if (freq > 1) {
+        this.freqsAsc.updatePriority(f, freq - 1);
+        this.freqsDesc.updatePriority(f, freq - 1);
       }
-    }
-  }
-
-  // ==========================================================================
-  // Clear methods.
-
-  /**
-   * Resets (clears) this counter.
-   */
-  public void reset() {
-    clear();
-    resetComputedValues();
-  }
-
-  /**
-   * Resets the internal counters.
-   */
-  protected void resetComputedValues() {
-    this.largestFloat = -Float.MAX_VALUE;
-    this.smallestFloat = Float.MAX_VALUE;
-    this.mostFrequentFloat = -Float.MAX_VALUE;
-    this.allMostFrequentFloats = null;
-    this.mostFrequentFloatFrequency = -Integer.MAX_VALUE;
-    this.leastFrequentFloat = Float.MAX_VALUE;
-    this.allLeastFrequentFloats = null;
-    this.leastFrequentFloatFrequency = Integer.MAX_VALUE;
-    this.averageValue = Float.MAX_VALUE;
-  }
-
-  // ==========================================================================
-  // Getter methods.
-
-  /**
-   * Returns (one of) the most frequent float values.
-   * 
-   * @return (One of) the most frequent float values.
-   */
-  public float getMostFrequentFloat() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.mostFrequentFloat;
-  }
-
-  /**
-   * Returns the frequency of the most frequent float value.
-   * 
-   * @return The frequency of the most frequent float value.
-   */
-  public int getMostFrequentFloatFrequency() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.mostFrequentFloatFrequency;
-  }
-
-  /**
-   * Returns the objects that are associated with the most frequent float in
-   * this counter.
-   * 
-   * @return The objects that are associated with the most frequent float in
-   *         this counter.
-   */
-  public Set<T> getObjectsWithMostFrequentFloat() {
-    return get(getMostFrequentFloat());
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns all most frequent float values.
-   * 
-   * @return All most frequent float values.
-   */
-  public float[] getAllMostFrequentFloats() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.allMostFrequentFloats;
-  }
-
-  /**
-   * Returns all objects that are associated with all most frequent float
-   * values in this counter.
-   * 
-   * @return all objects that are associated with all most frequent float
-   *         values in this counter.
-   */
-  public Set<T> getAllObjectsWithMostFrequentFloats() {
-    Set<T> allObjects = new HashSet<>();
-    for (float f : getAllMostFrequentFloats()) {
-      allObjects.addAll(get(f));
-    }
-    return allObjects;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the least frequent float value.
-   * 
-   * @return The least frequent float value.
-   */
-  public float getLeastFrequentFloat() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.leastFrequentFloat;
-  }
-
-  /**
-   * Returns the frequency of the least frequent float value.
-   * 
-   * @return The frequency of the least frequent float value.
-   */
-  public int getLeastFrequentFloatFrequency() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.leastFrequentFloatFrequency;
-  }
-
-  /**
-   * Returns the objects that are associated with the least frequent float in
-   * this counter.
-   * 
-   * @return The objects that are associated with the least frequent float in
-   *         this counter.
-   */
-  public Set<T> getObjectsWithLeastFrequentFloat() {
-    return get(getLeastFrequentFloat());
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns all least frequent float values in this counter.
-   * 
-   * @return All least frequent float values in this counter.
-   */
-  public float[] getAllLeastFrequentFloats() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.allLeastFrequentFloats;
-  }
-
-  /**
-   * Returns all objects that are associated with all least frequent float
-   * values in this counter.
-   * 
-   * @return all objects that are associated with all least frequent float
-   *         values in this counter.
-   */
-  public Set<T> getAllObjectsWithLeastFrequentFloats() {
-    Set<T> allObjects = new HashSet<>();
-    for (float f : getAllMostFrequentFloats()) {
-      allObjects.addAll(get(f));
-    }
-    return allObjects;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the average value over all float values.
-   * 
-   * @return The average value over all float values.
-   */
-  public float getAverageValue() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.averageValue;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the smallest float value.
-   * 
-   * @return The smallest float value.
-   */
-  public float getSmallestFloat() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.smallestFloat;
-  }
-
-  /**
-   * Returns the objects that are associated with the smallest float value.
-   * 
-   * @return The objects that are associated with the smallest float value.
-   */
-  public Set<T> getObjectsWithSmallestFloat() {
-    return get(getSmallestFloat());
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the smallest float value that occurs at least 'freq'-times.
-   * 
-   * @param freq
-   *        The frequency.
-   * @return The smallest float value that occurs at least 'freq'-times.
-   */
-  public float getSmallestFloatOccuringAtLeast(int freq) {
-    float smallestFloat = Float.MAX_VALUE;
-    for (float f : keys()) {
-      if (get(f).size() >= freq && f < smallestFloat) {
-        smallestFloat = f;
+      // Update the average value.
+      int n = this.numElements;
+      if (n > 1) {
+        this.avgFloat = ((n * this.avgFloat) - f) / (n - 1);
+      } else {
+        this.avgFloat = 0;
       }
+      this.numElements--;
     }
-    return smallestFloat;
   }
 
   /**
-   * Returns the objects that are associated with the smallest float value that
-   * occurs at least 'freq'-times.
+   * Returns the number of elements in this counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The objects that are associated with the smallest float value that
-   *         occurs at least 'freq'-times.
+   * @return The number of elements in this counter.
    */
-  public Set<T> getObjectsWithSmallestFloatOccuringAtLeast(int freq) {
-    return get(getSmallestFloatOccuringAtLeast(freq));
+  public int size() {
+    return this.numElements;
+  }
+  
+  /**
+   * Returns true if this counter has no elements.
+   * 
+   * @return True if this counter has no elements, False otherwise.
+   */
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+  
+  // ==========================================================================
+  
+  /**
+   * Clears this counter.
+   */
+  public void clear() {
+    this.elements.clear();
+    this.asc.clear();
+    this.desc.clear();
+    this.freqsAsc.clear();
+    this.freqsDesc.clear();
+    this.avgFloat = 0;
+    this.numElements = 0;
+  }
+  
+  // ==========================================================================
+
+  /**
+   * Returns the average value over all float values in this counter.
+   * 
+   * @return The average value.
+   */
+  public float getAverageFloat() {
+    return this.avgFloat;
   }
 
   // ==========================================================================
 
   /**
-   * Returns the smallest float value that occurs at most 'freq'-times.
+   * Returns the largest float in this counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The smallest float value that occurs at most 'freq'-times.
-   */
-  public float getSmallestFloatOccuringAtMost(int freq) {
-    float smallestFloat = Float.MAX_VALUE;
-    for (float f : keys()) {
-      if (get(f).size() <= freq && f < smallestFloat) {
-        smallestFloat = f;
-      }
-    }
-    return smallestFloat;
-  }
-
-  /**
-   * Returns the objects that are associated with the smallest float value that
-   * occurs at most 'freq'-times.
-   * 
-   * @param freq
-   *        The frequency.
-   * @return The objects that are associated with the smallest float value that
-   *         occurs at most 'freq'-times.
-   */
-  public Set<T> getObjectsWithSmallestFloatOccuringAtMost(int freq) {
-    return get(getSmallestFloatOccuringAtMost(freq));
-  }
-
-  // ==========================================================================
-
-  /**
-   * Returns the largest float value.
-   * 
-   * @return The largest float value.
+   * @return The largest float in this counter or Float.NaN if the counter does
+   *         not contain any float values.
    */
   public float getLargestFloat() {
-    if (this.isStatisticOutdated) {
-      count();
-    }
-    return this.largestFloat;
+    return !this.desc.isEmpty() ? this.desc.peek() : Float.NaN;
   }
 
   /**
-   * Returns the objects that are associated with the largest float value.
+   * Returns the elements associated with the largest float in this counter.
    * 
-   * @return The objects that are associated with the largest float value.
+   * @return The elements associated with the largest float in this counter or
+   *         null if the counter does not contain any float values.
    */
-  public Set<T> getObjectsWithLargestFloat() {
-    return get(getLargestFloat());
+  public Set<T> getElementsWithLargestFloat() {
+    return !this.desc.isEmpty() ? this.elements.get(this.desc.peek()) : null;
   }
 
   // ==========================================================================
 
   /**
-   * Returns the largest float value that occurs at most 'freq'-times.
+   * Returns the smallest float in this counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The largest float value that occurs at most 'freq'-times.
+   * @return The smallest float in this counter or Float.NaN if the counter
+   *         does not contain any float values.
    */
-  public float getLargestFloatOccuringAtMost(int freq) {
-    float largestFloat = -Float.MAX_VALUE;
-    for (float f : keys()) {
-      if (get(f).size() <= freq && f > largestFloat) {
-        largestFloat = f;
-      }
-    }
-    return largestFloat;
+  public float getSmallestFloat() {
+    return !this.asc.isEmpty() ? this.asc.peek() : Float.NaN;
   }
 
   /**
-   * Returns the objects that are associated with the largest float value that
-   * occurs at most 'freq'-times.
+   * Returns the elements associated with the smallest float in this counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The objects that are associated with the largest float value that
-   *         occurs at most 'freq'-times.
+   * @return The elements associated with the smallest float in this counter or
+   *         null if the counter does not contain any float values.
    */
-  public Set<T> getObjectsWithLargestFloatOccuringAtMost(int freq) {
-    return get(getLargestFloatOccuringAtMost(freq));
+  public Set<T> getElementsWithSmallestFloat() {
+    return !this.asc.isEmpty() ? this.elements.get(this.asc.peek()) : null;
   }
 
   // ==========================================================================
 
   /**
-   * Returns the largest float value that occurs at least 'freq'-times.
+   * Returns the most common float in this counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The largest float value that occurs at least 'freq'-times.
+   * @return The most common float in this counter or Float.NaN if the counter
+   *         does not contain any float values.
    */
-  public float getLargestFloatOccuringAtLeast(int freq) {
-    float largestFloat = -Float.MAX_VALUE;
-    for (float f : keys()) {
-      if (get(f).size() >= freq && f > largestFloat) {
-        largestFloat = f;
-      }
-    }
-    return largestFloat;
+  public float getMostCommonFloat() {
+    return !this.freqsDesc.isEmpty() ? this.freqsDesc.peek() : Float.NaN;
   }
 
   /**
-   * Returns the objects that are associated with the largest float value that
-   * occurs at least 'freq'-times.
+   * Returns the elements associated with the most common float in this
+   * counter.
    * 
-   * @param freq
-   *        The frequency.
-   * @return The objects that are associated with the largest float value that
-   *         occurs at least 'freq'-times.
+   * @return The elements associated with the most common float in this counter
+   *         or null if the counter does not contain any float values.
    */
-  public Set<T> getObjectsWithLargestFloatOccuringAtLeast(int freq) {
-    return get(getLargestFloatOccuringAtLeast(freq));
+  public Set<T> getElementsWithMostCommonFloat() {
+    return !this.freqsDesc.isEmpty() ? this.elements.get(this.freqsDesc.peek())
+        : null;
   }
 
   // ==========================================================================
 
   /**
-   * Counts the frequencies of the floats.
+   * Returns the least common float in this counter.
+   * 
+   * @return The least common float in this counter or Float.NaN if the counter
+   *         does not contain any float values.
    */
-  protected void count() {
-    resetComputedValues();
-
-    float sumFloats = 0;
-    float numFloats = 0;
-    TFloatArrayList allMostFrequentFloats = new TFloatArrayList();
-    TFloatArrayList allLeastFrequentFloats = new TFloatArrayList();
-
-    for (float f : keys()) {
-      int count = get(f).size();
-
-      if (count == 0) {
-        continue;
-      }
-
-      if (f > this.largestFloat) {
-        this.largestFloat = f;
-      }
-
-      if (f < this.smallestFloat) {
-        this.smallestFloat = f;
-      }
-
-      if (count > this.mostFrequentFloatFrequency) {
-        this.mostFrequentFloat = f;
-        this.mostFrequentFloatFrequency = count;
-        allMostFrequentFloats.clear();
-        allMostFrequentFloats.add(f);
-      }
-
-      if (count == this.mostFrequentFloatFrequency) {
-        allMostFrequentFloats.add(f);
-      }
-
-      if (count < this.mostFrequentFloatFrequency) {
-        this.leastFrequentFloat = f;
-        this.leastFrequentFloatFrequency = count;
-        allLeastFrequentFloats.clear();
-        allMostFrequentFloats.add(f);
-      }
-
-      if (count == this.leastFrequentFloatFrequency) {
-        allLeastFrequentFloats.add(f);
-      }
-
-      sumFloats += count * f;
-      numFloats += count;
-    }
-
-    this.averageValue = numFloats > 0 ? (sumFloats / numFloats) : 0;
-    this.allMostFrequentFloats = allMostFrequentFloats.toArray();
-    this.allLeastFrequentFloats = allLeastFrequentFloats.toArray();
-
-    this.isStatisticOutdated = false;
+  public float getLeastCommonFloat() {
+    return !this.freqsAsc.isEmpty() ? this.freqsAsc.peek() : Float.NaN;
   }
 
-  // ==========================================================================
-  // Util methods.
-
-  @Override
-  public Set<T> get(float f) {
-    if (containsKey(f)) {
-      return super.get(f);
-    }
-    // Return an empty list if this counter does not contain the given float.
-    return new HashSet<>();
+  /**
+   * Returns the elements associated with the least common float in this
+   * counter.
+   * 
+   * @return The elements associated with the least common float in this
+   *         counter or null if the counter does not contain any float values.
+   */
+  public Set<T> getElementsWithLeastCommonFloat() {
+    return !this.freqsAsc.isEmpty() ? this.elements.get(this.freqsAsc.peek())
+        : null;
   }
 }
