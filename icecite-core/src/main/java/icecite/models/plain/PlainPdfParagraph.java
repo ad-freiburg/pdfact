@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfTextLine;
@@ -55,6 +56,11 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
+  }
+
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.characters.add(character);
   }
 
   // ==========================================================================

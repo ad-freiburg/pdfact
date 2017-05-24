@@ -3,6 +3,7 @@ package icecite.models.plain;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfTextBlock;
 import icecite.utils.geometric.Rectangle;
@@ -43,6 +44,11 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
     this.characters = characters;
   }
 
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.characters.add(character);
+  }
+  
   // ==========================================================================
 
   @Override

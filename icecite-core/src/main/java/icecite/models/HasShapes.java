@@ -22,4 +22,12 @@ public interface HasShapes {
    *        The shapes to set.
    */
   void setShapes(Set<PdfShape> shapes);
+  
+  /**
+   * Adds the given shape.
+   * 
+   * @param shape
+   *        The shape to add.
+   */
+  void addShape(PdfShape shape);
 }

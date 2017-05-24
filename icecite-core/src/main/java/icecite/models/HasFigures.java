@@ -23,4 +23,12 @@ public interface HasFigures {
    *        The figures to set.
    */
   void setFigures(Set<PdfFigure> figures);
+  
+  /**
+   * Adds the given figure.
+   * 
+   * @param figure
+   *        The figure to add.
+   */
+  void addFigure(PdfFigure figure);
 }

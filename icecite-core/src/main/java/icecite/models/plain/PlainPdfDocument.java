@@ -3,13 +3,16 @@ package icecite.models.plain;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
@@ -51,33 +54,45 @@ public class PlainPdfDocument implements PdfDocument {
 
   /**
    * Creates a new PDF document.
+   * 
+   * @param characterListFactory
+   *        The factory to create instances of PdfCharacterList.
    */
   @AssistedInject
-  public PlainPdfDocument() {
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory) {
     this.pages = new ArrayList<PdfPage>();
+    this.characters = characterListFactory.create();
+    this.figures = new HashSet<>();
+    this.shapes = new HashSet<>();
   }
 
   /**
    * Creates a new PDF document.
    * 
+   * @param characterListFactory
+   *        The factory to create instances of PdfCharacterList.
    * @param pdf
    *        The PDF file given as a File object
    */
   @AssistedInject
-  public PlainPdfDocument(@Assisted File pdf) {
-    this();
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
+      @Assisted File pdf) {
+    this(characterListFactory);
     this.path = pdf.toPath();
   }
 
   /**
    * Creates a new PDF document.
    * 
+   * @param characterListFactory
+   *        The factory to create instances of PdfCharacterList.
    * @param pdf
    *        The PDF file given as a Path object
    */
   @AssistedInject
-  public PlainPdfDocument(@Assisted Path pdf) {
-    this();
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory, 
+      @Assisted Path pdf) {
+    this(characterListFactory);
     this.path = pdf;
   }
 
@@ -132,6 +147,11 @@ public class PlainPdfDocument implements PdfDocument {
     this.characters = characters;
   }
 
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.characters.add(character);
+  }
+
   // ==========================================================================
 
   @Override
@@ -143,7 +163,12 @@ public class PlainPdfDocument implements PdfDocument {
   public void setFigures(Set<PdfFigure> figures) {
     this.figures = figures;
   }
-
+  
+  @Override
+  public void addFigure(PdfFigure figure) {
+    this.figures.add(figure);
+  }
+  
   // ==========================================================================
 
   @Override
@@ -154,5 +179,10 @@ public class PlainPdfDocument implements PdfDocument {
   @Override
   public void setShapes(Set<PdfShape> shapes) {
     this.shapes = shapes;
+  }
+  
+  @Override
+  public void addShape(PdfShape shape) {
+    this.shapes.add(shape);
   }
 }

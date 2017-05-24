@@ -1,12 +1,14 @@
 package icecite.models.plain;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
@@ -14,13 +16,14 @@ import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 
 /**
  * A plain implementation of {@link PdfPage}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfPage implements PdfPage {
+public class PlainPdfPage implements PdfPage {  
   /**
    * The characters of this page.
    */
@@ -61,9 +64,15 @@ public class PlainPdfPage implements PdfPage {
 
   /**
    * Creates a new PDF page.
+   * 
+   * @param characterListFactory
+   *        The factory to create instances of PdfCharacterList.
    */
   @AssistedInject
-  public PlainPdfPage() {
+  public PlainPdfPage(PdfCharacterListFactory characterListFactory) {
+    this.characters = characterListFactory.create();
+    this.figures = new HashSet<>();
+    this.shapes = new HashSet<>();
     this.paragraphs = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
     this.textLines = new ArrayList<>();
@@ -72,11 +81,15 @@ public class PlainPdfPage implements PdfPage {
   /**
    * Creates a new PDF page.
    * 
+   * @param characterListFactory
+   *        The factory to create instances of PdfCharacterList.
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
-  public PlainPdfPage(@Assisted int pageNumber) {
+  public PlainPdfPage(PdfCharacterListFactory characterListFactory,
+      @Assisted int pageNumber) {
+    this(characterListFactory);
     this.pageNumber = pageNumber;
   }
 
@@ -91,7 +104,12 @@ public class PlainPdfPage implements PdfPage {
   public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
-
+  
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.characters.add(character);
+  }
+  
   // ==========================================================================
 
   @Override
@@ -104,6 +122,11 @@ public class PlainPdfPage implements PdfPage {
     this.figures = figures;
   }
 
+  @Override
+  public void addFigure(PdfFigure figure) {
+    this.figures.add(figure);
+  }
+  
   // ==========================================================================
 
   @Override
@@ -116,6 +139,11 @@ public class PlainPdfPage implements PdfPage {
     this.shapes = shapes;
   }
 
+  @Override
+  public void addShape(PdfShape shape) {
+    this.shapes.add(shape);
+  }
+  
   // ==========================================================================
 
   @Override
