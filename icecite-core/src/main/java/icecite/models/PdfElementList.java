@@ -13,56 +13,68 @@ import java.util.Set;
  */
 public interface PdfElementList<T extends PdfElement>
     extends List<T>, HasBoundingBox {
+
   /**
-   * Returns the most common height over all PDF elements in this list.
+   * Swaps the elements at index i and j.
    * 
-   * @return The most common height over all PDF elements in this list.
+   * @param i
+   *        The index of the first element to swap.
+   * @param j
+   *        The index of the second element to swap.
+   */
+  void swap(int i, int j);
+
+  // ==========================================================================
+
+  /**
+   * Returns the most common height of the PDF elements in this list.
+   * 
+   * @return The most common height of the PDF elements in this list.
    */
   float getMostCommonHeight();
 
   /**
-   * Returns all elements with the most common height value.
-   * 
-   * @return All elements with the most common height value.
+   * // * Returns all elements with the most common height. // * // * @return
+   * All elements with the most common height. //
    */
-  Set<T> getElementsWithMostCommonHeight();
+  // Set<T> getElementsWithMostCommonHeight();
 
   /**
-   * Returns the average height over all PDF elements in this list.
+   * Returns the average height of the PDF elements in this list.
    * 
-   * @return The average height over all PDF elements in this list.
+   * @return The average height of the PDF elements in this list.
    */
   float getAverageHeight();
 
   // ==========================================================================
 
   /**
-   * Returns the most common width over all PDF elements in this list.
+   * Returns the most common width of the PDF elements in this list.
    * 
-   * @return The most common width over all PDF elements in this list.
+   * @return The most common width of the PDF elements in this list.
    */
   float getMostCommonWidth();
 
-  /**
-   * Returns all elements with the most common width value.
-   * 
-   * @return All elements with the most common width value.
-   */
-  Set<T> getElementsWithMostCommonWidth();
+  // /**
+  // * Returns all elements with the most common width.
+  // *
+  // * @return All elements with the most common width.
+  // */
+  // Set<T> getElementsWithMostCommonWidth();
 
   /**
-   * Returns the average width over all PDF elements in this list.
+   * Returns the average width of the PDF elements in this list.
    * 
-   * @return The average width over all PDF elements in this list.
+   * @return The average width of the PDF elements in this list.
    */
   float getAverageWidth();
 
   // ==========================================================================
 
   /**
-   * Returns the smallest minX value of all PDF elements in this list.
+   * Returns the smallest minX value of the PDF elements in this list.
    * 
-   * @return The smallest minX value of all PDF elements in this list.
+   * @return The smallest minX value of the PDF elements in this list.
    */
   float getSmallestMinX();
 
@@ -76,9 +88,9 @@ public interface PdfElementList<T extends PdfElement>
   // ==========================================================================
 
   /**
-   * Returns the smallest minY value of all PDF elements in this list.
+   * Returns the smallest minY value of the PDF elements in this list.
    * 
-   * @return The smallest minY value of all PDF elements in this list.
+   * @return The smallest minY value of the PDF elements in this list.
    */
   float getSmallestMinY();
 
@@ -92,9 +104,9 @@ public interface PdfElementList<T extends PdfElement>
   // ==========================================================================
 
   /**
-   * Returns the largest maxX value of all PDF elements in this list.
+   * Returns the largest maxX value of the PDF elements in this list.
    * 
-   * @return The largest maxX value of all PDF elements in this list.
+   * @return The largest maxX value of the PDF elements in this list.
    */
   float getLargestMaxX();
 
@@ -108,9 +120,9 @@ public interface PdfElementList<T extends PdfElement>
   // ==========================================================================
 
   /**
-   * Returns the largest maxY value of all PDF elements in this list.
+   * Returns the largest maxY value of the PDF elements in this list.
    * 
-   * @return The largest maxY value of all PDF elements in this list.
+   * @return The largest maxY value of the PDF elements in this list.
    */
   float getLargestMaxY();
 
@@ -131,12 +143,12 @@ public interface PdfElementList<T extends PdfElement>
    * 
    * @param splitIndex
    *        The index where to split this list.
-   * @return An array of length 2, containing the both resulting views.
+   * @return A list of length 2, containing the two resulting views.
    */
-  List<? extends PdfElementList<T>> split(int splitIndex);
-  
+  List<? extends PdfElementList<T>> cut(int splitIndex);
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfElementList}.
    * 
@@ -147,7 +159,7 @@ public interface PdfElementList<T extends PdfElement>
    */
   public interface PdfElementListFactory<T extends PdfElement> {
     /**
-     * Creates a PdfElementList.
+     * Creates a new PdfElementList.
      * 
      * @return An instance of {@link PdfElementList}.
      */

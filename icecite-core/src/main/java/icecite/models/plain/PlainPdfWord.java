@@ -3,7 +3,7 @@ package icecite.models.plain;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterSet;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
 
@@ -16,7 +16,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   /**
    * The characters of this page.
    */
-  protected PdfCharacterSet characters;
+  protected PdfCharacterList characters;
 
   /**
    * The text of this word.
@@ -32,7 +32,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
    *        The characters of this word.
    */
   @AssistedInject
-  public PlainPdfWord(@Assisted PdfCharacterSet characters) {
+  public PlainPdfWord(@Assisted PdfCharacterList characters) {
     this.characters = characters;
   }
 
@@ -51,12 +51,12 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public PdfCharacterSet getCharacters() {
+  public PdfCharacterList getCharacters() {
     return this.characters;
   }
 
   @Override
-  public void setCharacters(PdfCharacterSet characters) {
+  public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
   

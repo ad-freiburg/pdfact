@@ -6,8 +6,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
-import icecite.models.PdfCharacterSet;
-import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
+import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfColorRegistry;
@@ -31,7 +31,7 @@ import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.plain.PlainPdfCharacter;
-import icecite.models.plain.PlainPdfCharacterSet;
+import icecite.models.plain.PlainPdfCharacterList;
 import icecite.models.plain.PlainPdfColor;
 import icecite.models.plain.PlainPdfColorRegistry;
 import icecite.models.plain.PlainPdfDocument;
@@ -113,11 +113,9 @@ public class IceciteBaseModule extends AbstractModule {
     fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
     fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
 
-    // fc(PdfElementSet.class, PdfElementSetFactory.class,
-    // PlainPdfElementSet.class);
-    fc(PdfCharacterSet.class, PdfCharacterSetFactory.class,
-        PlainPdfCharacterSet.class);
-
+    fc(PdfCharacterList.class, PdfCharacterListFactory.class,
+        PlainPdfCharacterList.class);
+    
     // Bind the geometric model factories.
     fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);
     fc(Line.class, LineFactory.class, PlainLine.class);

@@ -26,12 +26,14 @@ public class SetFontAndSize extends OperatorProcessor {
       throw new MissingOperandException(op, args);
     }
 
-    // TODO: Use PdfFont here.
     COSName fontName = (COSName) args.get(0);
     float fontSize = ((COSNumber) args.get(1)).floatValue();
     this.engine.getGraphicsState().getTextState().setFontSize(fontSize);
+    // TODO: This needs a lot of time (> 400ms) when called the first time.
+    // Reimplement it.
     PDFont font = this.engine.getResources().getFont(fontName);
     this.engine.getGraphicsState().getTextState().setFont(font);
+
   }
 
   @Override

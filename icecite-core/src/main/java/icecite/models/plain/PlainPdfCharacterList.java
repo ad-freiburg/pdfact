@@ -1,8 +1,14 @@
 package icecite.models.plain;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Spliterator;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -20,42 +26,47 @@ import icecite.utils.geometric.Rectangle.RectangleFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
-    implements PdfCharacterList {
+public class PlainPdfCharacterList
+    extends PlainPdfElementList<PdfCharacter> implements PdfCharacterList {
   /**
    * The serial id.
    */
-  protected static final long serialVersionUID = -7582729069033134941L;
+  private static final long serialVersionUID = 6187582288718513001L;
 
   /**
-   * The counter for the fonts.
+   * The most common font.
    */
-  protected ObjectCounter<PdfFont, PdfCharacter> fontCounter;
+  protected PdfFont mostCommonFont;
 
   /**
-   * The counter for the colors.
+   * The characters with the most common font.
    */
-  protected ObjectCounter<PdfColor, PdfCharacter> colorCounter;
+  protected Set<PdfCharacter> charsWithMostCommonFont;
 
   /**
-   * The counter for the font sizes.
+   * The most common color.
    */
-  protected FloatCounter<PdfCharacter> fontsizeCounter;
+  protected PdfColor mostCommonColor;
 
   /**
-   * The index of the previous split.
+   * The characters with the most common color.
    */
-  protected int currentSplitIndex;
+  protected Set<PdfCharacter> charsWithMostCommonColor;
 
   /**
-   * The previous portion between index 0 and previousSplitIndex.
+   * The most common font size.
    */
-  protected PdfCharacterListView currentLeftHalf;
+  protected float mostCommonFontsize;
 
   /**
-   * The previous portion between previousSplitIndex and index this.size().
+   * The characters with the most common font size.
    */
-  protected PdfCharacterListView currentRightHalf;
+  protected Set<PdfCharacter> charsWithMostCommonFontsize;
+
+  /**
+   * The average font size.
+   */
+  protected float averageFontsize;
 
   // ==========================================================================
   // Constructors.
@@ -68,7 +79,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
    */
   @AssistedInject
   public PlainPdfCharacterList(RectangleFactory rectangleFactory) {
-    super(rectangleFactory);
+    this(rectangleFactory, DEFAULT_INITIAL_CAPACITY);
   }
 
   /**
@@ -87,241 +98,183 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   // ==========================================================================
 
-  @Override
-  public void clear() {
-    super.clear();
-    this.fontCounter.clear();
-    this.colorCounter.clear();
-    this.fontsizeCounter.clear();
+  /**
+   * Computes statistics about the characters in this list.
+   */
+  protected void computeStatistics() {
+    super.computeStatistics();
+    ObjectCounter<PdfFont> fontsCounter = new ObjectCounter<>();
+    ObjectCounter<PdfColor> colorsCounter = new ObjectCounter<>();
+    FloatCounter fontsizesCounter = new FloatCounter();
+
+    for (PdfCharacter character : this) {
+      // Process the font.
+      fontsCounter.add(character.getFont());
+
+      // Process the color.
+      colorsCounter.add(character.getColor());
+
+      // Process the font size.
+      fontsizesCounter.add(character.getFontSize());
+    }
+
+    this.mostCommonFont = fontsCounter.getMostCommonObject();
+    this.mostCommonColor = colorsCounter.getMostCommonObject();
+    this.mostCommonFontsize = fontsizesCounter.getMostCommonFloat();
+    this.averageFontsize = fontsizesCounter.getAverageFloat();
+
+    this.isStatisticsComputed = true;
   }
 
   // ==========================================================================
-  // Split methods.
 
   @Override
-  public List<? extends PdfCharacterList> split(int splitIndex) {
-    PdfCharacterListView leftHalf = new PdfCharacterListView(this, 0,
-        splitIndex);
-    PdfCharacterListView rightHalf = new PdfCharacterListView(this, splitIndex,
-        this.size());
-    split(splitIndex, leftHalf, rightHalf);
-    return Arrays.asList(leftHalf, rightHalf);
-  }
-
-  /**
-   * Splits this list at the given index into two halves. Both halves are views
-   * of the related portion of the list, that is (1) the portion between index
-   * 0, inclusive, and splitIndex, exclusive; and (2) the portion between
-   * splitIndex, inclusive, and this.size(), exclusive.
-   * 
-   * @param splitIndex
-   *        The index where to split this list.
-   * @param leftHalfToFill
-   *        The left half to populate with the counters.
-   * @param rightHalfToFill
-   *        The left half to populate with the counters.
-   */
-  public void split(int splitIndex, PdfCharacterListView leftHalfToFill,
-      PdfCharacterListView rightHalfToFill) {
-    super.split(splitIndex, leftHalfToFill, rightHalfToFill);
-
-    ObjectCounter<PdfFont, PdfCharacter> leftFontCounter, rightFontCounter;
-    ObjectCounter<PdfColor, PdfCharacter> leftColorCounter, rightColorCounter;
-    FloatCounter<PdfCharacter> leftFontsizeCounter, rightFontsizeCounter;
-
-    if (this.currentLeftHalf != null && this.currentRightHalf != null) {
-      leftFontCounter = this.currentLeftHalf.getFontCounter();
-      rightFontCounter = this.currentRightHalf.getFontCounter();
-      leftColorCounter = this.currentLeftHalf.getColorCounter();
-      rightColorCounter = this.currentRightHalf.getColorCounter();
-      leftFontsizeCounter = this.currentLeftHalf.getFontsizeCounter();
-      rightFontsizeCounter = this.currentRightHalf.getFontsizeCounter();
-    } else {
-      int initialCapacity = 16; // TODO
-      leftFontCounter = new ObjectCounter<>(initialCapacity);
-      rightFontCounter = new ObjectCounter<>(initialCapacity);
-      leftColorCounter = new ObjectCounter<>(initialCapacity);
-      rightColorCounter = new ObjectCounter<>(initialCapacity);
-      leftFontsizeCounter = new FloatCounter<>(initialCapacity);
-      rightFontsizeCounter = new FloatCounter<>(initialCapacity);
-    }
-
-    // Update the counters.
-    if (splitIndex < this.currentSplitIndex) {
-      for (int i = splitIndex; i < this.currentSplitIndex; i++) {
-        PdfCharacter character = get(i);
-        if (character == null) {
-          continue;
-        }
-
-        // Remove elements from the left half.
-        leftFontCounter.remove(character.getFont(), character);
-        leftColorCounter.remove(character.getColor(), character);
-        leftFontsizeCounter.remove(character.getFontSize(), character);
-
-        // Add elements to the right half.
-        rightFontCounter.add(character.getFont(), character);
-        rightColorCounter.add(character.getColor(), character);
-        rightFontsizeCounter.add(character.getFontSize(), character);
-      }
-    } else if (splitIndex > this.currentSplitIndex) {
-      for (int i = this.currentSplitIndex; i < splitIndex; i++) {
-        PdfCharacter character = get(i);
-        if (character == null) {
-          continue;
-        }
-
-        // Add elements to the right half.
-        leftFontCounter.add(character.getFont(), character);
-        leftColorCounter.add(character.getColor(), character);
-        leftFontsizeCounter.add(character.getFontSize(), character);
-
-        // Remove elements from the right half.
-        rightFontCounter.remove(character.getFont(), character);
-        rightColorCounter.remove(character.getColor(), character);
-        rightFontsizeCounter.remove(character.getFontSize(), character);
-      }
-    }
-
-    // Set the counters of the left half.
-    leftHalfToFill.setFontCounter(leftFontCounter);
-    leftHalfToFill.setColorCounter(leftColorCounter);
-    leftHalfToFill.setFontsizeCounter(leftFontsizeCounter);
-
-    // Set the counters of the right half.
-    rightHalfToFill.setFontCounter(rightFontCounter);
-    rightHalfToFill.setColorCounter(rightColorCounter);
-    rightHalfToFill.setFontsizeCounter(rightFontsizeCounter);
-
-    this.currentLeftHalf = leftHalfToFill;
-    this.currentRightHalf = rightHalfToFill;
-    this.currentSplitIndex = splitIndex;
-  }
-
-  // ==========================================================================
-  // Register methods.
-
-  /**
-   * Registers the given element to this list.
-   * 
-   * @param character
-   *        The element to register.
-   */
-  @Override
-  protected void registerPdfElement(PdfCharacter character) {
-    super.registerPdfElement(character);
-    if (character == null) {
-      return;
-    }
-
-    this.fontCounter.add(character.getFont(), character);
-    this.colorCounter.add(character.getColor(), character);
-    this.fontsizeCounter.add(character.getFontSize(), character);
-  }
-
-  @Override
-  protected void unregisterPdfElement(Object object) {
-    if (object == null) {
-      return;
-    }
-
-    if (object instanceof PdfCharacter) {
-      PdfCharacter character = (PdfCharacter) object;
-
-      this.fontCounter.remove(character.getFont(), object);
-      this.colorCounter.remove(character.getColor(), object);
-      this.fontsizeCounter.remove(character.getFontSize(), object);
-    }
+  public List<PdfCharacterList> cut(int index) {
+    // Create new views.
+    PdfCharacterView left = new PdfCharacterView(this, 0, index);
+    PdfCharacterView right = new PdfCharacterView(this, index, this.size());
+    return Arrays.asList(left, right);
   }
 
   // ==========================================================================
 
   @Override
   public PdfFont getMostCommonFont() {
-    return this.fontCounter.getMostCommonObject();
+    if (!this.isStatisticsComputed) {
+      computeStatistics();
+    }
+    return this.mostCommonFont;
   }
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonFont() {
-    return this.fontCounter.getElementsWithMostCommonObject();
+    if (this.charsWithMostCommonFont == null) {
+      this.charsWithMostCommonFont = computeCharsWithMostCommonFont();
+    }
+    return this.charsWithMostCommonFont;
+  }
+
+  /**
+   * Computes the characters with the most common font.
+   * 
+   * @return The characters with the most common font.
+   */
+  protected Set<PdfCharacter> computeCharsWithMostCommonFont() {
+    PdfFont mostCommonFont = getMostCommonFont();
+    Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
+    for (PdfCharacter character : this) {
+      if (character.getFont() == mostCommonFont) {
+        characters.add(character);
+      }
+    }
+    return characters;
   }
 
   // ==========================================================================
 
   @Override
   public PdfColor getMostCommonColor() {
-    return this.colorCounter.getMostCommonObject();
+    if (!this.isStatisticsComputed) {
+      computeStatistics();
+    }
+    return this.mostCommonColor;
   }
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonColor() {
-    return this.colorCounter.getElementsWithMostCommonObject();
+    if (this.charsWithMostCommonColor == null) {
+      this.charsWithMostCommonColor = computeCharsWithMostCommonColor();
+    }
+    return this.charsWithMostCommonColor;
+  }
+
+  /**
+   * Computes the characters with the most common color.
+   * 
+   * @return The characters with the most common color.
+   */
+  protected Set<PdfCharacter> computeCharsWithMostCommonColor() {
+    PdfColor mostCommonColor = getMostCommonColor();
+    Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
+    for (PdfCharacter character : this) {
+      if (character.getColor() == mostCommonColor) {
+        characters.add(character);
+      }
+    }
+    return characters;
   }
 
   // ==========================================================================
 
   @Override
+  public float getAverageFontsize() {
+    if (!this.isStatisticsComputed) {
+      computeStatistics();
+    }
+    return this.averageFontsize;
+  }
+
+  @Override
   public float getMostCommonFontsize() {
-    return this.fontsizeCounter.getMostCommonFloat();
+    if (!this.isStatisticsComputed) {
+      computeStatistics();
+    }
+    return this.mostCommonFontsize;
   }
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonFontsize() {
-    return this.fontsizeCounter.getElementsWithMostCommonFloat();
-  }
-
-  @Override
-  public float getAverageFontsize() {
-    return this.fontsizeCounter.getAverageFloat();
+    if (this.charsWithMostCommonFontsize == null) {
+      this.charsWithMostCommonFontsize = computeCharsWithMostCommonFontsize();
+    }
+    return this.charsWithMostCommonFontsize;
   }
 
   /**
-   * A sublist of PDF characters.
+   * Computes the characters with the most common font size.
+   * 
+   * @return The characters with the most common font size.
+   */
+  protected Set<PdfCharacter> computeCharsWithMostCommonFontsize() {
+    float mostCommonFontsize = getMostCommonFontsize();
+    Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
+    for (PdfCharacter character : this) {
+      if (character.getFontSize() == mostCommonFontsize) {
+        characters.add(character);
+      }
+    }
+    return characters;
+  }
+
+  // ==========================================================================
+
+  /**
+   * A view of a PdfCharacterList.
    * 
    * @author Claudius Korzen
    */
-  class PdfCharacterListView extends PdfElementListView<PdfCharacter>
+  class PdfCharacterView extends PlainPdfCharacterList
       implements PdfCharacterList {
     /**
      * The serial id.
      */
-    private static final long serialVersionUID = 4550840178348993069L;
+    protected static final long serialVersionUID = 884367879377788123L;
 
     /**
-     * The counter for fonts.
+     * The parent list.
      */
-    protected ObjectCounter<PdfFont, PdfCharacter> fontCounter;
+    protected final PdfCharacterList base;
 
     /**
-     * The counter for colors.
+     * The offset in the parent list.
      */
-    protected ObjectCounter<PdfColor, PdfCharacter> colorCounter;
-
-    /**
-     * The counter for font sizes.
-     */
-    protected FloatCounter<PdfCharacter> fontsizeCounter;
-
-    /**
-     * The index of the previous split.
-     */
-    protected int currentSplitIndex;
-
-    /**
-     * The previous portion between index 0 and previousSplitIndex.
-     */
-    protected PdfCharacterListView currentLeftHalf;
-
-    /**
-     * The previous portion between previousSplitIndex and index this.size().
-     */
-    protected PdfCharacterListView currentRightHalf;
+    protected final int offset;
 
     // ========================================================================
     // Constructors.
 
     /**
-     * Creates a new sublist based on the given parent list.
+     * Creates a new view based on the given parent list.
      * 
      * @param parent
      *        The parent list.
@@ -330,215 +283,142 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
      * @param toIndex
      *        The end index.
      */
-    PdfCharacterListView(PdfCharacterList parent, int fromIndex, int toIndex) {
-      super(parent, fromIndex, toIndex);
+    PdfCharacterView(PdfCharacterList parent, int fromIndex, int toIndex) {
+      super(PlainPdfCharacterList.this.rectangleFactory);
+      this.base = parent;
+      this.offset = fromIndex;
+      this.size = toIndex - fromIndex;
     }
 
     // ========================================================================
-    // Custom methods.
-
-    /**
-     * Returns the font counter of this view.
-     * 
-     * @return The font counter of this view.
-     */
-    public ObjectCounter<PdfFont, PdfCharacter> getFontCounter() {
-      return this.fontCounter;
-    }
-
-    /**
-     * Sets the font counter of this view.
-     * 
-     * @param counter
-     *        The font counter of this view.
-     */
-    public void setFontCounter(ObjectCounter<PdfFont, PdfCharacter> counter) {
-      this.fontCounter = counter;
-    }
-
-    // ========================================================================
-
-    /**
-     * Returns the color counter of this view.
-     * 
-     * @return The color counter of this view.
-     */
-    public ObjectCounter<PdfColor, PdfCharacter> getColorCounter() {
-      return this.colorCounter;
-    }
-
-    /**
-     * Sets the color counter of this view.
-     * 
-     * @param counter
-     *        The color counter of this view.
-     */
-    public void setColorCounter(ObjectCounter<PdfColor, PdfCharacter> counter) {
-      this.colorCounter = counter;
-    }
-
-    // ========================================================================
-
-    /**
-     * Returns the font size counter of this view.
-     * 
-     * @return The font size counter of this view.
-     */
-    public FloatCounter<PdfCharacter> getFontsizeCounter() {
-      return this.fontsizeCounter;
-    }
-
-    /**
-     * Sets the font size counter of this view.
-     * 
-     * @param counter
-     *        The font size counter of this view.
-     */
-    public void setFontsizeCounter(FloatCounter<PdfCharacter> counter) {
-      this.fontsizeCounter = counter;
-    }
-
-    // ========================================================================
+    // Don't allow to add elements to views.
 
     @Override
-    public List<? extends PdfCharacterList> split(int splitIndex) {
-      PdfCharacterListView leftHalf = new PdfCharacterListView(this, 0,
-          splitIndex);
-      PdfCharacterListView rightHalf = new PdfCharacterListView(this,
-          splitIndex, this.size());
-      split(splitIndex, leftHalf, rightHalf);
-      return Arrays.asList(leftHalf, rightHalf);
+    public boolean add(PdfCharacter c) {
+      throw new UnsupportedOperationException();
     }
 
-    /**
-     * Splits this list at the given index into two halves. Both halves are
-     * views of the related portion of the list, that is (1) the portion
-     * between index 0, inclusive, and splitIndex, exclusive; and (2) the
-     * portion between splitIndex, inclusive, and this.size(), exclusive.
-     * 
-     * @param splitIndex
-     *        The index where to split this list.
-     * @param leftHalfToFill
-     *        The left half to populate with the counters.
-     * @param rightHalfToFill
-     *        The left half to populate with the counters.
-     */
-    public void split(int splitIndex, PdfCharacterListView leftHalfToFill,
-        PdfCharacterListView rightHalfToFill) {
-      super.split(splitIndex, leftHalfToFill, rightHalfToFill);
+    @Override
+    public void add(int index, PdfCharacter c) {
+      throw new UnsupportedOperationException();
+    }
 
-      ObjectCounter<PdfFont, PdfCharacter> leftFontCounter, rightFontCounter;
-      ObjectCounter<PdfColor, PdfCharacter> leftColorCounter, rightColorCounter;
-      FloatCounter<PdfCharacter> leftFontsizeCounter, rightFontsizeCounter;
+    @Override
+    public boolean addAll(Collection<? extends PdfCharacter> c) {
+      throw new UnsupportedOperationException();
+    }
 
-      if (this.currentLeftHalf != null && this.currentRightHalf != null) {
-        leftFontCounter = this.currentLeftHalf.getFontCounter();
-        rightFontCounter = this.currentRightHalf.getFontCounter();
-        leftColorCounter = this.currentLeftHalf.getColorCounter();
-        rightColorCounter = this.currentRightHalf.getColorCounter();
-        leftFontsizeCounter = this.currentLeftHalf.getFontsizeCounter();
-        rightFontsizeCounter = this.currentRightHalf.getFontsizeCounter();
-      } else {
-        int initialCapacity = 16; // TODO
-        leftFontCounter = new ObjectCounter<>(initialCapacity);
-        rightFontCounter = new ObjectCounter<>(initialCapacity);
-        leftColorCounter = new ObjectCounter<>(initialCapacity);
-        rightColorCounter = new ObjectCounter<>(initialCapacity);
-        leftFontsizeCounter = new FloatCounter<>(initialCapacity);
-        rightFontsizeCounter = new FloatCounter<>(initialCapacity);
-      }
+    @Override
+    public boolean addAll(int index, Collection<? extends PdfCharacter> c) {
+      throw new UnsupportedOperationException();
+    }
 
-      // Update the counters.
-      if (splitIndex < this.currentSplitIndex) {
-        for (int i = splitIndex; i < this.currentSplitIndex; i++) {
-          PdfCharacter character = get(i);
-          if (character == null) {
-            continue;
-          }
+    // ========================================================================
+    // Iterators.
 
-          // Remove elements from the left half.
-          leftFontCounter.remove(character.getFont(), character);
-          leftColorCounter.remove(character.getColor(), character);
-          leftFontsizeCounter.remove(character.getFontSize(), character);
+    @Override
+    public Iterator<PdfCharacter> iterator() {
+      return listIterator(0);
+    }
 
-          // Add elements to the right half.
-          rightFontCounter.add(character.getFont(), character);
-          rightColorCounter.add(character.getColor(), character);
-          rightFontsizeCounter.add(character.getFontSize(), character);
+    @Override
+    public ListIterator<PdfCharacter> listIterator(final int index) {
+      return new ListIterator<PdfCharacter>() {
+        int cursor = index;
+
+        @Override
+        public boolean hasNext() {
+          return this.cursor != PdfCharacterView.this.size;
         }
-      } else if (splitIndex > this.currentSplitIndex) {
-        for (int i = this.currentSplitIndex; i < splitIndex; i++) {
-          PdfCharacter character = get(i);
-          if (character == null) {
-            continue;
+
+        @Override
+        public PdfCharacter next() {
+          if (this.cursor >= PdfCharacterView.this.size) {
+            throw new NoSuchElementException();
           }
-
-          // Add elements to the right half.
-          leftFontCounter.add(character.getFont(), character);
-          leftColorCounter.add(character.getColor(), character);
-          leftFontsizeCounter.add(character.getFontSize(), character);
-
-          // Remove elements from the right half.
-          rightFontCounter.remove(character.getFont(), character);
-          rightColorCounter.remove(character.getColor(), character);
-          rightFontsizeCounter.remove(character.getFontSize(), character);
+          return PdfCharacterView.this.get(this.cursor++);
         }
-      }
 
-      // Set the counters of the left half.
-      leftHalfToFill.setFontCounter(leftFontCounter);
-      leftHalfToFill.setColorCounter(leftColorCounter);
-      leftHalfToFill.setFontsizeCounter(leftFontsizeCounter);
+        @Override
+        public boolean hasPrevious() {
+          return this.cursor != 0;
+        }
 
-      // Set the counters of the right half.
-      rightHalfToFill.setFontCounter(rightFontCounter);
-      rightHalfToFill.setColorCounter(rightColorCounter);
-      rightHalfToFill.setFontsizeCounter(rightFontsizeCounter);
+        @Override
+        public PdfCharacter previous() {
+          if (this.cursor - 1 < 0) {
+            throw new NoSuchElementException();
+          }
+          return PdfCharacterView.this.get(this.cursor--);
+        }
 
-      this.currentLeftHalf = leftHalfToFill;
-      this.currentRightHalf = rightHalfToFill;
-      this.currentSplitIndex = splitIndex;
+        @Override
+        public int nextIndex() {
+          return this.cursor;
+        }
+
+        @Override
+        public int previousIndex() {
+          return this.cursor - 1;
+        }
+
+        @Override
+        public void remove() {
+          throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(PdfCharacter c) {
+          throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(PdfCharacter c) {
+          throw new UnsupportedOperationException();
+        }
+      };
+    }
+
+    @Override
+    public Spliterator<PdfCharacter> spliterator() {
+      throw new UnsupportedOperationException();
+    }
+
+    // ========================================================================
+    // Getters.
+
+    @Override
+    public PdfCharacter get(int index) {
+      return this.base.get(this.offset + index);
+    }
+
+    @Override
+    public int size() {
+      return this.size;
+    }
+
+    public boolean isEmpty() {
+      return this.size == 0;
     }
 
     // ========================================================================
 
     @Override
-    public PdfFont getMostCommonFont() {
-      return this.fontCounter.getMostCommonObject();
-    }
-
-    @Override
-    public Set<PdfCharacter> getCharactersWithMostCommonFont() {
-      return this.fontCounter.getElementsWithMostCommonObject();
+    public void swap(int i, int j) {
+      this.base.swap(this.offset + i, this.offset + j);
     }
 
     // ========================================================================
 
     @Override
-    public PdfColor getMostCommonColor() {
-      return this.colorCounter.getMostCommonObject();
-    }
-
-    @Override
-    public Set<PdfCharacter> getCharactersWithMostCommonColor() {
-      return this.colorCounter.getElementsWithMostCommonObject();
-    }
-
-    // ========================================================================
-
-    @Override
-    public float getMostCommonFontsize() {
-      return this.fontsizeCounter.getMostCommonFloat();
-    }
-
-    @Override
-    public Set<PdfCharacter> getCharactersWithMostCommonFontsize() {
-      return this.fontsizeCounter.getElementsWithMostCommonFloat();
-    }
-
-    @Override
-    public float getAverageFontsize() {
-      return this.fontsizeCounter.getAverageFloat();
+    public List<PdfCharacterList> cut(int i) {
+      // Create new views.
+      int left = this.offset;
+      int cut = this.offset + i;
+      int right = this.offset + size();
+      PdfCharacterView v1 = new PdfCharacterView(this.base, left, cut);
+      PdfCharacterView v2 = new PdfCharacterView(this.base, cut, right);
+      return Arrays.asList(v1, v2);
     }
   }
 }

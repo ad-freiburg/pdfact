@@ -2,7 +2,7 @@ package icecite.tokenizer;
 
 import java.util.List;
 
-import icecite.models.PdfCharacterSet;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
@@ -25,5 +25,5 @@ public interface PdfTextBlockTokenizer {
    * @return The list of identified paragraphs.
    */
   List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars);
+      PdfCharacterList chars);
 }

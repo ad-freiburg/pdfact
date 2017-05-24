@@ -3,54 +3,28 @@ package icecite.tokenizer.xycut;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
-import com.google.inject.Inject;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterSet;
-import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfPage;
-import icecite.utils.geometric.Rectangle;
+import icecite.utils.comparators.MaxYComparator;
+import icecite.utils.comparators.MinXComparator;
 
 /**
- * A class that cuts given characters horizontally and vertically into any type
- * of blocks, which has to be defined in the implementing class.
+ * A class that cuts a list of characters horizontally and vertically into
+ * (smaller) blocks.
  * 
  * @param <T>
  *        The type in which the resulting character blocks should be packed.
  * 
  * @author Claudius Korzen
  */
-public abstract class XYCut<T extends PdfElement> {
+public abstract class XYCut<T extends PdfElement> {  
   /**
-   * The factory to create instance of {@link PdfCharacterSet}.
-   */
-  protected PdfCharacterSetFactory characterSetFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new instance of XYCut.
-   * 
-   * @param characterSetFactory
-   *        The factory to create instances of {@link PdfCharacterSet}.
-   */
-  @Inject
-  public XYCut(PdfCharacterSetFactory characterSetFactory) {
-    this.characterSetFactory = characterSetFactory;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Cuts the given characters into objects of type T.
+   * Cuts the given characters into blocks of type T.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -59,19 +33,17 @@ public abstract class XYCut<T extends PdfElement> {
    * @param chars
    *        The characters to cut.
    * 
-   * @return The list of resulting objects.
+   * @return The list of resulting blocks.
    */
-  public List<T> cut(PdfDocument pdf, PdfPage page, PdfCharacterSet chars) {
-    List<T> objects = new ArrayList<>();
-    cut(pdf, page, chars, objects);
-    return objects;
+  public List<T> cut(PdfDocument pdf, PdfPage page, PdfCharacterList chars) {
+    List<T> blocks = new ArrayList<>();
+    cut(pdf, page, chars, blocks);
+    return blocks;
   }
 
-  // ==========================================================================
-
   /**
-   * Cuts the given characters into objects of type T and adds them into the
-   * given list.
+   * Cuts the given characters into blocks of type T and adds them to the given
+   * result list.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -79,38 +51,37 @@ public abstract class XYCut<T extends PdfElement> {
    *        The page in which the characters are located.
    * @param characters
    *        The characters to be cut.
-   * @param objects
-   *        The list of objects to fill.
+   * @param blocks
+   *        The list of blocks to fill.
    */
-  protected void cut(PdfDocument pdf, PdfPage page, PdfCharacterSet characters,
-      List<T> objects) {
-    // Do a vertical cut (x-cut).
-    List<PdfCharacterSet> xBlocks = xCut(pdf, page, characters);
-
-    for (PdfCharacterSet xBlock : xBlocks) {
-      // Do a horizontal cut (y-cut).
-      List<PdfCharacterSet> yBlocks = yCut(pdf, page, xBlock);
+  protected void cut(PdfDocument pdf, PdfPage page, PdfCharacterList characters,
+      List<T> blocks) {    
+    // Cut the characters vertically (x-cut).
+    List<PdfCharacterList> xBlocks = xCut(pdf, page, characters);
+    
+    for (PdfCharacterList xBlock : xBlocks) {
+      // Cut the characters horizontally (y-cut).
+      List<PdfCharacterList> yBlocks = yCut(pdf, page, xBlock);
       if (xBlocks.size() == 1 && yBlocks.size() == 1) {
-        // The characters could *not* be cut. Pack them and them to the result.
-        PdfCharacterSet block = yBlocks.get(0);
+        // Both cuts results in a single blocks. So, the characters could *not*
+        // be cut. Pack them and add them to the result list.
+        PdfCharacterList block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
-          objects.add(pack(page, block));
+          blocks.add(pack(page, block));
         }
       } else {
-        // The characters could be cut. Cut the subblocks recursively.
-        for (PdfCharacterSet yBlock : yBlocks) {
-          cut(pdf, page, yBlock, objects);
+        // The characters could be cut. Cut the resulted blocks recursively.
+        for (PdfCharacterList yBlock : yBlocks) {
+          cut(pdf, page, yBlock, blocks);
         }
       }
     }
   }
 
-  // ==========================================================================
-
   /**
-   * Takes a set of characters and sweeps them in x direction in order to find
-   * a position to cut the characters vertically into a left half and a right
-   * half.
+   * Takes a list of characters and iterates them by sweeping a lane in x
+   * direction in order to find a position to cut the characters vertically
+   * into a left half and a right half.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -118,103 +89,49 @@ public abstract class XYCut<T extends PdfElement> {
    *        The page in which the characters are located.
    * @param chars
    *        The characters to cut.
-   * @return A list of set of characters. In case of the characters could be
-   *         cut, this list has two inner sets, containing the characters of
+   * @return A list of list of characters. In case of the characters could be
+   *         cut, this list has two inner lists representing the characters of
    *         the two halves. In case of the characters could *not* be cut, the
-   *         list consists of a single set, which is a copy of the original set
-   *         of characters.
+   *         list consists only of a single list, which is the original list of
+   *         characters.
    */
-  protected List<PdfCharacterSet> xCut(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars) {
-    /*-
-     * To illustrate the approach of this sweep algorithm, we introduce an 
-     * example of bounding boxes in order to refer to it in further comments.
-     * The bounding boxes are given as intervals (minX, maxX), because we
-     * only consider the x direction in this method:
-     * 
-     * Character A (minX:  9, maxX: 13):         |---|
-     * Character B (minX:  1, maxX:  6): |----|   
-     * Character C (minX: 10, maxX: 12):          |-|
-     * Character D (minX:  2, maxX:  5):  |--|
-     * 
-     * Width of lane to sweep: 4  : |+++|->           
-     * 
-     * On processing, we actually sweep a (virtual) lane of width defined by
-     * getVerticalLaneWidth() through the characters.
-     */
+  protected List<PdfCharacterList> xCut(PdfDocument pdf, PdfPage page,
+      PdfCharacterList chars) {
+    // Sort the characters by minX in order to sweep them in x direction.
+    Collections.sort(chars, new MinXComparator());
+    
+    // The score of the best cut found so far.
+    float bestCutScore = 0;
+    // The index of the best cut found so far.
+    int bestCutIndex = -1;
+    // The current position in the list of characters.
+    float currentPos = chars.get(0).getBoundingBox().getMaxX();
+    
+    for (int index = 1; index < chars.size(); index++) {
+      PdfCharacter character = chars.get(index);
 
-    // Define the sweep direction: from left to right (minX -> maxX).
-    XYCutSweepDirection dir = XYCutSweepDirection.LEFT_TO_RIGHT;
-
-    // Define a min-based queue of events, where an event is defined by the
-    // start value (the minX value) and the end value (the maxX value) of an
-    // bounding box.
-    Comparator<XYCutSweepEvent> cmp = new XYCutSweepEventComparator();
-    Queue<XYCutSweepEvent> events = new PriorityQueue<>(cmp);
-
-    // Fill the queue with the related events. For the example above, the queue
-    // looks like: [(5, A), (9, A), (1, B), (6, B), ...]. They are removed from
-    // the queue in ascending order: (1, B), (2, D), (5, D), ...
-    for (PdfCharacter character : chars) {
-      Rectangle boundingBox = character.getBoundingBox();
-      events.add(new XYCutSweepEvent(character, boundingBox.getMinX(), dir));
-      events.add(new XYCutSweepEvent(character, boundingBox.getMaxX(), dir));
-    }
-
-    // The set of characters that overlap the current lane horizontally.
-    PdfCharacterSet overlapping = this.characterSetFactory.create();
-    // The set of characters of the left half.
-    PdfCharacterSet leftHalf = this.characterSetFactory.create();
-    // The set of characters of the right half.
-    PdfCharacterSet rightHalf = this.characterSetFactory.create(chars);
-
-    while (!events.isEmpty()) {
-      // Process the next event, e.g. "(1, B)" in the example above.
-      XYCutSweepEvent evt = events.poll();
-
-      if (evt.isStartEvent()) {
-        // Add the char to the overlapping characters.
-        overlapping.add(evt.getCharacter());
-        rightHalf.remove(evt.getCharacter());
-      } else {
-        // Remove the char from overlapping chars, e.g. if event is "(6, B)".
-        overlapping.remove(evt.getCharacter());
-        leftHalf.add(evt.getCharacter());
-      }
-
-      // Compute the extent of the lane, starting from the current value.
-      float border = evt.getValue() + getVerticalLaneWidth(pdf, page, chars);
-
-      // Identify all further chars that overlap the current lane.
-      while (!events.isEmpty()) {
-        XYCutSweepEvent next = events.peek();
-        // Only consider start events.
-        if (next.isEndEvent()) {
-          break;
+      if (character.getBoundingBox().getMinX() > currentPos) {
+        List<PdfCharacterList> halves = chars.cut(index);
+        // Find the position of the "best" cut.
+        while (index < chars.size()) {
+          // The score of the current cut.
+          float cutScore = assessVerticalCut(pdf, page, halves);
+          if (cutScore < 0) {
+            break;
+          } else if (cutScore > bestCutScore) {
+            bestCutScore = cutScore;
+            bestCutIndex = index;
+          }
+          halves = chars.cut(++index);
         }
-        // Only consider those chars that indeed falls into the lane area.
-        if (next.getValue() >= border) {
-          break;
+        if (bestCutIndex > -1) {
+          // A cut was found. Return the resulting halves.
+          return chars.cut(bestCutIndex);
         }
-        overlapping.add(next.getCharacter());
-        rightHalf.remove(next.getCharacter());
-        events.poll();
       }
-
-      // Break if a valid lane was found.
-      if (isValidVerticalLane(pdf, page, leftHalf, overlapping, rightHalf)) {
-        break;
-      }
-    }
-
-    if (rightHalf.isEmpty()) {
-      // If the chars could not be cut into two halves, rightHalf is empty.
-      // Return only the left half.
-      return Arrays.asList(leftHalf);
-    }
-
-    // The chars could be cut.
-    return Arrays.asList(leftHalf, rightHalf);
+      currentPos = character.getBoundingBox().getMaxX();
+    }        
+    return Arrays.asList(chars);
   }
 
   /**
@@ -235,155 +152,78 @@ public abstract class XYCut<T extends PdfElement> {
    *         be cut, the list consists only of a single set, representing a
    *         copy of the original set of characters.
    */
-  protected List<PdfCharacterSet> yCut(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars) {
-    // Define the sweep direction: from top to bottom (maxY -> minY).
-    XYCutSweepDirection dir = XYCutSweepDirection.TOP_TO_BOTTOM;
+  protected List<PdfCharacterList> yCut(PdfDocument pdf, PdfPage page,
+      PdfCharacterList chars) {
+    // Sort the characters by minX in order to sweep them in x direction.
+    Collections.sort(chars, Collections.reverseOrder(new MaxYComparator()));
 
-    // Define a *max*-based queue of events, where an event is defined by the
-    // start value (the maxY value) and the end value (the minY value) of an
-    // bounding box.
-    Comparator<XYCutSweepEvent> cmp = new XYCutSweepEventComparator();
-    Queue<XYCutSweepEvent> events = new PriorityQueue<>(
-        Collections.reverseOrder(cmp));
+    // The score of the best cut found so far.
+    float bestCutScore = 0;
+    // The index of the best cut found so far.
+    int bestCutIndex = -1;
+    // The current position in the list of characters.
+    float currentPos = chars.get(0).getBoundingBox().getMinY();
+    
+    for (int index = 1; index < chars.size(); index++) {
+      PdfCharacter character = chars.get(index);
 
-    // Fill the queue with the related events.
-    for (PdfCharacter character : chars) {
-      Rectangle boundingBox = character.getBoundingBox();
-      events.add(new XYCutSweepEvent(character, boundingBox.getMinY(), dir));
-      events.add(new XYCutSweepEvent(character, boundingBox.getMaxY(), dir));
-    }
-
-    // The set of characters that overlap the current lane horizontally.
-    PdfCharacterSet overlapping = this.characterSetFactory.create();
-    // The set of characters of the upper half.
-    PdfCharacterSet upperHalf = this.characterSetFactory.create();
-    // The set of characters of the lower half.
-    PdfCharacterSet lowerHalf = this.characterSetFactory.create(chars);
-
-    while (!events.isEmpty()) {
-      // Process the next event.
-      XYCutSweepEvent evt = events.poll();
-
-      if (evt.isStartEvent()) {
-        // Add the char to the overlapping characters.
-        overlapping.add(evt.getCharacter());
-        lowerHalf.remove(evt.getCharacter());
-      } else {
-        // Remove the char from the overlapping characters.
-        overlapping.remove(evt.getCharacter());
-        upperHalf.add(evt.getCharacter());
-      }
-
-      // Compute the extent of the lane, starting from the current value.
-      float border = evt.getValue() - getHorizontalLaneHeight(pdf, page, chars);
-
-      // Identify all further chars that overlap the current lane.
-      while (!events.isEmpty()) {
-        XYCutSweepEvent next = events.peek();
-        // Only consider start events.
-        if (next.isEndEvent()) {
-          break;
+      if (character.getBoundingBox().getMaxY() < currentPos) {
+        List<PdfCharacterList> halves = chars.cut(index);
+        // Find the position of the "best" cut.
+        while (index < chars.size()) {
+          float cutScore = assessHorizontalCut(pdf, page, halves);
+          if (cutScore < 0) {
+            break;
+          } else if (cutScore > bestCutScore) {
+            bestCutScore = cutScore;
+            bestCutIndex = index;
+          }
+          halves = chars.cut(++index);
         }
-        // Only consider those chars that indeed fall into the lane area.
-        if (next.getValue() <= border) {
-          break;
+        if (bestCutIndex > -1) {
+          // A cut was found. Return the resulting halves.
+          return chars.cut(bestCutIndex);
         }
-        overlapping.add(next.getCharacter());
-        lowerHalf.remove(next.getCharacter());
-        events.poll();
       }
-
-      // Break if a valid lane was found.
-      if (isValidHorizontalLane(pdf, page, upperHalf, overlapping, lowerHalf)) {
-        break;
-      }
+      currentPos = character.getBoundingBox().getMinY();
     }
-
-    if (lowerHalf.isEmpty()) {
-      // If the chars could not be cut into two halves, lowerHalf is empty.
-      // Return only the upper half.
-      return Arrays.asList(upperHalf);
-    }
-
-    // The chars could be cut.
-    return Arrays.asList(upperHalf, lowerHalf);
+    return Arrays.asList(chars);
   }
 
   // ==========================================================================
   // Abstract methods.
 
   /**
-   * Returns the width of the vertical lane to sweep through the given
-   * characters on cutting the characters vertically.
+   * Assesses the given vertical cut. Returns a positive score, if the cut
+   * is valid and a negative score if the cut is invalid. The better the cut, 
+   * the higher the returned score.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
    * @param page
    *        The page in which the characters are located.
-   * @param chars
-   *        The characters to cut.
-   * 
-   * @return The width of the vertical lane to sweep.
+   * @param halves
+   *        The characters of the two halves.
+   * @return A score that assesses the given cut.
    */
-  public abstract float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars);
+  public abstract float assessVerticalCut(PdfDocument pdf, PdfPage page,
+      List<PdfCharacterList> halves);
 
   /**
-   * Returns the height of the horizontal lane to sweep through the given
-   * characters on cutting the characters horizontally.
+   * Assesses the given horizontal cut. Returns a positive score, if the cut
+   * is valid and a negative score if the cut is invalid. The better the cut, 
+   * the higher the returned score.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
    * @param page
    *        The page in which the characters are located.
-   * @param chars
-   *        The chars to cut.
-   * 
-   * @return The height of the horizontal lane to sweep.
+   * @param halves
+   *        The characters of the two halves.
+   * @return A score that assesses the given cut.
    */
-  public abstract float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars);
-
-  /**
-   * Returns true, if the vertical lane that overlaps the given characters is
-   * valid; false otherwise.
-   * 
-   * @param pdf
-   *        The PDF document to which the characters belong to.
-   * @param page
-   *        The page in which the characters are located.
-   * @param left
-   *        The characters to the left of the lane.
-   * @param overlap
-   *        The characters that overlap the lane.
-   * @param right
-   *        The characters to the right of the lane.
-   * @return True, if the lane that overlaps the given characters is valid;
-   *         false otherwise.
-   */
-  public abstract boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right);
-
-  /**
-   * Returns true, if the horizontal lane that overlaps the given characters is
-   * valid; false otherwise.
-   * 
-   * @param pdf
-   *        The PDF document to which the characters belong to.
-   * @param page
-   *        The page in which the characters are located.
-   * @param upper
-   *        The characters above the lane.
-   * @param overlap
-   *        The characters that overlap the lane.
-   * @param lower
-   *        The characters below the lane.
-   * @return True, if the lane that overlaps the given characters is valid;
-   *         false otherwise.
-   */
-  public abstract boolean isValidHorizontalLane(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet upper, PdfCharacterSet overlap, PdfCharacterSet lower);
+  public abstract float assessHorizontalCut(PdfDocument pdf, PdfPage page,
+      List<PdfCharacterList> halves);
 
   /**
    * Packs the given characters into the target type.
@@ -395,5 +235,5 @@ public abstract class XYCut<T extends PdfElement> {
    * 
    * @return An object of given target type.
    */
-  public abstract T pack(PdfPage page, PdfCharacterSet characters);
+  public abstract T pack(PdfPage page, PdfCharacterList characters);
 }

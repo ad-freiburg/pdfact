@@ -20,6 +20,6 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
      * 
      * @return An instance of {@link PdfWord}.
      */
-    PdfWord create(PdfCharacterSet characters);
+    PdfWord create(PdfCharacterList characters);
   }
 }

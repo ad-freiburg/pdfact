@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterSet;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
@@ -24,7 +24,7 @@ public class PlainPdfPage implements PdfPage {
   /**
    * The characters of this page.
    */
-  protected PdfCharacterSet characters;
+  protected PdfCharacterList characters;
 
   /**
    * The figures in this page.
@@ -83,12 +83,12 @@ public class PlainPdfPage implements PdfPage {
   // ==========================================================================
 
   @Override
-  public PdfCharacterSet getCharacters() {
+  public PdfCharacterList getCharacters() {
     return this.characters;
   }
 
   @Override
-  public void setCharacters(PdfCharacterSet characters) {
+  public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
 

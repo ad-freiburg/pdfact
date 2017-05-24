@@ -6,8 +6,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterSet;
-import icecite.models.PdfCharacterSet.PdfCharacterSetFactory;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
@@ -15,6 +14,8 @@ import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.tokenizer.xycut.XYCut;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.plain.PlainRectangle;
+
+// TODO: Rework
 
 /**
  * An implementation of {@link PdfTextBlockTokenizer} based on XYCut.
@@ -34,16 +35,12 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   /**
    * Creates a new text block tokenizer.
    * 
-   * @param characterSetFactory
-   *        The factory to create instances of {@link PdfCharacterSet} (needed
-   *        for XYCut).
    * @param textBlockFactory
    *        The factory to create instance of {@link PdfTextBlock}.
    */
   @Inject
-  public XYCutPdfTextBlockTokenizer(PdfCharacterSetFactory characterSetFactory,
-      PdfTextBlockFactory textBlockFactory) {
-    super(characterSetFactory);
+  public XYCutPdfTextBlockTokenizer(PdfTextBlockFactory textBlockFactory) {
+    super();
     this.textBlockFactory = textBlockFactory;
   }
 
@@ -51,49 +48,58 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
 
   @Override
   public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet characters) {
+      PdfCharacterList characters) {    
     return cut(pdf, page, characters);
   }
 
   // ==========================================================================
 
   @Override
-  public float getVerticalLaneWidth(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars) {
+  public float assessVerticalCut(PdfDocument pdf, PdfPage page,
+      List<PdfCharacterList> halves) {
+    PdfCharacterList l = halves.get(0);
+    PdfCharacterList r = halves.get(1);
+            
+    float width = r.getBoundingBox().getMinX() - l.getBoundingBox().getMaxX();
+
     float docWidths = pdf.getCharacters().getMostCommonWidth();
     float pageWidths = page.getCharacters().getMostCommonWidth();
-    return Math.max(docWidths, pageWidths);
-  }
-
-  @Override
-  public boolean isValidVerticalLane(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet left, PdfCharacterSet overlap, PdfCharacterSet right) {
-    if (!overlap.isEmpty()) {
-      return false;
+    if (width < Math.max(docWidths, pageWidths)) {
+      return -1;
     }
-    return !separatesConsecutiveCharacters(left, right);
+    
+    if (separatesConsecutiveCharacters(l, r)) {
+      return -1;
+    }
+    return Math.abs(width);
   }
 
   // ==========================================================================
 
   @Override
-  public float getHorizontalLaneHeight(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet chars) {
+  public float assessHorizontalCut(PdfDocument pdf, PdfPage page,
+      List<PdfCharacterList> halves) {
+    PdfCharacterList u = halves.get(0);
+    PdfCharacterList l = halves.get(1);
+        
+    float height = u.getBoundingBox().getMinY() - l.getBoundingBox().getMaxY();
+    
+    if (height < 0) {
+      return -1;
+    }
+    
     float docHeights = pdf.getCharacters().getMostCommonHeight();
     float pageHeights = page.getCharacters().getMostCommonHeight();
-    return Math.min(docHeights, pageHeights);
-  }
-
-  @Override
-  public boolean isValidHorizontalLane(PdfDocument pdf, PdfPage page,
-      PdfCharacterSet upper, PdfCharacterSet overlap, PdfCharacterSet lower) {
-    return overlap.isEmpty();
+    if (height < Math.min(docHeights, pageHeights)) {
+      return -1;
+    }
+    return height;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfTextBlock pack(PdfPage page, PdfCharacterSet characters) {
+  public PdfTextBlock pack(PdfPage page, PdfCharacterList characters) {
     // FIXME
     PdfTextBlock block = this.textBlockFactory.create(characters);
     // TODO: use Guice here.
@@ -116,11 +122,11 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
    *        The second character set.
    * @return True if there is such a character pair, false otherwise.
    */
-  protected boolean separatesConsecutiveCharacters(PdfCharacterSet left,
-      PdfCharacterSet right) {
-    Set<PdfCharacter> leftChars = left.getRightMostCharacters();
-    Set<PdfCharacter> rightChars = right.getLeftMostCharacters();
-
+  protected boolean separatesConsecutiveCharacters(PdfCharacterList left,
+      PdfCharacterList right) {
+    Set<PdfCharacter> leftChars = left.getElementsWithLargestMaxX();
+    Set<PdfCharacter> rightChars = right.getElementsWithSmallestMinX();
+         
     for (PdfCharacter leftChar : leftChars) {
       int leftCharNum = leftChar.getExtractionOrderNumber();
       Rectangle leftCharBox = leftChar.getBoundingBox();
@@ -139,7 +145,6 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
         return true;
       }
     }
-
     return false;
   }
 }

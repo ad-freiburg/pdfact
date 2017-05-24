@@ -1,7 +1,6 @@
 package icecite.models.plain;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfFont;
 import icecite.models.PdfType;
@@ -15,7 +14,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
    * The extraction order number.
    */
-  protected int extractionOrderNumber;
+  protected int extractionOrderNumber; // TODO: Rename this variable.
 
   /**
    * The text of this character.
@@ -88,7 +87,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public void setExtractionOrderNumber(int num) {
+  public void setExtractionOrderNumber(int num) { // TODO: Rename this method.
     this.extractionOrderNumber = num;
   }
 

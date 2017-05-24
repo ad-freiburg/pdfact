@@ -130,7 +130,6 @@ public class ShowText extends OperatorProcessor {
       // ignore ( )Tj
       return;
     }
-
     // Get the graphics state from the engine.
     PDGraphicsState state = this.engine.getGraphicsState();
 
@@ -174,7 +173,7 @@ public class ShowText extends OperatorProcessor {
         if (codeLength == 1 && code == 32) {
           wordSpacing += textState.getWordSpacing();
         }
-
+        
         // Define the text rendering matrix (text space -> device space)
         Matrix ctm = state.getCurrentTransformationMatrix();
         Matrix trm = params.multiply(this.engine.getTextMatrix()).multiply(ctm);
@@ -190,12 +189,12 @@ public class ShowText extends OperatorProcessor {
           // vertical origin
           trm.translate(v);
         }
-
+                
         // Process the glyph.
         this.engine.saveGraphicsState();
         showGlyph(unicode, code, font, trm);
         this.engine.restoreGraphicsState();
-
+        
         // Get glyph's horizontal and vertical displacements, in text space
         Vector w = font.getDisplacement(code);
 
@@ -208,7 +207,7 @@ public class ShowText extends OperatorProcessor {
           tx = (w.getX() * fontSize + charSpacing + wordSpacing) * horizScaling;
           ty = 0;
         }
-
+        
         // Update the text matrix.
         Matrix translate = Matrix.getTranslateInstance(tx, ty);
         this.engine.getTextMatrix().concatenate(translate);
@@ -237,13 +236,15 @@ public class ShowText extends OperatorProcessor {
       throws IOException {
     // Compute a bounding box that indeed surrounds the whole glyph, even in
     // case of ascenders (e.g., "l") and descenders (e.g., "g").
+    // TODO: Make it faster.
     Rectangle boundBox = computeGlyphBoundingBox(code, font, trm);
 
     // Compute the bounding box of the glyph by the method of PdfBox, where all
     // bounding boxes in a text line share the same baseline, even in case of
     // ascenders and descenders.
+    // TODO: Make it faster.
     Rectangle pdfBoxBoundBox = computePdfBoxGlyphBoundingBox(code, font, trm);
-
+    
     if (boundBox != null) {
       // Bounding boxes need some adjustments.
       if (MathUtils.isEqual(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
@@ -277,11 +278,12 @@ public class ShowText extends OperatorProcessor {
     if (fontsize != scaleFactorX) {
       fontsize *= scaleFactorX;
     }
-
+    
     // Use our additional glyph list for Unicode mapping
+    // TODO: Needs > 2ms.
     GlyphList additionalGlyphs = PdfBoxGlyphUtils.getAdditionalGlyphs();
     String unicode = font.toUnicode(code, additionalGlyphs);
-
+    
     // TODO: If we need the hasEncoding flag, uncomment the following:
     // boolean hasEncoding = unicode != null;
     //
@@ -304,7 +306,7 @@ public class ShowText extends OperatorProcessor {
     // if (PdfGlyphDictionary.hasGlyphForName(glyphName)) {
     // unicode = PdfGlyphDictionary.getGlyphForName(glyphName);
     // }
-
+    
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it

@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterSet;
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
@@ -17,9 +17,9 @@ import icecite.models.PdfWord;
  */
 public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   /**
-   * The characters of this page.
+   * The characters of this text line.
    */
-  protected PdfCharacterSet characters;
+  protected PdfCharacterList characters;
 
   /**
    * The words of this text line.
@@ -40,19 +40,19 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
    *        The characters of this text line.
    */
   @AssistedInject
-  public PlainPdfTextLine(@Assisted PdfCharacterSet characters) {
+  public PlainPdfTextLine(@Assisted PdfCharacterList characters) {
     this.characters = characters;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfCharacterSet getCharacters() {
+  public PdfCharacterList getCharacters() {
     return this.characters;
   }
 
   @Override
-  public void setCharacters(PdfCharacterSet characters) {
+  public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
 

@@ -8,11 +8,11 @@ package icecite.models;
  */
 public interface HasCharacters {
   /**
-   * Returns the set of characters.
+   * Returns the list of characters.
    * 
-   * @return The set of characters.
+   * @return The list of characters.
    */
-  PdfCharacterSet getCharacters();
+  PdfCharacterList getCharacters();
 
   /**
    * Sets the characters.
@@ -20,5 +20,5 @@ public interface HasCharacters {
    * @param characters
    *        The characters to set.
    */
-  void setCharacters(PdfCharacterSet characters);
+  void setCharacters(PdfCharacterList characters);
 }

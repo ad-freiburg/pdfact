@@ -204,21 +204,21 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
       PDResources parent = pushResources(stream);
       Stack<PDGraphicsState> savedStack = saveGraphicsStack();
       Matrix parentMatrix = this.initialMatrix;
-
+      
       // Transform the CTM using the stream's matrix.
       getCurrentTransformationMatrix().concatenate(stream.getMatrix());
-
+      
       // The stream's initial matrix includes the parent CTM, e.g. this
       // allows a scaled form.
       this.initialMatrix = getCurrentTransformationMatrix().clone();
-
+      
       // TODO: Do we need this snippet?
       // clip to bounding box
       // PDRectangle bbox = stream.getBBox();
       // clipToRect(bbox);
 
       processStreamOperators(stream);
-
+      
       // Restore the initialMatrix, the graphics stack and the resources.
       this.initialMatrix = parentMatrix;
       restoreGraphicsStack(savedStack);
@@ -279,6 +279,7 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
     PDFStreamParser parser = new PDFStreamParser(stream);
 
     parser.parse();
+            
     for (Object token : parser.getTokens()) {
       if (token instanceof COSObject) {
         arguments.add(((COSObject) token).getObject());

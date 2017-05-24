@@ -47,6 +47,6 @@ public interface PdfTextLine extends PdfElement, HasCharacters, HasText {
      * 
      * @return An instance of {@link PdfTextLine}.
      */
-    PdfTextLine create(PdfCharacterSet characters);
+    PdfTextLine create(PdfCharacterList characters);
   }
 }

@@ -20,6 +20,7 @@ import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
@@ -155,6 +156,27 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       }
     }
 
+    // TODO: Remove it
+    // Visualize the text blocks.
+    for (PdfTextBlock block : page.getTextBlocks()) {
+      if (isVisualizePdfElement(block)) {
+        visualizePdfElement(block, drawer, Color.PINK);
+      }
+    }
+    // TODO: Remove it 
+    // Visualize the text lines.
+    for (PdfTextLine line : page.getTextLines()) {
+      if (isVisualizePdfElement(line)) {
+        visualizePdfElement(line, drawer, Color.BLUE);
+      }
+      // Visualize words.
+      for (PdfWord word : line.getWords()) {
+        if (isVisualizePdfElement(line)) {
+          visualizePdfElement(word, drawer, Color.RED);
+        }
+      }
+    }
+    
     // Visualize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
       if (isVisualizePdfElement(figure)) {
