@@ -115,7 +115,7 @@ public class IceciteBaseModule extends AbstractModule {
 
     fc(PdfCharacterList.class, PdfCharacterListFactory.class,
         PlainPdfCharacterList.class);
-    
+
     // Bind the geometric model factories.
     fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);
     fc(Line.class, LineFactory.class, PlainLine.class);

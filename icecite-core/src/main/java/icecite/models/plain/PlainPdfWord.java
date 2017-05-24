@@ -6,6 +6,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
+import icecite.utils.geometric.Rectangle;
 
 /**
  * A plain implementation of {@link PdfWord}.
@@ -59,9 +60,22 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
-  
+
   // ==========================================================================
-  
+
+  @Override
+  public Rectangle getBoundingBox() {
+    return this.characters.getBoundingBox();
+  }
+
+  @Override
+  public void setBoundingBox(Rectangle boundingBox) {
+    // The bounding box results from the characters of this text block.
+    throw new UnsupportedOperationException();
+  }
+
+  // ==========================================================================
+
   @Override
   public PdfType getType() {
     return PdfType.WORDS;

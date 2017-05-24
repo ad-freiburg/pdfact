@@ -7,7 +7,7 @@ import icecite.models.PdfColor;
 import icecite.models.PdfColorRegistry;
 
 /**
- * A plain implementation of PdfColorFactory. 
+ * A plain implementation of PdfColorFactory.
  * 
  * @author Claudius Korzen
  */

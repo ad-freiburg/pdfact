@@ -26,7 +26,7 @@ public class LineTo extends OperatorProcessor {
 
   // ==========================================================================
   // Constructors.
-  
+
   /**
    * Creates a new OperatorProcessor to process the operation "LineTo".
    * 
@@ -37,9 +37,9 @@ public class LineTo extends OperatorProcessor {
   public LineTo(PointFactory pointFactory) {
     this.pointFactory = pointFactory;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     // append straight line segment from the current point to the point.

@@ -1,7 +1,6 @@
 package icecite.models.plain;
 
 import icecite.models.PdfElement;
-import icecite.models.PdfPage;
 import icecite.models.PdfRole;
 import icecite.models.PdfType;
 import icecite.utils.geometric.Rectangle;
@@ -18,15 +17,10 @@ public class PlainPdfElement implements PdfElement {
   protected Rectangle boundingBox;
 
   /**
-   * The page in which this element is included.
-   */
-  protected PdfPage page;
-
-  /**
    * The role of this PDF element.
    */
   protected PdfRole role;
-  
+
   // ==========================================================================
 
   @Override
@@ -42,18 +36,6 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
 
   @Override
-  public PdfPage getPage() {
-    return this.page;
-  }
-
-  @Override
-  public void setPage(PdfPage page) {
-    this.page = page;
-  }
-
-  // ==========================================================================
-
-  @Override
   public PdfRole getRole() {
     return this.role;
   }
@@ -62,9 +44,9 @@ public class PlainPdfElement implements PdfElement {
   public void setRole(PdfRole role) {
     this.role = role;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfType getType() {
     return null;

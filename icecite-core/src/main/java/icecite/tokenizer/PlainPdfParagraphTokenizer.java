@@ -34,13 +34,12 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   }
 
   // ==========================================================================
-  
+
   @Override
   public List<PdfParagraph> tokenize(PdfDocument pdf, PdfPage page,
       List<PdfTextLine> textLines) {
     // TODO:
     PdfParagraph paragraph = this.paragraphFactory.create(textLines);
-    paragraph.setPage(page);
     return Arrays.asList(paragraph);
   }
 }

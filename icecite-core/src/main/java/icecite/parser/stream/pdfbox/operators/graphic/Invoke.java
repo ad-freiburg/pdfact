@@ -41,28 +41,27 @@ public class Invoke extends OperatorProcessor {
    * The factory to create instances of {@link PdfColor}.
    */
   protected PdfColorFactory colorFactory;
-  
+
   /**
    * The factory to create instances of {@link PdfShape}.
    */
   protected PdfShapeFactory shapeFactory;
-  
+
   /**
    * The factory to create instances of {@link Point}.
    */
   protected PointFactory pointFactory;
-  
+
   /**
    * The factory to create instances of {@link Rectangle}.
    */
   protected RectangleFactory rectangleFactory;
-  
+
   // ==========================================================================
   // Constructors.
-  
+
   /**
-   * Creates a new OperatorProcessor to process the operation
-   * "Invoke".
+   * Creates a new OperatorProcessor to process the operation "Invoke".
    * 
    * @param figureFactory
    *        The factory to create instances of PdfFigure.
@@ -76,18 +75,18 @@ public class Invoke extends OperatorProcessor {
    *        The factory to create instances of Rectangle.
    */
   @Inject
-  public Invoke(PdfFigureFactory figureFactory,
-      PdfColorFactory colorFactory, PdfShapeFactory shapeFactory,
-      PointFactory pointFactory, RectangleFactory rectangleFactory) {
+  public Invoke(PdfFigureFactory figureFactory, PdfColorFactory colorFactory,
+      PdfShapeFactory shapeFactory, PointFactory pointFactory,
+      RectangleFactory rectangleFactory) {
     this.figureFactory = figureFactory;
     this.colorFactory = colorFactory;
     this.shapeFactory = shapeFactory;
     this.pointFactory = pointFactory;
     this.rectangleFactory = rectangleFactory;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     // Get the name of the PDXOject.
@@ -139,7 +138,7 @@ public class Invoke extends OperatorProcessor {
       Point ll = this.pointFactory.create(minX, minY);
       Point ur = this.pointFactory.create(maxX, maxY);
       Rectangle boundBox = this.rectangleFactory.create(ll, ur);
-      
+
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());

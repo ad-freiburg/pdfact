@@ -24,7 +24,7 @@ public class ColorUtils {
     float blue = ((pixel) & 0xff) / 255f;
     return new float[] { red, green, blue, alpha };
   }
-  
+
   /**
    * Checks if the given image consists only of a single color and returns the
    * color if so. Returns null if there a at least two different colors.

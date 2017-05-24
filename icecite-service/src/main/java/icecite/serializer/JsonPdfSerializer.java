@@ -221,28 +221,28 @@ public class JsonPdfSerializer implements PdfSerializer {
     // Serialize the text elements.
     for (PdfParagraph paragraph : page.getParagraphs()) {
       if (isSerializePdfElement(paragraph)) {
-        JSONObject serializedParagraph = serializePdfElement(paragraph);
+        JSONObject serializedParagraph = serializePdfElement(page, paragraph);
         if (serializedParagraph != null && serializedParagraph.length() > 0) {
           paragraphs.put(serializedParagraph);
         }
       }
       for (PdfTextLine line : paragraph.getTextLines()) {
         if (isSerializePdfElement(line)) {
-          JSONObject serializedTextLine = serializePdfElement(line);
+          JSONObject serializedTextLine = serializePdfElement(page, line);
           if (serializedTextLine != null && serializedTextLine.length() > 0) {
             textLines.put(serializedTextLine);
           }
         }
         for (PdfWord word : line.getWords()) {
           if (isSerializePdfElement(word)) {
-            JSONObject serializedTextWord = serializePdfElement(word);
+            JSONObject serializedTextWord = serializePdfElement(page, word);
             if (serializedTextWord != null && serializedTextWord.length() > 0) {
               words.put(serializedTextWord);
             }
           }
           for (PdfCharacter character : word.getCharacters()) {
             if (isSerializePdfElement(character)) {
-              JSONObject serializedChar = serializePdfElement(character);
+              JSONObject serializedChar = serializePdfElement(page, character);
               if (serializedChar != null && serializedChar.length() > 0) {
                 characters.put(serializedChar);
               }
@@ -255,7 +255,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     // Serialize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
       if (isSerializePdfElement(figure)) {
-        JSONObject serializedFigure = serializePdfElement(figure);
+        JSONObject serializedFigure = serializePdfElement(page, figure);
         if (serializedFigure != null && serializedFigure.length() > 0) {
           figures.put(serializedFigure);
         }
@@ -263,7 +263,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     }
     for (PdfShape shape : page.getShapes()) {
       if (isSerializePdfElement(shape)) {
-        JSONObject serializedShapes = serializePdfElement(shape);
+        JSONObject serializedShapes = serializePdfElement(page, shape);
         if (serializedShapes != null && serializedShapes.length() > 0) {
           shapes.put(serializedShapes);
         }
@@ -302,17 +302,19 @@ public class JsonPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF element.
    * 
+   * @param page
+   *        The page in which the element is located.
    * @param element
    *        The element to serialize.
    * @return A JSON object representing the serialized PDF element.
    */
-  protected JSONObject serializePdfElement(PdfElement element) {
+  protected JSONObject serializePdfElement(PdfPage page, PdfElement element) {
     if (element == null) {
       return null;
     }
 
     JSONObject json = new JSONObject();
-    
+
     if (element instanceof HasText) {
       HasText hasText = (HasText) element;
       String text = hasText.getText();
@@ -332,7 +334,7 @@ public class JsonPdfSerializer implements PdfSerializer {
         // Append the id of the font.
         json.put(CONTEXT_NAME_ELEMENT_FONT, fontId);
         // Register the font as a utilized font.
-        this.usedFonts.add(font); 
+        this.usedFonts.add(font);
       }
       // Append the font size.
       json.put(CONTEXT_NAME_ELEMENT_FONT_SIZE, hasFont.getFontSize());
@@ -350,7 +352,6 @@ public class JsonPdfSerializer implements PdfSerializer {
       }
     }
 
-    PdfPage page = element.getPage();
     if (page != null) {
       // Append the page number.
       json.put(CONTEXT_NAME_ELEMENT_PAGE, page.getPageNumber());
@@ -462,7 +463,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     JSONObject json = new JSONObject();
     // Append the id of the color.
     json.put(CONTEXT_NAME_COLOR_ID, id);
-    
+
     float[] rgb = color.getRGB();
     if (rgb != null && rgb.length == 3) {
       // Append the RGB values of the color.

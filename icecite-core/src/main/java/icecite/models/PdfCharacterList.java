@@ -22,9 +22,9 @@ public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
    * @return All characters with the most common font.
    */
   Set<PdfCharacter> getCharactersWithMostCommonFont();
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the most common color of the characters in this list.
    * 
@@ -38,7 +38,7 @@ public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
    * @return All characters with the most common color.
    */
   Set<PdfCharacter> getCharactersWithMostCommonColor();
-  
+
   // ==========================================================================
 
   /**
@@ -54,7 +54,7 @@ public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
    * @return All characters with the most common font size.
    */
   Set<PdfCharacter> getCharactersWithMostCommonFontsize();
-  
+
   /**
    * Returns the average font size of the characters in this list.
    * 
@@ -75,9 +75,9 @@ public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
    * @return A list of length 2, containing the two resulting views.
    */
   List<PdfCharacterList> cut(int splitIndex);
-  
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link PdfCharacterList}.
    * 

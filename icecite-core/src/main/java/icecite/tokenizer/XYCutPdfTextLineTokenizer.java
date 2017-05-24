@@ -10,7 +10,6 @@ import icecite.models.PdfPage;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.tokenizer.xycut.XYCut;
-import icecite.utils.geometric.plain.PlainRectangle;
 
 // TODO: Rework.
 
@@ -89,13 +88,8 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   // ==========================================================================
 
   @Override
-  public PdfTextLine pack(PdfPage page, PdfCharacterList characters) {
-    // FIXME
-    PdfTextLine line = this.textLineFactory.create(characters);
-    // TODO: Use Guice here.
-    line.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
-    line.setPage(page);
-    return line;
+  public PdfTextLine pack(PdfCharacterList characters) {
+    return this.textLineFactory.create(characters);
   }
 
   // ==========================================================================

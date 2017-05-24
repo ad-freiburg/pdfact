@@ -27,7 +27,7 @@ public class AppendRectangleToPath extends OperatorProcessor {
 
   // ==========================================================================
   // Constructors.
-  
+
   /**
    * Creates a new OperatorProcessor to process the operation
    * "AppendRectangleToPath".
@@ -41,7 +41,7 @@ public class AppendRectangleToPath extends OperatorProcessor {
   }
 
   // ==========================================================================
-  
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x = (COSNumber) args.get(0);
@@ -53,7 +53,7 @@ public class AppendRectangleToPath extends OperatorProcessor {
     float minY = y.floatValue();
     float maxX = minX + w.floatValue();
     float maxY = minY + h.floatValue();
-    
+
     Point ll = this.pointFactory.create(minX, minY);
     Point ur = this.pointFactory.create(maxX, maxY);
 

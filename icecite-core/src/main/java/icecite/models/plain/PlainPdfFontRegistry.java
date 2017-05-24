@@ -7,7 +7,7 @@ import icecite.models.PdfFont;
 import icecite.models.PdfFontRegistry;
 
 /**
- * A plain implementation of PdfFontFactory. 
+ * A plain implementation of PdfFontFactory.
  * 
  * @author Claudius Korzen
  */

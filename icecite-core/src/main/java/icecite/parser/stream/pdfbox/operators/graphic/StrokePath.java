@@ -176,7 +176,7 @@ public class StrokePath extends OperatorProcessor {
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
           rect = this.rectangleFactory.create(ll, ur);
-          
+
           shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);
@@ -196,7 +196,7 @@ public class StrokePath extends OperatorProcessor {
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
           rect = this.rectangleFactory.create(ll, ur);
-          
+
           shape = this.shapeFactory.create();
           shape.setBoundingBox(rect);
           shape.setColor(color);

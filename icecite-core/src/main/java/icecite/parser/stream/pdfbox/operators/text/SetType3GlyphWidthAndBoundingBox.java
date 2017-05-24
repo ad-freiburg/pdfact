@@ -48,7 +48,7 @@ public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
    * 
    * @param pointFactory
    *        The factory to create instances of Point.
-   * @param rectangleFactory 
+   * @param rectangleFactory
    *        The factory to create instances of Rectangle.
    */
   @Inject

@@ -26,7 +26,7 @@ public interface PdfFontRegistry {
    * @return An instance of {@link PdfFont}.
    */
   PdfFont getFont(String fontName);
-  
+
   /**
    * Registers the given font.
    * 

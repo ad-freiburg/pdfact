@@ -50,12 +50,12 @@ public class PlainPdfPage implements PdfPage {
    * The identified text blocks of this page.
    */
   protected List<PdfTextBlock> textBlocks;
-  
+
   /**
    * The identified text lines of this page.
    */
   protected List<PdfTextLine> textLines;
-  
+
   // ==========================================================================
   // Constructors.
 
@@ -149,7 +149,7 @@ public class PlainPdfPage implements PdfPage {
   public void setTextLines(List<PdfTextLine> lines) {
     this.textLines = lines;
   }
-  
+
   // ==========================================================================
 
   @Override

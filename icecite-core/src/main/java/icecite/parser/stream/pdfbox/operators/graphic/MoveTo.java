@@ -26,7 +26,7 @@ public class MoveTo extends OperatorProcessor {
 
   // ==========================================================================
   // Constructors.
-  
+
   /**
    * Creates a new OperatorProcessor to process the operation "MoveTo".
    * 
@@ -37,9 +37,9 @@ public class MoveTo extends OperatorProcessor {
   public MoveTo(PointFactory pointFactory) {
     this.pointFactory = pointFactory;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x = (COSNumber) args.get(0);

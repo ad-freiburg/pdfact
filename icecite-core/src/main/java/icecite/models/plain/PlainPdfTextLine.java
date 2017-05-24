@@ -9,6 +9,7 @@ import icecite.models.PdfCharacterList;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
+import icecite.utils.geometric.Rectangle;
 
 /**
  * A plain implementation of {@link PdfTextLine}.
@@ -84,9 +85,22 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   public void setText(String text) {
     this.text = text;
   }
-  
+
   // ==========================================================================
-  
+
+  @Override
+  public Rectangle getBoundingBox() {
+    return this.characters.getBoundingBox();
+  }
+
+  @Override
+  public void setBoundingBox(Rectangle boundingBox) {
+    // The bounding box results from the characters of this text block.
+    throw new UnsupportedOperationException();
+  }
+
+  // ==========================================================================
+
   @Override
   public PdfType getType() {
     return PdfType.TEXTLINES;

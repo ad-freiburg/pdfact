@@ -90,7 +90,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *        The roles of the PDF elements to visualize.
    */
   @AssistedInject
-  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, 
+  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory,
       @Assisted("types") Set<PdfType> types,
       @Assisted("roles") Set<PdfRole> roles) {
     this(pdfDrawerFactory);
@@ -136,19 +136,19 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (paragraphs != null) {
       for (PdfParagraph paragraph : paragraphs) {
         if (isVisualizePdfElement(paragraph)) {
-          visualizePdfElement(paragraph, drawer, Color.GREEN);
+          visualizePdfElement(page, paragraph, drawer, Color.GREEN);
         }
         for (PdfTextLine line : paragraph.getTextLines()) {
           if (isVisualizePdfElement(line)) {
-            visualizePdfElement(line, drawer, Color.BLUE);
+            visualizePdfElement(page, line, drawer, Color.BLUE);
           }
           for (PdfWord word : line.getWords()) {
             if (isVisualizePdfElement(word)) {
-              visualizePdfElement(word, drawer, Color.RED);
+              visualizePdfElement(page, word, drawer, Color.RED);
             }
             for (PdfCharacter character : word.getCharacters()) {
               if (isVisualizePdfElement(character)) {
-                visualizePdfElement(character, drawer, Color.GRAY);
+                visualizePdfElement(page, character, drawer, Color.GRAY);
               }
             }
           }
@@ -160,32 +160,32 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     // Visualize the text blocks.
     for (PdfTextBlock block : page.getTextBlocks()) {
       if (isVisualizePdfElement(block)) {
-        visualizePdfElement(block, drawer, Color.PINK);
+        visualizePdfElement(page, block, drawer, Color.PINK);
       }
     }
-    // TODO: Remove it 
+    // TODO: Remove it
     // Visualize the text lines.
     for (PdfTextLine line : page.getTextLines()) {
       if (isVisualizePdfElement(line)) {
-        visualizePdfElement(line, drawer, Color.BLUE);
+        visualizePdfElement(page, line, drawer, Color.BLUE);
       }
       // Visualize words.
       for (PdfWord word : line.getWords()) {
         if (isVisualizePdfElement(line)) {
-          visualizePdfElement(word, drawer, Color.RED);
+          visualizePdfElement(page, word, drawer, Color.RED);
         }
       }
     }
-    
+
     // Visualize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
       if (isVisualizePdfElement(figure)) {
-        visualizePdfElement(figure, drawer, Color.CYAN);
+        visualizePdfElement(page, figure, drawer, Color.CYAN);
       }
     }
     for (PdfShape shape : page.getShapes()) {
       if (isVisualizePdfElement(shape)) {
-        visualizePdfElement(shape, drawer, Color.MAGENTA);
+        visualizePdfElement(page, shape, drawer, Color.MAGENTA);
       }
     }
   }
@@ -193,6 +193,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Visualizes the given list of rectangles using the given drawer.
    * 
+   * @param page
+   *        The page in which the element is located.
    * @param element
    *        The element to visualize.
    * @param drawer
@@ -202,10 +204,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @throws IOException
    *         If the drawing failed.
    */
-  protected void visualizePdfElement(PdfElement element, PdfDrawer drawer,
-      Color color) throws IOException {
+  protected void visualizePdfElement(PdfPage page, PdfElement element,
+      PdfDrawer drawer, Color color) throws IOException {
     if (element != null) {
-      drawer.drawBoundingBox(element, element.getPage().getPageNumber(), color);
+      drawer.drawBoundingBox(element, page.getPageNumber(), color);
     }
   }
 

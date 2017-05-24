@@ -10,7 +10,6 @@ import icecite.models.PdfPage;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.tokenizer.xycut.XYCut;
-import icecite.utils.geometric.plain.PlainRectangle;
 
 // TODO: Rework.
 
@@ -56,10 +55,10 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
       List<PdfCharacterList> halves) {
     PdfCharacterList l = halves.get(0);
     PdfCharacterList r = halves.get(1);
-            
+
     float width = r.getBoundingBox().getMinX() - l.getBoundingBox().getMaxX();
     if (width < 1f) {
-      return -1;  
+      return -1;
     }
     return width;
   }
@@ -75,13 +74,8 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWord pack(PdfPage page, PdfCharacterList characters) {
-    // FIXME
-    PdfWord word = this.wordFactory.create(characters);
-    // TODO: Use guice here.
-    word.setBoundingBox(PlainRectangle.fromBoundingBoxOf(characters));
-    word.setPage(page);
-    return word;
+  public PdfWord pack(PdfCharacterList characters) {
+    return this.wordFactory.create(characters);
   }
 
   // ==========================================================================

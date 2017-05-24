@@ -7,31 +7,14 @@ package icecite.models;
  */
 public interface PdfElement extends HasBoundingBox {
   /**
-   * Returns the page in which this PDF element is included.
-   * 
-   * @return The page in which this PDF element is included.
-   */
-  PdfPage getPage();
-
-  /**
-   * Sets the page in which this PDF element is included.
-   * 
-   * @param page
-   *        The page of this PDF element.
-   */
-  void setPage(PdfPage page);
-  
-  // ==========================================================================
-  
-  /**
    * Returns the type of this PDF element.
    * 
    * @return The type of this PDF element.
    */
   PdfType getType();
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the role of this PDF element.
    * 

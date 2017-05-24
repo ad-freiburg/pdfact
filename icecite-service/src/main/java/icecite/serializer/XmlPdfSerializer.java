@@ -236,34 +236,34 @@ public class XmlPdfSerializer implements PdfSerializer {
    * 
    * @param page
    *        The page to serialize.
-   * @param lvl
+   * @param l
    *        The current indentation level.
    * @return The serialization string representing the given page.
    */
-  protected List<String> serializePage(PdfPage page, int lvl) {
+  protected List<String> serializePage(PdfPage page, int l) {
     if (page == null) {
       return null;
     }
-    
+
     List<String> lines = new ArrayList<>();
     // Serialize the text elements.
     List<PdfParagraph> paragraphs = page.getParagraphs();
     if (paragraphs != null) {
       for (PdfParagraph para : paragraphs) {
         if (isSerializePdfElement(para)) {
-          lines.add(serializePdfElement(para, CONTEXT_NAME_PARAGRAPH, lvl));
+          lines.add(serializeElement(page, para, CONTEXT_NAME_PARAGRAPH, l));
         }
         for (PdfTextLine line : para.getTextLines()) {
           if (isSerializePdfElement(line)) {
-            lines.add(serializePdfElement(line, CONTEXT_NAME_TEXTLINE, lvl));
+            lines.add(serializeElement(page, line, CONTEXT_NAME_TEXTLINE, l));
           }
           for (PdfWord word : line.getWords()) {
             if (isSerializePdfElement(word)) {
-              lines.add(serializePdfElement(word, CONTEXT_NAME_WORD, lvl));
+              lines.add(serializeElement(page, word, CONTEXT_NAME_WORD, l));
             }
             for (PdfCharacter c : word.getCharacters()) {
               if (isSerializePdfElement(c)) {
-                lines.add(serializePdfElement(c, CONTEXT_NAME_CHARACTER, lvl));
+                lines.add(serializeElement(page, c, CONTEXT_NAME_CHARACTER, l));
               }
             }
           }
@@ -274,12 +274,12 @@ public class XmlPdfSerializer implements PdfSerializer {
     // Serialize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
       if (isSerializePdfElement(figure)) {
-        lines.add(serializePdfElement(figure, CONTEXT_NAME_FIGURE, lvl));
+        lines.add(serializeElement(page, figure, CONTEXT_NAME_FIGURE, l));
       }
     }
     for (PdfShape shape : page.getShapes()) {
       if (isSerializePdfElement(shape)) {
-        lines.add(serializePdfElement(shape, CONTEXT_NAME_SHAPE, lvl));
+        lines.add(serializeElement(page, shape, CONTEXT_NAME_SHAPE, l));
       }
     }
 
@@ -289,6 +289,8 @@ public class XmlPdfSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF element.
    * 
+   * @param page
+   *        The page in which the PDF element is located.
    * @param element
    *        The PDF element to serialize.
    * @param tagName
@@ -297,8 +299,8 @@ public class XmlPdfSerializer implements PdfSerializer {
    *        The current indentation level.
    * @return The serialization string representing the given PDF element.
    */
-  protected String serializePdfElement(PdfElement element, String tagName,
-      int level) {
+  protected String serializeElement(PdfPage page, PdfElement element,
+      String tagName, int level) {
     if (element == null) {
       return null;
     }
@@ -319,7 +321,6 @@ public class XmlPdfSerializer implements PdfSerializer {
     xml.append(tagName);
 
     // Append the page number to the tag: <character page="1"
-    PdfPage page = element.getPage();
     if (page != null) {
       int pageNum = page.getPageNumber();
       xml.append(" " + CONTEXT_NAME_ELEMENT_PAGE + "=\"" + pageNum + "\"");
@@ -327,7 +328,7 @@ public class XmlPdfSerializer implements PdfSerializer {
 
     Rectangle r = element.getBoundingBox();
     if (r != null) {
-      // Append the coordinates of the bounding box: 
+      // Append the coordinates of the bounding box:
       // <character ... minX="1" minY="2" maxX="3" maxY="4"
       xml.append(" " + CONTEXT_NAME_ELEMENT_MIN_X + "=\"" + r.getMinX() + "\"");
       xml.append(" " + CONTEXT_NAME_ELEMENT_MIN_Y + "=\"" + r.getMinY() + "\"");
@@ -432,7 +433,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     xml.append(indent);
     xml.append("<");
     xml.append(CONTEXT_NAME_FONT);
-    
+
     // Append the id of the font: <font id="foo"
     xml.append(" " + CONTEXT_NAME_FONT_ID + "=\"" + font.getId() + "\"");
 
@@ -441,7 +442,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     if (name != null) {
       xml.append(" " + CONTEXT_NAME_FONT_NAME + "=\"" + name + "\"");
     }
-    
+
     // TODO: Add some more attributes to the fonts.
     // boolean isBold = font.isBold();
     // xml.append(" " + CONTEXT_NAME_FONT_IS_BOLD + "=\"" + isBold + "\"");
@@ -449,7 +450,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     // xml.append(" " + CONTEXT_NAME_FONT_IS_ITALIC + "=\"" + isItalic + "\"");
     // boolean isType3 = font.isType3Font();
     // xml.append(" " + CONTEXT_NAME_FONT_IS_TYPE3 + "=\"" + isType3 + "\"");
-    
+
     // Close the tag: <font id="foo" name="bar" ... />
     xml.append("/>");
 
@@ -504,7 +505,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     xml.append(indent);
     xml.append("<");
     xml.append(CONTEXT_NAME_COLOR);
-    
+
     // Append the id of the color: <color id="foo"
     xml.append(" " + CONTEXT_NAME_COLOR_ID + "=\"" + color.getId() + "\"");
 
@@ -515,7 +516,7 @@ public class XmlPdfSerializer implements PdfSerializer {
       xml.append(" " + CONTEXT_NAME_COLOR_G + "=\"" + rgb[1] + "\"");
       xml.append(" " + CONTEXT_NAME_COLOR_B + "=\"" + rgb[2] + "\"");
     }
-    
+
     // Close the tag: <color id="foo" r="0" g="1" b="1">
     xml.append("/>");
 

@@ -22,7 +22,7 @@ import icecite.utils.comparators.MinXComparator;
  * 
  * @author Claudius Korzen
  */
-public abstract class XYCut<T extends PdfElement> {  
+public abstract class XYCut<T extends PdfElement> {
   /**
    * TODO: Delete it.
    */
@@ -31,7 +31,7 @@ public abstract class XYCut<T extends PdfElement> {
    * TODO: Delete it.
    */
   public long timeAssess = 0;
-  
+
   /**
    * Cuts the given characters into blocks of type T.
    * 
@@ -66,10 +66,10 @@ public abstract class XYCut<T extends PdfElement> {
    *        The list of blocks to fill.
    */
   protected void cut(PdfDocument pdf, PdfPage page, PdfCharacterList characters,
-      List<T> blocks) {    
+      List<T> blocks) {
     // Cut the characters vertically (x-cut).
     List<PdfCharacterList> xBlocks = xCut(pdf, page, characters);
-    
+
     for (PdfCharacterList xBlock : xBlocks) {
       // Cut the characters horizontally (y-cut).
       List<PdfCharacterList> yBlocks = yCut(pdf, page, xBlock);
@@ -78,7 +78,7 @@ public abstract class XYCut<T extends PdfElement> {
         // be cut. Pack them and add them to the result list.
         PdfCharacterList block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
-          blocks.add(pack(page, block));
+          blocks.add(pack(block));
         }
       } else {
         // The characters could be cut. Cut the resulted blocks recursively.
@@ -113,14 +113,14 @@ public abstract class XYCut<T extends PdfElement> {
     Collections.sort(chars, new MinXComparator());
     long t2 = System.currentTimeMillis();
     this.timeSort += (t2 - t1);
-    
+
     // The score of the best cut found so far.
     float bestCutScore = 0;
     // The index of the best cut found so far.
     int bestCutIndex = -1;
     // The current position in the list of characters.
     float currentPos = chars.get(0).getBoundingBox().getMaxX();
-    
+
     for (int index = 1; index < chars.size(); index++) {
       PdfCharacter character = chars.get(index);
 
@@ -133,7 +133,7 @@ public abstract class XYCut<T extends PdfElement> {
           float cutScore = assessVerticalCut(pdf, page, halves);
           long t6 = System.currentTimeMillis();
           this.timeAssess += (t6 - t5);
-          
+
           if (cutScore < 0) {
             break;
           } else if (cutScore > bestCutScore) {
@@ -148,7 +148,7 @@ public abstract class XYCut<T extends PdfElement> {
         }
       }
       currentPos = character.getBoundingBox().getMaxX();
-    }        
+    }
     return Arrays.asList(chars);
   }
 
@@ -177,14 +177,14 @@ public abstract class XYCut<T extends PdfElement> {
     Collections.sort(chars, Collections.reverseOrder(new MaxYComparator()));
     long t2 = System.currentTimeMillis();
     this.timeSort += (t2 - t1);
-    
+
     // The score of the best cut found so far.
     float bestCutScore = 0;
     // The index of the best cut found so far.
     int bestCutIndex = -1;
     // The current position in the list of characters.
     float currentPos = chars.get(0).getBoundingBox().getMinY();
-    
+
     for (int index = 1; index < chars.size(); index++) {
       PdfCharacter character = chars.get(index);
 
@@ -196,7 +196,7 @@ public abstract class XYCut<T extends PdfElement> {
           float cutScore = assessHorizontalCut(pdf, page, halves);
           long t6 = System.currentTimeMillis();
           this.timeAssess += (t6 - t5);
-          
+
           if (cutScore < 0) {
             break;
           } else if (cutScore > bestCutScore) {
@@ -219,9 +219,9 @@ public abstract class XYCut<T extends PdfElement> {
   // Abstract methods.
 
   /**
-   * Assesses the given vertical cut. Returns a positive score, if the cut
-   * is valid and a negative score if the cut is invalid. The better the cut, 
-   * the higher the returned score.
+   * Assesses the given vertical cut. Returns a positive score, if the cut is
+   * valid and a negative score if the cut is invalid. The better the cut, the
+   * higher the returned score.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -235,9 +235,9 @@ public abstract class XYCut<T extends PdfElement> {
       List<PdfCharacterList> halves);
 
   /**
-   * Assesses the given horizontal cut. Returns a positive score, if the cut
-   * is valid and a negative score if the cut is invalid. The better the cut, 
-   * the higher the returned score.
+   * Assesses the given horizontal cut. Returns a positive score, if the cut is
+   * valid and a negative score if the cut is invalid. The better the cut, the
+   * higher the returned score.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -253,12 +253,10 @@ public abstract class XYCut<T extends PdfElement> {
   /**
    * Packs the given characters into the target type.
    * 
-   * @param page
-   *        The page in which the given characters are included.
    * @param characters
    *        The characters to pack.
    * 
    * @return An object of given target type.
    */
-  public abstract T pack(PdfPage page, PdfCharacterList characters);
+  public abstract T pack(PdfCharacterList characters);
 }

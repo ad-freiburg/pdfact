@@ -17,12 +17,12 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
    * The id of this color.
    */
   protected String id;
-  
+
   /**
    * The name of this color.
    */
   protected String name;
-  
+
   /**
    * The RGB value of this color.
    */
@@ -61,9 +61,9 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   public void setId(String id) {
     this.id = id;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public String getName() {
     return this.name;
@@ -73,9 +73,9 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   public void setName(String name) {
     this.name = name;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public void setRGB(float[] rgb) {
     this.rgb = rgb;

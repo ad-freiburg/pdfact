@@ -18,17 +18,17 @@ public class FloatCounter extends TFloatIntHashMap {
    * The most common float.
    */
   protected float mostCommonFloat = Float.NaN;
-  
+
   /**
    * The average float.
    */
   protected float averageFloat = Float.NaN;
-  
+
   /**
    * A flag that indicates whether the statistics were already computed.
    */
   protected boolean isStatisticsComputed;
-  
+
   // ==========================================================================
   // Constructors.
 
@@ -48,7 +48,7 @@ public class FloatCounter extends TFloatIntHashMap {
   public FloatCounter(int initialCapacity) {
     super(initialCapacity);
   }
-  
+
   // ==========================================================================
   // Public methods.
 
@@ -84,7 +84,7 @@ public class FloatCounter extends TFloatIntHashMap {
   public float getMostCommonFloatFreq() {
     return get(getMostCommonFloat());
   }
-  
+
   /**
    * Returns the average float.
    * 
@@ -96,7 +96,7 @@ public class FloatCounter extends TFloatIntHashMap {
     }
     return this.averageFloat;
   }
-  
+
   /**
    * Computes some statistics about the float values.
    */
@@ -104,12 +104,12 @@ public class FloatCounter extends TFloatIntHashMap {
     float sumFloats = 0;
     float sumFreqs = 0;
     int largestFreq = -1;
-    
+
     // Do nothing if the counter is empty.
     if (isEmpty()) {
       return;
     }
-    
+
     TFloatIntIterator itr = iterator();
     while (itr.hasNext()) {
       itr.advance();
@@ -122,7 +122,7 @@ public class FloatCounter extends TFloatIntHashMap {
       sumFloats += freq * f;
       sumFreqs += freq;
     }
-    
+
     this.averageFloat = sumFreqs > 0 ? sumFloats / sumFreqs : 0;
     this.isStatisticsComputed = true;
   }

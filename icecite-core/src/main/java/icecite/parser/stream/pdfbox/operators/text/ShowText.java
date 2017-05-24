@@ -173,7 +173,7 @@ public class ShowText extends OperatorProcessor {
         if (codeLength == 1 && code == 32) {
           wordSpacing += textState.getWordSpacing();
         }
-        
+
         // Define the text rendering matrix (text space -> device space)
         Matrix ctm = state.getCurrentTransformationMatrix();
         Matrix trm = params.multiply(this.engine.getTextMatrix()).multiply(ctm);
@@ -189,12 +189,12 @@ public class ShowText extends OperatorProcessor {
           // vertical origin
           trm.translate(v);
         }
-                
+
         // Process the glyph.
         this.engine.saveGraphicsState();
         showGlyph(unicode, code, font, trm);
         this.engine.restoreGraphicsState();
-        
+
         // Get glyph's horizontal and vertical displacements, in text space
         Vector w = font.getDisplacement(code);
 
@@ -207,7 +207,7 @@ public class ShowText extends OperatorProcessor {
           tx = (w.getX() * fontSize + charSpacing + wordSpacing) * horizScaling;
           ty = 0;
         }
-        
+
         // Update the text matrix.
         Matrix translate = Matrix.getTranslateInstance(tx, ty);
         this.engine.getTextMatrix().concatenate(translate);
@@ -244,7 +244,7 @@ public class ShowText extends OperatorProcessor {
     // ascenders and descenders.
     // TODO: Make it faster.
     Rectangle pdfBoxBoundBox = computePdfBoxGlyphBoundingBox(code, font, trm);
-    
+
     if (boundBox != null) {
       // Bounding boxes need some adjustments.
       if (MathUtils.isEqual(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
@@ -278,12 +278,12 @@ public class ShowText extends OperatorProcessor {
     if (fontsize != scaleFactorX) {
       fontsize *= scaleFactorX;
     }
-    
+
     // Use our additional glyph list for Unicode mapping
     // TODO: Needs > 2ms.
     GlyphList additionalGlyphs = PdfBoxGlyphUtils.getAdditionalGlyphs();
     String unicode = font.toUnicode(code, additionalGlyphs);
-    
+
     // TODO: If we need the hasEncoding flag, uncomment the following:
     // boolean hasEncoding = unicode != null;
     //
@@ -306,7 +306,7 @@ public class ShowText extends OperatorProcessor {
     // if (PdfGlyphDictionary.hasGlyphForName(glyphName)) {
     // unicode = PdfGlyphDictionary.getGlyphForName(glyphName);
     // }
-    
+
     // When there is no Unicode mapping available, Acrobat simply coerces the
     // character code into Unicode, so we do the same. Subclasses of
     // PDFStreamEngine don't necessarily want this, which is why we leave it
@@ -346,8 +346,8 @@ public class ShowText extends OperatorProcessor {
       pdfColor.setRGB(rgb);
       this.colorRegistry.registerColor(pdfColor);
     }
-    
-    // TODO set the properties of the font.   
+
+    // TODO set the properties of the font.
     String fontName = font.getName();
     PdfFont pdfFont = this.fontRegistry.getFont(fontName);
     if (pdfFont == null) {
@@ -361,7 +361,7 @@ public class ShowText extends OperatorProcessor {
     boundBox.setMinY(MathUtils.round(boundBox.getMinY(), 1));
     boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
     boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
-        
+
     PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontSize(fontsize);

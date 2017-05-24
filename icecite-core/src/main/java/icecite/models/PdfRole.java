@@ -29,7 +29,7 @@ public enum PdfRole {
   PdfRole(String name) {
     this.name = name;
   }
-  
+
   /**
    * Returns the name of this role.
    * 

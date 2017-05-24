@@ -31,9 +31,9 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   public void setColor(PdfColor color) {
     this.color = color;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfType getType() {
     return PdfType.SHAPES;

@@ -98,8 +98,8 @@ public class Quicksort {
     int j = r - 1;
 
     // Choose the pivot index: Take the leftmost element per default.
-//    int pivotIndex = getRandomNumber(l, r);
-//    int pivotIndex = l + ((r - l) / 2);
+    // int pivotIndex = getRandomNumber(l, r);
+    // int pivotIndex = l + ((r - l) / 2);
     int pivotIndex = r;
     T pivot = list.get(pivotIndex);
 

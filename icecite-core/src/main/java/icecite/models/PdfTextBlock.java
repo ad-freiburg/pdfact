@@ -15,12 +15,10 @@ public interface PdfTextBlock extends PdfElement, HasCharacters {
     /**
      * Creates a PdfTextBlock.
      * 
-     * @param page
-     *        The page of in which this text block is located. 
      * @param characters
      *        The characters of this text block.
      * @return An instance of {@link PdfTextBlock}.
      */
-    PdfTextBlock create(PdfPage page, PdfCharacterList characters);
+    PdfTextBlock create(PdfCharacterList characters);
   }
 }

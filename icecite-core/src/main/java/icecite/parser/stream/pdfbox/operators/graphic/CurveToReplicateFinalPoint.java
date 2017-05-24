@@ -25,7 +25,7 @@ public class CurveToReplicateFinalPoint extends OperatorProcessor {
   protected PointFactory pointFactory;
 
   // ==========================================================================
-  
+
   /**
    * Creates a new OperatorProcessor to process the operation
    * "CurveToReplicateFinalPoint".
@@ -37,9 +37,9 @@ public class CurveToReplicateFinalPoint extends OperatorProcessor {
   public CurveToReplicateFinalPoint(PointFactory pointFactory) {
     this.pointFactory = pointFactory;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     COSNumber x1 = (COSNumber) args.get(0);

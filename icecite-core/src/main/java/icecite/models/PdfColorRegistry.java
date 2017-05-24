@@ -26,7 +26,7 @@ public interface PdfColorRegistry {
    * @return An instance of {@link PdfColor}.
    */
   PdfColor getColor(String colorName);
-  
+
   /**
    * Registers the given color.
    * 
