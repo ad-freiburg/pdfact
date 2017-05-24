@@ -21,6 +21,8 @@ import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.sort.Quicksort;
 
+// TODO: Accelerate cut method.
+
 /**
  * A plain implementation of {@link PdfElementList}.
  * 

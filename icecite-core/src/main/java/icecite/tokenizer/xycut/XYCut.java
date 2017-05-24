@@ -24,6 +24,15 @@ import icecite.utils.comparators.MinXComparator;
  */
 public abstract class XYCut<T extends PdfElement> {  
   /**
+   * TODO: Delete it.
+   */
+  public long timeSort = 0;
+  /**
+   * TODO: Delete it.
+   */
+  public long timeAssess = 0;
+  
+  /**
    * Cuts the given characters into blocks of type T.
    * 
    * @param pdf
@@ -36,6 +45,8 @@ public abstract class XYCut<T extends PdfElement> {
    * @return The list of resulting blocks.
    */
   public List<T> cut(PdfDocument pdf, PdfPage page, PdfCharacterList chars) {
+    this.timeSort = 0;
+    this.timeAssess = 0;
     List<T> blocks = new ArrayList<>();
     cut(pdf, page, chars, blocks);
     return blocks;
@@ -98,7 +109,10 @@ public abstract class XYCut<T extends PdfElement> {
   protected List<PdfCharacterList> xCut(PdfDocument pdf, PdfPage page,
       PdfCharacterList chars) {
     // Sort the characters by minX in order to sweep them in x direction.
+    long t1 = System.currentTimeMillis();
     Collections.sort(chars, new MinXComparator());
+    long t2 = System.currentTimeMillis();
+    this.timeSort += (t2 - t1);
     
     // The score of the best cut found so far.
     float bestCutScore = 0;
@@ -115,7 +129,11 @@ public abstract class XYCut<T extends PdfElement> {
         // Find the position of the "best" cut.
         while (index < chars.size()) {
           // The score of the current cut.
+          long t5 = System.currentTimeMillis();
           float cutScore = assessVerticalCut(pdf, page, halves);
+          long t6 = System.currentTimeMillis();
+          this.timeAssess += (t6 - t5);
+          
           if (cutScore < 0) {
             break;
           } else if (cutScore > bestCutScore) {
@@ -155,8 +173,11 @@ public abstract class XYCut<T extends PdfElement> {
   protected List<PdfCharacterList> yCut(PdfDocument pdf, PdfPage page,
       PdfCharacterList chars) {
     // Sort the characters by minX in order to sweep them in x direction.
+    long t1 = System.currentTimeMillis();
     Collections.sort(chars, Collections.reverseOrder(new MaxYComparator()));
-
+    long t2 = System.currentTimeMillis();
+    this.timeSort += (t2 - t1);
+    
     // The score of the best cut found so far.
     float bestCutScore = 0;
     // The index of the best cut found so far.
@@ -171,7 +192,11 @@ public abstract class XYCut<T extends PdfElement> {
         List<PdfCharacterList> halves = chars.cut(index);
         // Find the position of the "best" cut.
         while (index < chars.size()) {
+          long t5 = System.currentTimeMillis();
           float cutScore = assessHorizontalCut(pdf, page, halves);
+          long t6 = System.currentTimeMillis();
+          this.timeAssess += (t6 - t5);
+          
           if (cutScore < 0) {
             break;
           } else if (cutScore > bestCutScore) {

@@ -21,6 +21,8 @@ import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 
+//TODO: Accelerate cut method.
+
 /**
  * A plain implementation of {@link PdfCharacterList}.
  * 

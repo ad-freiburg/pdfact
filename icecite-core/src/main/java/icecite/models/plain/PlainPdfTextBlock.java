@@ -4,7 +4,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
+import icecite.utils.geometric.Rectangle;
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -17,21 +19,20 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    */
   protected PdfCharacterList characters;
 
-  /**
-   * The text of this text block.
-   */
-  protected String text;
-
   // ==========================================================================
 
   /**
    * Creates a new text block.
    * 
+   * @param page
+   *        The page in which this text block is created.
    * @param characters
    *        The characters of this block.
    */
   @AssistedInject
-  public PlainPdfTextBlock(@Assisted PdfCharacterList characters) {
+  public PlainPdfTextBlock(@Assisted PdfPage page,
+      @Assisted PdfCharacterList characters) {
+    this.page = page;
     this.characters = characters;
   }
 
@@ -50,12 +51,13 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   // ==========================================================================
 
   @Override
-  public String getText() {
-    return this.text;
+  public Rectangle getBoundingBox() {
+    return this.characters.getBoundingBox();
   }
 
   @Override
-  public void setText(String text) {
-    this.text = text;
+  public void setBoundingBox(Rectangle boundingBox) {
+    // The bounding box results from the characters of this text block.
+    throw new UnsupportedOperationException();
   }
 }

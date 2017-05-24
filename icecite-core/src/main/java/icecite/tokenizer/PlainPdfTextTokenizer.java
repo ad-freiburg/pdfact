@@ -79,7 +79,11 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     long t1 = System.currentTimeMillis();
     // Tokenize each page separately.
     for (PdfPage page : pages) {
+      long t11 = System.currentTimeMillis();
       tokenizePdfPage(document, page);
+      long t21 = System.currentTimeMillis();
+      System.out.println("Time needed to tokenize page " + page.getPageNumber()
+          + ": " + (t21 - t11));
     }
     long t2 = System.currentTimeMillis();
     System.out.println("Time needed to tokenize the PDF doc: " + (t2 - t1));
@@ -107,8 +111,9 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     for (PdfTextLine line : lines) {
       line.setWords(tokenizeIntoWords(document, page, line));
     }
-//    // Tokenize the text lines into paragraphs.
-//    page.setParagraphs(tokenizeIntoParagraphs(document, page, lines));
+    // TODO: Tokenize into paragraphs.
+    // // Tokenize the text lines into paragraphs.
+    // page.setParagraphs(tokenizeIntoParagraphs(document, page, lines));
   }
 
   /**
