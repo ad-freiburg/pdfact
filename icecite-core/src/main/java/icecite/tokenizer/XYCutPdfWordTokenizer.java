@@ -82,7 +82,6 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
     Collections.sort(characters, new MinXComparator());
 
     PdfWord word = this.wordFactory.create(page, characters);
-
     word.setText(CollectionUtils.join(characters, ""));
 
     return word;

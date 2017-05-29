@@ -39,8 +39,6 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   // TODO: Dehyphenation.
   public List<PdfParagraph> tokenize(PdfDocument pdf) {
     List<PdfParagraph> paragraphs = new ArrayList<>();
-
-    // The current paragraph.
     PdfParagraph paragraph = null;
 
     List<PdfTextLine> lines = pdf.getTextLines();

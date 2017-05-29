@@ -217,7 +217,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     if (!PdfCharacterFilter.filterPdfCharacter(character)) {
       // TODO
       character.setExtractionOrderNumber(this.page.getCharacters().size());
-
+      character.setPage(this.page);
+      
       this.page.addCharacter(character);
       this.pdfDocument.addCharacter(character);
     }
@@ -229,6 +230,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   @Override
   public void handlePdfFigure(PdfFigure figure) {
     if (!PdfFigureFilter.filterPdfFigure(figure)) {
+      figure.setPage(this.page);
+      
       this.page.addFigure(figure);
       this.pdfDocument.addFigure(figure);
     }
@@ -237,6 +240,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   @Override
   public void handlePdfShape(PdfShape shape) {
     if (!PdfShapeFilter.filterPdfShape(shape)) {
+      shape.setPage(this.page);
+      
       this.page.addShape(shape);
       this.pdfDocument.addShape(shape);
     }

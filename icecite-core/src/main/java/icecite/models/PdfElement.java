@@ -7,7 +7,7 @@ import icecite.utils.geometric.HasRectangle;
  * 
  * @author Claudius Korzen
  */
-public interface PdfElement extends HasRectangle {
+public interface PdfElement extends HasRectangle, HasPage {
   /**
    * Returns the type of this PDF element.
    * 

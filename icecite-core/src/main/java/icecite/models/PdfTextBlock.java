@@ -16,8 +16,7 @@ public interface PdfTextBlock extends PdfElement, HasPage, HasCharacters {
      * Creates a PdfTextBlock.
      * 
      * @param page
-     *        The page in which the block is located.
-     * 
+     *        The page in which the block is located.  
      * @param characters
      *        The characters of this text block.
      *
