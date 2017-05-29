@@ -114,9 +114,9 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected Rectangle boundingBox;
 
   /**
-   * A flag that indicates whether the statistics were already computed.
+   * A flag that indicates whether the statistics are outdated.
    */
-  protected boolean isStatisticsComputed;
+  protected boolean isStatisticsOutdated = true;
 
   /**
    * The size of the ArrayList (the number of elements it contains).
@@ -157,35 +157,35 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public boolean add(T t) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.add(t);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    this.size++;
-    return super.add(t);
+    return added;
   }
 
   @Override
   public void add(int index, T t) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
-    }
     super.add(index, t);
+    this.isStatisticsOutdated = true;
   }
 
   @Override
   public boolean addAll(Collection<? extends T> c) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.addAll(c);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    return super.addAll(c);
+    return added;
   }
 
   @Override
   public boolean addAll(int index, Collection<? extends T> c) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.addAll(index, c);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    return super.addAll(index, c);
+    return added;
   }
 
   @Override
@@ -247,29 +247,29 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
     for (T element : this) {
       // Process the height.
-      heightsCounter.add(element.getBoundingBox().getHeight());
+      heightsCounter.add(element.getRectangle().getHeight());
 
       // Process the width.
-      widthsCounter.add(element.getBoundingBox().getWidth());
+      widthsCounter.add(element.getRectangle().getWidth());
 
       // Process minX.
-      if (element.getBoundingBox().getMinX() < this.smallestMinX) {
-        this.smallestMinX = element.getBoundingBox().getMinX();
+      if (element.getRectangle().getMinX() < this.smallestMinX) {
+        this.smallestMinX = element.getRectangle().getMinX();
       }
 
       // Process minY.
-      if (element.getBoundingBox().getMinY() < this.smallestMinY) {
-        this.smallestMinY = element.getBoundingBox().getMinY();
+      if (element.getRectangle().getMinY() < this.smallestMinY) {
+        this.smallestMinY = element.getRectangle().getMinY();
       }
 
       // Process maxX.
-      if (element.getBoundingBox().getMaxX() > this.largestMaxX) {
-        this.largestMaxX = element.getBoundingBox().getMaxX();
+      if (element.getRectangle().getMaxX() > this.largestMaxX) {
+        this.largestMaxX = element.getRectangle().getMaxX();
       }
 
       // Process maxY.
-      if (element.getBoundingBox().getMaxY() > this.largestMaxY) {
-        this.largestMaxY = element.getBoundingBox().getMaxY();
+      if (element.getRectangle().getMaxY() > this.largestMaxY) {
+        this.largestMaxY = element.getRectangle().getMaxY();
       }
     }
     this.averageHeight = heightsCounter.getAverageFloat();
@@ -278,7 +278,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     this.averageWidth = widthsCounter.getAverageFloat();
     this.mostCommonWidth = widthsCounter.getMostCommonFloat();
 
-    this.isStatisticsComputed = true;
+    this.isStatisticsOutdated = false;
   }
 
   // ==========================================================================
@@ -295,7 +295,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageHeight() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageHeight;
@@ -303,7 +303,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonHeight() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonHeight;
@@ -313,7 +313,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageWidth() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageWidth;
@@ -321,7 +321,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonWidth() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonWidth;
@@ -331,7 +331,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinX() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinX;
@@ -354,7 +354,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     float smallestMinX = getSmallestMinX();
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
-      if (element.getBoundingBox().getMinX() == smallestMinX) {
+      if (element.getRectangle().getMinX() == smallestMinX) {
         elements.add(element);
       }
     }
@@ -365,7 +365,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinY() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinY;
@@ -388,7 +388,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     float smallestMinY = getSmallestMinY();
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
-      if (element.getBoundingBox().getMinY() == smallestMinY) {
+      if (element.getRectangle().getMinY() == smallestMinY) {
         elements.add(element);
       }
     }
@@ -399,7 +399,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxX() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxX;
@@ -422,7 +422,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     float largestMaxX = getLargestMaxX();
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
-      if (element.getBoundingBox().getMaxX() == largestMaxX) {
+      if (element.getRectangle().getMaxX() == largestMaxX) {
         elements.add(element);
       }
     }
@@ -433,7 +433,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxY() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxY;
@@ -456,7 +456,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     float largestMaxY = getLargestMaxY();
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
-      if (element.getBoundingBox().getMaxY() == largestMaxY) {
+      if (element.getRectangle().getMaxY() == largestMaxY) {
         elements.add(element);
       }
     }
@@ -466,7 +466,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   // ==========================================================================
 
   @Override
-  public Rectangle getBoundingBox() {
+  public Rectangle getRectangle() {
     if (this.boundingBox == null) {
       this.boundingBox = this.rectangleFactory.create();
       this.boundingBox.setMinX(getSmallestMinX());
@@ -478,7 +478,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   }
 
   @Override
-  public void setBoundingBox(Rectangle boundingBox) {
+  public void setRectangle(Rectangle boundingBox) {
     // The bounding box results from the elements in this list. It is not
     // allowed to set the bounding box explicitly.
     throw new UnsupportedOperationException();

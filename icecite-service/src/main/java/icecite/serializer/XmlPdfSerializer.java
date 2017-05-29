@@ -326,7 +326,7 @@ public class XmlPdfSerializer implements PdfSerializer {
       xml.append(" " + CONTEXT_NAME_ELEMENT_PAGE + "=\"" + pageNum + "\"");
     }
 
-    Rectangle r = element.getBoundingBox();
+    Rectangle r = element.getRectangle();
     if (r != null) {
       // Append the coordinates of the bounding box:
       // <character ... minX="1" minY="2" maxX="3" maxY="4"

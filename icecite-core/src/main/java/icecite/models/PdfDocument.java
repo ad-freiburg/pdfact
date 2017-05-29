@@ -9,7 +9,8 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument extends HasCharacters, HasFigures, HasShapes {
+public interface PdfDocument extends HasCharacters, HasFigures, HasShapes,
+    HasTextLines, HasTextBlocks, HasParagraphs {
   /**
    * Returns the pages of this document.
    * 
@@ -49,6 +50,8 @@ public interface PdfDocument extends HasCharacters, HasFigures, HasShapes {
    *        The file on which the PDF document is based on.
    */
   void setFile(File file);
+
+  // ==========================================================================
 
   /**
    * Returns the file as Path object on which the PDF document is based on.

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
@@ -17,7 +16,6 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
@@ -131,26 +129,20 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       return;
     }
 
+    // TODO: Visualize the paragraphs.
+
     // Visualize the text elements.
-    List<PdfParagraph> paragraphs = page.getParagraphs();
-    if (paragraphs != null) {
-      for (PdfParagraph paragraph : paragraphs) {
-        if (isVisualizePdfElement(paragraph)) {
-          visualizePdfElement(page, paragraph, drawer, Color.GREEN);
+    for (PdfTextLine line : page.getTextLines()) {
+      if (isVisualizePdfElement(line)) {
+        visualizePdfElement(page, line, drawer, Color.BLUE);
+      }
+      for (PdfWord word : line.getWords()) {
+        if (isVisualizePdfElement(word)) {
+          visualizePdfElement(page, word, drawer, Color.RED);
         }
-        for (PdfTextLine line : paragraph.getTextLines()) {
-          if (isVisualizePdfElement(line)) {
-            visualizePdfElement(page, line, drawer, Color.BLUE);
-          }
-          for (PdfWord word : line.getWords()) {
-            if (isVisualizePdfElement(word)) {
-              visualizePdfElement(page, word, drawer, Color.RED);
-            }
-            for (PdfCharacter character : word.getCharacters()) {
-              if (isVisualizePdfElement(character)) {
-                visualizePdfElement(page, character, drawer, Color.GRAY);
-              }
-            }
+        for (PdfCharacter character : word.getCharacters()) {
+          if (isVisualizePdfElement(character)) {
+            visualizePdfElement(page, character, drawer, Color.GRAY);
           }
         }
       }

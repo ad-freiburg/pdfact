@@ -21,7 +21,15 @@ public interface HasCharacters {
    *        The characters to set.
    */
   void setCharacters(PdfCharacterList characters);
-  
+
+  /**
+   * Adds the given characters.
+   * 
+   * @param characters
+   *        The characters to add.
+   */
+  void addCharacters(PdfCharacterList characters);
+
   /**
    * Adds the given character.
    * 

@@ -148,6 +148,14 @@ public abstract class Rectangle extends Geometric {
   public abstract float getOverlapRatio(Geometric geom);
 
   /**
+   * Extends this rect by the given rect.
+   * 
+   * @param rect
+   *        The other rectangle.
+   */
+  public abstract void extend(HasRectangle rect);
+  
+  /**
    * Merges this rect with given rect. Returns the minimum bounding box that
    * contains both rectangles.
    * 

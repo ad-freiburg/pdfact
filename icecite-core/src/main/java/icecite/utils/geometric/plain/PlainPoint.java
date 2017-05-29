@@ -91,7 +91,7 @@ public class PlainPoint extends Point {
   }
 
   @Override
-  public Rectangle getBoundingBox() {
+  public Rectangle getRectangle() {
     if (this.isBoundingBoxOutdated) {
       this.boundingBox.setMinX(getX());
       this.boundingBox.setMinY(getY());
@@ -103,7 +103,7 @@ public class PlainPoint extends Point {
   }
 
   @Override
-  public void setBoundingBox(Rectangle boundingBox) {
+  public void setRectangle(Rectangle boundingBox) {
     this.boundingBox = boundingBox;
     this.isBoundingBoxOutdated = false;
   }

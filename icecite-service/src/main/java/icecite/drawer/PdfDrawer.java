@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import icecite.models.HasBoundingBox;
+import icecite.utils.geometric.HasRectangle;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Rectangle;
@@ -255,7 +255,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rectangle, int pageNum)
+  void drawBoundingBox(HasRectangle rectangle, int pageNum)
     throws IOException;
 
   /**
@@ -270,7 +270,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color)
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color color)
     throws IOException;
 
   /**
@@ -288,7 +288,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
       float thickness)
     throws IOException;
 
@@ -309,7 +309,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rect, int pageNum,
+  void drawBoundingBox(HasRectangle rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
     throws IOException;
 
@@ -332,7 +332,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
     throws IOException;
 
@@ -358,7 +358,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasBoundingBox rect, int pageNum, Color color,
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
     throws IOException;
 

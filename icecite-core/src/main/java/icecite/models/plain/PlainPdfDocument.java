@@ -3,9 +3,7 @@ package icecite.models.plain;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -16,7 +14,10 @@ import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
+import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextLine;
 
 /**
  * A plain implementation of {@link PdfDocument}.
@@ -25,29 +26,47 @@ import icecite.models.PdfShape;
  */
 public class PlainPdfDocument implements PdfDocument {
   /**
-   * The pages of this PDF document.
-   */
-  protected List<PdfPage> pages;
-
-  /**
    * The file on which this PDF document is based on.
    */
   protected Path path;
 
   /**
-   * The characters of this PDF document.
+   * The pages of this PDF document.
+   */
+  protected List<PdfPage> pages;
+
+  /**
+   * The characters of this PDF document. Needed to get document-wide
+   * statistics about characters.
    */
   protected PdfCharacterList characters;
 
   /**
-   * The figures of this PDF document.
+   * The figures of this PDF document. Needed to get document-wide statistics
+   * about figures.
    */
-  protected Set<PdfFigure> figures;
+  protected List<PdfFigure> figures;
 
   /**
-   * The shapes of this PDF document.
+   * The shapes of this PDF document. Needed to get document-wide statistics
+   * about shapes.
    */
-  protected Set<PdfShape> shapes;
+  protected List<PdfShape> shapes;
+
+  /**
+   * The text blocks in this PDF document.
+   */
+  protected List<PdfTextBlock> textBlocks;
+
+  /**
+   * The text lines in this PDF document.
+   */
+  protected List<PdfTextLine> textLines;
+
+  /**
+   * The paragraphs in this PDF document.
+   */
+  protected List<PdfParagraph> paragraphs;
 
   // ==========================================================================
   // Constructors.
@@ -62,8 +81,11 @@ public class PlainPdfDocument implements PdfDocument {
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory) {
     this.pages = new ArrayList<PdfPage>();
     this.characters = characterListFactory.create();
-    this.figures = new HashSet<>();
-    this.shapes = new HashSet<>();
+    this.figures = new ArrayList<>();
+    this.shapes = new ArrayList<>();
+    this.textBlocks = new ArrayList<>();
+    this.textLines = new ArrayList<>();
+    this.paragraphs = new ArrayList<>();
   }
 
   /**
@@ -90,7 +112,7 @@ public class PlainPdfDocument implements PdfDocument {
    *        The PDF file given as a Path object
    */
   @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory, 
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
       @Assisted Path pdf) {
     this(characterListFactory);
     this.path = pdf;
@@ -148,6 +170,13 @@ public class PlainPdfDocument implements PdfDocument {
   }
 
   @Override
+  public void addCharacters(PdfCharacterList characters) {
+    for (PdfCharacter character : characters) {
+      addCharacter(character);
+    }
+  }
+
+  @Override
   public void addCharacter(PdfCharacter character) {
     this.characters.add(character);
   }
@@ -155,34 +184,120 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public Set<PdfFigure> getFigures() {
+  public List<PdfFigure> getFigures() {
     return this.figures;
   }
 
   @Override
-  public void setFigures(Set<PdfFigure> figures) {
+  public void setFigures(List<PdfFigure> figures) {
     this.figures = figures;
   }
-  
+
+  @Override
+  public void addFigures(List<PdfFigure> figures) {
+    for (PdfFigure figure : figures) {
+      addFigure(figure);
+    }
+  }
+
   @Override
   public void addFigure(PdfFigure figure) {
     this.figures.add(figure);
   }
-  
+
   // ==========================================================================
 
   @Override
-  public Set<PdfShape> getShapes() {
+  public List<PdfShape> getShapes() {
     return this.shapes;
   }
 
   @Override
-  public void setShapes(Set<PdfShape> shapes) {
+  public void setShapes(List<PdfShape> shapes) {
     this.shapes = shapes;
   }
-  
+
+  @Override
+  public void addShapes(List<PdfShape> shapes) {
+    for (PdfShape shape : shapes) {
+      addShape(shape);
+    }
+  }
+
   @Override
   public void addShape(PdfShape shape) {
     this.shapes.add(shape);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<PdfTextBlock> getTextBlocks() {
+    return this.textBlocks;
+  }
+
+  @Override
+  public void setTextBlocks(List<PdfTextBlock> blocks) {
+    this.textBlocks = blocks;
+  }
+
+  @Override
+  public void addTextBlocks(List<PdfTextBlock> blocks) {
+    for (PdfTextBlock block : blocks) {
+      addTextBlock(block);
+    }
+  }
+
+  @Override
+  public void addTextBlock(PdfTextBlock block) {
+    this.textBlocks.add(block);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<PdfTextLine> getTextLines() {
+    return this.textLines;
+  }
+
+  @Override
+  public void setTextLines(List<PdfTextLine> lines) {
+    this.textLines = lines;
+  }
+
+  @Override
+  public void addTextLines(List<PdfTextLine> lines) {
+    for (PdfTextLine line : lines) {
+      addTextLine(line);
+    }
+  }
+
+  @Override
+  public void addTextLine(PdfTextLine line) {
+    this.textLines.add(line);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<PdfParagraph> getParagraphs() {
+    return this.paragraphs;
+  }
+
+  @Override
+  public void setParagraphs(List<PdfParagraph> paragraphs) {
+    this.paragraphs = paragraphs;
+  }
+
+  @Override
+  public void addParagraphs(List<PdfParagraph> paragraphs) {
+    for (PdfParagraph paragraph : paragraphs) {
+      addParagraph(paragraph);
+    }
+  }
+
+  @Override
+  public void addParagraph(PdfParagraph paragraph) {
+    this.paragraphs.add(paragraph);
   }
 }

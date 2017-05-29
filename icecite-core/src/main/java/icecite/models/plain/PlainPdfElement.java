@@ -24,12 +24,12 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
 
   @Override
-  public Rectangle getBoundingBox() {
+  public Rectangle getRectangle() {
     return this.boundingBox;
   }
 
   @Override
-  public void setBoundingBox(Rectangle boundingBox) {
+  public void setRectangle(Rectangle boundingBox) {
     this.boundingBox = boundingBox;
   }
 

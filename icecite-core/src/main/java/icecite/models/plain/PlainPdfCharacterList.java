@@ -125,7 +125,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     this.mostCommonFontsize = fontsizesCounter.getMostCommonFloat();
     this.averageFontsize = fontsizesCounter.getAverageFloat();
 
-    this.isStatisticsComputed = true;
+    this.isStatisticsOutdated = false;
   }
 
   // ==========================================================================
@@ -142,7 +142,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public PdfFont getMostCommonFont() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonFont;
@@ -176,7 +176,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public PdfColor getMostCommonColor() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonColor;
@@ -210,7 +210,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public float getAverageFontsize() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageFontsize;
@@ -218,7 +218,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public float getMostCommonFontsize() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonFontsize;

@@ -17,6 +17,7 @@ import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFigure.PdfFigureFactory;
+import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
@@ -117,16 +118,17 @@ public class BeginInlineImage extends OperatorProcessor {
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
+      PdfPage pdfPage = this.engine.getCurrentPdfPage();
       if (exclusiveColor != null) {
         PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);
-        PdfShape shape = this.shapeFactory.create();
-        shape.setBoundingBox(boundBox);
+        PdfShape shape = this.shapeFactory.create(pdfPage);
+        shape.setRectangle(boundBox);
         shape.setColor(color);
         this.engine.handlePdfShape(shape);
       } else {
-        PdfFigure figure = this.figureFactory.create();
-        figure.setBoundingBox(boundBox);
+        PdfFigure figure = this.figureFactory.create(pdfPage);
+        figure.setRectangle(boundBox);
         this.engine.handlePdfFigure(figure);
       }
     }

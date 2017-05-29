@@ -1,6 +1,10 @@
 package icecite.models.plain;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 import icecite.models.PdfColor;
+import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfType;
 
@@ -11,6 +15,11 @@ import icecite.models.PdfType;
  */
 public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   /**
+   * The page in which this shape is located.
+   */
+  protected PdfPage page;
+  
+  /**
    * The extraction order number.
    */
   protected int extractionOrderNumber;
@@ -20,6 +29,32 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
    */
   protected PdfColor color;
 
+  // ==========================================================================
+  // Constructors.
+  
+  /**
+   * Creates a new PdfShape.
+   * 
+   * @param page
+   *        The page in which this shape is located.
+   */
+  @AssistedInject
+  public PlainPdfShape(@Assisted PdfPage page) {
+    this.page = page;
+  }
+
+  // ==========================================================================
+  
+  @Override
+  public PdfPage getPage() {
+    return this.page;
+  }
+
+  @Override
+  public void setPage(PdfPage page) {
+    this.page = page;
+  }
+  
   // ==========================================================================
 
   @Override

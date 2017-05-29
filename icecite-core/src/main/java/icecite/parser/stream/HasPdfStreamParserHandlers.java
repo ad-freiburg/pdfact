@@ -4,6 +4,7 @@ import java.io.File;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfFigure;
+import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 
 /**
@@ -32,18 +33,18 @@ public interface HasPdfStreamParserHandlers {
   /**
    * Handles the start of a PDF page.
    * 
-   * @param pageNum
-   *        The number of the page in the PDF file.
+   * @param page
+   *        The page to process.
    */
-  void handlePdfPageStart(int pageNum);
+  void handlePdfPageStart(PdfPage page);
 
   /**
    * Handles the end of a PDF page.
    * 
-   * @param pageNum
-   *        The number of the page in the PDF file.
+   * @param page
+   *        The page to process.
    */
-  void handlePdfPageEnd(int pageNum);
+  void handlePdfPageEnd(PdfPage page);
 
   /**
    * Handles a character in the PDF file.

@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfFigure extends PdfElement {
+public interface PdfFigure extends PdfElement, HasPage {
   /**
    * The factory to create instances of {@link PdfFigure}.
    * 
@@ -15,8 +15,11 @@ public interface PdfFigure extends PdfElement {
     /**
      * Creates a new PdfFigure.
      * 
-     * @return An instance odf PdfFigure.
+     * @param page
+     *        The page in which the figure is located.
+     * 
+     * @return An instance of PdfFigure.
      */
-    PdfFigure create();
+    PdfFigure create(PdfPage page);
   }
 }

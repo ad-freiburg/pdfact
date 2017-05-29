@@ -63,8 +63,8 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
     PdfCharacterList right = halves.get(1);
 
     // Compute the (fictive) lane between the left and right half.
-    float laneMinX = left.getBoundingBox().getMaxX();
-    float laneMaxX = right.getBoundingBox().getMinX();
+    float laneMinX = left.getRectangle().getMaxX();
+    float laneMaxX = right.getRectangle().getMinX();
     float laneWidth = laneMaxX - laneMinX;
 
     float docCharWidth = pdf.getCharacters().getMostCommonWidth();
@@ -92,8 +92,8 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
     PdfCharacterList lower = halves.get(1);
 
     // Compute the (fictive) lane between the lower and upper half.
-    float laneMinY = lower.getBoundingBox().getMaxY();
-    float laneMaxY = upper.getBoundingBox().getMinY();
+    float laneMinY = lower.getRectangle().getMaxY();
+    float laneMaxY = upper.getRectangle().getMinY();
     float laneHeight = laneMaxY - laneMinY;
 
     // Don't allow lanes with negative heights.
@@ -115,8 +115,8 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   // ==========================================================================
 
   @Override
-  public PdfTextBlock pack(PdfCharacterList characters) {
-    return this.textBlockFactory.create(characters);
+  public PdfTextBlock pack(PdfPage page, PdfCharacterList characters) {
+    return this.textBlockFactory.create(page, characters);
   }
 
   // ==========================================================================
@@ -141,10 +141,10 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
 
     for (PdfCharacter leftChar : leftChars) {
       int leftCharNum = leftChar.getExtractionOrderNumber();
-      Rectangle leftCharBox = leftChar.getBoundingBox();
+      Rectangle leftCharBox = leftChar.getRectangle();
       for (PdfCharacter rightChar : rightChars) {
         int rightCharNum = rightChar.getExtractionOrderNumber();
-        Rectangle rightCharNox = rightChar.getBoundingBox();
+        Rectangle rightCharNox = rightChar.getRectangle();
 
         // Check if the characters are consecutive.
         if (rightCharNum != leftCharNum + 1) {

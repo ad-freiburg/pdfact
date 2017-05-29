@@ -1,5 +1,6 @@
 package icecite.tokenizer;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.inject.Inject;
@@ -10,6 +11,8 @@ import icecite.models.PdfPage;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.tokenizer.xycut.XYCut;
+import icecite.utils.collection.CollectionUtils;
+import icecite.utils.comparators.MinXComparator;
 
 // TODO: Rework.
 
@@ -56,7 +59,7 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
     PdfCharacterList l = halves.get(0);
     PdfCharacterList r = halves.get(1);
 
-    float width = r.getBoundingBox().getMinX() - l.getBoundingBox().getMaxX();
+    float width = r.getRectangle().getMinX() - l.getRectangle().getMaxX();
     if (width < 1f) {
       return -1;
     }
@@ -74,8 +77,15 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWord pack(PdfCharacterList characters) {
-    return this.wordFactory.create(characters);
+  public PdfWord pack(PdfPage page, PdfCharacterList characters) {
+    // Sort the characters by minX.
+    Collections.sort(characters, new MinXComparator());
+
+    PdfWord word = this.wordFactory.create(page, characters);
+
+    word.setText(CollectionUtils.join(characters, ""));
+
+    return word;
   }
 
   // ==========================================================================

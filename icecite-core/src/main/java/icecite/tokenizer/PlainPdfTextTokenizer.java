@@ -1,6 +1,7 @@
 package icecite.tokenizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.inject.Inject;
@@ -11,6 +12,8 @@ import icecite.models.PdfParagraph;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
+import icecite.utils.collection.CollectionUtils;
+import icecite.utils.comparators.MinXComparator;
 
 /**
  * An implementation of {@link PdfTextTokenizer} using XYCut.
@@ -76,17 +79,13 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
       return;
     }
 
-    long t1 = System.currentTimeMillis();
     // Tokenize each page separately.
     for (PdfPage page : pages) {
-      long t11 = System.currentTimeMillis();
       tokenizePdfPage(document, page);
-      long t21 = System.currentTimeMillis();
-      System.out.println("Time needed to tokenize page " + page.getPageNumber()
-          + ": " + (t21 - t11));
     }
-    long t2 = System.currentTimeMillis();
-    System.out.println("Time needed to tokenize the PDF doc: " + (t2 - t1));
+
+    // Tokenize the text lines into paragraphs.
+    document.setParagraphs(tokenizeIntoParagraphs(document));
   }
 
   // ==========================================================================
@@ -103,17 +102,23 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   protected void tokenizePdfPage(PdfDocument document, PdfPage page) {
     // Tokenize the given page into text blocks.
     List<PdfTextBlock> blocks = tokenizeIntoTextBlocks(document, page);
-    page.setTextBlocks(blocks);
     // Tokenize the text blocks into text lines.
     List<PdfTextLine> lines = tokenizeIntoTextLines(document, page, blocks);
-    page.setTextLines(lines);
     // Tokenize the text lines into words.
     for (PdfTextLine line : lines) {
+      // TODO
       line.setWords(tokenizeIntoWords(document, page, line));
+      Collections.sort(line.getWords(), new MinXComparator());
+      line.setText(CollectionUtils.join(line.getWords(), " "));
     }
-    // TODO: Tokenize into paragraphs.
-    // // Tokenize the text lines into paragraphs.
-    // page.setParagraphs(tokenizeIntoParagraphs(document, page, lines));
+
+    // Register the blocks and lines to the PDF document.
+    document.addTextBlocks(blocks);
+    document.addTextLines(lines);
+
+    // Register the blocks and lines to the page.
+    page.addTextBlocks(blocks);
+    page.addTextLines(lines);
   }
 
   /**
@@ -198,15 +203,11 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * Tokenizes the given text lines into paragraphs.
    * 
    * @param doc
-   *        The PDF document to which the text blocks belong to.
-   * @param page
-   *        The page in which the text blocks are located.
-   * @param lines
-   *        The text lines to process.
+   *        The PDF document to process.
+   * 
    * @return The identified paragraphs.
    */
-  protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc,
-      PdfPage page, List<PdfTextLine> lines) {
-    return this.paragraphTokenizer.tokenize(doc, page, lines);
+  protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc) {
+    return this.paragraphTokenizer.tokenize(doc);
   }
 }

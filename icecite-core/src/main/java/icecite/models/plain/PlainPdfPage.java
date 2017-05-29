@@ -1,29 +1,26 @@
 package icecite.models.plain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
-import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 
 /**
  * A plain implementation of {@link PdfPage}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfPage implements PdfPage {  
+public class PlainPdfPage implements PdfPage {
   /**
    * The characters of this page.
    */
@@ -32,22 +29,17 @@ public class PlainPdfPage implements PdfPage {
   /**
    * The figures in this page.
    */
-  protected Set<PdfFigure> figures;
+  protected List<PdfFigure> figures;
 
   /**
    * The shapes in this page.
    */
-  protected Set<PdfShape> shapes;
+  protected List<PdfShape> shapes;
 
   /**
    * The number of this page in the PDF document.
    */
   protected int pageNumber;
-
-  /**
-   * The identified paragraphs of this page.
-   */
-  protected List<PdfParagraph> paragraphs;
 
   /**
    * The identified text blocks of this page.
@@ -71,9 +63,8 @@ public class PlainPdfPage implements PdfPage {
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory) {
     this.characters = characterListFactory.create();
-    this.figures = new HashSet<>();
-    this.shapes = new HashSet<>();
-    this.paragraphs = new ArrayList<>();
+    this.figures = new ArrayList<>();
+    this.shapes = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
     this.textLines = new ArrayList<>();
   }
@@ -104,56 +95,65 @@ public class PlainPdfPage implements PdfPage {
   public void setCharacters(PdfCharacterList characters) {
     this.characters = characters;
   }
-  
+
+  @Override
+  public void addCharacters(PdfCharacterList characters) {
+    for (PdfCharacter character : characters) {
+      addCharacter(character);
+    }
+  }
+
   @Override
   public void addCharacter(PdfCharacter character) {
     this.characters.add(character);
   }
-  
+
   // ==========================================================================
 
   @Override
-  public Set<PdfFigure> getFigures() {
+  public List<PdfFigure> getFigures() {
     return this.figures;
   }
 
   @Override
-  public void setFigures(Set<PdfFigure> figures) {
+  public void setFigures(List<PdfFigure> figures) {
     this.figures = figures;
+  }
+
+  @Override
+  public void addFigures(List<PdfFigure> figures) {
+    for (PdfFigure figure : figures) {
+      addFigure(figure);
+    }
   }
 
   @Override
   public void addFigure(PdfFigure figure) {
     this.figures.add(figure);
   }
-  
+
   // ==========================================================================
 
   @Override
-  public Set<PdfShape> getShapes() {
+  public List<PdfShape> getShapes() {
     return this.shapes;
   }
 
   @Override
-  public void setShapes(Set<PdfShape> shapes) {
+  public void setShapes(List<PdfShape> shapes) {
     this.shapes = shapes;
+  }
+
+  @Override
+  public void addShapes(List<PdfShape> shapes) {
+    for (PdfShape shape : shapes) {
+      addShape(shape);
+    }
   }
 
   @Override
   public void addShape(PdfShape shape) {
     this.shapes.add(shape);
-  }
-  
-  // ==========================================================================
-
-  @Override
-  public int getPageNumber() {
-    return this.pageNumber;
-  }
-
-  @Override
-  public void setPageNumber(int pageNumber) {
-    this.pageNumber = pageNumber;
   }
 
   // ==========================================================================
@@ -169,6 +169,20 @@ public class PlainPdfPage implements PdfPage {
   }
 
   @Override
+  public void addTextBlocks(List<PdfTextBlock> blocks) {
+    for (PdfTextBlock block : blocks) {
+      addTextBlock(block);
+    }
+  }
+
+  @Override
+  public void addTextBlock(PdfTextBlock block) {
+    this.textBlocks.add(block);
+  }
+
+  // ==========================================================================
+
+  @Override
   public List<PdfTextLine> getTextLines() {
     return this.textLines;
   }
@@ -178,20 +192,27 @@ public class PlainPdfPage implements PdfPage {
     this.textLines = lines;
   }
 
+  @Override
+  public void addTextLines(List<PdfTextLine> lines) {
+    for (PdfTextLine line : lines) {
+      addTextLine(line);
+    }
+  }
+
+  @Override
+  public void addTextLine(PdfTextLine line) {
+    this.textLines.add(line);
+  }
+
   // ==========================================================================
 
   @Override
-  public List<PdfParagraph> getParagraphs() {
-    return this.paragraphs;
+  public int getPageNumber() {
+    return this.pageNumber;
   }
 
   @Override
-  public void setParagraphs(List<PdfParagraph> paragraphs) {
-    this.paragraphs = paragraphs;
-  }
-
-  @Override
-  public void addParagraph(PdfParagraph paragraph) {
-    this.paragraphs.add(paragraph);
+  public void setPageNumber(int pageNumber) {
+    this.pageNumber = pageNumber;
   }
 }

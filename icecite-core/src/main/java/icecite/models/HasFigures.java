@@ -1,6 +1,6 @@
 package icecite.models;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * An interface that declares that the implementing object consists of multiple
@@ -14,7 +14,7 @@ public interface HasFigures {
    * 
    * @return The set of figures.
    */
-  Set<PdfFigure> getFigures();
+  List<PdfFigure> getFigures();
 
   /**
    * Sets the figures.
@@ -22,8 +22,16 @@ public interface HasFigures {
    * @param figures
    *        The figures to set.
    */
-  void setFigures(Set<PdfFigure> figures);
-  
+  void setFigures(List<PdfFigure> figures);
+
+  /**
+   * Adds the given figures.
+   * 
+   * @param figures
+   *        The figures to add.
+   */
+  void addFigures(List<PdfFigure> figures);
+
   /**
    * Adds the given figure.
    * 

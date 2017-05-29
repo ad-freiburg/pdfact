@@ -36,7 +36,7 @@ public class DiacriticsTranslator {
     }
 
     // Get the bounding box of the diacritic.
-    Rectangle diacriticBoundingBox = diacritic.getBoundingBox();
+    Rectangle diacriticBoundingBox = diacritic.getRectangle();
     if (diacriticBoundingBox == null) {
       return;
     }
@@ -46,14 +46,14 @@ public class DiacriticsTranslator {
     float leftOverlap = 0;
     if (leftCharacter != null) {
       leftOverlap = diacriticBoundingBox
-          .computeHorizontalOverlapLength(leftCharacter.getBoundingBox());
+          .computeHorizontalOverlapLength(leftCharacter.getRectangle());
     }
 
     // (2) Compute the horizontal overlap with the right character.
     float rightOverlap = 0;
     if (rightCharacter != null) {
       rightOverlap = diacriticBoundingBox
-          .computeHorizontalOverlapLength(rightCharacter.getBoundingBox());
+          .computeHorizontalOverlapLength(rightCharacter.getRectangle());
     }
 
     // Merge the diacritic to the base character with the largest overlap.

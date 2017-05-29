@@ -40,6 +40,7 @@ import icecite.models.PdfColorRegistry;
 import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
 import icecite.models.PdfFontRegistry;
+import icecite.models.PdfPage;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
 import icecite.parser.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parser.stream.pdfbox.utils.PdfBoxGlyphUtils;
@@ -362,12 +363,13 @@ public class ShowText extends OperatorProcessor {
     boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
     boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
 
-    PdfCharacter character = this.characterFactory.create();
+    PdfPage pdfPage = this.engine.getCurrentPdfPage();
+    PdfCharacter character = this.characterFactory.create(pdfPage);
     character.setText(unicode);
     character.setFontSize(fontsize);
     character.setColor(pdfColor);
     character.setFont(pdfFont);
-    character.setBoundingBox(boundBox);
+    character.setRectangle(boundBox);
 
     this.engine.handlePdfCharacter(character);
   }

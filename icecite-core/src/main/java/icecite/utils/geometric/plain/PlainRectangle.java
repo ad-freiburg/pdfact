@@ -6,8 +6,8 @@ import java.util.Arrays;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.HasBoundingBox;
 import icecite.utils.geometric.Geometric;
+import icecite.utils.geometric.HasRectangle;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Rectangle;
 
@@ -162,9 +162,9 @@ public class PlainRectangle extends Rectangle {
    * 
    * @return A rectangle that represents the union of the two rectangles.
    */
-  public static Rectangle fromUnion(HasBoundingBox hb1, HasBoundingBox hb2) {
-    Rectangle rect1 = hb1.getBoundingBox();
-    Rectangle rect2 = hb2.getBoundingBox();
+  public static Rectangle fromUnion(HasRectangle hb1, HasRectangle hb2) {
+    Rectangle rect1 = hb1.getRectangle();
+    Rectangle rect2 = hb2.getRectangle();
 
     float minX = Math.min(rect1.getMinX(), rect2.getMinX());
     float maxX = Math.max(rect1.getMaxX(), rect2.getMaxX());
@@ -215,7 +215,7 @@ public class PlainRectangle extends Rectangle {
    *        The objects to include.
    * @return The bounding box.
    */
-  public static Rectangle fromBoundingBoxOf(HasBoundingBox... rects) {
+  public static Rectangle fromBoundingBoxOf(HasRectangle... rects) {
     return fromBoundingBoxOf(new ArrayList<>(Arrays.asList(rects)));
   }
 
@@ -228,7 +228,7 @@ public class PlainRectangle extends Rectangle {
    * @return The bounding box.
    */
   public static Rectangle fromBoundingBoxOf(
-      Iterable<? extends HasBoundingBox> objects) {
+      Iterable<? extends HasRectangle> objects) {
     if (objects == null) {
       return null;
     }
@@ -238,8 +238,8 @@ public class PlainRectangle extends Rectangle {
     float maxX = -Float.MAX_VALUE;
     float maxY = -Float.MAX_VALUE;
 
-    for (HasBoundingBox object : objects) {
-      Rectangle rectangle = object.getBoundingBox();
+    for (HasRectangle object : objects) {
+      Rectangle rectangle = object.getRectangle();
       if (rectangle.getMinX() < minX) {
         minX = rectangle.getMinX();
       }
@@ -359,12 +359,12 @@ public class PlainRectangle extends Rectangle {
   }
 
   @Override
-  public Rectangle getBoundingBox() {
+  public Rectangle getRectangle() {
     return this;
   }
 
   @Override
-  public void setBoundingBox(Rectangle boundingBox) {
+  public void setRectangle(Rectangle boundingBox) {
     setMinX(boundingBox.getMinX());
     setMinY(boundingBox.getMinY());
     setMaxX(boundingBox.getMaxX());
@@ -381,6 +381,14 @@ public class PlainRectangle extends Rectangle {
     return computeOverlapArea(geom) / getArea();
   }
 
+  @Override
+  public void extend(HasRectangle rect) {
+    setMinX(Math.min(getMinX(), rect.getRectangle().getMinX()));
+    setMaxX(Math.max(getMaxX(), rect.getRectangle().getMaxX()));
+    setMinY(Math.min(getMinY(), rect.getRectangle().getMinY()));
+    setMaxY(Math.max(getMaxY(), rect.getRectangle().getMaxY()));
+  }
+  
   @Override
   public Rectangle union(Rectangle rect) {
     float minX = Math.min(getMinX(), rect.getMinX());

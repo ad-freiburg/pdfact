@@ -1,14 +1,12 @@
 package icecite.utils.geometric;
 
-import icecite.models.HasBoundingBox;
-
 /**
  * The base class of a (two-dimensional) geometric object (e.g., a point, a
  * line, a rectangle, etc).
  * 
  * @author Claudius Korzen
  */
-public abstract class Geometric implements HasBoundingBox {
+public abstract class Geometric implements HasRectangle {
   /**
    * Returns true, when the bounding box of this geometric object completely
    * contains the given geometric object.
@@ -24,8 +22,8 @@ public abstract class Geometric implements HasBoundingBox {
       return false;
     }
 
-    Rectangle rect = getBoundingBox();
-    Rectangle other = g.getBoundingBox();
+    Rectangle rect = getRectangle();
+    Rectangle other = g.getRectangle();
 
     if (rect == null || other == null) {
       return false;
@@ -58,7 +56,7 @@ public abstract class Geometric implements HasBoundingBox {
     if (g == null) {
       return false;
     }
-    Rectangle rect = g.getBoundingBox();
+    Rectangle rect = g.getRectangle();
     if (rect == null) {
       return false;
     }
@@ -99,7 +97,7 @@ public abstract class Geometric implements HasBoundingBox {
     if (g == null) {
       return false;
     }
-    Rectangle rect = g.getBoundingBox();
+    Rectangle rect = g.getRectangle();
     if (rect == null) {
       return false;
     }
@@ -118,7 +116,7 @@ public abstract class Geometric implements HasBoundingBox {
    * @return True if this geometric object overlaps the given horizontal range.
    */
   public boolean overlapsHorizontally(float minX, float maxX) {
-    Rectangle rect = getBoundingBox();
+    Rectangle rect = getRectangle();
     if (rect == null) {
       return false;
     }
@@ -139,7 +137,7 @@ public abstract class Geometric implements HasBoundingBox {
     if (g == null) {
       return false;
     }
-    Rectangle rect = g.getBoundingBox();
+    Rectangle rect = g.getRectangle();
     if (rect == null) {
       return false;
     }
@@ -158,8 +156,8 @@ public abstract class Geometric implements HasBoundingBox {
    * @return True if this geometric object overlaps the given vertical range.
    */
   public boolean overlapsVertically(float minY, float maxY) {
-    return getBoundingBox().getMinY() <= maxY
-        && getBoundingBox().getMaxY() >= minY;
+    return getRectangle().getMinY() <= maxY
+        && getRectangle().getMaxY() >= minY;
   }
 
   /**
@@ -183,8 +181,8 @@ public abstract class Geometric implements HasBoundingBox {
    * @return The length of the vertical overlap
    */
   public float computeVerticalOverlapLength(Geometric g) {
-    Rectangle rect = getBoundingBox();
-    Rectangle other = g.getBoundingBox();
+    Rectangle rect = getRectangle();
+    Rectangle other = g.getRectangle();
     if (rect != null && g != null) {
       float minMaxY = Math.min(rect.getMaxY(), other.getMaxY());
       float maxMinY = Math.max(rect.getMinY(), other.getMinY());
@@ -202,8 +200,8 @@ public abstract class Geometric implements HasBoundingBox {
    * @return The length of the vertical overlap
    */
   public float computeHorizontalOverlapLength(Geometric g) {
-    Rectangle rect = getBoundingBox();
-    Rectangle other = g.getBoundingBox();
+    Rectangle rect = getRectangle();
+    Rectangle other = g.getRectangle();
     if (rect != null && g != null) {
       float minMaxX = Math.min(rect.getMaxX(), other.getMaxX());
       float maxMinX = Math.max(rect.getMinX(), other.getMinX());
@@ -214,8 +212,8 @@ public abstract class Geometric implements HasBoundingBox {
 
   @Override
   public String toString() {
-    return "[" + getBoundingBox().getMinX() + "," + getBoundingBox().getMinY()
-        + "," + getBoundingBox().getMaxX() + "," + getBoundingBox().getMaxY()
+    return "[" + getRectangle().getMinX() + "," + getRectangle().getMinY()
+        + "," + getRectangle().getMaxX() + "," + getRectangle().getMaxY()
         + "]";
   }
 }

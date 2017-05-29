@@ -5,7 +5,8 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfCharacter extends PdfElement, HasColor, HasFont, HasText {
+public interface PdfCharacter
+    extends PdfElement, HasPage, HasColor, HasFont, HasText {
   /**
    * Returns the number of this character in the extraction order.
    *
@@ -32,8 +33,11 @@ public interface PdfCharacter extends PdfElement, HasColor, HasFont, HasText {
     /**
      * Creates a PdfCharacter.
      * 
+     * @param page
+     *        The page in which the characters is located.
+     * 
      * @return An instance of {@link PdfCharacter}.
      */
-    PdfCharacter create();
+    PdfCharacter create(PdfPage page);
   }
 }

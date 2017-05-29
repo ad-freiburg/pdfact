@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfColorRegistry;
+import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
@@ -148,7 +149,8 @@ public class StrokePath extends OperatorProcessor {
       }
 
       float[] pathPosition = this.engine.getLinePathPosition();
-
+      PdfPage pdfPage = this.engine.getCurrentPdfPage();
+      
       switch (currentSegment) {
         case PathIterator.SEG_CLOSE:
           float[] lastMoveTo = this.engine.getLinePathLastMoveToPosition();
@@ -162,8 +164,8 @@ public class StrokePath extends OperatorProcessor {
           Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
           Rectangle rect = this.rectangleFactory.create(ll, ur);
 
-          PdfShape shape = this.shapeFactory.create();
-          shape.setBoundingBox(rect);
+          PdfShape shape = this.shapeFactory.create(pdfPage);
+          shape.setRectangle(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 
@@ -177,8 +179,8 @@ public class StrokePath extends OperatorProcessor {
           ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
           rect = this.rectangleFactory.create(ll, ur);
 
-          shape = this.shapeFactory.create();
-          shape.setBoundingBox(rect);
+          shape = this.shapeFactory.create(pdfPage);
+          shape.setRectangle(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 
@@ -197,8 +199,8 @@ public class StrokePath extends OperatorProcessor {
           ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
           rect = this.rectangleFactory.create(ll, ur);
 
-          shape = this.shapeFactory.create();
-          shape.setBoundingBox(rect);
+          shape = this.shapeFactory.create(pdfPage);
+          shape.setRectangle(rect);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 

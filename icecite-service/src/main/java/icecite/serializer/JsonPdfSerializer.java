@@ -357,7 +357,7 @@ public class JsonPdfSerializer implements PdfSerializer {
       json.put(CONTEXT_NAME_ELEMENT_PAGE, page.getPageNumber());
     }
 
-    Rectangle rect = element.getBoundingBox();
+    Rectangle rect = element.getRectangle();
     if (rect != null) {
       // Append the coordinates of the bounding box.
       json.put(CONTEXT_NAME_ELEMENT_MIN_X, rect.getMinX());

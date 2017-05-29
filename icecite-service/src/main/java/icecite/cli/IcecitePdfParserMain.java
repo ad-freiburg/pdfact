@@ -106,9 +106,9 @@ public class IcecitePdfParserMain {
       visualizer.visualize(document, stream);
     }
 
-    Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
-    try (OutputStream stream = Files.newOutputStream(vis2)) {
-      serializer.serialize(document, stream);
-    }
+//    Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
+//    try (OutputStream stream = Files.newOutputStream(vis2)) {
+//      serializer.serialize(document, stream);
+//    }
   }
 }

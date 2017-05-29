@@ -1,8 +1,12 @@
 package icecite.models.plain;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfFont;
+import icecite.models.PdfPage;
 import icecite.models.PdfType;
 
 /**
@@ -11,6 +15,11 @@ import icecite.models.PdfType;
  * @author Claudius Korzen
  */
 public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
+  /**
+   * The page in which this character is located.
+   */
+  protected PdfPage page;
+  
   /**
    * The extraction order number.
    */
@@ -36,6 +45,32 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
    */
   protected PdfColor color;
 
+  // ==========================================================================
+  // The constructors.
+
+  /**
+   * Creates a new PdfCharacter.
+   * 
+   * @param page
+   *        The page in which this character is located.
+   */
+  @AssistedInject
+  public PlainPdfCharacter(@Assisted PdfPage page) {
+    this.page = page;
+  }
+
+  // ==========================================================================
+  
+  @Override
+  public PdfPage getPage() {
+    return this.page;
+  }
+
+  @Override
+  public void setPage(PdfPage page) {
+    this.page = page;
+  }
+  
   // ==========================================================================
 
   @Override

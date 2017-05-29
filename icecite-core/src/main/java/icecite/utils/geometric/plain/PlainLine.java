@@ -141,7 +141,7 @@ public class PlainLine extends Line {
   }
 
   @Override
-  public Rectangle getBoundingBox() {
+  public Rectangle getRectangle() {
     if (this.isBoundingBoxOutdated) {
       this.boundingBox.setMinX(getStartX());
       this.boundingBox.setMinY(getStartY());
@@ -153,7 +153,7 @@ public class PlainLine extends Line {
   }
 
   @Override
-  public void setBoundingBox(Rectangle boundingBox) {
+  public void setRectangle(Rectangle boundingBox) {
     this.boundingBox = boundingBox;
     this.isBoundingBoxOutdated = false;
   }

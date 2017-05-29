@@ -3,6 +3,8 @@ package icecite.models;
 import java.util.List;
 import java.util.Set;
 
+import icecite.utils.geometric.HasRectangle;
+
 /**
  * A list of PDF elements.
  * 
@@ -12,7 +14,7 @@ import java.util.Set;
  * @author Claudius Korzen
  */
 public interface PdfElementList<T extends PdfElement>
-    extends List<T>, HasBoundingBox {
+    extends List<T>, HasRectangle {
 
   /**
    * Swaps the elements at index i and j.

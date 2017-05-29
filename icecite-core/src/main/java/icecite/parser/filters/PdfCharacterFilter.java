@@ -31,12 +31,12 @@ public class PdfCharacterFilter {
     }
 
     // Ignore the character, if the width of its bounding box is <= 0.
-    if (character.getBoundingBox().getWidth() <= 0) {
+    if (character.getRectangle().getWidth() <= 0) {
       return true;
     }
 
     // Ignore the character, if the height of its bounding box is <= 0.
-    if (character.getBoundingBox().getHeight() <= 0) {
+    if (character.getRectangle().getHeight() <= 0) {
       return true;
     }
 

@@ -3,6 +3,9 @@ package icecite.utils.collection;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+
+import icecite.models.HasText;
 
 /**
  * A collection of utility methods that deal with collections.
@@ -90,6 +93,33 @@ public class CollectionUtils {
       Object element = iterator.next();
       result.append(element != null ? element.toString() : null);
       result.append(iterator.hasNext() ? delimiter : "");
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Joins the given text elements.
+   * 
+   * @param elements
+   *        The text elements to join.
+   * @param delim
+   *        The delimiter to use on joining.
+   * @return The joined elements as a string.
+   */
+  // TODO: Move it to another util?
+  public static String join(List<? extends HasText> elements, String delim) {
+    if (elements == null) {
+      return null;
+    }
+
+    StringBuilder result = new StringBuilder();
+
+    Iterator<? extends HasText> iterator = elements.iterator();
+    while (iterator.hasNext()) {
+      HasText element = iterator.next();
+      result.append(element != null ? element.getText() : null);
+      result.append(iterator.hasNext() ? delim : "");
     }
 
     return result.toString();

@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWord extends PdfElement, HasCharacters, HasText {
+public interface PdfWord extends PdfElement, HasPage, HasCharacters, HasText {
   /**
    * The factory to create instances of {@link PdfWord}.
    * 
@@ -15,11 +15,13 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
     /**
      * Creates a PdfWord.
      * 
+     * @param page
+     *        The page in which this word is located.
      * @param characters
      *        The characters of the word to create.
      * 
      * @return An instance of {@link PdfWord}.
      */
-    PdfWord create(PdfCharacterList characters);
+    PdfWord create(PdfPage page, PdfCharacterList characters);
   }
 }

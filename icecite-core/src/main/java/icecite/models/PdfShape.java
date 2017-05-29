@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfShape extends PdfElement, HasColor {
+public interface PdfShape extends PdfElement, HasPage, HasColor {
   /**
    * The factory to create instances of {@link PdfShape}.
    * 
@@ -15,8 +15,11 @@ public interface PdfShape extends PdfElement, HasColor {
     /**
      * Creates a new PdfShape.
      * 
+     * @param page
+     *        The page in which the shape is located.
+     * 
      * @return An instance of {@link PdfShape}.
      */
-    PdfShape create();
+    PdfShape create(PdfPage page);
   }
 }

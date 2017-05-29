@@ -21,7 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.drawer.PdfDrawer;
-import icecite.models.HasBoundingBox;
+import icecite.utils.geometric.HasRectangle;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
@@ -301,44 +301,44 @@ public class PdfBoxDrawer implements PdfDrawer {
   // ==========================================================================
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum)
+  public void drawBoundingBox(HasRectangle box, int pageNum)
       throws IOException {
-    this.drawRectangle(box.getBoundingBox(), pageNum);
+    this.drawRectangle(box.getRectangle(), pageNum);
   }
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum,
+  public void drawBoundingBox(HasRectangle box, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    this.drawRectangle(box.getBoundingBox(), pageNum, relativeToUpperLeft,
+    this.drawRectangle(box.getRectangle(), pageNum, relativeToUpperLeft,
         originInUpperLeft);
   }
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color)
+  public void drawBoundingBox(HasRectangle box, int pageNum, Color color)
       throws IOException {
-    this.drawRectangle(box.getBoundingBox(), pageNum, color);
+    this.drawRectangle(box.getRectangle(), pageNum, color);
   }
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
+  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    this.drawRectangle(box.getBoundingBox(), pageNum, color,
+    this.drawRectangle(box.getRectangle(), pageNum, color,
         relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
+  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
       float thickness) throws IOException {
-    drawRectangle(box.getBoundingBox(), pageNum, color, thickness);
+    drawRectangle(box.getRectangle(), pageNum, color, thickness);
   }
 
   @Override
-  public void drawBoundingBox(HasBoundingBox box, int pageNum, Color color,
+  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
       float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    drawRectangle(box.getBoundingBox(), pageNum, color, thickness,
+    drawRectangle(box.getRectangle(), pageNum, color, thickness,
         relativeToUpperLeft, originInUpperLeft);
   }
 

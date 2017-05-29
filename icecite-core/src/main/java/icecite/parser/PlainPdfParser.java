@@ -13,7 +13,6 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfDocument.PdfDocumentFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfPage.PdfPageFactory;
 import icecite.models.PdfShape;
 import icecite.parser.filters.PdfCharacterFilter;
 import icecite.parser.filters.PdfFigureFilter;
@@ -39,11 +38,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    * The factory to create instances of PdfDocument.
    */
   protected PdfDocumentFactory documentFactory;
-
-  /**
-   * The factory to create instances of PdfPage.
-   */
-  protected PdfPageFactory pageFactory;
 
   /**
    * The factory to create instances of PdfCharacterList.
@@ -91,17 +85,15 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    *        The PDF stream parser.
    * @param pdfDocFactory
    *        The factory to create instances of PdfDocument.
-   * @param pdfPageFactory
-   *        The factory to create instances of PdfPage.
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    */
   @AssistedInject
   public PlainPdfParser(PdfStreamParserFactory pdfStreamParserFactory,
-      PdfDocumentFactory pdfDocFactory, PdfPageFactory pdfPageFactory,
+      PdfDocumentFactory pdfDocFactory,
       PdfCharacterListFactory characterListFactory) {
-    this(pdfStreamParserFactory, pdfDocFactory, pdfPageFactory,
-        characterListFactory, true, true);
+    this(pdfStreamParserFactory, pdfDocFactory, characterListFactory, true,
+        true);
   }
 
   /**
@@ -111,8 +103,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    *        The PDF stream parser.
    * @param pdfDocumentFactory
    *        The factory to create instances of PdfDocument.
-   * @param pdfPageFactory
-   *        The factory to create instances of PdfPage.
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param resolveLigatures
@@ -124,13 +114,12 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    */
   @AssistedInject
   public PlainPdfParser(PdfStreamParserFactory pdfStreamParserFactory,
-      PdfDocumentFactory pdfDocumentFactory, PdfPageFactory pdfPageFactory,
+      PdfDocumentFactory pdfDocumentFactory,
       PdfCharacterListFactory characterListFactory,
       @Assisted("resolveLigatures") boolean resolveLigatures,
       @Assisted("resolveDiacritics") boolean resolveDiacritics) {
     this.streamParserFactory = pdfStreamParserFactory;
     this.documentFactory = pdfDocumentFactory;
-    this.pageFactory = pdfPageFactory;
     this.characterListFactory = characterListFactory;
     this.resolveLigatures = resolveLigatures;
     this.resolveDiacritics = resolveDiacritics;
@@ -191,15 +180,13 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   }
 
   @Override
-  public void handlePdfPageStart(int pageNum) {
-    // Create a new PDF page.
-    this.page = this.pageFactory.create(pageNum);
+  public void handlePdfPageStart(PdfPage page) {
+    this.page = page;
   }
 
   @Override
-  public void handlePdfPageEnd(int pageNum) {
-    // Add the page to the PDF document.
-    this.pdfDocument.addPage(this.page);
+  public void handlePdfPageEnd(PdfPage page) {
+    this.pdfDocument.addPage(page);
   }
 
   @Override
@@ -228,6 +215,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     }
 
     if (!PdfCharacterFilter.filterPdfCharacter(character)) {
+      // TODO
       character.setExtractionOrderNumber(this.page.getCharacters().size());
 
       this.page.addCharacter(character);

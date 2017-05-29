@@ -81,15 +81,15 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     PdfCharacterList u = halves.get(0);
     PdfCharacterList l = halves.get(1);
 
-    float height = u.getBoundingBox().getMinY() - l.getBoundingBox().getMaxY();
+    float height = u.getRectangle().getMinY() - l.getRectangle().getMaxY();
     return height;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfTextLine pack(PdfCharacterList characters) {
-    return this.textLineFactory.create(characters);
+  public PdfTextLine pack(PdfPage page, PdfCharacterList characters) {
+    return this.textLineFactory.create(page, characters);
   }
 
   // ==========================================================================

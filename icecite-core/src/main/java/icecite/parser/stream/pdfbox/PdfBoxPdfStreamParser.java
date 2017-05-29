@@ -29,7 +29,9 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfFigure;
+import icecite.models.PdfPage;
 import icecite.models.PdfShape;
+import icecite.models.PdfPage.PdfPageFactory;
 import icecite.parser.stream.HasPdfStreamParserHandlers;
 import icecite.parser.stream.PdfStreamParser;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
@@ -44,6 +46,11 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PdfBoxPdfStreamParser implements PdfStreamParser {
   /**
+   * The factory to create instances of PdfPage.
+   */
+  protected PdfPageFactory pageFactory;
+
+  /**
    * The interface to the callback methods that handle the parsed PDF elements.
    */
   protected HasPdfStreamParserHandlers handlers;
@@ -57,6 +64,12 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    * The current page in the PDF file.
    */
   protected PDPage page;
+
+  /**
+   * The current page in the PDF file.
+   */
+  // TODO: Replace this.page (PDPage) by pdfPage.
+  protected PdfPage pdfPage;
 
   /**
    * The resources of the current page.
@@ -123,21 +136,25 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
   /**
    * Creates a new stream engine.
    * 
+   * @param pageFactory
+   *        The factory to create instance of {@link PdfPage}.
    * @param operators
    *        The operator processors to investigate on parsing.
    * @param handlers
    *        The callback methods that handle the parsed PDF elements.
    */
   @AssistedInject
-  public PdfBoxPdfStreamParser(Set<OperatorProcessor> operators,
+  public PdfBoxPdfStreamParser(PdfPageFactory pageFactory,
+      Set<OperatorProcessor> operators,
       @Assisted HasPdfStreamParserHandlers handlers) {
-    this.graphicsStack = new Stack<PDGraphicsState>();
-    this.linePath = new GeneralPath();
-    this.handlers = handlers;
+    this.pageFactory = pageFactory;
     this.operatorProcessors = new HashMap<>();
     for (OperatorProcessor operator : operators) {
       this.operatorProcessors.put(operator.getName(), operator);
     }
+    this.handlers = handlers;
+    this.graphicsStack = new Stack<PDGraphicsState>();
+    this.linePath = new GeneralPath();
   }
 
   // ==========================================================================
@@ -173,6 +190,7 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    */
   protected void processPage(PDPage page, int pageNum) throws IOException {
     this.page = page;
+    this.pdfPage = this.pageFactory.create(pageNum);
     this.graphicsStack.clear();
     this.graphicsStack.push(new PDGraphicsState(page.getCropBox()));
     this.resources = null;
@@ -186,9 +204,9 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
     this.currentType3GlyphBoundingBox = null;
     this.isType3Stream = false;
 
-    handlePdfPageStart(pageNum);
+    handlePdfPageStart(this.pdfPage);
     processStream(page);
-    handlePdfPageEnd(pageNum);
+    handlePdfPageEnd(this.pdfPage);
   }
 
   /**
@@ -666,6 +684,17 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
   }
 
   // ==========================================================================
+
+  /**
+   * Returns the current PdfPage.
+   * 
+   * @return the current PdfPage.
+   */
+  public PdfPage getCurrentPdfPage() {
+    return this.pdfPage;
+  }
+
+  // ==========================================================================
   // Handler methods.
 
   /**
@@ -693,23 +722,23 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
   /**
    * A callback to handle the start of the processing of a PDF page.
    * 
-   * @param pageNum
-   *        The page number of the page to process.
+   * @param page
+   *        The page to process.
    */
-  public void handlePdfPageStart(int pageNum) {
+  public void handlePdfPageStart(PdfPage page) {
     // Delegate the event to the handler.
-    this.handlers.handlePdfPageStart(pageNum);
+    this.handlers.handlePdfPageStart(page);
   }
 
   /**
    * A callback to handle the end of the processing of a PDF page.
    * 
-   * @param pageNum
-   *        The page number of the processed page.
+   * @param page
+   *        The page to process.
    */
-  public void handlePdfPageEnd(int pageNum) {
+  public void handlePdfPageEnd(PdfPage page) {
     // Delegate the event to the handler.
-    this.handlers.handlePdfPageEnd(pageNum);
+    this.handlers.handlePdfPageEnd(page);
   }
 
   /**

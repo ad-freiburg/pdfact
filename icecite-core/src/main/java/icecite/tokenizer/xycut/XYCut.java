@@ -78,7 +78,7 @@ public abstract class XYCut<T extends PdfElement> {
         // be cut. Pack them and add them to the result list.
         PdfCharacterList block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
-          blocks.add(pack(block));
+          blocks.add(pack(page, block));
         }
       } else {
         // The characters could be cut. Cut the resulted blocks recursively.
@@ -119,12 +119,12 @@ public abstract class XYCut<T extends PdfElement> {
     // The index of the best cut found so far.
     int bestCutIndex = -1;
     // The current position in the list of characters.
-    float currentPos = chars.get(0).getBoundingBox().getMaxX();
+    float currentPos = chars.get(0).getRectangle().getMaxX();
 
     for (int index = 1; index < chars.size(); index++) {
       PdfCharacter character = chars.get(index);
 
-      if (character.getBoundingBox().getMinX() > currentPos) {
+      if (character.getRectangle().getMinX() > currentPos) {
         List<PdfCharacterList> halves = chars.cut(index);
         // Find the position of the "best" cut.
         while (index < chars.size()) {
@@ -147,7 +147,7 @@ public abstract class XYCut<T extends PdfElement> {
           return chars.cut(bestCutIndex);
         }
       }
-      currentPos = character.getBoundingBox().getMaxX();
+      currentPos = character.getRectangle().getMaxX();
     }
     return Arrays.asList(chars);
   }
@@ -183,12 +183,12 @@ public abstract class XYCut<T extends PdfElement> {
     // The index of the best cut found so far.
     int bestCutIndex = -1;
     // The current position in the list of characters.
-    float currentPos = chars.get(0).getBoundingBox().getMinY();
+    float currentPos = chars.get(0).getRectangle().getMinY();
 
     for (int index = 1; index < chars.size(); index++) {
       PdfCharacter character = chars.get(index);
 
-      if (character.getBoundingBox().getMaxY() < currentPos) {
+      if (character.getRectangle().getMaxY() < currentPos) {
         List<PdfCharacterList> halves = chars.cut(index);
         // Find the position of the "best" cut.
         while (index < chars.size()) {
@@ -210,7 +210,7 @@ public abstract class XYCut<T extends PdfElement> {
           return chars.cut(bestCutIndex);
         }
       }
-      currentPos = character.getBoundingBox().getMinY();
+      currentPos = character.getRectangle().getMinY();
     }
     return Arrays.asList(chars);
   }
@@ -253,10 +253,12 @@ public abstract class XYCut<T extends PdfElement> {
   /**
    * Packs the given characters into the target type.
    * 
+   * @param page
+   *        The page in which the characters are located.
    * @param characters
    *        The characters to pack.
    * 
    * @return An object of given target type.
    */
-  public abstract T pack(PdfCharacterList characters);
+  public abstract T pack(PdfPage page, PdfCharacterList characters);
 }
