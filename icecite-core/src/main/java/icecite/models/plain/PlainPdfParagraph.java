@@ -1,15 +1,15 @@
 package icecite.models.plain;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
+import icecite.utils.geometric.Rectangle;
+import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * A plain implementation of {@link PdfParagraph}.
@@ -17,11 +17,6 @@ import icecite.models.PdfType;
  * @author Claudius Korzen
  */
 public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
-  /**
-   * The characters of this page.
-   */
-  protected PdfCharacterList characters;
-
   /**
    * The text lines of this paragraph.
    */
@@ -36,31 +31,15 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   // Constructors.
 
   /**
-   * Creates a new paragraph.
+   * Creates an empty paragraph.
    * 
-   * @param textLines
-   *        The text lines of this paragraph.
+   * @param rectangleFactory
+   *        The factory to create instances of Rectangle.
    */
   @AssistedInject
-  public PlainPdfParagraph(@Assisted List<PdfTextLine> textLines) {
-    this.textLines = textLines;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfCharacterList getCharacters() {
-    return this.characters;
-  }
-
-  @Override
-  public void setCharacters(PdfCharacterList characters) {
-    this.characters = characters;
-  }
-
-  @Override
-  public void addCharacter(PdfCharacter character) {
-    this.characters.add(character);
+  public PlainPdfParagraph(RectangleFactory rectangleFactory) {
+    this.textLines = new ArrayList<>();
+    this.boundingBox = rectangleFactory.create();
   }
 
   // ==========================================================================
@@ -78,6 +57,19 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void addTextLine(PdfTextLine textLine) {
     this.textLines.add(textLine);
+    // TODO
+    if (textLine.getBoundingBox().getMinX() < this.boundingBox.getMinX()) {
+      this.boundingBox.setMinX(textLine.getBoundingBox().getMinX());
+    }
+    if (textLine.getBoundingBox().getMinY() < this.boundingBox.getMinY()) {
+      this.boundingBox.setMinY(textLine.getBoundingBox().getMinY());
+    }
+    if (textLine.getBoundingBox().getMaxX() > this.boundingBox.getMaxX()) {
+      this.boundingBox.setMaxX(textLine.getBoundingBox().getMaxX());
+    }
+    if (textLine.getBoundingBox().getMaxY() > this.boundingBox.getMaxY()) {
+      this.boundingBox.setMaxY(textLine.getBoundingBox().getMaxY());
+    }
   }
 
   // ==========================================================================
@@ -90,6 +82,19 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void setText(String text) {
     this.text = text;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Rectangle getBoundingBox() {
+    return this.boundingBox;
+  }
+
+  @Override
+  public void setBoundingBox(Rectangle boundingBox) {
+    // The bounding box results from the text lines of this paragraph.
+    throw new UnsupportedOperationException();
   }
 
   // ==========================================================================

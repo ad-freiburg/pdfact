@@ -78,7 +78,7 @@ public abstract class XYCut<T extends PdfElement> {
         // be cut. Pack them and add them to the result list.
         PdfCharacterList block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
-          blocks.add(pack(block));
+          blocks.add(pack(page, block));
         }
       } else {
         // The characters could be cut. Cut the resulted blocks recursively.
@@ -253,10 +253,12 @@ public abstract class XYCut<T extends PdfElement> {
   /**
    * Packs the given characters into the target type.
    * 
+   * @param page
+   *        The page in which the characters are located.
    * @param characters
    *        The characters to pack.
    * 
    * @return An object of given target type.
    */
-  public abstract T pack(PdfCharacterList characters);
+  public abstract T pack(PdfPage page, PdfCharacterList characters);
 }

@@ -25,27 +25,30 @@ import icecite.models.PdfShape;
  */
 public class PlainPdfDocument implements PdfDocument {
   /**
-   * The pages of this PDF document.
-   */
-  protected List<PdfPage> pages;
-
-  /**
    * The file on which this PDF document is based on.
    */
   protected Path path;
 
   /**
-   * The characters of this PDF document.
+   * The pages of this PDF document.
+   */
+  protected List<PdfPage> pages;
+
+  /**
+   * The characters of this PDF document. Needed to get document-wide
+   * statistics about characters.
    */
   protected PdfCharacterList characters;
 
   /**
-   * The figures of this PDF document.
+   * The figures of this PDF document. Needed to get document-wide
+   * statistics about figures.
    */
   protected Set<PdfFigure> figures;
 
   /**
-   * The shapes of this PDF document.
+   * The shapes of this PDF document. Needed to get document-wide
+   * statistics about shapes.
    */
   protected Set<PdfShape> shapes;
 
@@ -90,7 +93,7 @@ public class PlainPdfDocument implements PdfDocument {
    *        The PDF file given as a Path object
    */
   @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory, 
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
       @Assisted Path pdf) {
     this(characterListFactory);
     this.path = pdf;
@@ -163,12 +166,12 @@ public class PlainPdfDocument implements PdfDocument {
   public void setFigures(Set<PdfFigure> figures) {
     this.figures = figures;
   }
-  
+
   @Override
   public void addFigure(PdfFigure figure) {
     this.figures.add(figure);
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -180,7 +183,7 @@ public class PlainPdfDocument implements PdfDocument {
   public void setShapes(Set<PdfShape> shapes) {
     this.shapes = shapes;
   }
-  
+
   @Override
   public void addShape(PdfShape shape) {
     this.shapes.add(shape);

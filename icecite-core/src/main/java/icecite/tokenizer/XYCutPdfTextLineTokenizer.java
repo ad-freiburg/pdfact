@@ -88,8 +88,11 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   // ==========================================================================
 
   @Override
-  public PdfTextLine pack(PdfCharacterList characters) {
-    return this.textLineFactory.create(characters);
+  public PdfTextLine pack(PdfPage page, PdfCharacterList characters) {
+    // TODO
+    PdfTextLine line = this.textLineFactory.create(characters);
+    line.setPage(page);
+    return line;
   }
 
   // ==========================================================================

@@ -14,9 +14,10 @@ public interface PdfTextBlock extends PdfElement, HasCharacters {
   public interface PdfTextBlockFactory {
     /**
      * Creates a PdfTextBlock.
-     * 
+     *  
      * @param characters
      *        The characters of this text block.
+     *
      * @return An instance of {@link PdfTextBlock}.
      */
     PdfTextBlock create(PdfCharacterList characters);

@@ -76,17 +76,10 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
       return;
     }
 
-    long t1 = System.currentTimeMillis();
     // Tokenize each page separately.
     for (PdfPage page : pages) {
-      long t11 = System.currentTimeMillis();
       tokenizePdfPage(document, page);
-      long t21 = System.currentTimeMillis();
-      System.out.println("Time needed to tokenize page " + page.getPageNumber()
-          + ": " + (t21 - t11));
     }
-    long t2 = System.currentTimeMillis();
-    System.out.println("Time needed to tokenize the PDF doc: " + (t2 - t1));
   }
 
   // ==========================================================================
@@ -103,17 +96,14 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   protected void tokenizePdfPage(PdfDocument document, PdfPage page) {
     // Tokenize the given page into text blocks.
     List<PdfTextBlock> blocks = tokenizeIntoTextBlocks(document, page);
-    page.setTextBlocks(blocks);
     // Tokenize the text blocks into text lines.
     List<PdfTextLine> lines = tokenizeIntoTextLines(document, page, blocks);
-    page.setTextLines(lines);
     // Tokenize the text lines into words.
     for (PdfTextLine line : lines) {
       line.setWords(tokenizeIntoWords(document, page, line));
     }
-    // TODO: Tokenize into paragraphs.
-    // // Tokenize the text lines into paragraphs.
-    // page.setParagraphs(tokenizeIntoParagraphs(document, page, lines));
+    // Tokenize the text lines into paragraphs.
+    page.setParagraphs(tokenizeIntoParagraphs(document, page, lines));
   }
 
   /**
@@ -198,11 +188,12 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * Tokenizes the given text lines into paragraphs.
    * 
    * @param doc
-   *        The PDF document to which the text blocks belong to.
+   *        The PDF document to process.
    * @param page
-   *        The page in which the text blocks are located.
+   *        The page in which the text lines are located.
    * @param lines
    *        The text lines to process.
+   * 
    * @return The identified paragraphs.
    */
   protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc,

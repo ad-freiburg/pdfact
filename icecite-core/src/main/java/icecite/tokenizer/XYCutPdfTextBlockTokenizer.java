@@ -115,8 +115,11 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   // ==========================================================================
 
   @Override
-  public PdfTextBlock pack(PdfCharacterList characters) {
-    return this.textBlockFactory.create(characters);
+  public PdfTextBlock pack(PdfPage page, PdfCharacterList characters) {
+    // TODO
+    PdfTextBlock block = this.textBlockFactory.create(characters);
+    block.setPage(page);
+    return block;
   }
 
   // ==========================================================================

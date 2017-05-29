@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfElement extends HasBoundingBox {
+public interface PdfElement extends HasBoundingBox, HasPage {
   /**
    * Returns the type of this PDF element.
    * 

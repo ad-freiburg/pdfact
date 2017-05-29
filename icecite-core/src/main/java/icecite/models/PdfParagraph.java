@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfElement, HasCharacters, HasText {
+public interface PdfParagraph extends PdfElement, HasText {
   /**
    * Returns the text lines of this paragraph.
    * 
@@ -40,13 +40,10 @@ public interface PdfParagraph extends PdfElement, HasCharacters, HasText {
    */
   public interface PdfParagraphFactory {
     /**
-     * Creates a PdfTextParagraph.
-     * 
-     * @param textLines
-     *        The lines of the paragraph to create.
-     * 
+     * Creates an empty PdfParagraph.
+     *  
      * @return An instance of {@link PdfParagraph}.
      */
-    PdfParagraph create(List<PdfTextLine> textLines);
+    PdfParagraph create();
   }
 }

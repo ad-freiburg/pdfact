@@ -74,8 +74,11 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWord pack(PdfCharacterList characters) {
-    return this.wordFactory.create(characters);
+  public PdfWord pack(PdfPage page, PdfCharacterList characters) {
+    // TODO
+    PdfWord word = this.wordFactory.create(characters);
+    word.setPage(page);
+    return word;
   }
 
   // ==========================================================================

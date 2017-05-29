@@ -114,9 +114,9 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected Rectangle boundingBox;
 
   /**
-   * A flag that indicates whether the statistics were already computed.
+   * A flag that indicates whether the statistics are outdated.
    */
-  protected boolean isStatisticsComputed;
+  protected boolean isStatisticsOutdated = true;
 
   /**
    * The size of the ArrayList (the number of elements it contains).
@@ -157,35 +157,35 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public boolean add(T t) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.add(t);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    this.size++;
-    return super.add(t);
+    return added;
   }
 
   @Override
   public void add(int index, T t) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
-    }
     super.add(index, t);
+    this.isStatisticsOutdated = true;
   }
 
   @Override
   public boolean addAll(Collection<? extends T> c) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.addAll(c);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    return super.addAll(c);
+    return added;
   }
 
   @Override
   public boolean addAll(int index, Collection<? extends T> c) {
-    if (this.isStatisticsComputed) {
-      throw new IllegalStateException("Statistics were already computed.");
+    boolean added = super.addAll(index, c);
+    if (added) {
+      this.isStatisticsOutdated = true;
     }
-    return super.addAll(index, c);
+    return added;
   }
 
   @Override
@@ -278,7 +278,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     this.averageWidth = widthsCounter.getAverageFloat();
     this.mostCommonWidth = widthsCounter.getMostCommonFloat();
 
-    this.isStatisticsComputed = true;
+    this.isStatisticsOutdated = false;
   }
 
   // ==========================================================================
@@ -295,7 +295,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageHeight() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageHeight;
@@ -303,7 +303,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonHeight() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonHeight;
@@ -313,7 +313,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageWidth() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageWidth;
@@ -321,7 +321,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonWidth() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonWidth;
@@ -331,7 +331,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinX() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinX;
@@ -365,7 +365,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinY() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinY;
@@ -399,7 +399,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxX() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxX;
@@ -433,7 +433,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxY() {
-    if (!this.isStatisticsComputed) {
+    if (this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxY;

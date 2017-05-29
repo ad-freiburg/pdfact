@@ -14,8 +14,8 @@ public interface PdfFigure extends PdfElement {
   public interface PdfFigureFactory {
     /**
      * Creates a new PdfFigure.
-     * 
-     * @return An instance odf PdfFigure.
+     *  
+     * @return An instance of PdfFigure.
      */
     PdfFigure create();
   }
