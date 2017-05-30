@@ -38,10 +38,9 @@ import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfColorRegistry;
 import icecite.models.PdfFont;
-import icecite.models.PdfFont.PdfFontFactory;
-import icecite.models.PdfFontRegistry;
 import icecite.models.PdfPage;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
+import icecite.parser.stream.pdfbox.translators.PDFontTranslator;
 import icecite.parser.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parser.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import icecite.utils.geometric.Point;
@@ -62,14 +61,14 @@ public class ShowText extends OperatorProcessor {
   protected PdfCharacterFactory characterFactory;
 
   /**
-   * The factory to create instances of {@link PdfFont}.
+   * The translator to translate PDFont objects to PdfFont objects.
    */
-  protected PdfFontFactory fontFactory;
+  protected PDFontTranslator fontTranslator;
 
-  /**
-   * The registry to manage {@link PdfFont} objects.
-   */
-  protected PdfFontRegistry fontRegistry;
+  // /**
+  // * The registry to manage {@link PdfFont} objects.
+  // */
+  // protected PdfFontRegistry fontRegistry;
 
   /**
    * The factory to create instances of {@link PdfColor}.
@@ -96,10 +95,8 @@ public class ShowText extends OperatorProcessor {
    * 
    * @param characterFactory
    *        The factory to create instances of {@link PdfCharacterFactory}.
-   * @param fontFactory
+   * @param fontUtils
    *        The factory to create instances of {@link PdfFont}.
-   * @param fontRegistry
-   *        The registry to manage {@link PdfFont} objects.
    * @param colorFactory
    *        The factory to create instances of {@link PdfColor}.
    * @param colorRegistry
@@ -111,12 +108,12 @@ public class ShowText extends OperatorProcessor {
    */
   @Inject
   public ShowText(PdfCharacterFactory characterFactory,
-      PdfFontFactory fontFactory, PdfFontRegistry fontRegistry,
-      PdfColorFactory colorFactory, PdfColorRegistry colorRegistry,
-      RectangleFactory rectangleFactory, PointFactory pointFactory) {
+      PDFontTranslator fontUtils, PdfColorFactory colorFactory,
+      PdfColorRegistry colorRegistry, RectangleFactory rectangleFactory,
+      PointFactory pointFactory) {
     this.characterFactory = characterFactory;
-    this.fontFactory = fontFactory;
-    this.fontRegistry = fontRegistry;
+    this.fontTranslator = fontUtils;
+    // this.fontRegistry = fontRegistry;
     this.colorFactory = colorFactory;
     this.colorRegistry = colorRegistry;
     this.rectangleFactory = rectangleFactory;
@@ -226,25 +223,25 @@ public class ShowText extends OperatorProcessor {
    *        The Unicode text for this glyph.
    * @param code
    *        The internal PDF character code for the glyph
-   * @param font
+   * @param pdFont
    *        The font of the glyph.
    * @param trm
    *        The current text rendering matrix
    * @throws IOException
    *         if something went wrong on processing the glyph.
    */
-  public void showGlyph(String glyph, int code, PDFont font, Matrix trm)
+  public void showGlyph(String glyph, int code, PDFont pdFont, Matrix trm)
       throws IOException {
     // Compute a bounding box that indeed surrounds the whole glyph, even in
     // case of ascenders (e.g., "l") and descenders (e.g., "g").
     // TODO: Make it faster.
-    Rectangle boundBox = computeGlyphBoundingBox(code, font, trm);
+    Rectangle boundBox = computeGlyphBoundingBox(code, pdFont, trm);
 
     // Compute the bounding box of the glyph by the method of PdfBox, where all
     // bounding boxes in a text line share the same baseline, even in case of
     // ascenders and descenders.
     // TODO: Make it faster.
-    Rectangle pdfBoxBoundBox = computePdfBoxGlyphBoundingBox(code, font, trm);
+    Rectangle pdfBoxBoundBox = computePdfBoxGlyphBoundingBox(code, pdFont, trm);
 
     if (boundBox != null) {
       // Bounding boxes need some adjustments.
@@ -283,7 +280,7 @@ public class ShowText extends OperatorProcessor {
     // Use our additional glyph list for Unicode mapping
     // TODO: Needs > 2ms.
     GlyphList additionalGlyphs = PdfBoxGlyphUtils.getAdditionalGlyphs();
-    String unicode = font.toUnicode(code, additionalGlyphs);
+    String unicode = pdFont.toUnicode(code, additionalGlyphs);
 
     // TODO: If we need the hasEncoding flag, uncomment the following:
     // boolean hasEncoding = unicode != null;
@@ -313,7 +310,7 @@ public class ShowText extends OperatorProcessor {
     // PDFStreamEngine don't necessarily want this, which is why we leave it
     // until this point in PDFTextStreamEngine.
     if (unicode == null) {
-      if (font instanceof PDSimpleFont) {
+      if (pdFont instanceof PDSimpleFont) {
         char c = (char) code;
         unicode = new String(new char[] { c });
 
@@ -335,6 +332,8 @@ public class ShowText extends OperatorProcessor {
       }
     }
 
+    PdfPage pdfPage = this.engine.getCurrentPdfPage();
+    
     PDColor nonStrokingColor = graphicsState.getNonStrokingColor();
     PDColorSpace cs = graphicsState.getNonStrokingColorSpace();
     float[] rgb = cs.toRGB(nonStrokingColor.getComponents());
@@ -348,14 +347,8 @@ public class ShowText extends OperatorProcessor {
       this.colorRegistry.registerColor(pdfColor);
     }
 
-    // TODO set the properties of the font.
-    String fontName = font.getName();
-    PdfFont pdfFont = this.fontRegistry.getFont(fontName);
-    if (pdfFont == null) {
-      pdfFont = this.fontFactory.create();
-      pdfFont.setName(fontName);
-      this.fontRegistry.registerFont(pdfFont);
-    }
+    // Create the font.
+    PdfFont font = this.fontTranslator.translate(pdFont);
 
     // TODO: Round the values of boundingbox.
     boundBox.setMinX(MathUtils.round(boundBox.getMinX(), 1));
@@ -363,12 +356,11 @@ public class ShowText extends OperatorProcessor {
     boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
     boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
 
-    PdfPage pdfPage = this.engine.getCurrentPdfPage();
     PdfCharacter character = this.characterFactory.create(pdfPage);
     character.setText(unicode);
     character.setFontSize(fontsize);
     character.setColor(pdfColor);
-    character.setFont(pdfFont);
+    character.setFont(font);
     character.setRectangle(boundBox);
 
     this.engine.handlePdfCharacter(character);

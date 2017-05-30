@@ -438,7 +438,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     xml.append(" " + CONTEXT_NAME_FONT_ID + "=\"" + font.getId() + "\"");
 
     // Append the name of the font: <font id="foo" name="bar"
-    String name = font.getName();
+    String name = font.getNormalizedName();
     if (name != null) {
       xml.append(" " + CONTEXT_NAME_FONT_NAME + "=\"" + name + "\"");
     }

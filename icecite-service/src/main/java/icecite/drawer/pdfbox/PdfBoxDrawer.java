@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -51,9 +52,14 @@ public class PdfBoxDrawer implements PdfDrawer {
   protected PointFactory pointFactory;
 
   /**
-   * The default color.
+   * The default stroking color.
    */
-  protected static final Color DEFAULT_COLOR = Color.BLACK;
+  protected static final Color DEFAULT_STROKING_COLOR = Color.BLACK;
+
+  /**
+   * The default non-stroking color.
+   */
+  protected static final Color DEFAULT_NON_STROKING_COLOR = null;
 
   /**
    * The default font.
@@ -202,7 +208,7 @@ public class PdfBoxDrawer implements PdfDrawer {
   @Override
   public void drawLine(Line line, int pageNum, boolean relativeToUpperLeft,
       boolean originInUpperLeft) throws IOException {
-    this.drawLine(line, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
+    this.drawLine(line, pageNum, DEFAULT_STROKING_COLOR, relativeToUpperLeft,
         originInUpperLeft);
   }
 
@@ -251,34 +257,36 @@ public class PdfBoxDrawer implements PdfDrawer {
   public void drawRectangle(Rectangle rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    this.drawRectangle(rect, pageNum, DEFAULT_COLOR, relativeToUpperLeft,
-        originInUpperLeft);
+    this.drawRectangle(rect, pageNum, DEFAULT_STROKING_COLOR,
+        DEFAULT_NON_STROKING_COLOR, relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
-  public void drawRectangle(Rectangle rect, int pageNum, Color color)
-      throws IOException {
-    this.drawRectangle(rect, pageNum, color, false, false);
+  public void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor) throws IOException {
+    this.drawRectangle(rect, pageNum, strokingColor, nonStrokingColor, false,
+        false);
   }
 
   @Override
-  public void drawRectangle(Rectangle rect, int pageNum, Color color,
-      boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
-    this.drawRectangle(rect, pageNum, color, DEFAULT_LINE_THICKNESS,
-        relativeToUpperLeft, originInUpperLeft);
+  public void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException {
+    this.drawRectangle(rect, pageNum, strokingColor, nonStrokingColor,
+        DEFAULT_LINE_THICKNESS, relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override
-  public void drawRectangle(Rectangle rect, int pageNum, Color color,
-      float thickness) throws IOException {
-    drawRectangle(rect, pageNum, color, thickness, false, false);
+  public void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness) throws IOException {
+    drawRectangle(rect, pageNum, strokingColor, nonStrokingColor, thickness,
+        false, false);
   }
 
   @Override
-  public void drawRectangle(Rectangle rect, int pageNum, Color color,
-      float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
+  public void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException {
     if (rect == null) {
       return;
     }
@@ -287,14 +295,24 @@ public class PdfBoxDrawer implements PdfDrawer {
     Rectangle adapted = adaptRectangle(rect, pageNum, relativeToUpperLeft,
         originInUpperLeft);
 
-    stream.setStrokingColor(color);
-    stream.setNonStrokingColor(color);
+    float minX = adapted.getMinX();
+    float minY = adapted.getMinY();
+    float width = adapted.getWidth();
+    float height = adapted.getHeight();
+
+    stream.setStrokingColor(strokingColor);
     stream.setLineWidth(thickness);
-    stream.moveTo(adapted.getMinX(), adapted.getMinY());
-    stream.lineTo(adapted.getMaxX(), adapted.getMinY());
-    stream.lineTo(adapted.getMaxX(), adapted.getMaxY());
-    stream.lineTo(adapted.getMinX(), adapted.getMaxY());
-    stream.lineTo(adapted.getMinX(), adapted.getMinY());
+    stream.addRect(minX, minY, width, height);
+
+    if (nonStrokingColor != null) {
+      PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
+      graphicsState.setNonStrokingAlphaConstant(0.5f);
+      stream.setGraphicsStateParameters(graphicsState);
+      
+      stream.setNonStrokingColor(nonStrokingColor);
+      stream.fill();
+    }
+
     stream.stroke();
   }
 
@@ -315,31 +333,35 @@ public class PdfBoxDrawer implements PdfDrawer {
   }
 
   @Override
-  public void drawBoundingBox(HasRectangle box, int pageNum, Color color)
-      throws IOException {
-    this.drawRectangle(box.getRectangle(), pageNum, color);
+  public void drawBoundingBox(HasRectangle box, int pageNum,
+      Color strokingColor, Color nonStrokingColor) throws IOException {
+    this.drawRectangle(box.getRectangle(), pageNum, strokingColor,
+        nonStrokingColor);
   }
 
   @Override
-  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
+  public void drawBoundingBox(HasRectangle box, int pageNum,
+      Color strokingColor, Color nonStrokingColor, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException {
+    this.drawRectangle(box.getRectangle(), pageNum, strokingColor,
+        nonStrokingColor, relativeToUpperLeft, originInUpperLeft);
+  }
+
+  @Override
+  public void drawBoundingBox(HasRectangle box, int pageNum,
+      Color strokingColor, Color nonStrokingColor, float thickness)
+      throws IOException {
+    drawRectangle(box.getRectangle(), pageNum, strokingColor, nonStrokingColor,
+        thickness);
+  }
+
+  @Override
+  public void drawBoundingBox(HasRectangle box, int pageNum,
+      Color strokingColor, Color nonStrokingColor, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    this.drawRectangle(box.getRectangle(), pageNum, color,
-        relativeToUpperLeft, originInUpperLeft);
-  }
-
-  @Override
-  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
-      float thickness) throws IOException {
-    drawRectangle(box.getRectangle(), pageNum, color, thickness);
-  }
-
-  @Override
-  public void drawBoundingBox(HasRectangle box, int pageNum, Color color,
-      float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-      throws IOException {
-    drawRectangle(box.getRectangle(), pageNum, color, thickness,
-        relativeToUpperLeft, originInUpperLeft);
+    drawRectangle(box.getRectangle(), pageNum, strokingColor, nonStrokingColor,
+        thickness, relativeToUpperLeft, originInUpperLeft);
   }
 
   // ==========================================================================
@@ -366,8 +388,8 @@ public class PdfBoxDrawer implements PdfDrawer {
   public void drawText(String text, int pageNum, Point point,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException {
-    this.drawText(text, pageNum, point, DEFAULT_COLOR, relativeToUpperLeft,
-        originInUpperLeft);
+    this.drawText(text, pageNum, point, DEFAULT_STROKING_COLOR,
+        relativeToUpperLeft, originInUpperLeft);
   }
 
   @Override

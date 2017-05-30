@@ -14,7 +14,7 @@ import icecite.utils.geometric.Rectangle;
  *
  * @author Claudius Korzen
  */
-public interface PdfDrawer {  
+public interface PdfDrawer {
   /**
    * Draws the given line on the given page.
    * 
@@ -57,7 +57,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawLine(Line line, int pageNum, Color color, float thickness)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given line on the given page.
@@ -76,8 +76,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawLine(Line line, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft)
-    throws IOException;
+      boolean originInUpperLeft) throws IOException;
 
   /**
    * Draws the given line in the given color on the given page.
@@ -99,7 +98,7 @@ public interface PdfDrawer {
    */
   void drawLine(Line line, int pageNum, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given line with given color and given thickness on the given
@@ -124,7 +123,7 @@ public interface PdfDrawer {
    */
   void drawLine(Line line, int pageNum, Color color, float thickness,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   // ==========================================================================
 
@@ -147,13 +146,15 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawRectangle(Rectangle rect, int pageNum, Color color)
-    throws IOException;
+  void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor) throws IOException;
 
   /**
    * Draws the given rectangle with given color and given thickness on the
@@ -163,15 +164,17 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param thickness
    *        The thickness of the border of the rectangle.
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawRectangle(Rectangle rect, int pageNum, Color color, float thickness)
-    throws IOException;
+  void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness) throws IOException;
 
   /**
    * Draws the given rectangle on the given page.
@@ -192,7 +195,7 @@ public interface PdfDrawer {
    */
   void drawRectangle(Rectangle rectangle, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given rectangle in the given color on the given page.
@@ -201,8 +204,10 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
    *        be considered as relative to the upper left vertex of the
@@ -213,9 +218,9 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawRectangle(Rectangle rect, int pageNum, Color color,
-      boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+  void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException;
 
   /**
    * Draws the given rectangle with given color and given thickness on the
@@ -225,8 +230,10 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param thickness
    *        The thickness of the border of the rectangle.
    * @param relativeToUpperLeft
@@ -239,9 +246,9 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawRectangle(Rectangle rect, int pageNum, Color color, float thickness,
-      boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+  void drawRectangle(Rectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException;
 
   // ==========================================================================
 
@@ -255,8 +262,7 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasRectangle rectangle, int pageNum)
-    throws IOException;
+  void drawBoundingBox(HasRectangle rectangle, int pageNum) throws IOException;
 
   /**
    * Draws a bounding box in the given color on the given page.
@@ -265,13 +271,15 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasRectangle rect, int pageNum, Color color)
-    throws IOException;
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor) throws IOException;
 
   /**
    * Draws a bounding box with given color and given thickness on the given
@@ -281,16 +289,17 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param thickness
    *        The thickness of the border of the rectangle.
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
-      float thickness)
-    throws IOException;
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness) throws IOException;
 
   /**
    * Draws a bounding box on the given page.
@@ -311,7 +320,7 @@ public interface PdfDrawer {
    */
   void drawBoundingBox(HasRectangle rect, int pageNum,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws a bounding box in the given color on the given page.
@@ -320,8 +329,10 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
    *        be considered as relative to the upper left vertex of the
@@ -332,9 +343,9 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
-      boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException;
 
   /**
    * Draws a bounding box with given color and given thickness on the given
@@ -344,8 +355,10 @@ public interface PdfDrawer {
    *        The rectangle to draw.
    * @param pageNum
    *        The number of the page in which the rectangle should be drawn.
-   * @param color
-   *        The color to use.
+   * @param strokingColor
+   *        The color to use on stroking the edges of the rectangle.
+   * @param nonStrokingColor
+   *        The color to use on filling the rectangle.
    * @param thickness
    *        The thickness of the border of the rectangle.
    * @param relativeToUpperLeft
@@ -358,9 +371,9 @@ public interface PdfDrawer {
    * @throws IOException
    *         If the drawing failed.
    */
-  void drawBoundingBox(HasRectangle rect, int pageNum, Color color,
-      float thickness, boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+  void drawBoundingBox(HasRectangle rect, int pageNum, Color strokingColor,
+      Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
+      boolean originInUpperLeft) throws IOException;
 
   // ==========================================================================
 
@@ -405,7 +418,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, Point pos, Color color)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given text in the given color and given fontsize at the given
@@ -425,8 +438,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, Point pos, Color color,
-      float fontsize)
-    throws IOException;
+      float fontsize) throws IOException;
 
   /**
    * Draws the given text on the given page.
@@ -445,8 +457,7 @@ public interface PdfDrawer {
    *         If the drawing failed.
    */
   void drawText(String text, int pageNum, boolean relativeToUpperLeft,
-      boolean originInUpperLeft)
-    throws IOException;
+      boolean originInUpperLeft) throws IOException;
 
   /**
    * Draws the given text at the given position in the page.
@@ -468,7 +479,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given text in the given color at the given position in the page.
@@ -492,7 +503,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos, Color color,
       boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   /**
    * Draws the given text in the given color and given fontsize at the given
@@ -519,7 +530,7 @@ public interface PdfDrawer {
    */
   void drawText(String text, int pageNum, Point pos, Color color,
       float fontsize, boolean relativeToUpperLeft, boolean originInUpperLeft)
-    throws IOException;
+      throws IOException;
 
   // ==========================================================================
 

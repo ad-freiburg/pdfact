@@ -34,7 +34,7 @@ public class DiacriticsTranslator {
     if (!isDiacritic(diacritic)) {
       return;
     }
-
+    
     // Get the bounding box of the diacritic.
     Rectangle diacriticBoundingBox = diacritic.getRectangle();
     if (diacriticBoundingBox == null) {
@@ -100,7 +100,7 @@ public class DiacriticsTranslator {
     if (diacritic == null || baseCharacter == null) {
       return;
     }
-
+    
     String diacriticText = diacritic.getText();
     String baseText = baseCharacter.getText();
     if (diacriticText == null || baseText == null) {
@@ -111,11 +111,11 @@ public class DiacriticsTranslator {
     if (DIACRITICS.containsKey(diacriticText.codePointAt(0))) {
       diacriticText = DIACRITICS.get(diacriticText.codePointAt(0));
     }
-
+    
     // Merge the diacritic with the base character.
     String mergedText = Normalizer
         .normalize(baseText + diacriticText, Normalizer.Form.NFC).trim();
-
+    
     // Adjust the text of the base character.
     baseCharacter.setText(mergedText);
   }
@@ -147,6 +147,7 @@ public class DiacriticsTranslator {
     DIACRITICS.put(0x02DC, "\u0303");
     DIACRITICS.put(0x00AF, "\u0304");
     DIACRITICS.put(0x02C9, "\u0304");
+    DIACRITICS.put(0x00A8, "\u0308");
     DIACRITICS.put(0x00B0, "\u030A");
     DIACRITICS.put(0x02DA, "\u030A");
     DIACRITICS.put(0x0022, "\u030B");

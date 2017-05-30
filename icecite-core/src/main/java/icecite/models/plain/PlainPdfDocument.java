@@ -18,6 +18,8 @@ import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 
 /**
  * A plain implementation of {@link PdfDocument}.
@@ -61,7 +63,7 @@ public class PlainPdfDocument implements PdfDocument {
   /**
    * The text lines in this PDF document.
    */
-  protected List<PdfTextLine> textLines;
+  protected PdfTextLineList textLines;
 
   /**
    * The paragraphs in this PDF document.
@@ -76,15 +78,18 @@ public class PlainPdfDocument implements PdfDocument {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
+   * @param textLineListFactory
+   *        The factory to create instances of PdfTextLineList. 
    */
   @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory) {
+  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
+      PdfTextLineListFactory textLineListFactory) {
     this.pages = new ArrayList<PdfPage>();
     this.characters = characterListFactory.create();
+    this.textLines = textLineListFactory.create();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
-    this.textLines = new ArrayList<>();
     this.paragraphs = new ArrayList<>();
   }
 
@@ -93,13 +98,15 @@ public class PlainPdfDocument implements PdfDocument {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
+   * @param textLineListFactory
+   *        The factory to create instances of PdfTextLineList. 
    * @param pdf
    *        The PDF file given as a File object
    */
   @AssistedInject
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
-      @Assisted File pdf) {
-    this(characterListFactory);
+      PdfTextLineListFactory textLineListFactory, @Assisted File pdf) {
+    this(characterListFactory, textLineListFactory);
     this.path = pdf.toPath();
   }
 
@@ -108,13 +115,15 @@ public class PlainPdfDocument implements PdfDocument {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
+   * @param textLineListFactory
+   *        The factory to create instances of PdfTextLineList. 
    * @param pdf
-   *        The PDF file given as a Path object
+   *        The PDF file given as a File object
    */
   @AssistedInject
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
-      @Assisted Path pdf) {
-    this(characterListFactory);
+      PdfTextLineListFactory textLineListFactory, @Assisted Path pdf) {
+    this(characterListFactory, textLineListFactory);
     this.path = pdf;
   }
 
@@ -256,17 +265,17 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public List<PdfTextLine> getTextLines() {
+  public PdfTextLineList getTextLines() {
     return this.textLines;
   }
 
   @Override
-  public void setTextLines(List<PdfTextLine> lines) {
+  public void setTextLines(PdfTextLineList lines) {
     this.textLines = lines;
   }
 
   @Override
-  public void addTextLines(List<PdfTextLine> lines) {
+  public void addTextLines(PdfTextLineList lines) {
     for (PdfTextLine line : lines) {
       addTextLine(line);
     }

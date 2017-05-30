@@ -1,5 +1,7 @@
 package icecite.models;
 
+import icecite.utils.geometric.Line;
+
 /**
  * A text line in a PDF document.
  * 
@@ -7,6 +9,24 @@ package icecite.models;
  */
 public interface PdfTextLine
     extends PdfElement, HasPage, HasCharacters, HasWords, HasText {
+  /**
+   * Returns the baseline of this text line. For more details about a baseline,
+   * see https://en.wikipedia.org/wiki/Baseline_(typography)
+   * 
+   * @return The base line of this text line.
+   */
+  Line getBaseline();
+
+  /**
+   * Sets the baseline of this text line.
+   * 
+   * @param baseLine
+   *        The base line of this text line.
+   */
+  void setBaseline(Line baseLine);
+
+  // ==========================================================================
+
   /**
    * The factory to create instances of {@link PdfTextLine}.
    * 

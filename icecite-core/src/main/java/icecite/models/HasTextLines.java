@@ -1,7 +1,5 @@
 package icecite.models;
 
-import java.util.List;
-
 /**
  * An interface that declares that the implementing object has text lines.
  *
@@ -13,7 +11,7 @@ public interface HasTextLines {
    * 
    * @return The text lines.
    */
-  List<PdfTextLine> getTextLines();
+  PdfTextLineList getTextLines();
 
   /**
    * Sets the text lines.
@@ -21,7 +19,7 @@ public interface HasTextLines {
    * @param lines
    *        The list of text lines to set.
    */
-  void setTextLines(List<PdfTextLine> lines);
+  void setTextLines(PdfTextLineList lines);
 
   /**
    * Adds the text lines.
@@ -29,7 +27,7 @@ public interface HasTextLines {
    * @param lines
    *        The list of text lines to add.
    */
-  void addTextLines(List<PdfTextLine> lines);
+  void addTextLines(PdfTextLineList lines);
 
   /**
    * Adds the given text line.

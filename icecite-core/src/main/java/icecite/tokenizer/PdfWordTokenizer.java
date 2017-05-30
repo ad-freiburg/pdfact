@@ -1,11 +1,9 @@
 package icecite.tokenizer;
 
-import java.util.List;
-
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfWord;
+import icecite.models.PdfWordList;
 
 /**
  * A tokenizer that tokenizes lists of characters into words.
@@ -24,5 +22,5 @@ public interface PdfWordTokenizer {
    *        The characters to tokenize.
    * @return The list of identified paragraphs.
    */
-  List<PdfWord> tokenize(PdfDocument pdf, PdfPage page, PdfCharacterList chars);
+  PdfWordList tokenize(PdfDocument pdf, PdfPage page, PdfCharacterList chars);
 }

@@ -4,12 +4,19 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
+import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.tokenizer.xycut.XYCut;
+import icecite.utils.character.PdfCharacterUtils;
+import icecite.utils.counter.FloatCounter;
+import icecite.utils.geometric.Line;
+import icecite.utils.geometric.Line.LineFactory;
 
 // TODO: Rework.
 
@@ -21,9 +28,19 @@ import icecite.tokenizer.xycut.XYCut;
 public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     implements PdfTextLineTokenizer {
   /**
+   * The factory to create instances of PdfTextLineList.
+   */
+  protected PdfTextLineListFactory textLineListFactory;
+  
+  /**
    * The factory to create instances of PdfTextLine.
    */
   protected PdfTextLineFactory textLineFactory;
+
+  /**
+   * The factory to create instances of Line.
+   */
+  protected LineFactory lineFactory;
 
   /**
    * The overlapping characters of the previous sweep iteration.
@@ -48,21 +65,30 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   /**
    * Creates a new text line tokenizer.
    * 
+   * @param textLineListFactory 
+   *        The factory to create instance of {@link PdfTextLineList}.
    * @param textLineFactory
    *        The factory to create instance of {@link PdfTextLine}.
+   * @param lineFactory
+   *        The factory to create instances of {@link Line}.
    */
   @Inject
-  public XYCutPdfTextLineTokenizer(PdfTextLineFactory textLineFactory) {
+  public XYCutPdfTextLineTokenizer(PdfTextLineListFactory textLineListFactory, 
+      PdfTextLineFactory textLineFactory, LineFactory lineFactory) {
     super();
+    this.textLineListFactory = textLineListFactory;
     this.textLineFactory = textLineFactory;
+    this.lineFactory = lineFactory;
   }
 
   // ==========================================================================
 
   @Override
-  public List<PdfTextLine> tokenize(PdfDocument pdf, PdfPage page,
+  public PdfTextLineList tokenize(PdfDocument pdf, PdfPage page,
       PdfCharacterList characters) {
-    return cut(pdf, page, characters);
+    PdfTextLineList textLines = this.textLineListFactory.create();
+    cut(pdf, page, characters, textLines);
+    return textLines;
   }
 
   // ==========================================================================
@@ -89,10 +115,34 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
 
   @Override
   public PdfTextLine pack(PdfPage page, PdfCharacterList characters) {
-    return this.textLineFactory.create(page, characters);
+    PdfTextLine textLine = this.textLineFactory.create(page, characters);
+    textLine.setBaseline(computeBaseline(textLine));
+    return textLine;
   }
 
   // ==========================================================================
+
+  /**
+   * Computes the baseline for the given text line.
+   * 
+   * @param textLine
+   *        The text line to process.
+   * @return The base line of the given text line.
+   */
+  protected Line computeBaseline(PdfTextLine textLine) {
+    // Compute the most common minY value among all baseline characters.
+    FloatCounter minYValuesOfBaselineCharacters = new FloatCounter();
+    for (PdfCharacter character : textLine.getCharacters()) {
+      if (PdfCharacterUtils.isBaselineCharacter(character)) {
+        minYValuesOfBaselineCharacters.add(character.getRectangle().getMinY());
+      }
+    }
+    float startX = textLine.getRectangle().getMinX();
+    float endX = textLine.getRectangle().getMaxX();
+    float y = minYValuesOfBaselineCharacters.getMostCommonFloat();
+
+    return this.lineFactory.create(startX, y, endX, y);
+  }
 
   // /**
   // * Decides if the given lane is valid, given that the set of overlapping

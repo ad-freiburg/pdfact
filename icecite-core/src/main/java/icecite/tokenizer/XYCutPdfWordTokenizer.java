@@ -1,6 +1,5 @@
 package icecite.tokenizer;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.google.inject.Inject;
@@ -10,11 +9,9 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
+import icecite.models.PdfWordList;
+import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.tokenizer.xycut.XYCut;
-import icecite.utils.collection.CollectionUtils;
-import icecite.utils.comparators.MinXComparator;
-
-// TODO: Rework.
 
 /**
  * An implementation of {@link PdfWordTokenizer} based on XYCut.
@@ -23,6 +20,11 @@ import icecite.utils.comparators.MinXComparator;
  */
 public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
     implements PdfWordTokenizer {
+  /**
+   * The factory to create instances of PdfWordList.
+   */
+  protected PdfWordListFactory wordListFactory;
+  
   /**
    * The factory to create instances of PdfWord.
    */
@@ -33,22 +35,28 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
 
   /**
    * Creates a new word tokenizer.
-   * 
+   *
+   * @param wordListFactory
+   *        The factory to create instance of {@link PdfWordList}.
    * @param wordFactory
    *        The factory to create instance of {@link PdfWord}.
    */
   @Inject
-  public XYCutPdfWordTokenizer(PdfWordFactory wordFactory) {
+  public XYCutPdfWordTokenizer(PdfWordListFactory wordListFactory,
+      PdfWordFactory wordFactory) {
     super();
+    this.wordListFactory = wordListFactory;
     this.wordFactory = wordFactory;
   }
 
   // ==========================================================================
 
   @Override
-  public List<PdfWord> tokenize(PdfDocument pdf, PdfPage page,
+  public PdfWordList tokenize(PdfDocument pdf, PdfPage page,
       PdfCharacterList characters) {
-    return cut(pdf, page, characters);
+    PdfWordList words = this.wordListFactory.create();
+    cut(pdf, page, characters, words);
+    return words;
   }
 
   // ==========================================================================
@@ -78,13 +86,7 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
 
   @Override
   public PdfWord pack(PdfPage page, PdfCharacterList characters) {
-    // Sort the characters by minX.
-    Collections.sort(characters, new MinXComparator());
-
-    PdfWord word = this.wordFactory.create(page, characters);
-    word.setText(CollectionUtils.join(characters, ""));
-
-    return word;
+    return this.wordFactory.create(page, characters);
   }
 
   // ==========================================================================

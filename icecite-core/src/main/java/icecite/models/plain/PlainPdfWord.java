@@ -10,6 +10,8 @@ import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.utils.geometric.Rectangle;
 
+// TODO: Do not derive the bounding box in the model.
+
 /**
  * A plain implementation of {@link PdfWord}.
  * 

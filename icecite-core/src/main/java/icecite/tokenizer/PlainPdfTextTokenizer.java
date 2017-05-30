@@ -1,6 +1,5 @@
 package icecite.tokenizer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,7 +10,10 @@ import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfWord;
+import icecite.models.PdfWordList;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.comparators.MinXComparator;
 
@@ -41,6 +43,11 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    */
   protected PdfParagraphTokenizer paragraphTokenizer;
 
+  /**
+   * The factory to create instances of PdfTextLineList.
+   */
+  protected PdfTextLineListFactory textLineListFactory;
+
   // ==========================================================================
   // Constructors.
 
@@ -55,15 +62,19 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    *        The tokenizer to identify words.
    * @param paragraphTokenizer
    *        The tokenizer to identify paragraphs.
+   * @param textLineListFactory 
+   *        The factory to create instances of {@link PdfTextLineList}.
    */
   @Inject
   public PlainPdfTextTokenizer(PdfTextBlockTokenizer textBlockTokenizer,
       PdfTextLineTokenizer textLineTokenizer, PdfWordTokenizer wordTokenizer,
-      PdfParagraphTokenizer paragraphTokenizer) {
+      PdfParagraphTokenizer paragraphTokenizer,
+      PdfTextLineListFactory textLineListFactory) {
     this.textBlockTokenizer = textBlockTokenizer;
     this.textLineTokenizer = textLineTokenizer;
     this.wordTokenizer = wordTokenizer;
     this.paragraphTokenizer = paragraphTokenizer;
+    this.textLineListFactory = textLineListFactory;
   }
 
   // ==========================================================================
@@ -103,13 +114,13 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     // Tokenize the given page into text blocks.
     List<PdfTextBlock> blocks = tokenizeIntoTextBlocks(document, page);
     // Tokenize the text blocks into text lines.
-    List<PdfTextLine> lines = tokenizeIntoTextLines(document, page, blocks);
+    PdfTextLineList lines = tokenizeIntoTextLines(document, page, blocks);
     // Tokenize the text lines into words.
     for (PdfTextLine line : lines) {
-      // TODO
+      // Identify the word in the given text line.
       line.setWords(tokenizeIntoWords(document, page, line));
-      Collections.sort(line.getWords(), new MinXComparator());
-      line.setText(CollectionUtils.join(line.getWords(), " "));
+      // Compose the text of the given text line.
+      computeTextOfTextLine(line);
     }
 
     // Register the blocks and lines to the PDF document.
@@ -148,10 +159,10 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * 
    * @return The list of identified text lines from all text blocks.
    */
-  protected List<PdfTextLine> tokenizeIntoTextLines(PdfDocument doc,
-      PdfPage page, List<PdfTextBlock> blocks) {
+  protected PdfTextLineList tokenizeIntoTextLines(PdfDocument doc, PdfPage page,
+      List<PdfTextBlock> blocks) {
     // The text lines of all blocks.
-    List<PdfTextLine> textLines = new ArrayList<>();
+    PdfTextLineList textLines = this.textLineListFactory.create();
 
     if (blocks != null) {
       // Iterate through the blocks and identify lines in each single block.
@@ -178,8 +189,8 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    * 
    * @return The list of identified text lines.
    */
-  protected List<PdfTextLine> tokenizeIntoTextLines(PdfDocument doc,
-      PdfPage page, PdfTextBlock block) {
+  protected PdfTextLineList tokenizeIntoTextLines(PdfDocument doc, PdfPage page,
+      PdfTextBlock block) {
     return this.textLineTokenizer.tokenize(doc, page, block.getCharacters());
   }
 
@@ -194,7 +205,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    *        The text line to tokenize.
    * @return The list of identified words.
    */
-  protected List<PdfWord> tokenizeIntoWords(PdfDocument doc, PdfPage page,
+  protected PdfWordList tokenizeIntoWords(PdfDocument doc, PdfPage page,
       PdfTextLine line) {
     return this.wordTokenizer.tokenize(doc, page, line.getCharacters());
   }
@@ -209,5 +220,25 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    */
   protected List<PdfParagraph> tokenizeIntoParagraphs(PdfDocument doc) {
     return this.paragraphTokenizer.tokenize(doc);
+  }
+
+  /**
+   * Computes the texts of the given line and its included words.
+   * 
+   * @param line
+   *        The line to process.
+   */
+  protected void computeTextOfTextLine(PdfTextLine line) {
+    List<PdfWord> words = line.getWords();
+
+    // Compute the text for each word of the line.
+    for (PdfWord word : words) {
+      Collections.sort(word.getCharacters(), new MinXComparator());
+      word.setText(CollectionUtils.join(word.getCharacters(), ""));
+    }
+
+    // Compute the text for the line.
+    Collections.sort(words, new MinXComparator());
+    line.setText(CollectionUtils.join(words, " "));
   }
 }

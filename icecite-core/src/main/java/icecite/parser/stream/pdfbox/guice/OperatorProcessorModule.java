@@ -1,6 +1,7 @@
 package icecite.parser.stream.pdfbox.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
@@ -54,6 +55,7 @@ import icecite.parser.stream.pdfbox.operators.text.SetType3GlyphWidthAndBounding
 import icecite.parser.stream.pdfbox.operators.text.SetWordSpacing;
 import icecite.parser.stream.pdfbox.operators.text.ShowText;
 import icecite.parser.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPositioning;
+import icecite.utils.font.PdfFontUtils;
 
 /**
  * A module that defines the Guice bindings to the operator processors.
@@ -63,6 +65,8 @@ import icecite.parser.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPo
 public class OperatorProcessorModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(PdfFontUtils.class).in(Singleton.class);
+    
     Multibinder<OperatorProcessor> binder = Multibinder.newSetBinder(binder(),
         OperatorProcessor.class);
 

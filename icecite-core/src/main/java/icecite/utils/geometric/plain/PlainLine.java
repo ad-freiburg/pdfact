@@ -54,7 +54,10 @@ public class PlainLine extends Line {
    * @param endY
    *        The y value of the end point.
    */
-  public PlainLine(float startX, float startY, float endX, float endY) {
+  @AssistedInject
+  public PlainLine(@Assisted("startX") float startX,
+      @Assisted("startY") float startY, @Assisted("endX") float endX,
+      @Assisted("endY") float endY) {
     this(new PlainPoint(startX, startY), new PlainPoint(endX, endY));
   }
 

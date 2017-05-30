@@ -125,5 +125,23 @@ public abstract class Line extends Geometric {
      */
     Line create(@Assisted("start") Point startPoint,
         @Assisted("end") Point endPoint);
+
+    /**
+     * Creates a new line.
+     * 
+     * @param startX
+     *        The x-value of the start point of the line.
+     * @param startY
+     *        The y-value of the start point of the line.
+     * @param endX
+     *        The x-value of the end point of the line.
+     * @param endY
+     *        The y-value of the end point of the line.
+     * 
+     * @return An instance of {@PdfLine}.
+     */
+    Line create(@Assisted("startX") float startX,
+        @Assisted("startY") float startY, @Assisted("endX") float endX,
+        @Assisted("endY") float endY);
   }
 }

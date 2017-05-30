@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import icecite.models.PdfDocument;
+import icecite.models.PdfFont;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfParagraph.PdfParagraphFactory;
 import icecite.models.PdfTextLine;
@@ -46,8 +47,8 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
-      
-      if (introducesParagraph(paragraph, prevLine, line, nextLine)) {
+
+      if (introducesParagraph(pdf, paragraph, prevLine, line, nextLine)) {
         if (paragraph != null && !paragraph.getWords().isEmpty()) {
           paragraphs.add(paragraph);
         }
@@ -55,7 +56,6 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
         // Create a new paragraph.
         paragraph = this.paragraphFactory.create();
       }
-
       // Add the word of the current line to the current paragraph.
       paragraph.addWords(line.getWords());
     }
@@ -69,7 +69,9 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
   /**
    * Checks if the given current text line introduces a new paragraph.
-   *
+   * 
+   * @param pdf
+   *        The PDF document.
    * @param paragraph
    *        The current paragraph.
    * @param prevLine
@@ -81,7 +83,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
    * @return True, if the given current line introduces a new paragraph; false
    *         otherwise.
    */
-  protected boolean introducesParagraph(PdfParagraph paragraph,
+  protected boolean introducesParagraph(PdfDocument pdf, PdfParagraph paragraph,
       PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
     // The line does *not* introduce a new paragraph, if it is null.
     if (line == null) {
@@ -115,12 +117,21 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     if (isIndented(prevLine, line, nextLine)) {
       return true;
     }
+
+    // The line introduces a new paragraph, if it has a special font face.
+    if (hasSignificantDifferentFontFace(prevLine, line)) {
+      return true;
+    }
     
-    // The line introduces a new paragraph, if it has a larger fontsize than the
-    // previous line.
-//    if (hasLargerFontsize(prevLine, line)) {
+    // The line introduces a new paragraph, if the pitch to the previous line
+    // is larger than the most common line pitch in the paragraph.
+//    if (linepitchIsTooLarge(paragraph, prevLine, line)) {
 //      return true;
 //    }
+
+    // TODO: Line pitch.
+    // TODO: Itemizes
+    // References.
 
     return false;
   }
@@ -176,19 +187,62 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     if (prevLine == null || line == null || nextLine == null) {
       return false;
     }
-    
+
     Rectangle prevRectangle = prevLine.getRectangle();
     Rectangle rectangle = line.getRectangle();
     Rectangle nextRectangle = nextLine.getRectangle();
-    
+
     if (prevRectangle == null || rectangle == null || nextRectangle == null) {
       return false;
     }
-    
+
     if (prevRectangle.getMinX() != nextRectangle.getMinX()) {
       return false;
     }
-    
+
     return rectangle.getMinX() > prevRectangle.getMinX();
+  }
+
+  /**
+   * Checks if the given line has a special font face, comapred to the given
+   * previous line.
+   * 
+   * @param prevLine
+   *        The previous line of the line to process.
+   * @param line
+   *        The line to process.
+   * @return True, if the given line has a special font face, False otherwise.
+   */
+  protected static boolean hasSignificantDifferentFontFace(PdfTextLine prevLine,
+      PdfTextLine line) {
+    if (prevLine == null || line == null) {
+      return false;
+    }
+
+    // If the font of the previous line and the font of the current line are
+    // not from the same base, the line has a special font face.
+    PdfFont prevLineFont = prevLine.getCharacters().getMostCommonFont();
+    PdfFont lineFont = line.getCharacters().getMostCommonFont();
+    if (prevLineFont == null || lineFont == null) {
+      return false;
+    }
+    String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
+    String lineFontFamilyName = lineFont.getFontFamilyName();
+    if (prevLineFontFamilyName == null || lineFontFamilyName == null) {
+      return false;
+    }
+    if (!prevLineFontFamilyName.equals(lineFontFamilyName)) {
+      return true;
+    }
+
+    // If the font size of the previous line and the font size of the current
+    // line are not equal, the line has a special font face.
+    float prevLineFontsize = prevLine.getCharacters().getMostCommonFontsize();
+    float lineFontsize = line.getCharacters().getMostCommonFontsize();
+    if (prevLineFontsize != lineFontsize) {
+      return true;
+    }
+
+    return false;
   }
 }

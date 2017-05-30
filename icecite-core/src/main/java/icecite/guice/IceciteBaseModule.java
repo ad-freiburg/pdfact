@@ -17,7 +17,6 @@ import icecite.models.PdfFigure;
 import icecite.models.PdfFigure.PdfFigureFactory;
 import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
-import icecite.models.PdfFontRegistry;
 import icecite.models.PdfPage;
 import icecite.models.PdfPage.PdfPageFactory;
 import icecite.models.PdfParagraph;
@@ -28,8 +27,12 @@ import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
+import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
+import icecite.models.PdfWordList;
+import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.models.plain.PlainPdfCharacter;
 import icecite.models.plain.PlainPdfCharacterList;
 import icecite.models.plain.PlainPdfColor;
@@ -37,13 +40,14 @@ import icecite.models.plain.PlainPdfColorRegistry;
 import icecite.models.plain.PlainPdfDocument;
 import icecite.models.plain.PlainPdfFigure;
 import icecite.models.plain.PlainPdfFont;
-import icecite.models.plain.PlainPdfFontRegistry;
 import icecite.models.plain.PlainPdfPage;
 import icecite.models.plain.PlainPdfParagraph;
 import icecite.models.plain.PlainPdfShape;
 import icecite.models.plain.PlainPdfTextBlock;
 import icecite.models.plain.PlainPdfTextLine;
+import icecite.models.plain.PlainPdfTextLineList;
 import icecite.models.plain.PlainPdfWord;
+import icecite.models.plain.PlainPdfWordList;
 import icecite.parser.PdfParser;
 import icecite.parser.PdfParser.PdfParserFactory;
 import icecite.parser.PlainPdfParser;
@@ -97,24 +101,32 @@ public class IceciteBaseModule extends AbstractModule {
     // Bind the registries for PdfColor and PdfFont.
     bind(PdfColorRegistry.class).to(PlainPdfColorRegistry.class)
         .in(Singleton.class);
-    bind(PdfFontRegistry.class).to(PlainPdfFontRegistry.class)
-        .in(Singleton.class);
+    // bind(PdfFontRegistry.class).to(PlainPdfFontRegistry.class)
+    // .in(Singleton.class);
 
     // Bind the PDF model factories.
-    fc(PdfCharacter.class, PdfCharacterFactory.class, PlainPdfCharacter.class);
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);
-    fc(PdfFigure.class, PdfFigureFactory.class, PlainPdfFigure.class);
     fc(PdfPage.class, PdfPageFactory.class, PlainPdfPage.class);
+
+    fc(PdfCharacter.class, PdfCharacterFactory.class, PlainPdfCharacter.class);
+    fc(PdfCharacterList.class, PdfCharacterListFactory.class,
+        PlainPdfCharacterList.class);
+
+    fc(PdfFigure.class, PdfFigureFactory.class, PlainPdfFigure.class);
     fc(PdfShape.class, PdfShapeFactory.class, PlainPdfShape.class);
-    fc(PdfTextBlock.class, PdfTextBlockFactory.class, PlainPdfTextBlock.class);
-    fc(PdfWord.class, PdfWordFactory.class, PlainPdfWord.class);
-    fc(PdfTextLine.class, PdfTextLineFactory.class, PlainPdfTextLine.class);
-    fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
     fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
     fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
 
-    fc(PdfCharacterList.class, PdfCharacterListFactory.class,
-        PlainPdfCharacterList.class);
+    fc(PdfTextBlock.class, PdfTextBlockFactory.class, PlainPdfTextBlock.class);
+
+    fc(PdfWord.class, PdfWordFactory.class, PlainPdfWord.class);
+    fc(PdfWordList.class, PdfWordListFactory.class, PlainPdfWordList.class);
+
+    fc(PdfTextLine.class, PdfTextLineFactory.class, PlainPdfTextLine.class);
+    fc(PdfTextLineList.class, PdfTextLineListFactory.class,
+        PlainPdfTextLineList.class);
+
+    fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
 
     // Bind the geometric model factories.
     fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);

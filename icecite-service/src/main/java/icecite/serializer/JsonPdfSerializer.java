@@ -411,7 +411,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     json.put(CONTEXT_NAME_FONT_ID, id);
 
     // Append the name of the font.
-    String name = font.getName();
+    String name = font.getNormalizedName();
     if (name != null) {
       json.put(CONTEXT_NAME_FONT_NAME, name);
     }

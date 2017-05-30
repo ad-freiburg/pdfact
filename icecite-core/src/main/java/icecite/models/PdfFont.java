@@ -7,53 +7,118 @@ package icecite.models;
  */
 public interface PdfFont extends PdfResource {
   /**
-   * Returns the id of this font.
+   * Returns the normalized name of this font. That is the lower cased name of
+   * the font as it appears in the PDF document without the substring up to the
+   * "+" sign. For example, if the name of font is "FPVPVX+NimbusRomNo9L-Medi", 
+   * this method returns "nimbusromno9l-medi".
    * 
-   * @return The id of this font.
+   * @return The normalized name of this font.
    */
-  String getId();
+  String getNormalizedName();
 
   /**
-   * Sets the id of this font.
+   * Sets the normalized name of this font.
    * 
    * @param name
-   *        The id of this font.
+   *        The normalized name of this font.
    */
-  void setId(String name);
+  void setNormalizedName(String name);
 
   // ==========================================================================
 
   /**
-   * Returns the full name of this font.
+   * Returns the basename of this font, that is the basename of this font
+   * without the substring behind the "-" sign and without any digits or any
+   * other special characters. For example, if the basename of the font is 
+   * "nimbusromno9l-medi", this method returns "nimbusromnol".
    * 
-   * @return The full name of this font.
-   */
-  String getName();
-
-  /**
-   * Sets the full name of this font.
-   * 
-   * @param name
-   *        The full name of this font.
-   */
-  void setName(String name);
-
-  // ==========================================================================
-
-  /**
-   * Returns the base name of this font.
-   * 
-   * @return The base name of this font.
+   * @return The basename of this font.
    */
   String getBaseName();
 
   /**
-   * Sets the base name of this font.
+   * Sets the basename of this font.
    * 
    * @param name
-   *        The base name of this font.
+   *        The basename of this font.
    */
   void setBaseName(String name);
+
+
+  // ==========================================================================
+
+  /**
+   * Returns the name of the font family of this font. For example, if the font
+   * is "cmr9", this method returns "computer modern".
+   * 
+   * @return The name of the font family of this font.
+   */
+  String getFontFamilyName();
+
+  /**
+   * Sets the name of the font family of this font.
+   * 
+   * @param name
+   *        The font family name.
+   */
+  void setFontFamilyName(String name);
+  
+  // ==========================================================================
+
+  /**
+   * Returns true, if this font is a Type3 font.
+   * 
+   * @return True, if this font is a Type3 font. False otherwise.
+   */
+  boolean isType3Font();
+
+  /**
+   * Sets the boolean flag that indicates whether this font is a Type3 font.
+   * 
+   * @param isType3Font
+   *        The boolean flag that indicates whether this font is a Type3 font.
+   */
+  void setIsType3Font(boolean isType3Font);
+
+  // ==========================================================================
+
+  /**
+   * Returns true, if this font represents a font with a bold font face.
+   * 
+   * @return True, if this font represents a font with a bold font face, False
+   *         otherwise.
+   */
+  boolean isBold();
+
+  /**
+   * Sets the boolean flag that indicates whether this font represents a font
+   * with a bold font face.
+   * 
+   * @param isBold
+   *        The boolean flag that indicates whether this font represents a font
+   *        with a bold font face.
+   */
+  void setIsBold(boolean isBold);
+
+  // ==========================================================================
+
+  /**
+   * Returns true, if this font represents a font with a bold font face.
+   * 
+   * @return True, if this font represents a font with a bold font face, False
+   *         otherwise.
+   */
+  boolean isItalic();
+
+  /**
+   * Sets the boolean flag that indicates whether this font represents a font
+   * with an italic bold font face.
+   * 
+   * @param isItalic
+   *        The boolean flag that indicates whether this font represents a font
+   *        with an italic font face.
+   */
+  void setIsItalic(boolean isItalic);
 
   // ==========================================================================
 

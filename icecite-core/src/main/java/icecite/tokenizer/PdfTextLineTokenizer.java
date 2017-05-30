@@ -1,11 +1,9 @@
 package icecite.tokenizer;
 
-import java.util.List;
-
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
 
 /**
  * A tokenizer that tokenizes lists of characters into text lines.
@@ -24,6 +22,6 @@ public interface PdfTextLineTokenizer {
    *        The characters to tokenize.
    * @return The list of identified paragraphs.
    */
-  List<PdfTextLine> tokenize(PdfDocument pdf, PdfPage page,
+  PdfTextLineList tokenize(PdfDocument pdf, PdfPage page,
       PdfCharacterList chars);
 }

@@ -1,7 +1,5 @@
 package icecite.models;
 
-import java.util.List;
-
 /**
  * An interface that declares that the implementing object has words.
  *
@@ -13,15 +11,31 @@ public interface HasWords {
    * 
    * @return The words.
    */
-  List<PdfWord> getWords();
+  PdfWordList getWords();
 
+  /**
+   * Returns the first word.
+   * 
+   * @return The first word or null if the list of words is empty.
+   */
+  PdfWord getFirstWord();
+  
+  /**
+   * Returns the last word.
+   * 
+   * @return The last word or null if the list of words is empty.
+   */
+  PdfWord getLastWord();
+  
+  // ==========================================================================
+  
   /**
    * Sets the words.
    * 
    * @param words
    *        The words to set.
    */
-  void setWords(List<PdfWord> words);
+  void setWords(PdfWordList words);
 
   /**
    * Adds the words.
@@ -29,7 +43,7 @@ public interface HasWords {
    * @param words
    *        The words to add.
    */
-  void addWords(List<PdfWord> words);
+  void addWords(PdfWordList words);
 
   /**
    * Adds the given word.

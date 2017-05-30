@@ -9,11 +9,13 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
 
 /**
  * A plain implementation of {@link PdfPage}.
@@ -49,7 +51,7 @@ public class PlainPdfPage implements PdfPage {
   /**
    * The identified text lines of this page.
    */
-  protected List<PdfTextLine> textLines;
+  protected PdfTextLineList textLines;
 
   // ==========================================================================
   // Constructors.
@@ -59,14 +61,17 @@ public class PlainPdfPage implements PdfPage {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
+   * @param textLineListFactory
+   *        The factory to create instances of PdfTextLineList. 
    */
   @AssistedInject
-  public PlainPdfPage(PdfCharacterListFactory characterListFactory) {
+  public PlainPdfPage(PdfCharacterListFactory characterListFactory,
+      PdfTextLineListFactory textLineListFactory) {
     this.characters = characterListFactory.create();
+    this.textLines = textLineListFactory.create();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
-    this.textLines = new ArrayList<>();
   }
 
   /**
@@ -74,13 +79,15 @@ public class PlainPdfPage implements PdfPage {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
+   * @param textLineListFactory
+   *        The factory to create instances of PdfTextLineList. 
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory,
-      @Assisted int pageNumber) {
-    this(characterListFactory);
+      PdfTextLineListFactory textLineListFactory, @Assisted int pageNumber) {
+    this(characterListFactory, textLineListFactory);
     this.pageNumber = pageNumber;
   }
 
@@ -183,17 +190,17 @@ public class PlainPdfPage implements PdfPage {
   // ==========================================================================
 
   @Override
-  public List<PdfTextLine> getTextLines() {
+  public PdfTextLineList getTextLines() {
     return this.textLines;
   }
 
   @Override
-  public void setTextLines(List<PdfTextLine> lines) {
+  public void setTextLines(PdfTextLineList lines) {
     this.textLines = lines;
   }
 
   @Override
-  public void addTextLines(List<PdfTextLine> lines) {
+  public void addTextLines(PdfTextLineList lines) {
     for (PdfTextLine line : lines) {
       addTextLine(line);
     }
