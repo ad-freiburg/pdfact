@@ -14,16 +14,11 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.drawer.PdfDrawer;
 import icecite.drawer.PdfDrawerFactory;
-import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
-import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
-import icecite.models.PdfShape;
-import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
@@ -114,41 +109,41 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       throws IOException {
     PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
 
-     for (PdfPage page : pdf.getPages()) {
-     visualizePage(page, drawer);
-     }
+    // for (PdfPage page : pdf.getPages()) {
+    // visualizePage(page, drawer);
+    // }
 
     // TODO: Visualize the paragraphs.
-//    for (PdfParagraph paragraph : pdf.getParagraphs()) {
-//      Color color = new Color(this.r.nextInt(256), this.r.nextInt(256),
-//          this.r.nextInt(256));
-//      List<List<PdfWord>> words = new ArrayList<>();
-//      List<PdfWord> w = new ArrayList<>();
-//
-//      PdfWord prevWord = null;
-//      for (int i = 0; i < paragraph.getWords().size(); i++) {
-//        PdfWord word = paragraph.getWords().get(i);
-//
-//        if (prevWord != null && prevWord.getPage().getPageNumber() != word
-//            .getPage().getPageNumber()) {
-//          if (!w.isEmpty()) {
-//            words.add(w);
-//          }
-//          w = new ArrayList<>();
-//        }
-//
-//        w.add(word);
-//        prevWord = word;
-//      }
-//      if (!w.isEmpty()) {
-//        words.add(w);
-//      }
-//
-//      for (List<PdfWord> x : words) {
-//        drawer.drawBoundingBox(PlainRectangle.fromBoundingBoxOf(x),
-//            x.get(0).getPage().getPageNumber(), color, color);
-//      }
-//    }
+    for (PdfParagraph paragraph : pdf.getParagraphs()) {
+      Color color = new Color(this.r.nextInt(256), this.r.nextInt(256),
+          this.r.nextInt(256));
+      List<List<PdfWord>> words = new ArrayList<>();
+      List<PdfWord> w = new ArrayList<>();
+
+      PdfWord prevWord = null;
+      for (int i = 0; i < paragraph.getWords().size(); i++) {
+        PdfWord word = paragraph.getWords().get(i);
+
+        if (prevWord != null && prevWord.getPage().getPageNumber() != word
+            .getPage().getPageNumber()) {
+          if (!w.isEmpty()) {
+            words.add(w);
+          }
+          w = new ArrayList<>();
+        }
+
+        w.add(word);
+        prevWord = word;
+      }
+      if (!w.isEmpty()) {
+        words.add(w);
+      }
+
+      for (List<PdfWord> x : words) {
+        drawer.drawBoundingBox(PlainRectangle.fromBoundingBoxOf(x),
+            x.get(0).getPage().getPageNumber(), color, color);
+      }
+    }
 
     drawer.writeTo(stream);
   }
@@ -172,57 +167,56 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       return;
     }
 
-    // Visualize the text elements.
-    for (PdfTextLine line : page.getTextLines()) {
-      if (isVisualizePdfElement(line)) {
-//        visualizePdfElement(page, line, drawer, Color.BLUE);
-        drawer.drawLine(line.getBaseline(), page.getPageNumber(), Color.BLUE);
-      }
-//      for (PdfWord word : line.getWords()) {
-//        if (isVisualizePdfElement(word)) {
-//          visualizePdfElement(page, word, drawer, Color.RED);
-//        }
-//        for (PdfCharacter character : word.getCharacters()) {
-//          if (isVisualizePdfElement(character)) {
-//            visualizePdfElement(page, character, drawer, Color.GRAY);
-//          }
-//        }
-//      }
-    }
-
-//    // TODO: Remove it
-//    // Visualize the text blocks.
-//    for (PdfTextBlock block : page.getTextBlocks()) {
-//      if (isVisualizePdfElement(block)) {
-//        visualizePdfElement(page, block, drawer, Color.PINK);
-//      }
-//    }
-//    // TODO: Remove it
-//    // Visualize the text lines.
-//    for (PdfTextLine line : page.getTextLines()) {
-//      if (isVisualizePdfElement(line)) {
-//        visualizePdfElement(page, line, drawer, Color.BLUE);
-//      }
-//      // Visualize words.
-//      for (PdfWord word : line.getWords()) {
-//        if (isVisualizePdfElement(line)) {
-//          visualizePdfElement(page, word, drawer, Color.RED);
-//        }
-//      }
-//    }
-//
-//    // Visualize the graphical elements.
-//    for (PdfFigure figure : page.getFigures()) {
-//      if (isVisualizePdfElement(figure)) {
-//        visualizePdfElement(page, figure, drawer, Color.CYAN);
-//      }
-//    }
-//    for (PdfShape shape : page.getShapes()) {
-//      if (isVisualizePdfElement(shape)) {
-//        visualizePdfElement(page, shape, drawer, Color.MAGENTA);
-//      }
-//    }
+    // // Visualize the text elements.
+    // for (PdfTextLine line : page.getTextLines()) {
+    // if (isVisualizePdfElement(line)) {
+    // visualizePdfElement(page, line, drawer, Color.BLUE);
+    // }
+    // for (PdfWord word : line.getWords()) {
+    // if (isVisualizePdfElement(word)) {
+    // visualizePdfElement(page, word, drawer, Color.RED);
+    // }
+    // for (PdfCharacter character : word.getCharacters()) {
+    // if (isVisualizePdfElement(character)) {
+    // visualizePdfElement(page, character, drawer, Color.GRAY);
+    // }
+    // }
+    // }
   }
+
+  // // TODO: Remove it
+  // // Visualize the text blocks.
+  // for (PdfTextBlock block : page.getTextBlocks()) {
+  // if (isVisualizePdfElement(block)) {
+  // visualizePdfElement(page, block, drawer, Color.PINK);
+  // }
+  // }
+  // // TODO: Remove it
+  // // Visualize the text lines.
+  // for (PdfTextLine line : page.getTextLines()) {
+  // if (isVisualizePdfElement(line)) {
+  // visualizePdfElement(page, line, drawer, Color.BLUE);
+  // }
+  // // Visualize words.
+  // for (PdfWord word : line.getWords()) {
+  // if (isVisualizePdfElement(line)) {
+  // visualizePdfElement(page, word, drawer, Color.RED);
+  // }
+  // }
+  // }
+  //
+  // // Visualize the graphical elements.
+  // for (PdfFigure figure : page.getFigures()) {
+  // if (isVisualizePdfElement(figure)) {
+  // visualizePdfElement(page, figure, drawer, Color.CYAN);
+  // }
+  // }
+  // for (PdfShape shape : page.getShapes()) {
+  // if (isVisualizePdfElement(shape)) {
+  // visualizePdfElement(page, shape, drawer, Color.MAGENTA);
+  // }
+  // }
+//  }
 
   /**
    * Visualizes the given list of rectangles using the given drawer.

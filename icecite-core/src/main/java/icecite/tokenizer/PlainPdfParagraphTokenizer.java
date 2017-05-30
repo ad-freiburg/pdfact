@@ -5,12 +5,15 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfParagraph.PdfParagraphFactory;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
 import icecite.utils.geometric.Rectangle;
+import icecite.utils.textlines.PdfTextLineUtils;
 
 /**
  * A plain implementation of {@link PdfParagraphTokenizer}.
@@ -122,12 +125,12 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     if (hasSignificantDifferentFontFace(prevLine, line)) {
       return true;
     }
-    
+
     // The line introduces a new paragraph, if the pitch to the previous line
     // is larger than the most common line pitch in the paragraph.
-//    if (linepitchIsTooLarge(paragraph, prevLine, line)) {
-//      return true;
-//    }
+    if (isLinepitchTooLarge(pdf, prevLine, line)) {
+      return true;
+    }
 
     // TODO: Line pitch.
     // TODO: Itemizes
@@ -244,5 +247,47 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     }
 
     return false;
+  }
+
+  /**
+   * Checks if the line pitch between the given line and the given previous
+   * line is larger than usual (larger than the most common line pitch for the
+   * font / font size pair of the given line).
+   * 
+   * @param pdf
+   *        The PDF document.
+   * @param prevLine
+   *        The previous line of the line to process.
+   * @param line
+   *        The line to process.
+   * @return True, if the line pitch between the given line and the given
+   *         previous line is larger than usual; False otherwise.
+   */
+  protected static boolean isLinepitchTooLarge(PdfDocument pdf,
+      PdfTextLine prevLine, PdfTextLine line) {
+    if (pdf == null || prevLine == null || line == null) {
+      return false;
+    }
+
+    PdfCharacterList lineCharacters = line.getCharacters();
+    if (lineCharacters == null) {
+      return false;
+    }
+
+    PdfTextLineList textLines = pdf.getTextLines();
+    if (textLines == null) {
+      return false;
+    }
+
+    // Obtain the expected and actual line pitch for the given line.
+    float expectedLinePitch = textLines.getMostCommonLinePitch(line);
+    float actualLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
+
+    if (Float.isNaN(expectedLinePitch) || Float.isNaN(actualLinePitch)) {
+      return false;
+    }
+
+    // TODO
+    return actualLinePitch - expectedLinePitch > 1;
   }
 }
