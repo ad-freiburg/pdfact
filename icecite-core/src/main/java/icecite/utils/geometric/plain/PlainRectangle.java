@@ -388,7 +388,7 @@ public class PlainRectangle extends Rectangle {
     setMinY(Math.min(getMinY(), rect.getRectangle().getMinY()));
     setMaxY(Math.max(getMaxY(), rect.getRectangle().getMaxY()));
   }
-  
+
   @Override
   public Rectangle union(Rectangle rect) {
     float minX = Math.min(getMinX(), rect.getMinX());

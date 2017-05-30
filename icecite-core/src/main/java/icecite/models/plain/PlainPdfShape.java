@@ -18,7 +18,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
    * The page in which this shape is located.
    */
   protected PdfPage page;
-  
+
   /**
    * The extraction order number.
    */
@@ -31,7 +31,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
 
   // ==========================================================================
   // Constructors.
-  
+
   /**
    * Creates a new PdfShape.
    * 
@@ -44,7 +44,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.page;
@@ -54,7 +54,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   public void setPage(PdfPage page) {
     this.page = page;
   }
-  
+
   // ==========================================================================
 
   @Override

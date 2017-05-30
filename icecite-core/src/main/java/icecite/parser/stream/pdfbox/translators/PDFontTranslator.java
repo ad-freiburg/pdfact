@@ -147,7 +147,7 @@ public class PDFontTranslator {
 
   /**
    * Computes the normalized name of the given font, that is the lower cased
-   * font name without the prefix (the part before "+"). For example, the 
+   * font name without the prefix (the part before "+"). For example, the
    * normalized name of "LTSLOS+NimbusSanL-Bold" is "nimbussanl-bold".
    * 
    * @param font

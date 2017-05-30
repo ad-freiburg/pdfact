@@ -9,7 +9,7 @@ public interface PdfFont extends PdfResource {
   /**
    * Returns the normalized name of this font. That is the lower cased name of
    * the font as it appears in the PDF document without the substring up to the
-   * "+" sign. For example, if the name of font is "FPVPVX+NimbusRomNo9L-Medi", 
+   * "+" sign. For example, if the name of font is "FPVPVX+NimbusRomNo9L-Medi",
    * this method returns "nimbusromno9l-medi".
    * 
    * @return The normalized name of this font.
@@ -29,7 +29,7 @@ public interface PdfFont extends PdfResource {
   /**
    * Returns the basename of this font, that is the basename of this font
    * without the substring behind the "-" sign and without any digits or any
-   * other special characters. For example, if the basename of the font is 
+   * other special characters. For example, if the basename of the font is
    * "nimbusromno9l-medi", this method returns "nimbusromnol".
    * 
    * @return The basename of this font.
@@ -43,7 +43,6 @@ public interface PdfFont extends PdfResource {
    *        The basename of this font.
    */
   void setBaseName(String name);
-
 
   // ==========================================================================
 
@@ -62,7 +61,7 @@ public interface PdfFont extends PdfResource {
    *        The font family name.
    */
   void setFontFamilyName(String name);
-  
+
   // ==========================================================================
 
   /**

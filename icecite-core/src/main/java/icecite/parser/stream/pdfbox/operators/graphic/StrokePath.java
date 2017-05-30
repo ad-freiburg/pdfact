@@ -150,7 +150,7 @@ public class StrokePath extends OperatorProcessor {
 
       float[] pathPosition = this.engine.getLinePathPosition();
       PdfPage pdfPage = this.engine.getCurrentPdfPage();
-      
+
       switch (currentSegment) {
         case PathIterator.SEG_CLOSE:
           float[] lastMoveTo = this.engine.getLinePathLastMoveToPosition();

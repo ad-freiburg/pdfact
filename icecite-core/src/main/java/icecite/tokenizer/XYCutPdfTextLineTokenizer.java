@@ -31,7 +31,7 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
    * The factory to create instances of PdfTextLineList.
    */
   protected PdfTextLineListFactory textLineListFactory;
-  
+
   /**
    * The factory to create instances of PdfTextLine.
    */
@@ -65,7 +65,7 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   /**
    * Creates a new text line tokenizer.
    * 
-   * @param textLineListFactory 
+   * @param textLineListFactory
    *        The factory to create instance of {@link PdfTextLineList}.
    * @param textLineFactory
    *        The factory to create instance of {@link PdfTextLine}.
@@ -73,7 +73,7 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
    *        The factory to create instances of {@link Line}.
    */
   @Inject
-  public XYCutPdfTextLineTokenizer(PdfTextLineListFactory textLineListFactory, 
+  public XYCutPdfTextLineTokenizer(PdfTextLineListFactory textLineListFactory,
       PdfTextLineFactory textLineFactory, LineFactory lineFactory) {
     super();
     this.textLineListFactory = textLineListFactory;

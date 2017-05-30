@@ -5,8 +5,8 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfPage extends HasCharacters, HasFigures, HasShapes,
-    HasTextLines, HasTextBlocks {
+public interface PdfPage
+    extends HasCharacters, HasFigures, HasShapes, HasTextLines, HasTextBlocks {
   /**
    * Returns the number of this page in the PDF document.
    * 

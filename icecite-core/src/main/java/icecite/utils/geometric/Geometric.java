@@ -156,8 +156,7 @@ public abstract class Geometric implements HasRectangle {
    * @return True if this geometric object overlaps the given vertical range.
    */
   public boolean overlapsVertically(float minY, float maxY) {
-    return getRectangle().getMinY() <= maxY
-        && getRectangle().getMaxY() >= minY;
+    return getRectangle().getMinY() <= maxY && getRectangle().getMaxY() >= minY;
   }
 
   /**
@@ -212,8 +211,7 @@ public abstract class Geometric implements HasRectangle {
 
   @Override
   public String toString() {
-    return "[" + getRectangle().getMinX() + "," + getRectangle().getMinY()
-        + "," + getRectangle().getMaxX() + "," + getRectangle().getMaxY()
-        + "]";
+    return "[" + getRectangle().getMinX() + "," + getRectangle().getMinY() + ","
+        + getRectangle().getMaxX() + "," + getRectangle().getMaxY() + "]";
   }
 }

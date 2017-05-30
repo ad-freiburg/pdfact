@@ -333,7 +333,7 @@ public class ShowText extends OperatorProcessor {
     }
 
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
-    
+
     PDColor nonStrokingColor = graphicsState.getNonStrokingColor();
     PDColorSpace cs = graphicsState.getNonStrokingColorSpace();
     float[] rgb = cs.toRGB(nonStrokingColor.getComponents());

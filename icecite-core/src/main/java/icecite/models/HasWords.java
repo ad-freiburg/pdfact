@@ -19,16 +19,16 @@ public interface HasWords {
    * @return The first word or null if the list of words is empty.
    */
   PdfWord getFirstWord();
-  
+
   /**
    * Returns the last word.
    * 
    * @return The last word or null if the list of words is empty.
    */
   PdfWord getLastWord();
-  
+
   // ==========================================================================
-  
+
   /**
    * Sets the words.
    * 

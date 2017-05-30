@@ -24,7 +24,7 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
    * The factory to create instances of PdfWordList.
    */
   protected PdfWordListFactory wordListFactory;
-  
+
   /**
    * The factory to create instances of PdfWord.
    */

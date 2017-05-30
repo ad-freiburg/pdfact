@@ -43,7 +43,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.page;
@@ -53,7 +53,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public void setPage(PdfPage page) {
     this.page = page;
   }
-  
+
   // ==========================================================================
 
   @Override

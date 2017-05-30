@@ -66,7 +66,7 @@ public class OperatorProcessorModule extends AbstractModule {
   @Override
   protected void configure() {
     bind(PdfFontUtils.class).in(Singleton.class);
-    
+
     Multibinder<OperatorProcessor> binder = Multibinder.newSetBinder(binder(),
         OperatorProcessor.class);
 

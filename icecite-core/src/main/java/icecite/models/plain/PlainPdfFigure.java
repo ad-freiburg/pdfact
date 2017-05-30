@@ -17,7 +17,7 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
    * The page in which this figure is located.
    */
   protected PdfPage page;
-  
+
   /**
    * Creates a new PdfFigure.
    * 
@@ -30,7 +30,7 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.page;
@@ -40,9 +40,9 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   public void setPage(PdfPage page) {
     this.page = page;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public PdfType getType() {
     return PdfType.FIGURES;

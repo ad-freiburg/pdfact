@@ -154,7 +154,7 @@ public abstract class Rectangle extends Geometric {
    *        The other rectangle.
    */
   public abstract void extend(HasRectangle rect);
-  
+
   /**
    * Merges this rect with given rect. Returns the minimum bounding box that
    * contains both rectangles.

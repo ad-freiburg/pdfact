@@ -62,7 +62,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    *        The tokenizer to identify words.
    * @param paragraphTokenizer
    *        The tokenizer to identify paragraphs.
-   * @param textLineListFactory 
+   * @param textLineListFactory
    *        The factory to create instances of {@link PdfTextLineList}.
    */
   @Inject

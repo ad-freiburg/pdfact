@@ -19,7 +19,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
    * The page in which this character is located.
    */
   protected PdfPage page;
-  
+
   /**
    * The extraction order number.
    */
@@ -60,7 +60,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.page;
@@ -70,7 +70,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   public void setPage(PdfPage page) {
     this.page = page;
   }
-  
+
   // ==========================================================================
 
   @Override

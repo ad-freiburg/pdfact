@@ -22,7 +22,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
    * The page in which this word is located.
    */
   protected PdfPage page;
-  
+
   /**
    * The characters of this page.
    */
@@ -51,7 +51,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.page;
@@ -61,7 +61,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   public void setPage(PdfPage page) {
     this.page = page;
   }
-  
+
   // ==========================================================================
 
   @Override

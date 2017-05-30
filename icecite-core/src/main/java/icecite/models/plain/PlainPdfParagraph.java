@@ -37,7 +37,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
    * @param rectangleFactory
    *        The factory to create instances of Rectangle.
    * @param wordListFactory
-   *        The factory to create instances of PdfWordList. 
+   *        The factory to create instances of PdfWordList.
    */
   @AssistedInject
   public PlainPdfParagraph(RectangleFactory rectangleFactory,

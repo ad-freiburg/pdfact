@@ -79,7 +79,7 @@ public class PlainPdfDocument implements PdfDocument {
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList. 
+   *        The factory to create instances of PdfTextLineList.
    */
   @AssistedInject
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
@@ -99,7 +99,7 @@ public class PlainPdfDocument implements PdfDocument {
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList. 
+   *        The factory to create instances of PdfTextLineList.
    * @param pdf
    *        The PDF file given as a File object
    */
@@ -116,7 +116,7 @@ public class PlainPdfDocument implements PdfDocument {
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList. 
+   *        The factory to create instances of PdfTextLineList.
    * @param pdf
    *        The PDF file given as a File object
    */

@@ -62,7 +62,7 @@ public class PlainPdfPage implements PdfPage {
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList. 
+   *        The factory to create instances of PdfTextLineList.
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory,
@@ -80,7 +80,7 @@ public class PlainPdfPage implements PdfPage {
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList. 
+   *        The factory to create instances of PdfTextLineList.
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
