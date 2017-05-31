@@ -21,8 +21,6 @@ import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 
-// TODO: Accelerate cut method.
-
 /**
  * A plain implementation of {@link PdfCharacterList}.
  * 
@@ -33,10 +31,10 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   /**
    * The serial id.
    */
-  private static final long serialVersionUID = 6187582288718513001L;
+  protected static final long serialVersionUID = 6187582288718513001L;
 
   /**
-   * The most common font.
+   * The most common font of the characters in this list.
    */
   protected PdfFont mostCommonFont;
 
@@ -46,7 +44,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   protected Set<PdfCharacter> charsWithMostCommonFont;
 
   /**
-   * The most common color.
+   * The most common color of the characters in this list.
    */
   protected PdfColor mostCommonColor;
 
@@ -56,9 +54,9 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   protected Set<PdfCharacter> charsWithMostCommonColor;
 
   /**
-   * The most common font size.
+   * The most common font size of the characters in this list.
    */
-  protected float mostCommonFontsize;
+  protected float mostCommonFontsize = Float.NaN;
 
   /**
    * The characters with the most common font size.
@@ -68,7 +66,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   /**
    * The average font size.
    */
-  protected float averageFontsize;
+  protected float averageFontsize = Float.NaN;
 
   // ==========================================================================
   // Constructors.
@@ -101,25 +99,23 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   // ==========================================================================
 
   /**
-   * Computes statistics about the characters in this list.
+   * Computes the statistics about the characters in this list.
    */
   protected void computeStatistics() {
     super.computeStatistics();
-    ObjectCounter<PdfFont> fontsCounter = new ObjectCounter<>();
+    
+    // Count the colors, fonts and font sizes.
     ObjectCounter<PdfColor> colorsCounter = new ObjectCounter<>();
+    ObjectCounter<PdfFont> fontsCounter = new ObjectCounter<>();
     FloatCounter fontsizesCounter = new FloatCounter();
 
     for (PdfCharacter character : this) {
-      // Process the font.
       fontsCounter.add(character.getFont());
-
-      // Process the color.
       colorsCounter.add(character.getColor());
-
-      // Process the font size.
       fontsizesCounter.add(character.getFontSize());
     }
 
+    // Obtain the most common (and average) values.
     this.mostCommonFont = fontsCounter.getMostCommonObject();
     this.mostCommonColor = colorsCounter.getMostCommonObject();
     this.mostCommonFontsize = fontsizesCounter.getMostCommonFloat();
@@ -132,7 +128,6 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public List<PdfCharacterList> cut(int index) {
-    // Create new views.
     PdfCharacterView left = new PdfCharacterView(this, 0, index);
     PdfCharacterView right = new PdfCharacterView(this, index, this.size());
     return Arrays.asList(left, right);
@@ -142,7 +137,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public PdfFont getMostCommonFont() {
-    if (this.isStatisticsOutdated) {
+    if (this.mostCommonFont == null || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonFont;
@@ -150,7 +145,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonFont() {
-    if (this.charsWithMostCommonFont == null) {
+    if (this.charsWithMostCommonFont == null || this.isStatisticsOutdated) {
       this.charsWithMostCommonFont = computeCharsWithMostCommonFont();
     }
     return this.charsWithMostCommonFont;
@@ -176,7 +171,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public PdfColor getMostCommonColor() {
-    if (this.isStatisticsOutdated) {
+    if (this.mostCommonColor == null || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonColor;
@@ -184,7 +179,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonColor() {
-    if (this.charsWithMostCommonColor == null) {
+    if (this.charsWithMostCommonColor == null || this.isStatisticsOutdated) {
       this.charsWithMostCommonColor = computeCharsWithMostCommonColor();
     }
     return this.charsWithMostCommonColor;
@@ -210,7 +205,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public float getAverageFontsize() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.averageFontsize) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageFontsize;
@@ -218,7 +213,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public float getMostCommonFontsize() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.mostCommonFontsize) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonFontsize;
@@ -226,7 +221,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   @Override
   public Set<PdfCharacter> getCharactersWithMostCommonFontsize() {
-    if (this.charsWithMostCommonFontsize == null) {
+    if (this.charsWithMostCommonFontsize == null || this.isStatisticsOutdated) {
       this.charsWithMostCommonFontsize = computeCharsWithMostCommonFontsize();
     }
     return this.charsWithMostCommonFontsize;
@@ -250,6 +245,23 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   // ==========================================================================
 
+  @Override
+  public String toString() {
+    return super.toString();
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
+  
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+  
+  // ==========================================================================
+  
   /**
    * A view of a PdfCharacterList.
    * 
@@ -265,12 +277,17 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     /**
      * The parent list.
      */
-    protected final PdfCharacterList base;
+    protected final PdfCharacterList parent;
 
     /**
-     * The offset in the parent list.
+     * The offset of this view in the parent list.
      */
     protected final int offset;
+    
+    /**
+     * The size of this list (the number of elements in the list).
+     */
+    protected int size;
 
     // ========================================================================
     // Constructors.
@@ -281,13 +298,13 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
      * @param parent
      *        The parent list.
      * @param fromIndex
-     *        The start index.
+     *        The start index in the parent list.
      * @param toIndex
-     *        The end index.
+     *        The end index in the parent list.
      */
     PdfCharacterView(PdfCharacterList parent, int fromIndex, int toIndex) {
       super(PlainPdfCharacterList.this.rectangleFactory);
-      this.base = parent;
+      this.parent = parent;
       this.offset = fromIndex;
       this.size = toIndex - fromIndex;
     }
@@ -391,7 +408,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
     @Override
     public PdfCharacter get(int index) {
-      return this.base.get(this.offset + index);
+      return this.parent.get(this.offset + index);
     }
 
     @Override
@@ -407,7 +424,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
     @Override
     public void swap(int i, int j) {
-      this.base.swap(this.offset + i, this.offset + j);
+      this.parent.swap(this.offset + i, this.offset + j);
     }
 
     // ========================================================================
@@ -418,9 +435,26 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
       int left = this.offset;
       int cut = this.offset + i;
       int right = this.offset + size();
-      PdfCharacterView v1 = new PdfCharacterView(this.base, left, cut);
-      PdfCharacterView v2 = new PdfCharacterView(this.base, cut, right);
+      PdfCharacterView v1 = new PdfCharacterView(this.parent, left, cut);
+      PdfCharacterView v2 = new PdfCharacterView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
+    }
+    
+    // ========================================================================
+    
+    @Override
+    public String toString() {
+      return super.toString();
+    }
+    
+    @Override
+    public boolean equals(Object other) {
+      return super.equals(other);
+    }
+    
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
   }
 }

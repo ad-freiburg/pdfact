@@ -27,7 +27,7 @@ import icecite.utils.sort.Quicksort;
  * A plain implementation of {@link PdfElementList}.
  * 
  * @param <T>
- *        The concrete type of the elements in this List.
+ *        The concrete type of the elements in this list.
  * 
  * @author Claudius Korzen
  */
@@ -36,7 +36,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   /**
    * The serial id.
    */
-  private static final long serialVersionUID = 2032345121881710427L;
+  protected static final long serialVersionUID = 2032345121881710427L;
 
   /**
    * The default initial capacity of this list.
@@ -44,32 +44,32 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected static final int DEFAULT_INITIAL_CAPACITY = 16;
 
   /**
-   * The factory to create instances of Rectangle.
+   * The factory to create instances of {@link Rectangle}.
    */
   protected RectangleFactory rectangleFactory;
 
   /**
-   * The average height.
+   * The average height of the elements in this list.
    */
   protected float averageHeight = Float.NaN;
 
   /**
-   * The most common height.
+   * The most common height of the elements in this list.
    */
   protected float mostCommonHeight = Float.NaN;
 
   /**
-   * The average width.
+   * The average width of the elements in this list.
    */
   protected float averageWidth = Float.NaN;
 
   /**
-   * The most common width.
+   * The most common width of the elements in this list.
    */
   protected float mostCommonWidth = Float.NaN;
 
   /**
-   * The smallest minX.
+   * The smallest minX of the elements in this list.
    */
   protected float smallestMinX = Float.MAX_VALUE;
 
@@ -79,7 +79,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected Set<T> elementsWithSmallestMinX;
 
   /**
-   * The smallest minY.
+   * The smallest minY of the elements in this list.
    */
   protected float smallestMinY = Float.MAX_VALUE;
 
@@ -89,7 +89,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected Set<T> elementsWithSmallestMinY;
 
   /**
-   * The largest maxX.
+   * The largest maxX of the elements in this list.
    */
   protected float largestMaxX = -Float.MAX_VALUE;
 
@@ -99,7 +99,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   protected Set<T> elementsWithLargestMaxX;
 
   /**
-   * The largest maxY.
+   * The largest maxY of the elements in this list.
    */
   protected float largestMaxY = -Float.MAX_VALUE;
 
@@ -118,11 +118,6 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
    */
   protected boolean isStatisticsOutdated = true;
 
-  /**
-   * The size of the ArrayList (the number of elements it contains).
-   */
-  protected int size;
-
   // ==========================================================================
   // Constructors.
 
@@ -130,7 +125,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
    * Creates a new list.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Rectangle}.
    */
   @AssistedInject
   public PlainPdfElementList(RectangleFactory rectangleFactory) {
@@ -141,7 +136,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
    * Creates a new list.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Rectangle}.
    * @param initialCapacity
    *        The initial capacity.
    */
@@ -239,43 +234,42 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   // Register methods.
 
   /**
-   * Registers the given element to this list.
+   * Computes some statistics about the elements in this list.
    */
   protected void computeStatistics() {
+    // Count the heights and widths of the elements in this list.
     FloatCounter heightsCounter = new FloatCounter();
     FloatCounter widthsCounter = new FloatCounter();
 
     for (T element : this) {
-      // Process the height.
       heightsCounter.add(element.getRectangle().getHeight());
-
-      // Process the width.
       widthsCounter.add(element.getRectangle().getWidth());
 
-      // Process minX.
       if (element.getRectangle().getMinX() < this.smallestMinX) {
         this.smallestMinX = element.getRectangle().getMinX();
       }
 
-      // Process minY.
       if (element.getRectangle().getMinY() < this.smallestMinY) {
         this.smallestMinY = element.getRectangle().getMinY();
       }
 
-      // Process maxX.
       if (element.getRectangle().getMaxX() > this.largestMaxX) {
         this.largestMaxX = element.getRectangle().getMaxX();
       }
 
-      // Process maxY.
       if (element.getRectangle().getMaxY() > this.largestMaxY) {
         this.largestMaxY = element.getRectangle().getMaxY();
       }
     }
-    this.averageHeight = heightsCounter.getAverageFloat();
-    this.mostCommonHeight = heightsCounter.getMostCommonFloat();
+    // TODO: Move the computation of the smallest / largest values into the
+    // counters.
 
+    // Compute the average values.
+    this.averageHeight = heightsCounter.getAverageFloat();
     this.averageWidth = widthsCounter.getAverageFloat();
+
+    // Compute the most common values.
+    this.mostCommonHeight = heightsCounter.getMostCommonFloat();
     this.mostCommonWidth = widthsCounter.getMostCommonFloat();
 
     this.isStatisticsOutdated = false;
@@ -285,7 +279,6 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public List<? extends PdfElementList<T>> cut(int index) {
-    // Create new views.
     PdfElementView<T> left = new PdfElementView<>(this, 0, index);
     PdfElementView<T> right = new PdfElementView<>(this, index, this.size());
     return Arrays.asList(left, right);
@@ -295,7 +288,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageHeight() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.averageHeight) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageHeight;
@@ -303,7 +296,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonHeight() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.mostCommonHeight) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonHeight;
@@ -313,7 +306,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getAverageWidth() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.averageWidth) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.averageWidth;
@@ -321,7 +314,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getMostCommonWidth() {
-    if (this.isStatisticsOutdated) {
+    if (Float.isNaN(this.mostCommonWidth) || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.mostCommonWidth;
@@ -331,7 +324,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinX() {
-    if (this.isStatisticsOutdated) {
+    if (this.smallestMinX == Float.MAX_VALUE || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinX;
@@ -339,7 +332,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Set<T> getElementsWithSmallestMinX() {
-    if (this.elementsWithSmallestMinX == null) {
+    if (this.elementsWithSmallestMinX == null || this.isStatisticsOutdated) {
       this.elementsWithSmallestMinX = computeElementsWithSmallestMinX();
     }
     return this.elementsWithSmallestMinX;
@@ -365,7 +358,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getSmallestMinY() {
-    if (this.isStatisticsOutdated) {
+    if (this.smallestMinY == Float.MAX_VALUE || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.smallestMinY;
@@ -373,7 +366,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Set<T> getElementsWithSmallestMinY() {
-    if (this.elementsWithSmallestMinY == null) {
+    if (this.elementsWithSmallestMinY == null || this.isStatisticsOutdated) {
       this.elementsWithSmallestMinY = computeElementsWithSmallestMinY();
     }
     return this.elementsWithSmallestMinY;
@@ -399,7 +392,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxX() {
-    if (this.isStatisticsOutdated) {
+    if (this.largestMaxX == -Float.MAX_VALUE || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxX;
@@ -407,7 +400,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Set<T> getElementsWithLargestMaxX() {
-    if (this.elementsWithLargestMaxX == null) {
+    if (this.elementsWithLargestMaxX == null || this.isStatisticsOutdated) {
       this.elementsWithLargestMaxX = computeElementsWithLargestMaxX();
     }
     return this.elementsWithLargestMaxX;
@@ -433,7 +426,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public float getLargestMaxY() {
-    if (this.isStatisticsOutdated) {
+    if (this.largestMaxY == -Float.MAX_VALUE || this.isStatisticsOutdated) {
       computeStatistics();
     }
     return this.largestMaxY;
@@ -441,7 +434,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Set<T> getElementsWithLargestMaxY() {
-    if (this.elementsWithLargestMaxY == null) {
+    if (this.elementsWithLargestMaxY == null || this.isStatisticsOutdated) {
       this.elementsWithLargestMaxY = computeElementsWithLargestMaxY();
     }
     return this.elementsWithLargestMaxY;
@@ -467,7 +460,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Rectangle getRectangle() {
-    if (this.boundingBox == null) {
+    if (this.boundingBox == null || this.isStatisticsOutdated) {
       this.boundingBox = this.rectangleFactory.create();
       this.boundingBox.setMinX(getSmallestMinX());
       this.boundingBox.setMinY(getSmallestMinY());
@@ -479,10 +472,29 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the elements in this list. It is not
-    // allowed to set the bounding box explicitly.
+    // The bounding box results from the elements in this list. Hence, it is
+    // not allowed to set the bounding box explicitly.
     throw new UnsupportedOperationException();
   }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return super.toString();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  // ==========================================================================
 
   /**
    * A view of a PdfElementList.
@@ -502,17 +514,17 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     /**
      * The parent list.
      */
-    protected final PdfElementList<S> base;
+    protected final PdfElementList<S> parent;
 
     /**
-     * The offset in the parent list.
+     * The offset of this view in the parent list.
      */
     protected final int offset;
 
     /**
-     * The size of the ArrayList (the number of elements it contains).
+     * The size of this list (the number of elements).
      */
-    private int size;
+    protected int size;
 
     // ========================================================================
     // Constructors.
@@ -523,13 +535,13 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
      * @param parent
      *        The parent list.
      * @param fromIndex
-     *        The start index.
+     *        The start index in the parent list.
      * @param toIndex
-     *        The end index.
+     *        The end index in the parent list.
      */
     PdfElementView(PdfElementList<S> parent, int fromIndex, int toIndex) {
       super(PlainPdfElementList.this.rectangleFactory);
-      this.base = parent;
+      this.parent = parent;
       this.offset = fromIndex;
       this.size = toIndex - fromIndex;
     }
@@ -633,7 +645,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
     @Override
     public S get(int index) {
-      return this.base.get(this.offset + index);
+      return this.parent.get(this.offset + index);
     }
 
     @Override
@@ -649,7 +661,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
     @Override
     public void swap(int i, int j) {
-      this.base.swap(this.offset + i, this.offset + j);
+      this.parent.swap(this.offset + i, this.offset + j);
     }
 
     // ========================================================================
@@ -660,9 +672,26 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
       int left = this.offset;
       int cut = this.offset + i;
       int right = this.offset + size();
-      PdfElementView<S> v1 = new PdfElementView<S>(this.base, left, cut);
-      PdfElementView<S> v2 = new PdfElementView<S>(this.base, cut, right);
+      PdfElementView<S> v1 = new PdfElementView<S>(this.parent, left, cut);
+      PdfElementView<S> v2 = new PdfElementView<S>(this.parent, cut, right);
       return Arrays.asList(v1, v2);
+    }
+    
+    // ========================================================================
+
+    @Override
+    public String toString() {
+      return super.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
   }
 }

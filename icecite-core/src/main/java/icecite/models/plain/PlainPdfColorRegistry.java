@@ -39,8 +39,6 @@ public class PlainPdfColorRegistry implements PdfColorRegistry {
     if (hasColor(colorName)) {
       throw new IllegalStateException("The color is already registered.");
     }
-    // Set the id of the color.
-    color.setId("" + this.index.size());
     // Index the color.
     this.index.put(colorName, color);
   }

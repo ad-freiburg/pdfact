@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -24,7 +27,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   protected PdfPage page;
 
   /**
-   * The characters of this page.
+   * The characters of this word.
    */
   protected PdfCharacterList characters;
 
@@ -39,7 +42,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
    * Creates a new word.
    * 
    * @param page
-   *        The page in which the word is located.
+   *        The page in which this word is located.
    * @param characters
    *        The characters of this word.
    */
@@ -116,5 +119,32 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   @Override
   public PdfType getType() {
     return PdfType.WORDS;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "PlainPdfWord(" + this.text + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfWord) {
+      PdfWord otherWord = (PdfWord) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getCharacters(), otherWord.getCharacters());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getCharacters());
+    return builder.hashCode();
   }
 }

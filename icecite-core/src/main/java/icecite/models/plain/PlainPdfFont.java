@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import icecite.models.PdfFont;
 
 /**
@@ -9,9 +12,9 @@ import icecite.models.PdfFont;
  */
 public class PlainPdfFont implements PdfFont {
   /**
-   * The full name of this font.
+   * The (normalized) name of this font.
    */
-  protected String name;
+  protected String normalizedName;
 
   /**
    * The base name of this font.
@@ -19,7 +22,7 @@ public class PlainPdfFont implements PdfFont {
   protected String basename;
 
   /**
-   * The name of the font family of this font.
+   * The name of the font family.
    */
   protected String fontFamilyName;
 
@@ -42,12 +45,12 @@ public class PlainPdfFont implements PdfFont {
 
   @Override
   public String getNormalizedName() {
-    return this.name;
+    return this.normalizedName;
   }
 
   @Override
   public void setNormalizedName(String name) {
-    this.name = name;
+    this.normalizedName = name;
   }
 
   // ==========================================================================
@@ -114,8 +117,28 @@ public class PlainPdfFont implements PdfFont {
 
   @Override
   public String toString() {
-    return "PlainPdfFont(" + this.name + ", " + this.basename + ", "
+    return "PlainPdfFont(" + this.normalizedName + ", " + this.basename + ", "
         + this.fontFamilyName + ", isType3: " + this.isType3Font + ", isBold: "
         + this.isBold + ", isItalic: " + this.isItalic() + ")";
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfFont) {
+      PdfFont otherFont = (PdfFont) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getNormalizedName(), otherFont.getNormalizedName());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getNormalizedName());
+    return builder.hashCode();
   }
 }

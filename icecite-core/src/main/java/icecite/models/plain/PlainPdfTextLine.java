@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -57,7 +60,7 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
    * @param characters
    *        The characters of this text line.
    * @param wordListFactory
-   *        The factory to create instances of PdfWordList.
+   *        The factory to create instances of {@link PdfWordList}.
    */
   @AssistedInject
   public PlainPdfTextLine(@Assisted PdfPage page,
@@ -186,5 +189,32 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   @Override
   public PdfType getType() {
     return PdfType.TEXTLINES;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "PlainPdfTextLine(" + this.text + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfTextLine) {
+      PdfTextLine otherTextLine = (PdfTextLine) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getCharacters(), otherTextLine.getCharacters());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getCharacters());
+    return builder.hashCode();
   }
 }

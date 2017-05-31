@@ -79,13 +79,6 @@ public interface PdfDocument extends HasCharacters, HasFigures, HasShapes,
     /**
      * Creates a PdfDocument.
      * 
-     * @return An instance of {@link PdfDocument}.
-     */
-    PdfDocument create();
-
-    /**
-     * Creates a PdfDocument.
-     * 
      * @param pdf
      *        The file on which the PDF document is based on.
      * 

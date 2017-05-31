@@ -7,23 +7,6 @@ package icecite.models;
  */
 public interface PdfColor extends PdfResource {
   /**
-   * Returns the id of this color.
-   * 
-   * @return The id of this color.
-   */
-  String getId();
-
-  /**
-   * Sets the id of this color.
-   * 
-   * @param name
-   *        The id of this color.
-   */
-  void setId(String name);
-
-  // ==========================================================================
-
-  /**
    * Returns the name of this color.
    * 
    * @return The name of this color.

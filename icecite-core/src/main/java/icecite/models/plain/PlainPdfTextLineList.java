@@ -9,6 +9,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.utils.counter.FloatCounter;
+import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.textlines.PdfTextLineUtils;
 
@@ -22,10 +23,11 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   /**
    * The serial id.
    */
-  private static final long serialVersionUID = 1759166517929546020L;
+  protected static final long serialVersionUID = 1759166517929546020L;
 
   /**
-   * The line pitches between the text lines, per font / font size pair.
+   * The line pitches between the text lines, per font faces (font / font size
+   * pair).
    */
   protected Map<String, FloatCounter> linePitchesPerFontFace;
 
@@ -33,7 +35,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    * Creates a new PlainPdfTextLineList.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Rectangle}.
    */
   @AssistedInject
   public PlainPdfTextLineList(RectangleFactory rectangleFactory) {
@@ -44,9 +46,9 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    * Creates a new PlainPdfTextLineList.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Rectangle}.
    * @param initialCapacity
-   *        The initial capacity.
+   *        The initial capacity of this list.
    */
   @AssistedInject
   public PlainPdfTextLineList(RectangleFactory rectangleFactory,
@@ -58,7 +60,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   // ==========================================================================
 
   /**
-   * Computes statistics about the text lines in this list.
+   * Computes some statistics about the text lines in this list.
    */
   protected void computeStatistics() {
     super.computeStatistics();
@@ -71,8 +73,9 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
         continue;
       }
 
-      // Compose the font face of the current line.
+      // Compute the font face of the current line.
       String fontFace = PdfTextLineUtils.computeFontFace(line);
+      // Compute the line pitch between the current line and the previous line.
       float linePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
 
       if (Float.isNaN(linePitch)) {
@@ -97,5 +100,22 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
       return this.linePitchesPerFontFace.get(fontFace).getMostCommonFloat();
     }
     return Float.NaN;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return super.toString();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 }

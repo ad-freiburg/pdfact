@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfParagraph;
@@ -35,9 +38,9 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
    * Creates an empty paragraph.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Rectangle}.
    * @param wordListFactory
-   *        The factory to create instances of PdfWordList.
+   *        The factory to create instances of {@link PdfWordList}.
    */
   @AssistedInject
   public PlainPdfParagraph(RectangleFactory rectangleFactory,
@@ -120,5 +123,36 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public PdfType getType() {
     return PdfType.PARAGRAPHS;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "PlainPdfParagraph(" + this.getText() + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfParagraph) {
+      PdfParagraph otherParagraph = (PdfParagraph) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPage(), otherParagraph.getPage());
+      builder.append(getRectangle(), otherParagraph.getRectangle());
+      builder.append(getText(), otherParagraph.getText());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPage());
+    builder.append(getRectangle());
+    builder.append(getText());
+    return builder.hashCode();
   }
 }

@@ -216,7 +216,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
     if (!PdfCharacterFilter.filterPdfCharacter(character)) {
       // TODO
-      character.setExtractionOrderNumber(this.page.getCharacters().size());
+      character.setPositionInExtractionOrder(this.page.getCharacters().size());
       character.setPage(this.page);
 
       this.page.addCharacter(character);

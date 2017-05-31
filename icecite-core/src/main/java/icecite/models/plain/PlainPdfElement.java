@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import icecite.models.PdfElement;
 import icecite.models.PdfPage;
 import icecite.models.PdfRole;
@@ -68,5 +71,35 @@ public class PlainPdfElement implements PdfElement {
   @Override
   public PdfType getType() {
     return null;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "PlainPdfElement(page: " + this.page.getPageNumber() + ", rect: "
+        + this.boundingBox + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfElement) {
+      PdfElement otherElement = (PdfElement) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPage(), otherElement.getPage());
+      builder.append(getRectangle(), otherElement.getRectangle());
+      
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPage());
+    builder.append(getRectangle());
+    return builder.hashCode();
   }
 }

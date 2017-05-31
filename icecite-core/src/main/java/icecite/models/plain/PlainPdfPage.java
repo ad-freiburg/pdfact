@@ -3,19 +3,22 @@ package icecite.models.plain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
-import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 
 /**
  * A plain implementation of {@link PdfPage}.
@@ -24,32 +27,32 @@ import icecite.models.PdfTextLineList;
  */
 public class PlainPdfPage implements PdfPage {
   /**
+   * The number of this page in the PDF document.
+   */
+  protected int pageNumber;
+  
+  /**
    * The characters of this page.
    */
   protected PdfCharacterList characters;
 
   /**
-   * The figures in this page.
+   * The figures of this page.
    */
   protected List<PdfFigure> figures;
 
   /**
-   * The shapes in this page.
+   * The shapes of this page.
    */
   protected List<PdfShape> shapes;
 
   /**
-   * The number of this page in the PDF document.
-   */
-  protected int pageNumber;
-
-  /**
-   * The identified text blocks of this page.
+   * The text blocks of this page.
    */
   protected List<PdfTextBlock> textBlocks;
 
   /**
-   * The identified text lines of this page.
+   * The text lines of this page.
    */
   protected PdfTextLineList textLines;
 
@@ -60,9 +63,9 @@ public class PlainPdfPage implements PdfPage {
    * Creates a new PDF page.
    * 
    * @param characterListFactory
-   *        The factory to create instances of PdfCharacterList.
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList.
+   *        The factory to create instances of {@link PdfTextLineList}.
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory,
@@ -221,5 +224,32 @@ public class PlainPdfPage implements PdfPage {
   @Override
   public void setPageNumber(int pageNumber) {
     this.pageNumber = pageNumber;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public String toString() {
+    return "PlainPdfPage(" + this.pageNumber + ")";
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfPage) {
+      PdfPage otherPage = (PdfPage) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPageNumber(), otherPage.getPageNumber());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPageNumber());
+    return builder.hashCode();
   }
 }

@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -46,5 +49,35 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   @Override
   public PdfType getType() {
     return PdfType.FIGURES;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "PlainPdfFigure(page: " + this.page.getPageNumber() + "rect: "
+        + this.boundingBox + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfFigure) {
+      PdfFigure otherFigure = (PdfFigure) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPage(), otherFigure.getPage());
+      builder.append(getRectangle(), otherFigure.getRectangle());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPage());
+    builder.append(getRectangle());
+    return builder.hashCode();
   }
 }

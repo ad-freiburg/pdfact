@@ -5,6 +5,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -38,35 +41,32 @@ public class PlainPdfDocument implements PdfDocument {
   protected List<PdfPage> pages;
 
   /**
-   * The characters of this PDF document. Needed to get document-wide
-   * statistics about characters.
+   * All characters of this PDF document.
    */
   protected PdfCharacterList characters;
 
   /**
-   * The figures of this PDF document. Needed to get document-wide statistics
-   * about figures.
+   * All figures of this PDF document.
    */
   protected List<PdfFigure> figures;
 
   /**
-   * The shapes of this PDF document. Needed to get document-wide statistics
-   * about shapes.
+   * All shapes of this PDF document.
    */
   protected List<PdfShape> shapes;
 
   /**
-   * The text blocks in this PDF document.
+   * All text blocks of this PDF document.
    */
   protected List<PdfTextBlock> textBlocks;
 
   /**
-   * The text lines in this PDF document.
+   * All text lines of this PDF document.
    */
   protected PdfTextLineList textLines;
 
   /**
-   * The paragraphs in this PDF document.
+   * All paragraphs of this PDF document.
    */
   protected List<PdfParagraph> paragraphs;
 
@@ -77,16 +77,15 @@ public class PlainPdfDocument implements PdfDocument {
    * Creates a new PDF document.
    * 
    * @param characterListFactory
-   *        The factory to create instances of PdfCharacterList.
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList.
+   *        The factory to create instances of {@link PdfTextLineList}.
    */
-  @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
+  protected PlainPdfDocument(PdfCharacterListFactory characterListFactory,
       PdfTextLineListFactory textLineListFactory) {
-    this.pages = new ArrayList<PdfPage>();
     this.characters = characterListFactory.create();
     this.textLines = textLineListFactory.create();
+    this.pages = new ArrayList<>();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
@@ -97,11 +96,11 @@ public class PlainPdfDocument implements PdfDocument {
    * Creates a new PDF document.
    * 
    * @param characterListFactory
-   *        The factory to create instances of PdfCharacterList.
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList.
+   *        The factory to create instances of {@link PdfTextLineList}.
    * @param pdf
-   *        The PDF file given as a File object
+   *        The PDF file given as a File object.
    */
   @AssistedInject
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
@@ -114,11 +113,11 @@ public class PlainPdfDocument implements PdfDocument {
    * Creates a new PDF document.
    * 
    * @param characterListFactory
-   *        The factory to create instances of PdfCharacterList.
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList.
+   *        The factory to create instances of {@link PdfTextLineList}.
    * @param pdf
-   *        The PDF file given as a File object
+   *        The PDF file given as a File object.
    */
   @AssistedInject
   public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
@@ -308,5 +307,32 @@ public class PlainPdfDocument implements PdfDocument {
   @Override
   public void addParagraph(PdfParagraph paragraph) {
     this.paragraphs.add(paragraph);
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public String toString() {
+    return "PlainPdfDocument(" + this.path + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfDocument) {
+      PdfDocument otherDocument = (PdfDocument) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPath(), otherDocument.getPath());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPath());
+    return builder.hashCode();
   }
 }

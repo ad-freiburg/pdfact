@@ -1,5 +1,10 @@
 package icecite.models.plain;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -13,11 +18,6 @@ import icecite.models.PdfColor;
  * @author Claudius Korzen
  */
 public class PlainPdfColor extends PlainPdfResource implements PdfColor {
-  /**
-   * The id of this color.
-   */
-  protected String id;
-
   /**
    * The name of this color.
    */
@@ -53,18 +53,6 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   // ==========================================================================
 
   @Override
-  public String getId() {
-    return this.id;
-  }
-
-  @Override
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  // ==========================================================================
-
-  @Override
   public String getName() {
     return this.name;
   }
@@ -91,5 +79,32 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   @Override
   public float[] getRGB() {
     return this.rgb;
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public String toString() {
+    return "PlainPdfColor(" + Arrays.toString(this.rgb) + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfColor) {
+      PdfColor otherColor = (PdfColor) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getRGB(), otherColor.getRGB());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getRGB());
+    return builder.hashCode();
   }
 }

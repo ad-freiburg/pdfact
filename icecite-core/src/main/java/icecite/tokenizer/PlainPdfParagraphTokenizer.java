@@ -2,6 +2,7 @@ package icecite.tokenizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.google.inject.Inject;
 
@@ -25,6 +26,12 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
    * The factory to create instances of PdfParagraph.
    */
   protected PdfParagraphFactory paragraphFactory;
+
+  /**
+   * The pattern to identify reference anchors.
+   */
+  protected static final Pattern REFERENCE_ANCHOR = Pattern
+      .compile("^\\[(.*)\\]\\s+");
 
   /**
    * Creates a new tokenizer to that tokenizes text lines into paragraphs.
@@ -132,9 +139,11 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
       return true;
     }
 
-    // TODO: Line pitch.
-    // TODO: Itemizes
-    // References.
+    // The line introduces a new paragraph, if it denotes the start of a
+    // reference.
+    if (isProbablyReferenceStart(prevLine, line, nextLine)) {
+      return true;
+    }
 
     return false;
   }
@@ -183,11 +192,29 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
    * @param nextLine
    *        The next line.
    * @return True, if the given line is indented compared to the given previous
-   *         line and the given next line.
+   *         line and the given next line and the line pitch between the
+   *         previous line / current line and between the current line / next
+   *         line are almost equal.
    */
   protected boolean isIndented(PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     if (prevLine == null || line == null || nextLine == null) {
+      return false;
+    }
+
+    // The line pitch between previous line / current line and between the
+    // current line / next line must be almost equal.
+    float prevLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
+    float linePitch = PdfTextLineUtils.computeLinePitch(line, nextLine);
+    // TODO
+    if (Math.abs(prevLinePitch - linePitch) > 1) {
+      return false;
+    }
+
+    // The previous and next line must not start with an reference anchor.
+    boolean hasPrevLineReferenceAnchor = startsWithReferenceAnchor(prevLine);
+    boolean hasNextLineReferenceAnchor = startsWithReferenceAnchor(nextLine);
+    if (hasPrevLineReferenceAnchor && hasNextLineReferenceAnchor) {
       return false;
     }
 
@@ -289,5 +316,72 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
     // TODO
     return actualLinePitch - expectedLinePitch > 1;
+  }
+
+  /**
+   * Returns true, if the given line is (probably) a reference start.
+   * 
+   * @param prevLine
+   *        The previous line of the line to process.
+   * @param line
+   *        The line to process.
+   * @param nextLine
+   *        The next line of the line to process.
+   * @return True, if the given line is (probably) a reference start.
+   */
+  protected boolean isProbablyReferenceStart(PdfTextLine prevLine,
+      PdfTextLine line, PdfTextLine nextLine) {
+    if (prevLine == null || line == null || nextLine == null) {
+      return false;
+    }
+
+    // The line must start with an reference anchor.
+    if (!startsWithReferenceAnchor(line)) {
+      return false;
+    }
+
+    Rectangle prevLineRect = prevLine.getRectangle();
+    Rectangle lineRect = line.getRectangle();
+    Rectangle nextLineRect = nextLine.getRectangle();
+    if (prevLineRect == null || lineRect == null || nextLineRect == null) {
+      return false;
+    }
+
+    float prevLineMinX = prevLineRect.getMinX();
+    float lineMinX = lineRect.getMinX();
+    float nextLineMinX = nextLineRect.getMinX();
+
+    // TODO
+    boolean hasPrevLineDifferentMinX = Math.abs(prevLineMinX - lineMinX) > 0.5;
+    boolean hasNextLineDifferentMinX = Math.abs(nextLineMinX - lineMinX) > 0.5;
+
+    boolean hasPrevLineReferenceAnchor = startsWithReferenceAnchor(prevLine);
+    boolean hasNextLineReferenceAnchor = startsWithReferenceAnchor(nextLine);
+
+    return (hasPrevLineDifferentMinX || hasPrevLineReferenceAnchor)
+        && (hasNextLineDifferentMinX || hasNextLineReferenceAnchor);
+  }
+
+  /**
+   * Checks is the given text line starts with a reference anchor like "[1]",
+   * "[2]", etc.
+   * 
+   * @param line
+   *        The text line to check.
+   * @return True, if the given text line starts with a reference anchor, false
+   *         otherwise.
+   */
+  // TODO: Move to any util.
+  protected boolean startsWithReferenceAnchor(PdfTextLine line) {
+    if (line == null) {
+      return false;
+    }
+
+    String text = line.getText();
+    if (text == null) {
+      return false;
+    }
+
+    return REFERENCE_ANCHOR.matcher(text).find();
   }
 }

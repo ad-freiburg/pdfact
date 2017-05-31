@@ -1,5 +1,8 @@
 package icecite.models.plain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -21,9 +24,9 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   protected PdfPage page;
 
   /**
-   * The extraction order number.
+   * The position of this character in the sequence of extracted PDF elements.
    */
-  protected int extractionOrderNumber; // TODO: Rename this variable.
+  protected int posInExtractionOrder;
 
   /**
    * The text of this character.
@@ -122,13 +125,13 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public void setExtractionOrderNumber(int num) { // TODO: Rename this method.
-    this.extractionOrderNumber = num;
+  public void setPositionInExtractionOrder(int pos) {
+    this.posInExtractionOrder = pos;
   }
 
   @Override
-  public int getExtractionOrderNumber() {
-    return this.extractionOrderNumber;
+  public int getPositionInExtractionOrder() {
+    return this.posInExtractionOrder;
   }
 
   // ==========================================================================
@@ -143,5 +146,37 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   @Override
   public String toString() {
     return "PlainPdfCharacter(" + this.text + ", " + this.boundingBox + ")";
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfCharacter) {
+      PdfCharacter otherCharacter = (PdfCharacter) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPage(), otherCharacter.getPage());
+      builder.append(getText(), otherCharacter.getText());
+      builder.append(getRectangle(), otherCharacter.getRectangle());
+      builder.append(getFont(), otherCharacter.getFont());
+      builder.append(getFontSize(), otherCharacter.getFontSize());
+      builder.append(getColor(), otherCharacter.getColor());
+      builder.append(getText(), otherCharacter.getText());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPage());
+    builder.append(getText());
+    builder.append(getRectangle());
+    builder.append(getFont());
+    builder.append(getFontSize());
+    builder.append(getColor());
+    builder.append(getText());
+    return builder.hashCode();
   }
 }
