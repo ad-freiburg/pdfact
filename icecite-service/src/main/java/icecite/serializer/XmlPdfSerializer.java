@@ -53,6 +53,7 @@ import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
@@ -247,13 +248,13 @@ public class XmlPdfSerializer implements PdfSerializer {
 
     List<String> lines = new ArrayList<>();
     // Serialize the text elements.
-    List<PdfParagraph> paragraphs = page.getParagraphs();
-    if (paragraphs != null) {
-      for (PdfParagraph para : paragraphs) {
-        if (isSerializePdfElement(para)) {
-          lines.add(serializeElement(page, para, CONTEXT_NAME_PARAGRAPH, l));
+    List<PdfTextBlock> blocks = page.getTextBlocks();
+    if (blocks != null) {
+      for (PdfTextBlock block : blocks) {
+        if (isSerializePdfElement(block)) {
+          lines.add(serializeElement(page, block, CONTEXT_NAME_PARAGRAPH, l));
         }
-        for (PdfTextLine line : para.getTextLines()) {
+        for (PdfTextLine line : block.getTextLines()) {
           if (isSerializePdfElement(line)) {
             lines.add(serializeElement(page, line, CONTEXT_NAME_TEXTLINE, l));
           }

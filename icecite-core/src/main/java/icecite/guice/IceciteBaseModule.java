@@ -54,14 +54,14 @@ import icecite.parser.PlainPdfParser;
 import icecite.parser.stream.PdfStreamParser;
 import icecite.parser.stream.PdfStreamParser.PdfStreamParserFactory;
 import icecite.parser.stream.pdfbox.PdfBoxPdfStreamParser;
-import icecite.tokenizer.PdfParagraphTokenizer;
+import icecite.tokenizer.PdfPageTokenizer;
+import icecite.tokenizer.PdfTextAreaTokenizer;
 import icecite.tokenizer.PdfTextBlockTokenizer;
 import icecite.tokenizer.PdfTextLineTokenizer;
-import icecite.tokenizer.PdfTextTokenizer;
 import icecite.tokenizer.PdfWordTokenizer;
-import icecite.tokenizer.PlainPdfParagraphTokenizer;
-import icecite.tokenizer.PlainPdfTextTokenizer;
-import icecite.tokenizer.XYCutPdfTextBlockTokenizer;
+import icecite.tokenizer.PlainPdfPageTokenizer;
+import icecite.tokenizer.PlainPdfTextBlockTokenizer;
+import icecite.tokenizer.XYCutPdfTextAreaTokenizer;
 import icecite.tokenizer.XYCutPdfTextLineTokenizer;
 import icecite.tokenizer.XYCutPdfWordTokenizer;
 import icecite.utils.geometric.Line;
@@ -92,11 +92,11 @@ public class IceciteBaseModule extends AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    bind(PdfTextTokenizer.class).to(PlainPdfTextTokenizer.class);
-    bind(PdfTextBlockTokenizer.class).to(XYCutPdfTextBlockTokenizer.class);
+    bind(PdfPageTokenizer.class).to(PlainPdfPageTokenizer.class);
+    bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
     bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
-    bind(PdfParagraphTokenizer.class).to(PlainPdfParagraphTokenizer.class);
+    bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
 
     // Bind the registries for PdfColor and PdfFont.
     bind(PdfColorRegistry.class).to(PlainPdfColorRegistry.class)

@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
+import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.PdfWordList;
@@ -52,10 +53,11 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWordList tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterList characters) {
+  public PdfWordList tokenize(PdfDocument pdf, PdfPage page, PdfTextLine line) {
     PdfWordList words = this.wordListFactory.create();
-    cut(pdf, page, characters, words);
+    if (line != null) {
+      cut(pdf, page, line.getCharacters(), words);
+    }
     return words;
   }
 

@@ -8,7 +8,8 @@ import java.util.Set;
  * 
  * @author Claudius Korzen
  */
-public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
+public interface PdfCharacterList
+    extends PdfElementList<PdfCharacter>, HasCharacters {
   /**
    * Returns the most common font of the characters in this list.
    * 

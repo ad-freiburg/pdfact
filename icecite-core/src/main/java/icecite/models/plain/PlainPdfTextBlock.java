@@ -6,11 +6,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.utils.geometric.Rectangle;
+
+// TODO: Don't derive the bounding box in the model.
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -19,14 +22,19 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   /**
+   * The text lines of this text block.
+   */
+  protected PdfTextLineList textLines;
+
+  /**
+   * The text of this text block.
+   */
+  protected String text;
+  
+  /**
    * The page in which this text block is located.
    */
   protected PdfPage page;
-
-  /**
-   * The characters of this text block.
-   */
-  protected PdfCharacterList characters;
 
   // ==========================================================================
 
@@ -35,14 +43,14 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    * 
    * @param page
    *        The page in which this text block is located.
-   * @param chars
-   *        The characters of this text block.
+   * @param textLineListFactory
+   *        The text lines of this text block.
    */
   @AssistedInject
-  public PlainPdfTextBlock(@Assisted PdfPage page,
-      @Assisted PdfCharacterList chars) {
+  public PlainPdfTextBlock(PdfTextLineListFactory textLineListFactory,
+      @Assisted PdfPage page) {
+    this.textLines = textLineListFactory.create();
     this.page = page;
-    this.characters = chars;
   }
 
   // ==========================================================================
@@ -60,32 +68,32 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   // ==========================================================================
 
   @Override
-  public PdfCharacterList getCharacters() {
-    return this.characters;
+  public PdfTextLineList getTextLines() {
+    return this.textLines;
   }
 
   @Override
-  public void setCharacters(PdfCharacterList characters) {
-    this.characters = characters;
+  public void setTextLines(PdfTextLineList textLines) {
+    this.textLines = textLines;
   }
 
   @Override
-  public void addCharacters(PdfCharacterList characters) {
-    for (PdfCharacter character : characters) {
-      addCharacter(character);
+  public void addTextLines(PdfTextLineList textLines) {
+    for (PdfTextLine line : textLines) {
+      addTextLine(line);
     }
   }
 
   @Override
-  public void addCharacter(PdfCharacter character) {
-    this.characters.add(character);
+  public void addTextLine(PdfTextLine line) {
+    this.textLines.add(line);
   }
 
   // ==========================================================================
 
   @Override
   public Rectangle getRectangle() {
-    return this.characters.getRectangle();
+    return this.textLines.getRectangle();
   }
 
   @Override
@@ -98,7 +106,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
 
   @Override
   public String toString() {
-    return "PlainPdfTextBlock(page: " + this.page.getPageNumber() + "rect: "
+    return "PlainPdfTextBlock(page: " + this.page.getPageNumber() + ", rect: "
         + this.boundingBox + ")";
   }
 
@@ -110,7 +118,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPage(), otherTextBlock.getPage());
       builder.append(getRectangle(), otherTextBlock.getRectangle());
-      builder.append(getCharacters(), otherTextBlock.getCharacters());
+      builder.append(getTextLines(), otherTextBlock.getTextLines());
 
       return builder.isEquals();
     }
@@ -122,7 +130,17 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPage());
     builder.append(getRectangle());
-    builder.append(getCharacters());
+    builder.append(getTextLines());
     return builder.hashCode();
+  }
+
+  @Override
+  public String getText() {
+    return this.text;
+  }
+
+  @Override
+  public void setText(String text) {
+    this.text = text;
   }
 }

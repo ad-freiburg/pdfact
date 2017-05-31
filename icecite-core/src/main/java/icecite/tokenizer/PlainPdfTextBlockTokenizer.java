@@ -9,23 +9,24 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
-import icecite.models.PdfParagraph;
-import icecite.models.PdfParagraph.PdfParagraphFactory;
+import icecite.models.PdfPage;
+import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.textlines.PdfTextLineUtils;
 
 /**
- * A plain implementation of {@link PdfParagraphTokenizer}.
+ * A plain implementation of {@link PdfTextBlockTokenizer}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
+public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
-   * The factory to create instances of PdfParagraph.
+   * The factory to create instances of {@link PdfTextBlock}.
    */
-  protected PdfParagraphFactory paragraphFactory;
+  protected PdfTextBlockFactory textBlockFactory;
 
   /**
    * The pattern to identify reference anchors.
@@ -34,112 +35,113 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
       .compile("^\\[(.*)\\]\\s+");
 
   /**
-   * Creates a new tokenizer to that tokenizes text lines into paragraphs.
+   * Creates a new tokenizer to that tokenizes text lines into text blocks.
    * 
-   * @param paragraphFactory
-   *        The factory to create instances of PdfParagraph.
+   * @param textBlockFactory
+   *        The factory to create instances of {@link PdfTextBlock}.
    */
   @Inject
-  public PlainPdfParagraphTokenizer(PdfParagraphFactory paragraphFactory) {
-    this.paragraphFactory = paragraphFactory;
+  public PlainPdfTextBlockTokenizer(PdfTextBlockFactory textBlockFactory) {
+    this.textBlockFactory = textBlockFactory;
   }
 
   // ==========================================================================
 
   @Override
-  // TODO: Dehyphenation.
-  public List<PdfParagraph> tokenize(PdfDocument pdf) {
-    List<PdfParagraph> paragraphs = new ArrayList<>();
-    PdfParagraph paragraph = null;
+  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page) {
+    List<PdfTextBlock> textBlocks = new ArrayList<>();
+    PdfTextBlock textBlock = null;
 
-    List<PdfTextLine> lines = pdf.getTextLines();
+    List<PdfTextLine> lines = page.getTextLines();
     for (int i = 0; i < lines.size(); i++) {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
-
-      if (introducesParagraph(pdf, paragraph, prevLine, line, nextLine)) {
-        if (paragraph != null && !paragraph.getWords().isEmpty()) {
-          paragraphs.add(paragraph);
+      
+      if (introducesTextBlock(pdf, textBlock, prevLine, line, nextLine)) {
+        if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
+          textBlocks.add(textBlock);
         }
 
-        // Create a new paragraph.
-        paragraph = this.paragraphFactory.create();
+        // Create a new text block.
+        textBlock = this.textBlockFactory.create(page);
       }
-      // Add the word of the current line to the current paragraph.
-      paragraph.addWords(line.getWords());
+      // Add the word of the current line to the current text block.
+      textBlock.addTextLine(line);
     }
-    // Don't forget the remaining paragraph.
-    if (paragraph != null && !paragraph.getWords().isEmpty()) {
-      paragraphs.add(paragraph);
+    // Don't forget the remaining text block.
+    if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
+      textBlocks.add(textBlock);
     }
 
-    return paragraphs;
+    return textBlocks;
   }
 
   /**
-   * Checks if the given current text line introduces a new paragraph.
+   * Checks if the given current text line introduces a new text block.
    * 
    * @param pdf
    *        The PDF document.
-   * @param paragraph
-   *        The current paragraph.
+   * @param block
+   *        The current text block.
    * @param prevLine
    *        The previous text line.
    * @param line
    *        The current text line.
    * @param nextLine
    *        The next text line.
-   * @return True, if the given current line introduces a new paragraph; false
+   * @return True, if the given current line introduces a new text block; false
    *         otherwise.
    */
-  protected boolean introducesParagraph(PdfDocument pdf, PdfParagraph paragraph,
+  protected boolean introducesTextBlock(PdfDocument pdf, PdfTextBlock block,
       PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
-    // The line does *not* introduce a new paragraph, if it is null.
+    // The line does *not* introduce a new text block, if it is null.
     if (line == null) {
       return false;
     }
 
-    // The line introduces a new paragraph, if there is no previous line.
+    // The line introduces a new text block, if there is no previous line.
     if (prevLine == null) {
       return true;
     }
 
-    // The line introduces a new paragraph, if there is no current
-    if (paragraph == null) {
+    // The line introduces a new text block, if there is no current
+    if (block == null) {
       return true;
     }
 
-    // The line does *not* introduce a new paragraph, if the current paragraph
+    // The line does *not* introduce a new text block, if the current text
+    // block
     // is empty.
-    if (paragraph.getWords().isEmpty()) {
+    if (block.getTextLines().isEmpty()) {
       return false;
     }
 
-    // The line introduces a new paragraph, if it doesn't overlap the paragraph
+    // The line introduces a new text block, if it doesn't overlap the text
+    // block
     // horizontally.
-    if (!overlapsHorizontally(paragraph, line)) {
+    if (!overlapsHorizontally(block, line)) {
       return true;
     }
 
-    // The line introduces a new paragraph, if it is indented compared to the
+    // The line introduces a new text block, if it is indented compared to the
     // previous and the next line.
     if (isIndented(prevLine, line, nextLine)) {
       return true;
     }
 
-    // The line introduces a new paragraph, if it has a special font face.
+    // The line introduces a new text block, if it has a special font face.
     if (hasSignificantDifferentFontFace(prevLine, line)) {
       return true;
     }
 
-    // The line introduces a new paragraph, if the pitch to the previous line
-    // is larger than the most common line pitch in the paragraph.
+    // The line introduces a new text block, if the pitch to the previous line
+    // is larger than the most common line pitch in the text block.
     if (isLinepitchTooLarge(pdf, prevLine, line)) {
       return true;
     }
 
-    // The line introduces a new paragraph, if it denotes the start of a
+    // The line introduces a new text block, if it denotes the start of a
     // reference.
     if (isProbablyReferenceStart(prevLine, line, nextLine)) {
       return true;
@@ -149,23 +151,22 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   }
 
   /**
-   * Checks, if the given line overlaps the given paragraph horizontally.
+   * Checks, if the given line overlaps the given text block horizontally.
    * 
-   * @param paragraph
-   *        The paragraph to process.
+   * @param block
+   *        The text block to process.
    * @param line
    *        The line to process.
-   * @return True, if the given line overlaps the given paragraph horizontally,
-   *         False otherwise.
+   * @return True, if the given line overlaps the given text block
+   *         horizontally, False otherwise.
    */
-  protected boolean overlapsHorizontally(PdfParagraph paragraph,
-      PdfTextLine line) {
-    if (paragraph == null) {
+  protected boolean overlapsHorizontally(PdfTextBlock block, PdfTextLine line) {
+    if (block == null) {
       return false;
     }
 
-    Rectangle paragraphBoundingBox = paragraph.getRectangle();
-    if (paragraphBoundingBox == null) {
+    Rectangle boundingBox = block.getRectangle();
+    if (boundingBox == null) {
       return false;
     }
 
@@ -178,7 +179,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
       return false;
     }
 
-    return paragraphBoundingBox.overlapsHorizontally(lineBoundingBox);
+    return boundingBox.overlapsHorizontally(lineBoundingBox);
   }
 
   /**

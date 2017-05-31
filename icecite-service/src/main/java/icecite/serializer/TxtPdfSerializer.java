@@ -17,9 +17,9 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
@@ -150,11 +150,11 @@ public class TxtPdfSerializer implements PdfSerializer {
 
     List<String> lines = new ArrayList<String>();
     // Serialize the text elements.
-    for (PdfParagraph paragraph : page.getParagraphs()) {
-      if (isSerializePdfElement(paragraph)) {
-        lines.add(serializePdfElement(paragraph));
+    for (PdfTextBlock block : page.getTextBlocks()) {
+      if (isSerializePdfElement(block)) {
+        lines.add(serializePdfElement(block));
       }
-      for (PdfTextLine line : paragraph.getTextLines()) {
+      for (PdfTextLine line : block.getTextLines()) {
         if (isSerializePdfElement(line)) {
           lines.add(serializePdfElement(line));
         }

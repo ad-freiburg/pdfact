@@ -20,7 +20,7 @@ import icecite.parser.PdfParser;
 import icecite.parser.PdfParser.PdfParserFactory;
 import icecite.parser.stream.pdfbox.guice.OperatorProcessorModule;
 import icecite.serializer.PdfSerializer;
-import icecite.tokenizer.PdfTextTokenizer;
+import icecite.tokenizer.PdfPageTokenizer;
 import icecite.visualizer.PdfVisualizer;
 import icecite.visualizer.PdfVisualizer.PdfVisualizerFactory;
 
@@ -92,9 +92,9 @@ public class IcecitePdfParserMain {
     PdfVisualizerFactory visualizerFactory = injector
         .getInstance(PdfVisualizerFactory.class);
     PdfSerializer serializer = injector
-        .getInstance(Key.get(PdfSerializer.class, Names.named("xml")));
+        .getInstance(Key.get(PdfSerializer.class, Names.named("txt")));
     PdfParser pdfParser = factory.create();
-    PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
+    PdfPageTokenizer tokenizer = injector.getInstance(PdfPageTokenizer.class);
 
     PdfVisualizer visualizer = visualizerFactory.create();
 
@@ -106,9 +106,9 @@ public class IcecitePdfParserMain {
       visualizer.visualize(document, stream);
     }
 
-//    Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
-//    try (OutputStream stream = Files.newOutputStream(vis2)) {
-//      serializer.serialize(document, stream);
-//    }
+    Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
+    try (OutputStream stream = Files.newOutputStream(vis2)) {
+      serializer.serialize(document, stream);
+    }
   }
 }

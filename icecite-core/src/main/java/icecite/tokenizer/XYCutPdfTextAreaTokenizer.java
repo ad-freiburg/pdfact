@@ -3,55 +3,23 @@ package icecite.tokenizer;
 import java.util.List;
 import java.util.Set;
 
-import com.google.inject.Inject;
-
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.tokenizer.xycut.XYCut;
 import icecite.utils.geometric.Rectangle;
 
 /**
- * An implementation of {@link PdfTextBlockTokenizer} based on XYCut.
+ * An implementation of {@link PdfTextAreaTokenizer} based on XYCut.
  * 
  * @author Claudius Korzen
  */
-public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
-    implements PdfTextBlockTokenizer {
-  /**
-   * The factory to create instances of PdfTextBlock.
-   */
-  protected PdfTextBlockFactory textBlockFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new text block tokenizer.
-   * 
-   * @param textBlockFactory
-   *        The factory to create instance of {@link PdfTextBlock}.
-   */
-  @Inject
-  public XYCutPdfTextBlockTokenizer(PdfTextBlockFactory textBlockFactory) {
-    super();
-    this.textBlockFactory = textBlockFactory;
-  }
-
-  // ==========================================================================
-
+public class XYCutPdfTextAreaTokenizer extends XYCut<PdfCharacterList>
+    implements PdfTextAreaTokenizer {
   @Override
-  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterList characters) {
-    List<PdfTextBlock> x = cut(pdf, page, characters);
-
-    System.out.println("Time needed to sort: " + this.timeSort);
-    // System.out.println("Time needed to assess: " + this.timeAssess);
-
-    return x;
+  public List<PdfCharacterList> tokenize(PdfDocument pdf, PdfPage page) {
+    return cut(pdf, page, page.getCharacters());
   }
 
   // ==========================================================================
@@ -115,8 +83,8 @@ public class XYCutPdfTextBlockTokenizer extends XYCut<PdfTextBlock>
   // ==========================================================================
 
   @Override
-  public PdfTextBlock pack(PdfPage page, PdfCharacterList characters) {
-    return this.textBlockFactory.create(page, characters);
+  public PdfCharacterList pack(PdfPage page, PdfCharacterList characters) {
+    return characters;
   }
 
   // ==========================================================================

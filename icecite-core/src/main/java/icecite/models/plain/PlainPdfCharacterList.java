@@ -97,6 +97,29 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   }
 
   // ==========================================================================
+  
+  @Override
+  public PdfCharacterList getCharacters() {
+    return this;
+  }
+
+  @Override
+  public void setCharacters(PdfCharacterList characters) {
+    this.clear();
+    this.addAll(characters);
+  }
+
+  @Override
+  public void addCharacters(PdfCharacterList characters) {
+    this.addAll(characters);
+  }
+
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.add(character);
+  }
+  
+  // ==========================================================================
 
   /**
    * Computes the statistics about the characters in this list.

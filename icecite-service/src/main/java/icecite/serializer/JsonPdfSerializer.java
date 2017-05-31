@@ -52,6 +52,7 @@ import icecite.models.PdfFont;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
+import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
@@ -219,14 +220,14 @@ public class JsonPdfSerializer implements PdfSerializer {
     JSONArray shapes = new JSONArray();
 
     // Serialize the text elements.
-    for (PdfParagraph paragraph : page.getParagraphs()) {
-      if (isSerializePdfElement(paragraph)) {
-        JSONObject serializedParagraph = serializePdfElement(page, paragraph);
+    for (PdfTextBlock block : page.getTextBlocks()) {
+      if (isSerializePdfElement(block)) {
+        JSONObject serializedParagraph = serializePdfElement(page, block);
         if (serializedParagraph != null && serializedParagraph.length() > 0) {
           paragraphs.put(serializedParagraph);
         }
       }
-      for (PdfTextLine line : paragraph.getTextLines()) {
+      for (PdfTextLine line : block.getTextLines()) {
         if (isSerializePdfElement(line)) {
           JSONObject serializedTextLine = serializePdfElement(page, line);
           if (serializedTextLine != null && serializedTextLine.length() > 0) {

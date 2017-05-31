@@ -85,9 +85,9 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
 
   @Override
   public PdfTextLineList tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterList characters) {
+      PdfCharacterList area) {
     PdfTextLineList textLines = this.textLineListFactory.create();
-    cut(pdf, page, characters, textLines);
+    cut(pdf, page, area, textLines);
     return textLines;
   }
 

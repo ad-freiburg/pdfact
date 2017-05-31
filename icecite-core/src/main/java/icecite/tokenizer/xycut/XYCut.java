@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import icecite.models.HasCharacters;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
-import icecite.models.PdfElement;
 import icecite.models.PdfPage;
 import icecite.utils.comparators.MaxYComparator;
 import icecite.utils.comparators.MinXComparator;
@@ -22,7 +22,7 @@ import icecite.utils.comparators.MinXComparator;
  * 
  * @author Claudius Korzen
  */
-public abstract class XYCut<T extends PdfElement> {
+public abstract class XYCut<T extends HasCharacters> {
   /**
    * TODO: Delete it.
    */
