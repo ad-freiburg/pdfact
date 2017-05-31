@@ -26,11 +26,6 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   /**
-   * The page in which this line is located.
-   */
-  protected PdfPage page;
-
-  /**
    * The characters of this text line.
    */
   protected PdfCharacterList characters;

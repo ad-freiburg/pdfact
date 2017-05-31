@@ -4,7 +4,6 @@ import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.fontbox.afm.CharMetric;
@@ -35,12 +34,11 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfColor;
-import icecite.models.PdfColor.PdfColorFactory;
-import icecite.models.PdfColorRegistry;
 import icecite.models.PdfFont;
 import icecite.models.PdfPage;
+import icecite.parser.stream.pdfbox.convert.PDColorConverter;
+import icecite.parser.stream.pdfbox.convert.PDFontConverter;
 import icecite.parser.stream.pdfbox.operators.OperatorProcessor;
-import icecite.parser.stream.pdfbox.translators.PDFontTranslator;
 import icecite.parser.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parser.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import icecite.utils.geometric.Point;
@@ -61,26 +59,6 @@ public class ShowText extends OperatorProcessor {
   protected PdfCharacterFactory characterFactory;
 
   /**
-   * The translator to translate PDFont objects to PdfFont objects.
-   */
-  protected PDFontTranslator fontTranslator;
-
-  // /**
-  // * The registry to manage {@link PdfFont} objects.
-  // */
-  // protected PdfFontRegistry fontRegistry;
-
-  /**
-   * The factory to create instances of {@link PdfColor}.
-   */
-  protected PdfColorFactory colorFactory;
-
-  /**
-   * The registry to manage {@link PdfColor} objects.
-   */
-  protected PdfColorRegistry colorRegistry;
-
-  /**
    * The factory to create instances of {@link Rectangle}.
    */
   protected RectangleFactory rectangleFactory;
@@ -91,16 +69,24 @@ public class ShowText extends OperatorProcessor {
   protected PointFactory pointFactory;
 
   /**
+   * The translator to translate PDFont objects to PdfFont objects.
+   */
+  protected PDFontConverter fontTranslator;
+
+  /**
+   * The translator to translate PDColor objects to PdfColor objects.
+   */
+  protected PDColorConverter colorTranslator;
+
+  /**
    * Creates a new OperatorProcessor to process the operation "ShowText".
    * 
    * @param characterFactory
    *        The factory to create instances of {@link PdfCharacterFactory}.
-   * @param fontUtils
-   *        The factory to create instances of {@link PdfFont}.
-   * @param colorFactory
-   *        The factory to create instances of {@link PdfColor}.
-   * @param colorRegistry
-   *        The registry to manage {@link PdfColor} objects.
+   * @param fontTranslator
+   *        The translator to translate PDFont objects into PdfFont objects.
+   * @param colorTranslator
+   *        The translator to translate PDColor objects into PdfColor objects.
    * @param rectangleFactory
    *        The factory to create instances of {@link Rectangle}.
    * @param pointFactory
@@ -108,14 +94,11 @@ public class ShowText extends OperatorProcessor {
    */
   @Inject
   public ShowText(PdfCharacterFactory characterFactory,
-      PDFontTranslator fontUtils, PdfColorFactory colorFactory,
-      PdfColorRegistry colorRegistry, RectangleFactory rectangleFactory,
-      PointFactory pointFactory) {
+      PDFontConverter fontTranslator, PDColorConverter colorTranslator,
+      RectangleFactory rectangleFactory, PointFactory pointFactory) {
     this.characterFactory = characterFactory;
-    this.fontTranslator = fontUtils;
-    // this.fontRegistry = fontRegistry;
-    this.colorFactory = colorFactory;
-    this.colorRegistry = colorRegistry;
+    this.fontTranslator = fontTranslator;
+    this.colorTranslator = colorTranslator;
     this.rectangleFactory = rectangleFactory;
     this.pointFactory = pointFactory;
   }
@@ -334,21 +317,17 @@ public class ShowText extends OperatorProcessor {
 
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
 
-    PDColor nonStrokingColor = graphicsState.getNonStrokingColor();
-    PDColorSpace cs = graphicsState.getNonStrokingColorSpace();
-    float[] rgb = cs.toRGB(nonStrokingColor.getComponents());
+    PDColor pdColor = graphicsState.getNonStrokingColor();
+    PDColorSpace pdColorSpace = graphicsState.getNonStrokingColorSpace();
 
-    // TODO set the properties of the color.
-    PdfColor pdfColor = this.colorRegistry.getColor(Arrays.toString(rgb));
-    if (pdfColor == null) {
-      pdfColor = this.colorFactory.create();
-      pdfColor.setName(Arrays.toString(rgb));
-      pdfColor.setRGB(rgb);
-      this.colorRegistry.registerColor(pdfColor);
-    }
+    // Convert the color.
+    PdfColor color = this.colorTranslator.convert(pdColor, pdColorSpace);
 
-    // Create the font.
-    PdfFont font = this.fontTranslator.translate(pdFont);
+    // Convert the font.
+    PdfFont font = this.fontTranslator.convert(pdFont);
+
+    // TODO: Round the font size.
+    fontsize = MathUtils.round(fontsize, 1);
 
     // TODO: Round the values of boundingbox.
     boundBox.setMinX(MathUtils.round(boundBox.getMinX(), 1));
@@ -359,7 +338,7 @@ public class ShowText extends OperatorProcessor {
     PdfCharacter character = this.characterFactory.create(pdfPage);
     character.setText(unicode);
     character.setFontSize(fontsize);
-    character.setColor(pdfColor);
+    character.setColor(color);
     character.setFont(font);
     character.setRectangle(boundBox);
 

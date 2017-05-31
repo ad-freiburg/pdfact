@@ -126,4 +126,16 @@ public class FloatCounter extends TFloatIntHashMap {
     this.averageFloat = sumFreqs > 0 ? sumFloats / sumFreqs : 0;
     this.isStatisticsComputed = true;
   }
+  
+  // ==========================================================================
+  
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
+  
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
 }

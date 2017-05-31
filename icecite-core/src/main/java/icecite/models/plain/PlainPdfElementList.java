@@ -676,7 +676,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
       PdfElementView<S> v2 = new PdfElementView<S>(this.parent, cut, right);
       return Arrays.asList(v1, v2);
     }
-    
+
     // ========================================================================
 
     @Override

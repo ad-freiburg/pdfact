@@ -15,7 +15,7 @@ public class Quicksort {
   /**
    * The random generator.
    */
-  protected static Random random = new Random();
+  protected static final Random RANDOM = new Random();
 
   /**
    * Identifier for the method for choosing the pivot element. For example, 1 =
@@ -144,6 +144,6 @@ public class Quicksort {
    * @return A random number in [min, max].
    */
   protected static int getRandomNumber(int min, int max) {
-    return random.nextInt((max - min) + 1) + min;
+    return RANDOM.nextInt((max - min) + 1) + min;
   }
 }

@@ -27,7 +27,8 @@ public class PdfBoxFontMetricsWrapper {
    */
   public PdfBoxFontMetricsWrapper(FontMetrics fontMetrics) {
     this.charMetricsMap = new HashMap<String, CharMetric>();
-
+    this.fontMetrics = fontMetrics;
+    
     if (fontMetrics != null) {
       for (CharMetric charMetric : fontMetrics.getCharMetrics()) {
         this.charMetricsMap.put(charMetric.getName(), charMetric);

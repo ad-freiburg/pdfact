@@ -19,7 +19,6 @@ import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
-import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
@@ -56,11 +55,6 @@ public class PlainPdfDocument implements PdfDocument {
   protected List<PdfShape> shapes;
 
   /**
-   * All text blocks of this PDF document.
-   */
-  protected List<PdfTextBlock> textBlocks;
-
-  /**
    * All text lines of this PDF document.
    */
   protected PdfTextLineList textLines;
@@ -88,7 +82,6 @@ public class PlainPdfDocument implements PdfDocument {
     this.pages = new ArrayList<>();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
-    this.textBlocks = new ArrayList<>();
     this.paragraphs = new ArrayList<>();
   }
 
@@ -240,30 +233,6 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public List<PdfTextBlock> getTextBlocks() {
-    return this.textBlocks;
-  }
-
-  @Override
-  public void setTextBlocks(List<PdfTextBlock> blocks) {
-    this.textBlocks = blocks;
-  }
-
-  @Override
-  public void addTextBlocks(List<PdfTextBlock> blocks) {
-    for (PdfTextBlock block : blocks) {
-      addTextBlock(block);
-    }
-  }
-
-  @Override
-  public void addTextBlock(PdfTextBlock block) {
-    this.textBlocks.add(block);
-  }
-
-  // ==========================================================================
-
-  @Override
   public PdfTextLineList getTextLines() {
     return this.textLines;
   }
@@ -308,9 +277,9 @@ public class PlainPdfDocument implements PdfDocument {
   public void addParagraph(PdfParagraph paragraph) {
     this.paragraphs.add(paragraph);
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public String toString() {
     return "PlainPdfDocument(" + this.path + ")";

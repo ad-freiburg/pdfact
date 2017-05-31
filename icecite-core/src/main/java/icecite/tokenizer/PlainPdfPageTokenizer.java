@@ -15,6 +15,7 @@ import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.comparators.MinXComparator;
+import icecite.utils.comparators.MinYComparator;
 
 /**
  * A plain implementation of {@link PdfPageTokenizer}.
@@ -84,7 +85,6 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
     for (PdfPage page : pages) {
       tokenizePdfPage(document, page);
     }
-    System.out.println("FINISHED");
   }
 
   // ==========================================================================
@@ -109,19 +109,20 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
         // Identify the word in the given text line.
         line.setWords(tokenizeIntoWords(pdf, page, line));
 
-        // Compose the text of the given text line.
-        computeTextOfTextLine(line);
-
         // Register the line to the page *and* the PDF document.
         page.addTextLine(line);
         pdf.addTextLine(line);
       }
     }
-       
+
+    // Compute the texts for text blocks, text lines and words.
+    computeTexts2(page);
+    
     // Tokenize the page into text blocks.
     page.setTextBlocks(tokenizeIntoTextBlocks(pdf, page));
-    
-    System.out.println("Tokenize " + page + " " + page.getTextBlocks().size());
+
+    // Compute the texts for text blocks, text lines and words.
+    computeTexts(page);
   }
 
   /**
@@ -189,22 +190,83 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
   }
 
   /**
-   * Computes the texts of the given line and its included words.
+   * Computes the texts of the text blocks, text lines and words of the given
+   * page.
    * 
-   * @param line
-   *        The line to process.
+   * @param page
+   *        The page to process.
    */
-  protected void computeTextOfTextLine(PdfTextLine line) {
-    List<PdfWord> words = line.getWords();
-
-    // Compute the text for each word of the line.
-    for (PdfWord word : words) {
-      Collections.sort(word.getCharacters(), new MinXComparator());
-      word.setText(CollectionUtils.join(word.getCharacters(), ""));
+  protected void computeTexts(PdfPage page) {
+    if (page == null) {
+      return;
     }
 
-    // Compute the text for the line.
-    Collections.sort(words, new MinXComparator());
-    line.setText(CollectionUtils.join(words, " "));
+    List<PdfTextBlock> textBlocks = page.getTextBlocks();
+    if (textBlocks == null) {
+      return;
+    }
+
+    for (PdfTextBlock block : textBlocks) {
+      PdfTextLineList lines = block.getTextLines();
+      if (lines == null) {
+        continue;
+      }
+
+      for (PdfTextLine line : lines) {
+        PdfWordList words = line.getWords();
+        if (words == null) {
+          continue;
+        }
+
+        for (PdfWord word : words) {
+          // Compute the text for the word.
+          Collections.sort(word.getCharacters(), new MinXComparator());
+          word.setText(CollectionUtils.join(word.getCharacters(), ""));
+        }
+
+        // Compute the text for the line.
+        Collections.sort(words, new MinXComparator());
+        line.setText(CollectionUtils.join(words, " "));
+      }
+
+      // Compute the text for the block.
+      Collections.sort(lines, Collections.reverseOrder(new MinYComparator()));
+      block.setText(CollectionUtils.join(lines, " "));
+    }
+  }
+
+  /**
+   * Computes the texts of the text blocks, text lines and words of the given
+   * page.
+   * 
+   * @param page
+   *        The page to process.
+   */
+  protected void computeTexts2(PdfPage page) {
+    if (page == null) {
+      return;
+    }
+
+    List<PdfTextBlock> textBlocks = page.getTextBlocks();
+    if (textBlocks == null) {
+      return;
+    }
+
+    for (PdfTextLine line : page.getTextLines()) {
+      PdfWordList words = line.getWords();
+      if (words == null) {
+        continue;
+      }
+
+      for (PdfWord word : words) {
+        // Compute the text for the word.
+        Collections.sort(word.getCharacters(), new MinXComparator());
+        word.setText(CollectionUtils.join(word.getCharacters(), ""));
+      }
+
+      // Compute the text for the line.
+      Collections.sort(words, new MinXComparator());
+      line.setText(CollectionUtils.join(words, " "));
+    }
   }
 }

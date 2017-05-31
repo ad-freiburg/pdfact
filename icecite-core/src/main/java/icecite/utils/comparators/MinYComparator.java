@@ -1,5 +1,6 @@
 package icecite.utils.comparators;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import icecite.utils.geometric.HasRectangle;
@@ -10,7 +11,12 @@ import icecite.utils.geometric.Rectangle;
  * 
  * @author Claudius Korzen
  */
-public class MinYComparator implements Comparator<HasRectangle> {
+public class MinYComparator implements Comparator<HasRectangle>, Serializable {
+  /**
+   * The serial id.
+   */
+  protected static final long serialVersionUID = -6048171342968387350L;
+  
   @Override
   public int compare(HasRectangle box1, HasRectangle box2) {
     if (box1 == null && box2 == null) {

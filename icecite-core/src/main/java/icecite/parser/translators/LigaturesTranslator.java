@@ -14,7 +14,7 @@ public class LigaturesTranslator {
   /**
    * A map with the unicodes of ligatures and its individual characters.
    */
-  protected static final Map<String, String> LIGATURES;
+  static final Map<String, String> LIGATURES;
 
   static {
     // Fill the ligatures DIACRITICS.

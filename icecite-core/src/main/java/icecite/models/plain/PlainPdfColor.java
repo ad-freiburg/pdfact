@@ -19,6 +19,11 @@ import icecite.models.PdfColor;
  */
 public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   /**
+   * The id of this color (needed for serialization).
+   */
+  protected String id;
+
+  /**
    * The name of this color.
    */
   protected String name;
@@ -53,6 +58,18 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   // ==========================================================================
 
   @Override
+  public String getId() {
+    return this.id;
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  // ==========================================================================
+
+  @Override
   public String getName() {
     return this.name;
   }
@@ -65,7 +82,7 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   // ==========================================================================
 
   @Override
-  public void setRGB(float[] rgb) {
+  public void setRGB(final float[] rgb) {
     this.rgb = rgb;
   }
 
@@ -80,9 +97,9 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   public float[] getRGB() {
     return this.rgb;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public String toString() {
     return "PlainPdfColor(" + Arrays.toString(this.rgb) + ")";

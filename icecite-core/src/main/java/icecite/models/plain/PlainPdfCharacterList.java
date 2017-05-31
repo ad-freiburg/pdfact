@@ -97,7 +97,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfCharacterList getCharacters() {
     return this;
@@ -118,7 +118,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   public void addCharacter(PdfCharacter character) {
     this.add(character);
   }
-  
+
   // ==========================================================================
 
   /**
@@ -126,7 +126,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
    */
   protected void computeStatistics() {
     super.computeStatistics();
-    
+
     // Count the colors, fonts and font sizes.
     ObjectCounter<PdfColor> colorsCounter = new ObjectCounter<>();
     ObjectCounter<PdfFont> fontsCounter = new ObjectCounter<>();
@@ -272,19 +272,19 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   public String toString() {
     return super.toString();
   }
-  
+
   @Override
   public boolean equals(Object other) {
     return super.equals(other);
   }
-  
+
   @Override
   public int hashCode() {
     return super.hashCode();
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * A view of a PdfCharacterList.
    * 
@@ -306,7 +306,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
      * The offset of this view in the parent list.
      */
     protected final int offset;
-    
+
     /**
      * The size of this list (the number of elements in the list).
      */
@@ -462,19 +462,19 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
       PdfCharacterView v2 = new PdfCharacterView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
     }
-    
+
     // ========================================================================
-    
+
     @Override
     public String toString() {
       return super.toString();
     }
-    
+
     @Override
     public boolean equals(Object other) {
       return super.equals(other);
     }
-    
+
     @Override
     public int hashCode() {
       return super.hashCode();

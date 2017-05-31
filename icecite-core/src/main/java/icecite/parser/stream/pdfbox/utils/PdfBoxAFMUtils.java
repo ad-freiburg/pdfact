@@ -25,10 +25,10 @@ public class PdfBoxAFMUtils {
   /**
    * The additional glyphs.
    */
-  protected static Map<String, PdfBoxFontMetricsWrapper> additionalAFMs;
+  protected static final Map<String, PdfBoxFontMetricsWrapper> ADDITIONAL_AFM;
 
   static {
-    additionalAFMs = readAdditionalAFMFiles("afm/");
+    ADDITIONAL_AFM = readAdditionalAFMFiles("afm/");
   }
 
   /**
@@ -45,7 +45,7 @@ public class PdfBoxAFMUtils {
     if (type1Font != null) {
       String basename = PdfFontUtils.computeBasename(type1Font);
 
-      PdfBoxFontMetricsWrapper fontMetrics = additionalAFMs.get(basename);
+      PdfBoxFontMetricsWrapper fontMetrics = ADDITIONAL_AFM.get(basename);
       if (fontMetrics != null) {
         return fontMetrics.getCharMetricsMap().get(glyphName);
       }

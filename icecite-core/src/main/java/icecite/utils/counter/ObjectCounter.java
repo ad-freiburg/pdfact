@@ -106,4 +106,17 @@ public class ObjectCounter<T> extends TObjectIntHashMap<T> {
     }
     this.isStatisticsComputed = true;
   }
+  
+  // ==========================================================================
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
 }

@@ -1,4 +1,4 @@
-package icecite.parser.stream.pdfbox.translators;
+package icecite.parser.stream.pdfbox.convert;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,11 +16,11 @@ import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
 
 /**
- * A translator that translates PDFont objects into PdfFont objects.
+ * A converter that converts PDFont objects into PdfFont objects.
  * 
  * @author Claudius Korzen
  */
-public class PDFontTranslator {
+public class PDFontConverter {
   /**
    * The factory to create instances of PdfFont.
    */
@@ -35,13 +35,13 @@ public class PDFontTranslator {
   // The constructors.
 
   /**
-   * Creates a new PDFontTranslator.
+   * Creates a new PDFontConverter.
    * 
    * @param fontFactory
    *        The factory to create instances of PdfFont.
    */
   @Inject
-  public PDFontTranslator(PdfFontFactory fontFactory) {
+  public PDFontConverter(PdfFontFactory fontFactory) {
     this.fontFactory = fontFactory;
     this.knownFonts = readWellKnownFontsFromFile();
   }
@@ -49,22 +49,23 @@ public class PDFontTranslator {
   // ==========================================================================
 
   /**
-   * Translates the given PDFont object to a related PdfFont object.
+   * Converts the given PDFont object to a related PdfFont object.
    * 
    * @param font
-   *        The font to translate.
+   *        The font to convert.
    * 
-   * @return The translated font.
+   * @return The converted font.
    */
-  public PdfFont translate(PDFont font) {
+  public PdfFont convert(PDFont font) {
     // Check if the font is already known.
     PdfFont wellKnownFont = getKnownFont(font);
     if (wellKnownFont != null) {
       return wellKnownFont;
     }
 
-    // THe font is not known. Create a new font.
+    // The font is not known. Create a new font.
     PdfFont newFont = this.fontFactory.create();
+    newFont.setId("font-" + this.knownFonts.size());
     newFont.setNormalizedName(computeNormalizedFontName(font));
     newFont.setBaseName(computeBasename(newFont));
     newFont.setIsBold(computeIsBold(newFont));
@@ -92,7 +93,8 @@ public class PDFontTranslator {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     InputStream is = classLoader.getResourceAsStream("afm.map");
 
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+    try (BufferedReader br = new BufferedReader(
+        new InputStreamReader(is, "UTF-8"))) {
       String line;
       while ((line = br.readLine()) != null) {
         if (line.trim().isEmpty()) {
@@ -151,8 +153,8 @@ public class PDFontTranslator {
    * normalized name of "LTSLOS+NimbusSanL-Bold" is "nimbussanl-bold".
    * 
    * @param font
-   *        The font to translate.
-   * @return The translated font.
+   *        The font to convert.
+   * @return The converted font.
    */
   protected String computeNormalizedFontName(PDFont font) {
     if (computeIsType3Font(font)) {

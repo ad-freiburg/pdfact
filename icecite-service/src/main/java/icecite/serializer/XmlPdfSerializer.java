@@ -50,7 +50,6 @@ import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
 import icecite.models.PdfPage;
-import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;

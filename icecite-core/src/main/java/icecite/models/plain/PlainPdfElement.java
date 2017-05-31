@@ -77,8 +77,8 @@ public class PlainPdfElement implements PdfElement {
 
   @Override
   public String toString() {
-    return "PlainPdfElement(page: " + this.page.getPageNumber() + ", rect: "
-        + this.boundingBox + ")";
+    return "PlainPdfElement(page: " + getPage().getPageNumber() + ", rect: "
+        + getRectangle() + ")";
   }
 
   @Override
@@ -89,7 +89,7 @@ public class PlainPdfElement implements PdfElement {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPage(), otherElement.getPage());
       builder.append(getRectangle(), otherElement.getRectangle());
-      
+
       return builder.isEquals();
     }
     return false;

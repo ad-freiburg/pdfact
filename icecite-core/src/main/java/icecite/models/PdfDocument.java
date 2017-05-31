@@ -9,8 +9,8 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument extends HasCharacters, HasFigures, HasShapes,
-    HasTextLines, HasTextBlocks, HasParagraphs {
+public interface PdfDocument
+    extends HasCharacters, HasFigures, HasShapes, HasTextLines, HasParagraphs {
   /**
    * Returns the pages of this PDF document.
    * 

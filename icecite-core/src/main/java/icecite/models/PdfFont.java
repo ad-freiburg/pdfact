@@ -7,6 +7,23 @@ package icecite.models;
  */
 public interface PdfFont extends PdfResource {
   /**
+   * Returns the id of this font (needed for serialization).
+   * 
+   * @return The id of this font.
+   */
+  String getId();
+
+  /**
+   * Sets the id of this font (needed for serialization).
+   * 
+   * @param id
+   *        The id of this font.
+   */
+  void setId(String id);
+  
+  // ==========================================================================
+  
+  /**
    * Returns the normalized name of this font. That is the lower cased name of
    * the font as it appears in the PDF document without the substring till the
    * "+" sign. For example, if the name of font is "FPVPVX+NimbusRomNo9L-Medi",

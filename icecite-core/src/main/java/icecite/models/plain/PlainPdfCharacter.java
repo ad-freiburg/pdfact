@@ -19,11 +19,6 @@ import icecite.models.PdfType;
  */
 public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
-   * The page in which this character is located.
-   */
-  protected PdfPage page;
-
-  /**
    * The position of this character in the sequence of extracted PDF elements.
    */
   protected int posInExtractionOrder;

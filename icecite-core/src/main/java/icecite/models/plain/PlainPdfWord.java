@@ -22,11 +22,6 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   /**
-   * The page in which this word is located.
-   */
-  protected PdfPage page;
-
-  /**
    * The characters of this word.
    */
   protected PdfCharacterList characters;

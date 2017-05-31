@@ -12,6 +12,11 @@ import icecite.models.PdfFont;
  */
 public class PlainPdfFont implements PdfFont {
   /**
+   * The id of this font (needed for serialization).
+   */
+  protected String id;
+  
+  /**
    * The (normalized) name of this font.
    */
   protected String normalizedName;
@@ -41,6 +46,18 @@ public class PlainPdfFont implements PdfFont {
    */
   protected boolean isItalic;
 
+  // ==========================================================================
+
+  @Override
+  public String getId() {
+    return this.id;
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = id;
+  }
+  
   // ==========================================================================
 
   @Override
@@ -121,7 +138,7 @@ public class PlainPdfFont implements PdfFont {
         + this.fontFamilyName + ", isType3: " + this.isType3Font + ", isBold: "
         + this.isBold + ", isItalic: " + this.isItalic() + ")";
   }
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfFont) {

@@ -18,11 +18,6 @@ import icecite.models.PdfType;
  */
 public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   /**
-   * The page in which this shape is located.
-   */
-  protected PdfPage page;
-
-  /**
    * The position of this shape in the extraction order of PDF elements.
    */
   protected int posInExtractionOrder;

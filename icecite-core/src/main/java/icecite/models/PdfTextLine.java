@@ -8,7 +8,7 @@ import icecite.utils.geometric.Line;
  * @author Claudius Korzen
  */
 public interface PdfTextLine
-    extends PdfElement, HasPage, HasCharacters, HasWords, HasText {
+    extends PdfElement, HasCharacters, HasWords, HasText {
   /**
    * Returns the baseline of this text line. See
    * https://en.wikipedia.org/wiki/Baseline_(typography) for more details about

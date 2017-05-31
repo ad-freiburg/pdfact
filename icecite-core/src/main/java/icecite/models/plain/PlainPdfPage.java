@@ -30,7 +30,7 @@ public class PlainPdfPage implements PdfPage {
    * The number of this page in the PDF document.
    */
   protected int pageNumber;
-  
+
   /**
    * The characters of this page.
    */
@@ -225,14 +225,14 @@ public class PlainPdfPage implements PdfPage {
   public void setPageNumber(int pageNumber) {
     this.pageNumber = pageNumber;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public String toString() {
     return "PlainPdfPage(" + this.pageNumber + ")";
   }
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfPage) {

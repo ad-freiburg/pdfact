@@ -30,11 +30,6 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    * The text of this text block.
    */
   protected String text;
-  
-  /**
-   * The page in which this text block is located.
-   */
-  protected PdfPage page;
 
   // ==========================================================================
 

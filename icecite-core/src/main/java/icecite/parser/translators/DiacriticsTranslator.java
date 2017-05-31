@@ -130,7 +130,7 @@ public class DiacriticsTranslator {
    * and identifying which characters are not mapped to by the normalization.
    * For example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
    */
-  protected static final Map<Integer, String> DIACRITICS;
+  static final Map<Integer, String> DIACRITICS;
 
   static {
     DIACRITICS = new HashMap<Integer, String>(31);

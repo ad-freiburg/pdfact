@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class PdfGlyphDictionary {
   /** The dictionary. */
-  public static final Map<String, String> DICT = new HashMap<>();
+  static final Map<String, String> DICT = new HashMap<>();
 
   static {
     DICT.put("Alpha", "Α");

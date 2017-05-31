@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import com.google.inject.Inject;
 
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
 import icecite.models.PdfPage;
@@ -29,13 +28,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   protected PdfTextBlockFactory textBlockFactory;
 
   /**
-   * The pattern to identify reference anchors.
-   */
-  protected static final Pattern REFERENCE_ANCHOR = Pattern
-      .compile("^\\[(.*)\\]\\s+");
-
-  /**
-   * Creates a new tokenizer to that tokenizes text lines into text blocks.
+   * Creates a new tokenizer that tokenizes text lines into text blocks.
    * 
    * @param textBlockFactory
    *        The factory to create instances of {@link PdfTextBlock}.
@@ -57,7 +50,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
-      
+
       if (introducesTextBlock(pdf, textBlock, prevLine, line, nextLine)) {
         if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
           textBlocks.add(textBlock);
@@ -69,6 +62,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
       // Add the word of the current line to the current text block.
       textBlock.addTextLine(line);
     }
+
     // Don't forget the remaining text block.
     if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
       textBlocks.add(textBlock);
@@ -95,54 +89,58 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    */
   protected boolean introducesTextBlock(PdfDocument pdf, PdfTextBlock block,
       PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
-    // The line does *not* introduce a new text block, if it is null.
+    // The line does *not* introduce a text block, if it is null.
     if (line == null) {
       return false;
     }
 
-    // The line introduces a new text block, if there is no previous line.
+    // The line introduces a text block, if there is no previous line.
     if (prevLine == null) {
       return true;
     }
 
-    // The line introduces a new text block, if there is no current
+    // The line introduces a text block, if there is no current text block.
     if (block == null) {
       return true;
     }
 
-    // The line does *not* introduce a new text block, if the current text
-    // block
-    // is empty.
+    // The line does *not* introduce a text block, if the current text block is
+    // empty.
     if (block.getTextLines().isEmpty()) {
       return false;
     }
 
-    // The line introduces a new text block, if it doesn't overlap the text
-    // block
-    // horizontally.
+    // The line introduces a text block, if it doesn't overlap the text
+    // block horizontally.
     if (!overlapsHorizontally(block, line)) {
       return true;
     }
 
-    // The line introduces a new text block, if it is indented compared to the
+    // The line introduces a new text block, if the line pitch between the
+    // line and the previous line is larger than expected.
+    if (isLinepitchLargerThanExpected(pdf, prevLine, line)) {
+      return true;
+    }
+
+    // The line introduces a new text block, if the line pitch between the
+    // line and the previous line is larger than the line pitch between the
+    // line and the next line.
+    if (isLinePitchLargerThanNextLinePitch(prevLine, line, nextLine)) {
+      return true;
+    }
+
+    // The line introduces a text block, if it is indented compared to the
     // previous and the next line.
     if (isIndented(prevLine, line, nextLine)) {
       return true;
     }
 
-    // The line introduces a new text block, if it has a special font face.
+    // The line introduces a text block, if it has a special font face.
     if (hasSignificantDifferentFontFace(prevLine, line)) {
       return true;
     }
 
-    // The line introduces a new text block, if the pitch to the previous line
-    // is larger than the most common line pitch in the text block.
-    if (isLinepitchTooLarge(pdf, prevLine, line)) {
-      return true;
-    }
-
-    // The line introduces a new text block, if it denotes the start of a
-    // reference.
+    // The line introduces a text block, if it is the start of a reference.
     if (isProbablyReferenceStart(prevLine, line, nextLine)) {
       return true;
     }
@@ -158,28 +156,76 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @param line
    *        The line to process.
    * @return True, if the given line overlaps the given text block
-   *         horizontally, False otherwise.
+   *         horizontally, false otherwise.
    */
   protected boolean overlapsHorizontally(PdfTextBlock block, PdfTextLine line) {
-    if (block == null) {
+    if (block == null || line == null) {
       return false;
     }
 
-    Rectangle boundingBox = block.getRectangle();
-    if (boundingBox == null) {
-      return false;
-    }
-
-    if (line == null) {
-      return false;
-    }
-
+    Rectangle blockBoundingBox = block.getRectangle();
     Rectangle lineBoundingBox = line.getRectangle();
-    if (lineBoundingBox == null) {
+    if (blockBoundingBox == null || lineBoundingBox == null) {
       return false;
     }
 
-    return boundingBox.overlapsHorizontally(lineBoundingBox);
+    return blockBoundingBox.overlapsHorizontally(lineBoundingBox);
+  }
+
+  /**
+   * Checks if the line pitch between the given line and the given previous
+   * line is larger than expected (larger than the most common line pitch for
+   * the font / font size pair of the given line).
+   * 
+   * @param pdf
+   *        The PDF document.
+   * @param prevLine
+   *        The previous line of the line to process.
+   * @param line
+   *        The line to process.
+   * @return True, if the line pitch between the given line and the given
+   *         previous line is larger than usual; False otherwise.
+   */
+  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf,
+      PdfTextLine prevLine, PdfTextLine line) {
+    if (pdf == null) {
+      return false;
+    }
+
+    PdfTextLineList textLines = pdf.getTextLines();
+    if (textLines == null) {
+      return false;
+    }
+
+    // Obtain the expected and actual line pitch for the given line.
+    float expectedLinePitch = textLines.getMostCommonLinePitch(line);
+    float actualLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
+
+    // TODO
+    return actualLinePitch - expectedLinePitch > 1;
+  }
+
+  /**
+   * Checks if the line pitch between the given line and its previous line is
+   * larger than the line pitch between the given line and its next line.
+   * 
+   * @param prevLine
+   *        The previous text line.
+   * @param line
+   *        The text line to process.
+   * @param nextLine
+   *        The next text line.
+   * @return True, if the line pitch between the given line and its previous
+   *         line is larger than the line pitch between the given line and its
+   *         next line, flase otherwise.
+   */
+  protected static boolean isLinePitchLargerThanNextLinePitch(
+      PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
+    float linePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
+    float nextLinePitch = PdfTextLineUtils.computeLinePitch(line, nextLine);
+
+    // TODO
+    return linePitch - nextLinePitch > 1;
   }
 
   /**
@@ -192,23 +238,15 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    *        The line to process.
    * @param nextLine
    *        The next line.
-   * @return True, if the given line is indented compared to the given previous
-   *         line and the given next line and the line pitch between the
-   *         previous line / current line and between the current line / next
-   *         line are almost equal.
+   * @return True, if (1) the line pitches between the lines are equal, (2)
+   *         prevLine and nextLine do not start with an reference anchor and
+   *         (3) the line is indented compared to the previous and the next
+   *         line.
    */
   protected boolean isIndented(PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
-    if (prevLine == null || line == null || nextLine == null) {
-      return false;
-    }
-
-    // The line pitch between previous line / current line and between the
-    // current line / next line must be almost equal.
-    float prevLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
-    float linePitch = PdfTextLineUtils.computeLinePitch(line, nextLine);
-    // TODO
-    if (Math.abs(prevLinePitch - linePitch) > 1) {
+    // The line pitches between the lines must be equal.
+    if (!PdfTextLineUtils.isLinepitchesEqual(prevLine, line, nextLine)) {
       return false;
     }
 
@@ -219,19 +257,14 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
       return false;
     }
 
-    Rectangle prevRectangle = prevLine.getRectangle();
-    Rectangle rectangle = line.getRectangle();
-    Rectangle nextRectangle = nextLine.getRectangle();
+    // Check if the line is indented compared to the previous and next line.
+    boolean isIndentedToPrevLine = PdfTextLineUtils.isIndented(line, prevLine);
+    boolean isIndentedToNextLine = PdfTextLineUtils.isIndented(line, nextLine);
 
-    if (prevRectangle == null || rectangle == null || nextRectangle == null) {
-      return false;
-    }
+    // Check if the minX values of the previous and the next lines are equal.
+    boolean isMinXEqual = PdfTextLineUtils.isMinXEqual(prevLine, nextLine);
 
-    if (prevRectangle.getMinX() != nextRectangle.getMinX()) {
-      return false;
-    }
-
-    return rectangle.getMinX() > prevRectangle.getMinX();
+    return isIndentedToPrevLine && isIndentedToNextLine && isMinXEqual;
   }
 
   /**
@@ -278,48 +311,6 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   }
 
   /**
-   * Checks if the line pitch between the given line and the given previous
-   * line is larger than usual (larger than the most common line pitch for the
-   * font / font size pair of the given line).
-   * 
-   * @param pdf
-   *        The PDF document.
-   * @param prevLine
-   *        The previous line of the line to process.
-   * @param line
-   *        The line to process.
-   * @return True, if the line pitch between the given line and the given
-   *         previous line is larger than usual; False otherwise.
-   */
-  protected static boolean isLinepitchTooLarge(PdfDocument pdf,
-      PdfTextLine prevLine, PdfTextLine line) {
-    if (pdf == null || prevLine == null || line == null) {
-      return false;
-    }
-
-    PdfCharacterList lineCharacters = line.getCharacters();
-    if (lineCharacters == null) {
-      return false;
-    }
-
-    PdfTextLineList textLines = pdf.getTextLines();
-    if (textLines == null) {
-      return false;
-    }
-
-    // Obtain the expected and actual line pitch for the given line.
-    float expectedLinePitch = textLines.getMostCommonLinePitch(line);
-    float actualLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
-
-    if (Float.isNaN(expectedLinePitch) || Float.isNaN(actualLinePitch)) {
-      return false;
-    }
-
-    // TODO
-    return actualLinePitch - expectedLinePitch > 1;
-  }
-
-  /**
    * Returns true, if the given line is (probably) a reference start.
    * 
    * @param prevLine
@@ -362,6 +353,12 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
     return (hasPrevLineDifferentMinX || hasPrevLineReferenceAnchor)
         && (hasNextLineDifferentMinX || hasNextLineReferenceAnchor);
   }
+
+  /**
+   * The pattern to identify reference anchors.
+   */
+  protected static final Pattern REFERENCE_ANCHOR = Pattern
+      .compile("^\\[(.*)\\]\\s+");
 
   /**
    * Checks is the given text line starts with a reference anchor like "[1]",

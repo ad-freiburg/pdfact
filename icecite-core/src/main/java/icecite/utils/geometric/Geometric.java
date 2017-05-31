@@ -180,9 +180,12 @@ public abstract class Geometric implements HasRectangle {
    * @return The length of the vertical overlap
    */
   public float computeVerticalOverlapLength(Geometric g) {
+    if (g == null) {
+      return 0;
+    }
     Rectangle rect = getRectangle();
     Rectangle other = g.getRectangle();
-    if (rect != null && g != null) {
+    if (rect != null && other != null) {
       float minMaxY = Math.min(rect.getMaxY(), other.getMaxY());
       float maxMinY = Math.max(rect.getMinY(), other.getMinY());
       return Math.max(0, minMaxY - maxMinY);
@@ -199,9 +202,12 @@ public abstract class Geometric implements HasRectangle {
    * @return The length of the vertical overlap
    */
   public float computeHorizontalOverlapLength(Geometric g) {
+    if (g == null) {
+      return 0;
+    }
     Rectangle rect = getRectangle();
     Rectangle other = g.getRectangle();
-    if (rect != null && g != null) {
+    if (rect != null && other != null) {
       float minMaxX = Math.min(rect.getMaxX(), other.getMaxX());
       float maxMinX = Math.max(rect.getMinX(), other.getMinX());
       return Math.max(0, minMaxX - maxMinX);

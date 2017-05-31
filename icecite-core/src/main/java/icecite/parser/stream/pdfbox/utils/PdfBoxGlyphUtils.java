@@ -17,11 +17,11 @@ public class PdfBoxGlyphUtils {
   /**
    * The additional glyphs.
    */
-  protected static GlyphList additionalGlyphs;
+  protected static final GlyphList ADDITIONAL_GLYPHS;
 
   static {
     // TODO: Don't hardcode the paths.
-    additionalGlyphs = readAdditionalGlyphs(
+    ADDITIONAL_GLYPHS = readAdditionalGlyphs(
         "org/apache/pdfbox/resources/glyphlist/additional.txt");
   }
 
@@ -31,7 +31,7 @@ public class PdfBoxGlyphUtils {
    * @return A list of additional glyphs.
    */
   public static GlyphList getAdditionalGlyphs() {
-    return additionalGlyphs;
+    return ADDITIONAL_GLYPHS;
   }
 
   /**

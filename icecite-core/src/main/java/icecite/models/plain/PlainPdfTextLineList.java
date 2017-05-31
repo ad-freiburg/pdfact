@@ -77,11 +77,11 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
       String fontFace = PdfTextLineUtils.computeFontFace(line);
       // Compute the line pitch between the current line and the previous line.
       float linePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
-
+     
       if (Float.isNaN(linePitch)) {
         continue;
       }
-
+      
       // Add a new float counter if there is none for the given font face.
       this.linePitchesPerFontFace.putIfAbsent(fontFace, new FloatCounter());
       this.linePitchesPerFontFace.get(fontFace).add(linePitch);

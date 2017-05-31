@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +39,7 @@ public class PathUtils {
    *         If reading the file failed.
    */
   public static String read(Path path) throws IOException {
-    return new String(Files.readAllBytes(path));
+    return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
   }
 
   /**
@@ -266,14 +267,17 @@ public class PathUtils {
           }
         }
       } else {
-        String filename = path.getFileName().toString();
-        if (extensions.length == 0) {
-          result.add(path);
-        } else {
-          for (String extension : extensions) {
-            if (filename.toLowerCase().endsWith(extension)) {
-              result.add(path);
-              break;
+        Path filename = path.getFileName();
+        if (filename != null) {
+          String filenameStr = filename.toString();
+          if (extensions.length == 0) {
+            result.add(path);
+          } else {
+            for (String extension : extensions) {
+              if (filenameStr.toLowerCase().endsWith(extension)) {
+                result.add(path);
+                break;
+              }
             }
           }
         }
@@ -317,23 +321,33 @@ public class PathUtils {
    *         If reading or copying the paths failed.
    */
   public static void copy(Path file, Path targetDir) throws Exception {
+    if (file == null || targetDir == null) {
+      return;
+    }
+
     if (Files.isRegularFile(file)) {
       Files.createDirectories(targetDir);
-      Files.copy(file, targetDir.resolve(file.getFileName().toString()),
-          StandardCopyOption.REPLACE_EXISTING);
+      Path filename = file.getFileName();
+      if (filename != null) {
+        Files.copy(file, targetDir.resolve(filename.toString()),
+            StandardCopyOption.REPLACE_EXISTING);
+      }
     } else if (Files.isDirectory(file)) {
       Files.createDirectories(targetDir);
       try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
         Iterator<Path> filesItr = files.iterator();
         while (filesItr.hasNext()) {
           Path f = filesItr.next();
-          Path target = targetDir.resolve(f.getFileName().toString());
+          Path filename = f.getFileName();
+          if (filename != null) {
+            Path target = targetDir.resolve(filename.toString());
 
-          if (Files.isDirectory(target)) {
-            clearDirectory(target);
+            if (Files.isDirectory(target)) {
+              clearDirectory(target);
+            }
+
+            Files.copy(f, target, StandardCopyOption.REPLACE_EXISTING);
           }
-
-          Files.copy(f, target, StandardCopyOption.REPLACE_EXISTING);
         }
       }
     }
@@ -354,21 +368,27 @@ public class PathUtils {
   public static void move(Path file, Path targetDir) throws Exception {
     if (Files.isRegularFile(file)) {
       Files.createDirectories(targetDir);
-      Files.move(file, targetDir.resolve(file.getFileName().toString()),
-          StandardCopyOption.REPLACE_EXISTING);
+      Path filename = file.getFileName();
+      if (filename != null) {
+        Files.move(file, targetDir.resolve(filename.toString()),
+            StandardCopyOption.REPLACE_EXISTING);
+      }
     } else if (Files.isDirectory(file)) {
       Files.createDirectories(targetDir);
       try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
         Iterator<Path> filesItr = files.iterator();
         while (filesItr.hasNext()) {
           Path f = filesItr.next();
-          Path target = targetDir.resolve(f.getFileName().toString());
+          Path filename = f.getFileName();
+          if (filename != null) {
+            Path target = targetDir.resolve(filename.toString());
 
-          if (Files.isDirectory(target)) {
-            clearDirectory(target);
+            if (Files.isDirectory(target)) {
+              clearDirectory(target);
+            }
+
+            Files.move(f, target, StandardCopyOption.REPLACE_EXISTING);
           }
-
-          Files.move(f, target, StandardCopyOption.REPLACE_EXISTING);
         }
       }
       Files.delete(file);
@@ -397,9 +417,12 @@ public class PathUtils {
    */
   public static String getBasename(Path file) {
     if (file != null) {
-      String filename = file.getFileName().toString();
-      String[] tokens = filename.split("\\.(?=[^\\.]+$)");
-      return tokens[0];
+      Path filename = file.getFileName();
+      if (filename != null) {
+        String filenameStr = filename.toString();
+        String[] tokens = filenameStr.split("\\.(?=[^\\.]+$)");
+        return tokens[0];
+      }
     }
     return null;
   }
@@ -413,9 +436,12 @@ public class PathUtils {
    */
   public static String getExtension(Path file) {
     if (file != null) {
-      String filename = file.getFileName().toString();
-      String[] tokens = filename.split("\\.(?=[^\\.]+$)");
-      return tokens.length > 1 ? tokens[1] : "";
+      Path filename = file.getFileName();
+      if (filename != null) {
+        String filenameStr = filename.toString();
+        String[] tokens = filenameStr.split("\\.(?=[^\\.]+$)");
+        return tokens.length > 1 ? tokens[1] : "";
+      }
     }
     return null;
   }
@@ -463,14 +489,19 @@ public class PathUtils {
         // Read the directory.
         directory = new File(classLoader.getResource(path).toURI());
       } catch (Exception e) {
-        return streams;
+        // Nothing to do.
       }
 
-      for (File file : directory.listFiles()) {
-        try {
-          streams.put(file.getName(), new FileInputStream(file));
-        } catch (Exception e) {
-          continue;
+      if (directory != null) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+          for (File file : files) {
+            try {
+              streams.put(file.getName(), new FileInputStream(file));
+            } catch (Exception e) {
+              continue;
+            }
+          }
         }
       }
     }
@@ -492,10 +523,10 @@ public class PathUtils {
 
     if (Files.exists(file)) {
       Path parent = file.getParent();
-
-      return parent.toString();
+      if (parent != null) {
+        return parent.toString();
+      }
     }
-
     return null;
   }
 

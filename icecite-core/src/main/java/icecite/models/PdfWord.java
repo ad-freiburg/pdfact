@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWord extends PdfElement, HasPage, HasCharacters, HasText {
+public interface PdfWord extends PdfElement, HasCharacters, HasText {
   /**
    * The factory to create instances of {@link PdfWord}.
    * 

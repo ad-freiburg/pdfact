@@ -17,11 +17,6 @@ import icecite.models.PdfType;
  */
 public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   /**
-   * The page in which this figure is located.
-   */
-  protected PdfPage page;
-
-  /**
    * Creates a new PdfFigure.
    * 
    * @param page
