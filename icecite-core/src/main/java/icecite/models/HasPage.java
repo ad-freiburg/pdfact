@@ -1,23 +1,24 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has a PDF page.
+ * An interface that declares that the implementing object belongs to a PDF
+ * page.
  *
  * @author Claudius Korzen
  */
 public interface HasPage {
   /**
-   * Returns the page in which this element is located.
+   * Returns the page.
    * 
-   * @return The page in which this element is located.
+   * @return The page.
    */
   PdfPage getPage();
 
   /**
-   * Sets the page in which this element is located.
+   * Sets the given page.
    * 
    * @param page
-   *        The page in which this element is located.
+   *        The page.
    */
   void setPage(PdfPage page);
 }

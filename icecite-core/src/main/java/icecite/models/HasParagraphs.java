@@ -9,17 +9,17 @@ import java.util.List;
  */
 public interface HasParagraphs {
   /**
-   * Returns the identified paragraphs in this page.
+   * Returns the paragraphs.
    * 
-   * @return The list of paragraphs in this page.
+   * @return The paragraphs.
    */
   List<PdfParagraph> getParagraphs();
 
   /**
-   * Sets the paragraphs of this page.
+   * Sets the given paragraphs.
    * 
    * @param paragraphs
-   *        The list of paragraphs to set.
+   *        The paragraphs.
    */
   void setParagraphs(List<PdfParagraph> paragraphs);
 
@@ -27,15 +27,15 @@ public interface HasParagraphs {
    * Adds the given paragraphs.
    * 
    * @param paragraphs
-   *        The paragraphs to add.
+   *        The paragraphs.
    */
   void addParagraphs(List<PdfParagraph> paragraphs);
 
   /**
-   * Adds the given paragraph to this page.
+   * Adds the given paragraph.
    * 
    * @param paragraph
-   *        The paragraph to add.
+   *        The paragraph.
    */
   void addParagraph(PdfParagraph paragraph);
 }

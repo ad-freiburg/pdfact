@@ -1,7 +1,9 @@
 package icecite.models;
 
+// TODO: Is this still needed? We could just use PdfCharacterList.
+
 /**
- * Any text block with no special definition.
+ * Any text block to group any set of characters.
  * 
  * @author Claudius Korzen
  */

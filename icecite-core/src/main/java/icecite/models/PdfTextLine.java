@@ -10,8 +10,9 @@ import icecite.utils.geometric.Line;
 public interface PdfTextLine
     extends PdfElement, HasPage, HasCharacters, HasWords, HasText {
   /**
-   * Returns the baseline of this text line. For more details about a baseline,
-   * see https://en.wikipedia.org/wiki/Baseline_(typography)
+   * Returns the baseline of this text line. See
+   * https://en.wikipedia.org/wiki/Baseline_(typography) for more details about
+   * baselines.
    * 
    * @return The base line of this text line.
    */
@@ -37,7 +38,7 @@ public interface PdfTextLine
      * Creates a PdfTextLine.
      * 
      * @param page
-     *        The page in which the lien is located.
+     *        The page in which the line is located.
      * @param characters
      *        The characters of the text line to create.
      * 

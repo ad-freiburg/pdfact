@@ -1,8 +1,7 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object consists of multiple
- * characters.
+ * An interface that declares that the implementing object has characters.
  *
  * @author Claudius Korzen
  */
@@ -15,7 +14,7 @@ public interface HasCharacters {
   PdfCharacterList getCharacters();
 
   /**
-   * Sets the characters.
+   * Sets the given characters.
    * 
    * @param characters
    *        The characters to set.

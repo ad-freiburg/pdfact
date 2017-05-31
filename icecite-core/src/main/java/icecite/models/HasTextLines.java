@@ -14,26 +14,26 @@ public interface HasTextLines {
   PdfTextLineList getTextLines();
 
   /**
-   * Sets the text lines.
+   * Sets the given text lines.
    * 
    * @param lines
-   *        The list of text lines to set.
+   *        The list of text lines.
    */
   void setTextLines(PdfTextLineList lines);
 
   /**
-   * Adds the text lines.
+   * Adds the given text lines.
    * 
    * @param lines
-   *        The list of text lines to add.
+   *        The text lines.
    */
   void addTextLines(PdfTextLineList lines);
 
   /**
-   * Adds the given text line.
+   * Adds the given given text line.
    * 
    * @param line
-   *        The text line to add.
+   *        The text line.
    */
   void addTextLine(PdfTextLine line);
 }

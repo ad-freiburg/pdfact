@@ -12,7 +12,7 @@ import java.util.List;
 public interface PdfDocument extends HasCharacters, HasFigures, HasShapes,
     HasTextLines, HasTextBlocks, HasParagraphs {
   /**
-   * Returns the pages of this document.
+   * Returns the pages of this PDF document.
    * 
    * @return The pages of this PDF document.
    */

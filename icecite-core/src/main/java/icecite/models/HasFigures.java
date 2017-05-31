@@ -3,24 +3,23 @@ package icecite.models;
 import java.util.List;
 
 /**
- * An interface that declares that the implementing object consists of multiple
- * figures.
+ * An interface that declares that the implementing object has figures.
  *
  * @author Claudius Korzen
  */
 public interface HasFigures {
   /**
-   * Returns the set of figures.
+   * Returns the figures.
    * 
-   * @return The set of figures.
+   * @return The figures.
    */
   List<PdfFigure> getFigures();
 
   /**
-   * Sets the figures.
+   * Sets the given figures.
    * 
    * @param figures
-   *        The figures to set.
+   *        The figures.
    */
   void setFigures(List<PdfFigure> figures);
 
@@ -28,7 +27,7 @@ public interface HasFigures {
    * Adds the given figures.
    * 
    * @param figures
-   *        The figures to add.
+   *        The figures.
    */
   void addFigures(List<PdfFigure> figures);
 
@@ -36,7 +35,7 @@ public interface HasFigures {
    * Adds the given figure.
    * 
    * @param figure
-   *        The figure to add.
+   *        The figure.
    */
   void addFigure(PdfFigure figure);
 }

@@ -16,32 +16,32 @@ public interface HasWords {
   /**
    * Returns the first word.
    * 
-   * @return The first word or null if the list of words is empty.
+   * @return The first word or null if there are no words.
    */
   PdfWord getFirstWord();
 
   /**
    * Returns the last word.
    * 
-   * @return The last word or null if the list of words is empty.
+   * @return The last word or null if there are no words.
    */
   PdfWord getLastWord();
 
   // ==========================================================================
 
   /**
-   * Sets the words.
+   * Sets the given words.
    * 
    * @param words
-   *        The words to set.
+   *        The words.
    */
   void setWords(PdfWordList words);
 
   /**
-   * Adds the words.
+   * Adds the given words.
    * 
    * @param words
-   *        The words to add.
+   *        The words.
    */
   void addWords(PdfWordList words);
 
@@ -49,7 +49,7 @@ public interface HasWords {
    * Adds the given word.
    * 
    * @param word
-   *        The word to add.
+   *        The word.
    */
   void addWord(PdfWord word);
 }

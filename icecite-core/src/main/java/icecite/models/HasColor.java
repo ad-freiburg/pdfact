@@ -7,17 +7,17 @@ package icecite.models;
  */
 public interface HasColor {
   /**
-   * Returns the color of the implementing object.
+   * Returns the color.
    * 
-   * @return The color of the implementing object.
+   * @return The color.
    */
   PdfColor getColor();
 
   /**
-   * Sets the color of the implementing object.
+   * Sets the given color.
    * 
    * @param color
-   *        The color of the implementing object.
+   *        The color.
    */
   void setColor(PdfColor color);
 }

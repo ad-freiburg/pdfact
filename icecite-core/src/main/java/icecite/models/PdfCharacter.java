@@ -11,8 +11,7 @@ public interface PdfCharacter
    * Returns the position of this character in the sequence of extracted PDF
    * elements.
    *
-   * @return The position of this character in the sequence of extracted PDF
-   *         elements.
+   * @return The position.
    */
   int getPositionInExtractionOrder();
 
@@ -21,8 +20,7 @@ public interface PdfCharacter
    * elements.
    *
    * @param pos
-   *        The position of this character in the sequence of extracted PDF
-   *        elements.
+   *        The position.
    */
   void setPositionInExtractionOrder(int pos);
 

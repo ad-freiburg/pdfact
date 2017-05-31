@@ -7,34 +7,34 @@ package icecite.models;
  */
 public interface HasFont {
   /**
-   * Returns the font of the implementing object.
+   * Returns the font.
    * 
-   * @return The font of the implementing object.
+   * @return The font.
    */
   PdfFont getFont();
 
   /**
-   * Sets the font of the implementing object.
+   * Sets the given font.
    * 
    * @param font
-   *        The font of the implementing object.
+   *        The font.
    */
   void setFont(PdfFont font);
 
   // ==========================================================================
 
   /**
-   * Returns the font size of the implementing object.
+   * Returns the font size.
    * 
-   * @return The font size of the implementing object.
+   * @return The font size.
    */
   float getFontSize();
 
   /**
-   * Sets the font size of the implementing object.
+   * Sets the given font size.
    * 
    * @param fontsize
-   *        The font size of the implementing object.
+   *        The font size.
    */
   void setFontSize(float fontsize);
 }

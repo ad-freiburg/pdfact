@@ -35,10 +35,11 @@ public interface PdfElementList<T extends PdfElement>
    */
   float getMostCommonHeight();
 
-  /**
-   * // * Returns all elements with the most common height. // * // * @return
-   * All elements with the most common height. //
-   */
+  // /**
+  // * Returns all elements with the most common height.
+  // *
+  // * @return All elements with the most common height.
+  // */
   // Set<T> getElementsWithMostCommonHeight();
 
   /**

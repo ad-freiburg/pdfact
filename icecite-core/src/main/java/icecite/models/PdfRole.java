@@ -1,7 +1,7 @@
 package icecite.models;
 
 /**
- * An enumeration of roles for PDF elements.
+ * An enumeration of semantic roles for paragraphs of PDF documents.
  * 
  * @author Claudius Korzen
  */

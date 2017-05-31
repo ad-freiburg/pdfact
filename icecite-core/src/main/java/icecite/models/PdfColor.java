@@ -44,9 +44,9 @@ public interface PdfColor extends PdfResource {
   void setRGB(float r, float g, float b);
 
   /**
-   * Returns the rgb value of this color.
+   * Returns the RGB value of this color.
    * 
-   * @return The rgb value given as array of three float values in [0,1].
+   * @return The RGB value given as array of three float values in [0,1].
    */
   float[] getRGB();
 

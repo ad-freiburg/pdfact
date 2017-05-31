@@ -9,17 +9,17 @@ import java.util.List;
  */
 public interface HasTextBlocks {
   /**
-   * Returns the identified text blocks.
+   * Returns the text blocks.
    * 
-   * @return The list of text blocks.
+   * @return The text blocks.
    */
   List<PdfTextBlock> getTextBlocks();
 
   /**
-   * Sets the text blocks.
+   * Sets the given text blocks.
    * 
    * @param blocks
-   *        The list of text blocks to set.
+   *        The text blocks.
    */
   void setTextBlocks(List<PdfTextBlock> blocks);
 
@@ -27,7 +27,7 @@ public interface HasTextBlocks {
    * Adds the given text blocks.
    * 
    * @param blocks
-   *        The list of text blocks to add.
+   *        The text blocks.
    */
   void addTextBlocks(List<PdfTextBlock> blocks);
 
@@ -35,7 +35,7 @@ public interface HasTextBlocks {
    * Adds the given text block.
    * 
    * @param block
-   *        The text block to add.
+   *        The text block.
    */
   void addTextBlock(PdfTextBlock block);
 }

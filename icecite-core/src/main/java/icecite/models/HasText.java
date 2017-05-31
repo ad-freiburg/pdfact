@@ -1,23 +1,23 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has a text.
+ * An interface that declares that the implementing object has text.
  *
  * @author Claudius Korzen
  */
 public interface HasText {
   /**
-   * Returns the text of the implementing object.
+   * Returns the text.
    * 
-   * @return The text of the implementing object.
+   * @return The text.
    */
   String getText();
 
   /**
-   * Sets the text of the implementing object.
+   * Sets the given text.
    * 
    * @param text
-   *        The text of the implementing object.
+   *        The text.
    */
   void setText(String text);
 }

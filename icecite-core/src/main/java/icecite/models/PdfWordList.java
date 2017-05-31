@@ -1,7 +1,7 @@
 package icecite.models;
 
 /**
- * A list of PDF text lines.
+ * A list of words.
  * 
  * @author Claudius Korzen
  */

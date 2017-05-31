@@ -18,7 +18,7 @@ public interface PdfFigure extends PdfElement, HasPage {
      * @param page
      *        The page in which the figure is located.
      * 
-     * @return An instance of PdfFigure.
+     * @return An instance of {@link PdfFigure}.
      */
     PdfFigure create(PdfPage page);
   }

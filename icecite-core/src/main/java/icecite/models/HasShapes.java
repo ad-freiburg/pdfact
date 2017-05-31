@@ -3,23 +3,23 @@ package icecite.models;
 import java.util.List;
 
 /**
- * An interface that declares that the implementing object has multiple shapes.
+ * An interface that declares that the implementing object has shapes.
  *
  * @author Claudius Korzen
  */
 public interface HasShapes {
   /**
-   * Returns the set of shapes.
+   * Returns the shapes.
    * 
-   * @return The set of shapes.
+   * @return The shapes.
    */
   List<PdfShape> getShapes();
 
   /**
-   * Sets the shapes.
+   * Sets the given shapes.
    * 
    * @param shapes
-   *        The shapes to set.
+   *        The shapes.
    */
   void setShapes(List<PdfShape> shapes);
 
@@ -27,7 +27,7 @@ public interface HasShapes {
    * Adds the given shapes.
    * 
    * @param shapes
-   *        The shapes to add.
+   *        The shapes.
    */
   void addShapes(List<PdfShape> shapes);
 
@@ -35,7 +35,7 @@ public interface HasShapes {
    * Adds the given shape.
    * 
    * @param shape
-   *        The shape to add.
+   *        The shape.
    */
   void addShape(PdfShape shape);
 }
