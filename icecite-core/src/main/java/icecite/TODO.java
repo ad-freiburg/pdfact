@@ -16,4 +16,5 @@ public class TODO {
   // TODO: In parser, use mor custom models.
   // TODO: In PdfElementList, accelerate cut method.
   // TODO: Write a PDColorTranslator, as for PDFont
+  // TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
 }

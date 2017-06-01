@@ -6,6 +6,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
+import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
@@ -22,6 +25,11 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   /**
+   * The characters of this text block.
+   */
+  protected PdfCharacterList characters;
+
+  /**
    * The text lines of this text block.
    */
   protected PdfTextLineList textLines;
@@ -36,14 +44,17 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   /**
    * Creates a new text block.
    * 
+   * @param characterListFactory
+   *        The factory to create instances of {@link PdfCharacter}.
+   * @param textLineListFactory
+   *        The factory to create instances of {@link PdfTextLine}.
    * @param page
    *        The page in which this text block is located.
-   * @param textLineListFactory
-   *        The text lines of this text block.
    */
   @AssistedInject
-  public PlainPdfTextBlock(PdfTextLineListFactory textLineListFactory,
-      @Assisted PdfPage page) {
+  public PlainPdfTextBlock(PdfCharacterListFactory characterListFactory,
+      PdfTextLineListFactory textLineListFactory, @Assisted PdfPage page) {
+    this.characters = characterListFactory.create();
     this.textLines = textLineListFactory.create();
     this.page = page;
   }
@@ -58,6 +69,30 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @Override
   public void setPage(PdfPage page) {
     this.page = page;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfCharacterList getCharacters() {
+    return this.characters;
+  }
+
+  @Override
+  public void setCharacters(PdfCharacterList characters) {
+    this.characters = characters;
+  }
+
+  @Override
+  public void addCharacters(PdfCharacterList characters) {
+    for (PdfCharacter character : characters) {
+      addCharacter(character);
+    }
+  }
+
+  @Override
+  public void addCharacter(PdfCharacter character) {
+    this.characters.add(character);
   }
 
   // ==========================================================================

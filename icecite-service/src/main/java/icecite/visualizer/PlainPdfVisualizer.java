@@ -209,6 +209,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (element != null) {
       drawer.drawBoundingBox(element, page.getPageNumber(), strokingColor,
           nonStrokingColor);
+      if (element.getRole() != null) {
+        // Visualize the role.
+        drawer.drawText(element.getRole().getName(), page.getPageNumber(), 
+            element.getRectangle().getUpperLeft(), strokingColor, 8);
+      }
     }
   }
 

@@ -16,11 +16,13 @@ import com.google.inject.name.Names;
 import icecite.guice.IceciteBaseModule;
 import icecite.guice.IceciteServiceModule;
 import icecite.models.PdfDocument;
-import icecite.parser.PdfParser;
-import icecite.parser.PdfParser.PdfParserFactory;
-import icecite.parser.stream.pdfbox.guice.OperatorProcessorModule;
+import icecite.parse.PdfParser;
+import icecite.parse.PdfParser.PdfParserFactory;
+import icecite.parse.stream.pdfbox.guice.OperatorProcessorModule;
+import icecite.semanticize.PdfTextSemanticizer;
+import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.serializer.PdfSerializer;
-import icecite.tokenizer.PdfPageTokenizer;
+import icecite.tokenize.PdfTextTokenizer;
 import icecite.visualizer.PdfVisualizer;
 import icecite.visualizer.PdfVisualizer.PdfVisualizerFactory;
 
@@ -94,12 +96,18 @@ public class IcecitePdfParserMain {
     PdfSerializer serializer = injector
         .getInstance(Key.get(PdfSerializer.class, Names.named("txt")));
     PdfParser pdfParser = factory.create();
-    PdfPageTokenizer tokenizer = injector.getInstance(PdfPageTokenizer.class);
+    PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
+    PdfTextSemanticizerFactory semanticizerFactory = injector
+        .getInstance(PdfTextSemanticizerFactory.class);
 
     PdfVisualizer visualizer = visualizerFactory.create();
 
     PdfDocument document = pdfParser.parsePdf(inputPdf);
+    
     tokenizer.tokenizePdfDocument(document);
+    
+    PdfTextSemanticizer semanticizer = semanticizerFactory.create(document);
+    semanticizer.semanticize();
 
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {

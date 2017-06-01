@@ -48,22 +48,25 @@ import icecite.models.plain.PlainPdfTextLine;
 import icecite.models.plain.PlainPdfTextLineList;
 import icecite.models.plain.PlainPdfWord;
 import icecite.models.plain.PlainPdfWordList;
-import icecite.parser.PdfParser;
-import icecite.parser.PdfParser.PdfParserFactory;
-import icecite.parser.PlainPdfParser;
-import icecite.parser.stream.PdfStreamParser;
-import icecite.parser.stream.PdfStreamParser.PdfStreamParserFactory;
-import icecite.parser.stream.pdfbox.PdfBoxPdfStreamParser;
-import icecite.tokenizer.PdfPageTokenizer;
-import icecite.tokenizer.PdfTextAreaTokenizer;
-import icecite.tokenizer.PdfTextBlockTokenizer;
-import icecite.tokenizer.PdfTextLineTokenizer;
-import icecite.tokenizer.PdfWordTokenizer;
-import icecite.tokenizer.PlainPdfPageTokenizer;
-import icecite.tokenizer.PlainPdfTextBlockTokenizer;
-import icecite.tokenizer.XYCutPdfTextAreaTokenizer;
-import icecite.tokenizer.XYCutPdfTextLineTokenizer;
-import icecite.tokenizer.XYCutPdfWordTokenizer;
+import icecite.parse.PdfParser;
+import icecite.parse.PlainPdfParser;
+import icecite.parse.PdfParser.PdfParserFactory;
+import icecite.parse.stream.PdfStreamParser;
+import icecite.parse.stream.PdfStreamParser.PdfStreamParserFactory;
+import icecite.parse.stream.pdfbox.PdfBoxPdfStreamParser;
+import icecite.semanticize.PdfTextSemanticizer;
+import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
+import icecite.semanticize.plain.PlainPdfTextSemanticizer;
+import icecite.tokenize.PdfTextTokenizer;
+import icecite.tokenize.PdfTextAreaTokenizer;
+import icecite.tokenize.PdfTextBlockTokenizer;
+import icecite.tokenize.PdfTextLineTokenizer;
+import icecite.tokenize.PdfWordTokenizer;
+import icecite.tokenize.PlainPdfTextTokenizer;
+import icecite.tokenize.PlainPdfTextBlockTokenizer;
+import icecite.tokenize.XYCutPdfTextAreaTokenizer;
+import icecite.tokenize.XYCutPdfTextLineTokenizer;
+import icecite.tokenize.XYCutPdfWordTokenizer;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
@@ -92,11 +95,15 @@ public class IceciteBaseModule extends AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    bind(PdfPageTokenizer.class).to(PlainPdfPageTokenizer.class);
+    bind(PdfTextTokenizer.class).to(PlainPdfTextTokenizer.class);
     bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
     bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
+
+    // Bind the semanticizer.
+    fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
+        PlainPdfTextSemanticizer.class);
 
     // Bind the registries for PdfColor and PdfFont.
     bind(PdfColorRegistry.class).to(PlainPdfColorRegistry.class)
