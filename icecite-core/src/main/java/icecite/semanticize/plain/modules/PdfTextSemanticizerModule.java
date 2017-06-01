@@ -1,5 +1,6 @@
 package icecite.semanticize.plain.modules;
 
+import icecite.models.PdfDocument;
 import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
 
@@ -9,7 +10,22 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public interface SemanticRoleTester {
+public abstract class PdfTextSemanticizerModule {
+  /**
+   * The PDF document.
+   */
+  protected PdfDocument pdf;
+
+  /**
+   * Sets the PDF document for this tester.
+   * 
+   * @param pdf
+   *        The PDF document.
+   */
+  public void setPdfDocument(PdfDocument pdf) {
+    this.pdf = pdf;
+  }
+
   /**
    * Checks if the given text block matches the role defined by getRole().
    * 
@@ -18,12 +34,12 @@ public interface SemanticRoleTester {
    * @return True, if the given text block matches the role defined by
    *         getRole(), false otherwise.
    */
-  boolean test(PdfTextBlock block);
+  public abstract boolean test(PdfTextBlock block);
 
   /**
    * Returns the specific role of this tester.
    * 
    * @return The role of this tester.
    */
-  PdfRole getRole();
+  public abstract PdfRole getRole();
 }

@@ -51,6 +51,7 @@ public class PdfTextLineUtils {
    * 
    * @return The font face of the given line.
    */
+  // TODO: Use the PdfFontFace class.
   public static String computeFontFace(PdfTextLine line) {
     if (line == null) {
       return null;

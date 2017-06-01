@@ -1,7 +1,7 @@
 package icecite.semanticize.plain;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -10,8 +10,7 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 import icecite.semanticize.PdfTextSemanticizer;
-import icecite.semanticize.plain.modules.SemanticRoleTester;
-import icecite.semanticize.plain.modules.TitleRoleTester;
+import icecite.semanticize.plain.modules.PdfTextSemanticizerModule;
 
 /**
  * A plain implementation of {@link PdfTextSemanticizer}.
@@ -23,27 +22,30 @@ public class PlainPdfTextSemanticizer implements PdfTextSemanticizer {
    * The PDF document.
    */
   protected PdfDocument pdf;
-  
+
   /**
    * The semantic role testers.
    */
-  protected List<SemanticRoleTester> testers;
+  protected Set<PdfTextSemanticizerModule> testers;
 
   // ==========================================================================
 
   /**
    * Creates a new PlainPdfTextSemanticizer.
    * 
+   * @param testers
+   *        The semantic role testers.
    * @param pdf
    *        The PDF document.
    */
   @AssistedInject
-  public PlainPdfTextSemanticizer(@Assisted PdfDocument pdf) {
+  public PlainPdfTextSemanticizer(@Assisted PdfDocument pdf,
+      Set<PdfTextSemanticizerModule> testers) {
     this.pdf = pdf;
-    
-    // List the role testers to use in this semanticizer.
-    this.testers = new ArrayList<>();
-    this.testers.add(new TitleRoleTester(pdf));
+    this.testers = testers;
+    for (PdfTextSemanticizerModule tester : testers) {
+      tester.setPdfDocument(pdf);
+    }
   }
 
   // ==========================================================================
@@ -100,7 +102,7 @@ public class PlainPdfTextSemanticizer implements PdfTextSemanticizer {
    */
   protected void semanticizePdfTextBlock(PdfDocument pdf, PdfPage page,
       PdfTextBlock block) {
-    for (SemanticRoleTester tester : this.testers) {
+    for (PdfTextSemanticizerModule tester : this.testers) {
       if (tester.test(block)) {
         block.setRole(tester.getRole());
         break;

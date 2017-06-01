@@ -11,16 +11,14 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
-import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 
 import com.google.inject.Inject;
 
 import icecite.models.PdfColor;
-import icecite.models.PdfColor.PdfColorFactory;
-import icecite.models.PdfColorRegistry;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
+import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
@@ -39,14 +37,9 @@ public class StrokePath extends OperatorProcessor {
   protected PdfShapeFactory shapeFactory;
 
   /**
-   * The factory to create instances of {@link PdfColor}.
+   * The converter to convert PDColor objects into PdfColor objects.
    */
-  protected PdfColorFactory colorFactory;
-
-  /**
-   * The registry to manage {@link PdfColor} objects.
-   */
-  protected PdfColorRegistry colorRegistry;
+  protected PDColorConverter colorConverter;
 
   /**
    * The factory to create instances of {@link Point}.
@@ -64,10 +57,8 @@ public class StrokePath extends OperatorProcessor {
   /**
    * Creates a new OperatorProcessor to process the operation "StrokePath".
    * 
-   * @param colorFactory
-   *        The factory to create instances of {@link PdfColor}.
-   * @param colorRegistry
-   *        The registry to manage {@link PdfColor} objects.
+   * @param colorConverter
+   *        The converter to convert PDColor objects into PdfColor objects.
    * @param shapeFactory
    *        The factory to create instances of PdfShapeFactory.
    * @param pointFactory
@@ -76,11 +67,10 @@ public class StrokePath extends OperatorProcessor {
    *        The factory to create instances of Rectangle.
    */
   @Inject
-  public StrokePath(PdfColorFactory colorFactory,
-      PdfColorRegistry colorRegistry, PdfShapeFactory shapeFactory,
-      PointFactory pointFactory, RectangleFactory rectangleFactory) {
-    this.colorFactory = colorFactory;
-    this.colorRegistry = colorRegistry;
+  public StrokePath(PDColorConverter colorConverter,
+      PdfShapeFactory shapeFactory, PointFactory pointFactory,
+      RectangleFactory rectangleFactory) {
+    this.colorConverter = colorConverter;
     this.shapeFactory = shapeFactory;
     this.pointFactory = pointFactory;
     this.rectangleFactory = rectangleFactory;
@@ -101,26 +91,18 @@ public class StrokePath extends OperatorProcessor {
     float maxX = -Float.MAX_VALUE;
     float maxY = -Float.MAX_VALUE;
 
-    float[] rgb = new float[3];
+    PDColor c;
+    PDColorSpace cs;
     if (windingRule < 0) {
-      PDColor c = this.engine.getGraphicsState().getStrokingColor();
-      PDColorSpace cs = this.engine.getGraphicsState().getStrokingColorSpace();
-      rgb = cs.toRGB(c.getComponents());
+      c = this.engine.getGraphicsState().getStrokingColor();
+      cs = this.engine.getGraphicsState().getStrokingColorSpace();
     } else {
-      PDGraphicsState graphicsState = this.engine.getGraphicsState();
-      PDColor c = graphicsState.getNonStrokingColor();
-      PDColorSpace cs = graphicsState.getNonStrokingColorSpace();
-      rgb = cs.toRGB(c.getComponents());
+      c = this.engine.getGraphicsState().getNonStrokingColor();
+      cs = this.engine.getGraphicsState().getNonStrokingColorSpace();
     }
 
-    // TODO set the properties of the color.
-    PdfColor color = this.colorRegistry.getColor(Arrays.toString(rgb));
-    if (color == null) {
-      color = this.colorFactory.create();
-      color.setName(Arrays.toString(rgb));
-      color.setRGB(rgb);
-      this.colorRegistry.registerColor(color);
-    }
+    // Convert the color.
+    PdfColor color = this.colorConverter.convert(c, cs);
 
     GeneralPath linePath = this.engine.getLinePath();
 

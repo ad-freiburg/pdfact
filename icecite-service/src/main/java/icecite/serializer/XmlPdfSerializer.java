@@ -41,7 +41,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.HasColor;
-import icecite.models.HasFont;
+import icecite.models.HasFontFace;
 import icecite.models.HasText;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
@@ -49,6 +49,7 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
+import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
@@ -336,10 +337,10 @@ public class XmlPdfSerializer implements PdfSerializer {
       xml.append(" " + CONTEXT_NAME_ELEMENT_MAX_Y + "=\"" + r.getMaxY() + "\"");
     }
 
-    if (element instanceof HasFont) {
-      HasFont hasFont = (HasFont) element;
-      PdfFont font = hasFont.getFont();
-      float fs = hasFont.getFontSize();
+    if (element instanceof HasFontFace) {
+      PdfFontFace fontFace = ((HasFontFace) element).getFontFace();
+      PdfFont font = fontFace.getFont();
+      float fs = fontFace.getFontSize();
 
       if (font != null) {
         String fontId = font.getId();

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfFontFace;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.utils.counter.FloatCounter;
@@ -29,7 +30,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    * The line pitches between the text lines, per font faces (font / font size
    * pair).
    */
-  protected Map<String, FloatCounter> linePitchesPerFontFace;
+  protected Map<PdfFontFace, FloatCounter> linePitchesPerFontFace;
 
   /**
    * Creates a new PlainPdfTextLineList.
@@ -74,7 +75,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
       }
 
       // Compute the font face of the current line.
-      String fontFace = PdfTextLineUtils.computeFontFace(line);
+      PdfFontFace fontFace = line.getCharacters().getMostCommonFontFace();
       // Compute the line pitch between the current line and the previous line.
       float linePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
      
@@ -95,7 +96,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
     if (this.isStatisticsOutdated) {
       computeStatistics();
     }
-    String fontFace = PdfTextLineUtils.computeFontFace(line);
+    PdfFontFace fontFace = line.getCharacters().getMostCommonFontFace();
     if (this.linePitchesPerFontFace.containsKey(fontFace)) {
       return this.linePitchesPerFontFace.get(fontFace).getMostCommonFloat();
     }

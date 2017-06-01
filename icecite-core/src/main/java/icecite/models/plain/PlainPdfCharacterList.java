@@ -17,6 +17,7 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfColor;
 import icecite.models.PdfFont;
+import icecite.models.PdfFontFace;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
@@ -33,6 +34,16 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
    */
   protected static final long serialVersionUID = 6187582288718513001L;
 
+  /**
+   * The most common font face of the characters in this list.
+   */
+  protected PdfFontFace mostCommonFontFace;
+  
+  /**
+   * The characters with the most common font face.
+   */
+  protected Set<PdfCharacter> charsWithMostCommonFontFace;
+  
   /**
    * The most common font of the characters in this list.
    */
@@ -129,16 +140,23 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
     // Count the colors, fonts and font sizes.
     ObjectCounter<PdfColor> colorsCounter = new ObjectCounter<>();
+    ObjectCounter<PdfFontFace> fontFaceCounter = new ObjectCounter<>();
     ObjectCounter<PdfFont> fontsCounter = new ObjectCounter<>();
     FloatCounter fontsizesCounter = new FloatCounter();
 
     for (PdfCharacter character : this) {
-      fontsCounter.add(character.getFont());
       colorsCounter.add(character.getColor());
-      fontsizesCounter.add(character.getFontSize());
+
+      PdfFontFace fontFace = character.getFontFace();
+      if (fontFace != null) {
+        fontFaceCounter.add(fontFace);
+        fontsCounter.add(fontFace.getFont());
+        fontsizesCounter.add(fontFace.getFontSize());
+      }
     }
 
     // Obtain the most common (and average) values.
+    this.mostCommonFontFace = fontFaceCounter.getMostCommonObject();
     this.mostCommonFont = fontsCounter.getMostCommonObject();
     this.mostCommonColor = colorsCounter.getMostCommonObject();
     this.mostCommonFontsize = fontsizesCounter.getMostCommonFloat();
@@ -154,6 +172,42 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     PdfCharacterView left = new PdfCharacterView(this, 0, index);
     PdfCharacterView right = new PdfCharacterView(this, index, this.size());
     return Arrays.asList(left, right);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfFontFace getMostCommonFontFace() {
+    if (this.mostCommonFontFace == null || this.isStatisticsOutdated) {
+      computeStatistics();
+    }
+    return this.mostCommonFontFace;
+  }
+
+  @Override
+  public Set<PdfCharacter> getCharactersWithMostCommonFontFace() {
+    if (this.charsWithMostCommonFontFace == null || this.isStatisticsOutdated) {
+      this.charsWithMostCommonFontFace = computeCharsWithMostCommonFontFace();
+    }
+    return this.charsWithMostCommonFontFace;
+  }
+
+  /**
+   * Computes the characters with the most common font face.
+   * 
+   * @return The characters with the most common font face.
+   */
+  protected Set<PdfCharacter> computeCharsWithMostCommonFontFace() {
+    Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
+    PdfFontFace mostCommonFontFace = getMostCommonFontFace();
+    if (mostCommonFontFace != null) {
+      for (PdfCharacter character : this) {
+        if (mostCommonFontFace == character.getFontFace()) {
+          characters.add(character);
+        }
+      }
+    }
+    return characters;
   }
 
   // ==========================================================================
@@ -183,7 +237,8 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     PdfFont mostCommonFont = getMostCommonFont();
     Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
     for (PdfCharacter character : this) {
-      if (character.getFont() == mostCommonFont) {
+      PdfFontFace fontFace = character.getFontFace();
+      if (fontFace != null && fontFace.getFont() == mostCommonFont) {
         characters.add(character);
       }
     }
@@ -259,7 +314,8 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     float mostCommonFontsize = getMostCommonFontsize();
     Set<PdfCharacter> characters = new HashSet<>(); // TODO: Choose capacity.
     for (PdfCharacter character : this) {
-      if (character.getFontSize() == mostCommonFontsize) {
+      PdfFontFace fontFace = character.getFontFace();
+      if (fontFace != null && fontFace.getFontSize() == mostCommonFontsize) {
         characters.add(character);
       }
     }

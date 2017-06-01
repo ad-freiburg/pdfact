@@ -6,6 +6,7 @@ import com.google.inject.multibindings.Multibinder;
 
 import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.convert.PDFontConverter;
+import icecite.parse.stream.pdfbox.convert.PDFontFaceConverter;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.parse.stream.pdfbox.operators.color.SetNonStrokingColor;
 import icecite.parse.stream.pdfbox.operators.color.SetNonStrokingColorN;
@@ -66,6 +67,7 @@ import icecite.parse.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPos
 public class OperatorProcessorModule extends AbstractModule {
   @Override
   protected void configure() {
+    bind(PDFontFaceConverter.class).in(Singleton.class);
     bind(PDFontConverter.class).in(Singleton.class);
     bind(PDColorConverter.class).in(Singleton.class);
     

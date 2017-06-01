@@ -6,7 +6,7 @@ package icecite.models;
  * @author Claudius Korzen
  */
 public interface PdfCharacter
-    extends PdfElement, HasColor, HasFont, HasText {
+    extends PdfElement, HasColor, HasFontFace, HasText {
   /**
    * Returns the position of this character in the sequence of extracted PDF
    * elements.

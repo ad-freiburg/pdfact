@@ -15,7 +15,7 @@ public class PlainPdfFont implements PdfFont {
    * The id of this font (needed for serialization).
    */
   protected String id;
-  
+
   /**
    * The (normalized) name of this font.
    */
@@ -57,7 +57,7 @@ public class PlainPdfFont implements PdfFont {
   public void setId(String id) {
     this.id = id;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -135,8 +135,9 @@ public class PlainPdfFont implements PdfFont {
   @Override
   public String toString() {
     return "PlainPdfFont(" + this.normalizedName + ", " + this.basename + ", "
-        + this.fontFamilyName + ", isType3: " + this.isType3Font + ", isBold: "
-        + this.isBold + ", isItalic: " + this.isItalic() + ")";
+        + this.fontFamilyName + ", id: " + this.id + ", isType3: "
+        + this.isType3Font + ", isBold: " + this.isBold + ", isItalic: "
+        + this.isItalic() + ")";
   }
 
   @Override

@@ -41,7 +41,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.HasColor;
-import icecite.models.HasFont;
+import icecite.models.HasFontFace;
 import icecite.models.HasText;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
@@ -49,6 +49,7 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
+import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
@@ -325,9 +326,9 @@ public class JsonPdfSerializer implements PdfSerializer {
       }
     }
 
-    if (element instanceof HasFont) {
-      HasFont hasFont = (HasFont) element;
-      PdfFont font = hasFont.getFont();
+    if (element instanceof HasFontFace) {
+      PdfFontFace fontFace = ((HasFontFace) element).getFontFace();
+      PdfFont font = fontFace.getFont();
 
       if (font != null) {
         String fontId = font.getId();
@@ -337,7 +338,7 @@ public class JsonPdfSerializer implements PdfSerializer {
         this.usedFonts.add(font);
       }
       // Append the font size.
-      json.put(CONTEXT_NAME_ELEMENT_FONT_SIZE, hasFont.getFontSize());
+      json.put(CONTEXT_NAME_ELEMENT_FONT_SIZE, fontFace.getFontSize());
     }
 
     if (element instanceof HasColor) {

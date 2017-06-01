@@ -11,6 +11,22 @@ import java.util.Set;
 public interface PdfCharacterList
     extends PdfElementList<PdfCharacter>, HasCharacters {
   /**
+   * Returns the most common font face of the characters in this list.
+   * 
+   * @return The most common font face of the characters in this list.
+   */
+  PdfFontFace getMostCommonFontFace();
+
+  /**
+   * Returns all characters with the most common font face.
+   * 
+   * @return All characters with the most common font face.
+   */
+  Set<PdfCharacter> getCharactersWithMostCommonFontFace();
+  
+  // ==========================================================================
+  
+  /**
    * Returns the most common font of the characters in this list.
    * 
    * @return The most common font of the characters in this list.

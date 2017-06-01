@@ -33,14 +33,16 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
+import icecite.models.PdfColor;
+import icecite.models.PdfFont;
+import icecite.models.PdfFontFace;
+import icecite.models.PdfPage;
 import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.convert.PDFontConverter;
+import icecite.parse.stream.pdfbox.convert.PDFontFaceConverter;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.parse.stream.pdfbox.utils.PdfBoxAFMUtils;
 import icecite.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
-import icecite.models.PdfColor;
-import icecite.models.PdfFont;
-import icecite.models.PdfPage;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
@@ -74,6 +76,11 @@ public class ShowText extends OperatorProcessor {
   protected PDFontConverter fontTranslator;
 
   /**
+   * The converter to create instances of {@link PdfFontFace}.
+   */
+  protected PDFontFaceConverter fontFaceConverter;
+  
+  /**
    * The translator to translate PDColor objects to PdfColor objects.
    */
   protected PDColorConverter colorTranslator;
@@ -85,6 +92,8 @@ public class ShowText extends OperatorProcessor {
    *        The factory to create instances of {@link PdfCharacterFactory}.
    * @param fontTranslator
    *        The translator to translate PDFont objects into PdfFont objects.
+   * @param fontFaceConverter
+   *        The converter to create instances of {@link PdfFontFace}.
    * @param colorTranslator
    *        The translator to translate PDColor objects into PdfColor objects.
    * @param rectangleFactory
@@ -94,10 +103,12 @@ public class ShowText extends OperatorProcessor {
    */
   @Inject
   public ShowText(PdfCharacterFactory characterFactory,
-      PDFontConverter fontTranslator, PDColorConverter colorTranslator,
-      RectangleFactory rectangleFactory, PointFactory pointFactory) {
+      PDFontConverter fontTranslator, PDFontFaceConverter fontFaceConverter,
+      PDColorConverter colorTranslator, RectangleFactory rectangleFactory,
+      PointFactory pointFactory) {
     this.characterFactory = characterFactory;
     this.fontTranslator = fontTranslator;
+    this.fontFaceConverter = fontFaceConverter;
     this.colorTranslator = colorTranslator;
     this.rectangleFactory = rectangleFactory;
     this.pointFactory = pointFactory;
@@ -254,10 +265,10 @@ public class ShowText extends OperatorProcessor {
     // equal.
     // TODO: Verify, that this is a correct observation.
     PDGraphicsState graphicsState = this.engine.getGraphicsState();
-    float fontsize = graphicsState.getTextState().getFontSize();
+    float fontSize = graphicsState.getTextState().getFontSize();
     float scaleFactorX = trm.getScalingFactorX();
-    if (fontsize != scaleFactorX) {
-      fontsize *= scaleFactorX;
+    if (fontSize != scaleFactorX) {
+      fontSize *= scaleFactorX;
     }
 
     // Use our additional glyph list for Unicode mapping
@@ -314,7 +325,7 @@ public class ShowText extends OperatorProcessor {
         return;
       }
     }
-
+    
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
 
     PDColor pdColor = graphicsState.getNonStrokingColor();
@@ -325,10 +336,10 @@ public class ShowText extends OperatorProcessor {
 
     // Convert the font.
     PdfFont font = this.fontTranslator.convert(pdFont);
-
     // TODO: Round the font size.
-    fontsize = MathUtils.round(fontsize, 1);
-
+    fontSize = MathUtils.round(fontSize, 1);
+    PdfFontFace fontFace = this.fontFaceConverter.convert(font, fontSize);
+    
     // TODO: Round the values of boundingbox.
     boundBox.setMinX(MathUtils.round(boundBox.getMinX(), 1));
     boundBox.setMinY(MathUtils.round(boundBox.getMinY(), 1));
@@ -337,14 +348,13 @@ public class ShowText extends OperatorProcessor {
 
     PdfCharacter character = this.characterFactory.create(pdfPage);
     character.setText(unicode);
-    character.setFontSize(fontsize);
+    character.setFontFace(fontFace);
     character.setColor(color);
-    character.setFont(font);
     character.setRectangle(boundBox);
 
     this.engine.handlePdfCharacter(character);
   }
-
+    
   // ==========================================================================
 
   /**

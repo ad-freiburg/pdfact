@@ -12,12 +12,7 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public class TitleRoleTester implements SemanticRoleTester {
-  /**
-   * The PDF document.
-   */
-  protected PdfDocument pdf;
-
+public class TitleModule extends PdfTextSemanticizerModule {
   /**
    * The title candidate of the given PDF document.
    */
@@ -31,18 +26,14 @@ public class TitleRoleTester implements SemanticRoleTester {
   
   // ==========================================================================
 
-  /**
-   * Creates a new TitleRoleTester.
-   * 
-   * @param pdf
-   *        The PDF document.
-   */
-  public TitleRoleTester(PdfDocument pdf) {
-    this.pdf = pdf;
+  @Override
+  public void setPdfDocument(PdfDocument pdf) {
+    super.setPdfDocument(pdf);
     // Find the title candidate.
     this.titleCandidate = findTitleCandidate();
+    this.isTitleFound = false;
   }
-
+  
   // ==========================================================================
 
   @Override

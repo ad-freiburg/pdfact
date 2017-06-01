@@ -108,7 +108,7 @@ public class IcecitePdfParserMain {
     
     PdfTextSemanticizer semanticizer = semanticizerFactory.create(document);
     semanticizer.semanticize();
-
+    
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {
       visualizer.visualize(document, stream);

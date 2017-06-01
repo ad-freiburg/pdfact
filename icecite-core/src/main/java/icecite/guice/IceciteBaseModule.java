@@ -1,8 +1,8 @@
 package icecite.guice;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
@@ -10,13 +10,14 @@ import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
-import icecite.models.PdfColorRegistry;
 import icecite.models.PdfDocument;
 import icecite.models.PdfDocument.PdfDocumentFactory;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFigure.PdfFigureFactory;
 import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
+import icecite.models.PdfFontFace;
+import icecite.models.PdfFontFace.PdfFontFaceFactory;
 import icecite.models.PdfPage;
 import icecite.models.PdfPage.PdfPageFactory;
 import icecite.models.PdfParagraph;
@@ -36,10 +37,10 @@ import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.models.plain.PlainPdfCharacter;
 import icecite.models.plain.PlainPdfCharacterList;
 import icecite.models.plain.PlainPdfColor;
-import icecite.models.plain.PlainPdfColorRegistry;
 import icecite.models.plain.PlainPdfDocument;
 import icecite.models.plain.PlainPdfFigure;
 import icecite.models.plain.PlainPdfFont;
+import icecite.models.plain.PlainPdfFontFace;
 import icecite.models.plain.PlainPdfPage;
 import icecite.models.plain.PlainPdfParagraph;
 import icecite.models.plain.PlainPdfShape;
@@ -49,21 +50,29 @@ import icecite.models.plain.PlainPdfTextLineList;
 import icecite.models.plain.PlainPdfWord;
 import icecite.models.plain.PlainPdfWordList;
 import icecite.parse.PdfParser;
-import icecite.parse.PlainPdfParser;
 import icecite.parse.PdfParser.PdfParserFactory;
+import icecite.parse.PlainPdfParser;
 import icecite.parse.stream.PdfStreamParser;
 import icecite.parse.stream.PdfStreamParser.PdfStreamParserFactory;
 import icecite.parse.stream.pdfbox.PdfBoxPdfStreamParser;
 import icecite.semanticize.PdfTextSemanticizer;
 import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.semanticize.plain.PlainPdfTextSemanticizer;
-import icecite.tokenize.PdfTextTokenizer;
+import icecite.semanticize.plain.modules.AbstractHeadingModule;
+import icecite.semanticize.plain.modules.AcknowledgmentsHeadingModule;
+import icecite.semanticize.plain.modules.AppendixHeadingModule;
+import icecite.semanticize.plain.modules.BodyTextHeadingModule;
+import icecite.semanticize.plain.modules.BodyTextModule;
+import icecite.semanticize.plain.modules.PdfTextSemanticizerModule;
+import icecite.semanticize.plain.modules.ReferencesHeadingModule;
+import icecite.semanticize.plain.modules.TitleModule;
 import icecite.tokenize.PdfTextAreaTokenizer;
 import icecite.tokenize.PdfTextBlockTokenizer;
 import icecite.tokenize.PdfTextLineTokenizer;
+import icecite.tokenize.PdfTextTokenizer;
 import icecite.tokenize.PdfWordTokenizer;
-import icecite.tokenize.PlainPdfTextTokenizer;
 import icecite.tokenize.PlainPdfTextBlockTokenizer;
+import icecite.tokenize.PlainPdfTextTokenizer;
 import icecite.tokenize.XYCutPdfTextAreaTokenizer;
 import icecite.tokenize.XYCutPdfTextLineTokenizer;
 import icecite.tokenize.XYCutPdfWordTokenizer;
@@ -105,12 +114,6 @@ public class IceciteBaseModule extends AbstractModule {
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
         PlainPdfTextSemanticizer.class);
 
-    // Bind the registries for PdfColor and PdfFont.
-    bind(PdfColorRegistry.class).to(PlainPdfColorRegistry.class)
-        .in(Singleton.class);
-    // bind(PdfFontRegistry.class).to(PlainPdfFontRegistry.class)
-    // .in(Singleton.class);
-
     // Bind the PDF model factories.
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);
     fc(PdfPage.class, PdfPageFactory.class, PlainPdfPage.class);
@@ -122,6 +125,7 @@ public class IceciteBaseModule extends AbstractModule {
     fc(PdfFigure.class, PdfFigureFactory.class, PlainPdfFigure.class);
     fc(PdfShape.class, PdfShapeFactory.class, PlainPdfShape.class);
     fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
+    fc(PdfFontFace.class, PdfFontFaceFactory.class, PlainPdfFontFace.class);
     fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
 
     fc(PdfTextBlock.class, PdfTextBlockFactory.class, PlainPdfTextBlock.class);
@@ -139,6 +143,18 @@ public class IceciteBaseModule extends AbstractModule {
     fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);
     fc(Line.class, LineFactory.class, PlainLine.class);
     fc(Point.class, PointFactory.class, PlainPoint.class);
+
+    Multibinder<PdfTextSemanticizerModule> binder = Multibinder
+        .newSetBinder(binder(), PdfTextSemanticizerModule.class);
+
+    // Bind semantic role testers.
+    binder.addBinding().to(TitleModule.class);
+    binder.addBinding().to(AbstractHeadingModule.class);
+    binder.addBinding().to(AcknowledgmentsHeadingModule.class);
+    binder.addBinding().to(AppendixHeadingModule.class);
+    binder.addBinding().to(ReferencesHeadingModule.class);
+    binder.addBinding().to(BodyTextHeadingModule.class);
+    binder.addBinding().to(BodyTextModule.class);
   }
 
   /**

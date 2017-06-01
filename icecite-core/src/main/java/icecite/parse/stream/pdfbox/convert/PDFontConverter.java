@@ -65,7 +65,7 @@ public class PDFontConverter {
 
     // The font is not known. Create a new font.
     PdfFont newFont = this.fontFactory.create();
-    newFont.setId("font-" + this.knownFonts.size());
+    newFont.setId("font" + this.knownFonts.size());
     newFont.setNormalizedName(computeNormalizedFontName(font));
     newFont.setBaseName(computeBasename(newFont));
     newFont.setIsBold(computeIsBold(newFont));
@@ -108,6 +108,7 @@ public class PDFontConverter {
 
         // Create the font from the line.
         PdfFont font = this.fontFactory.create();
+        font.setId("font" + wellKnownFonts.size());
         font.setNormalizedName(fields[0]);
         font.setBaseName(computeBasename(font));
         font.setFontFamilyName(fields[2].trim());

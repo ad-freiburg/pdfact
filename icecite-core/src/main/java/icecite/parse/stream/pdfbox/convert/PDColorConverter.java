@@ -73,7 +73,7 @@ public class PDColorConverter {
     }
     
     PdfColor newColor = this.colorFactory.create();
-    newColor.setId("color-" + this.knownColors.size());
+    newColor.setId("color" + this.knownColors.size());
     newColor.setName(computeColorName(color, colorSpace));
     newColor.setRGB(rgb);
     
