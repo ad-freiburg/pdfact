@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import icecite.models.PdfElement;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
 import icecite.models.PdfRole;
 import icecite.models.PdfType;
 import icecite.utils.geometric.Rectangle;
@@ -16,14 +17,9 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfElement implements PdfElement {
   /**
-   * The page in which this PDF element is located.
+   * The position of this PDF element.
    */
-  protected PdfPage page;
-
-  /**
-   * The bounding box of this PDF element.
-   */
-  protected Rectangle boundingBox;
+  protected PdfPosition position;
 
   /**
    * The role of this PDF element.
@@ -33,27 +29,43 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
 
   @Override
+  public PdfPosition getPosition() {
+    return this.position;
+  }
+
+  @Override
+  public void setPosition(PdfPosition position) {
+    this.position = position;
+  }
+
+  // ==========================================================================
+  
+  @Override
   public PdfPage getPage() {
-    return this.page;
+    return this.position != null ? this.position.getPage() : null;
   }
 
   @Override
   public void setPage(PdfPage page) {
-    this.page = page;
+    if (this.position != null) {
+      this.position.setPage(page);
+    }
   }
-
+  
   // ==========================================================================
-
+  
   @Override
   public Rectangle getRectangle() {
-    return this.boundingBox;
+    return this.position != null ? this.position.getRectangle() : null;
   }
 
   @Override
-  public void setRectangle(Rectangle boundingBox) {
-    this.boundingBox = boundingBox;
+  public void setRectangle(Rectangle rectangle) {
+    if (this.position != null) {
+      this.position.setRectangle(rectangle);
+    }
   }
-
+  
   // ==========================================================================
 
   @Override
@@ -77,8 +89,7 @@ public class PlainPdfElement implements PdfElement {
 
   @Override
   public String toString() {
-    return "PlainPdfElement(page: " + getPage().getPageNumber() + ", rect: "
-        + getRectangle() + ")";
+    return "PlainPdfElement(pos: " + getPosition() + ")";
   }
 
   @Override
@@ -87,8 +98,7 @@ public class PlainPdfElement implements PdfElement {
       PdfElement otherElement = (PdfElement) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getPage(), otherElement.getPage());
-      builder.append(getRectangle(), otherElement.getRectangle());
+      builder.append(getPosition(), otherElement.getPosition());
 
       return builder.isEquals();
     }
@@ -98,8 +108,7 @@ public class PlainPdfElement implements PdfElement {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getPage());
-    builder.append(getRectangle());
+    builder.append(getPosition());
     return builder.hashCode();
   }
 }

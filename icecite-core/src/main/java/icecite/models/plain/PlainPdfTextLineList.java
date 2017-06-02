@@ -36,7 +36,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    * Creates a new PlainPdfTextLineList.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
+   *        The factory to create instances of {@link RectangleFactory}.
    */
   @AssistedInject
   public PlainPdfTextLineList(RectangleFactory rectangleFactory) {

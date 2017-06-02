@@ -16,13 +16,15 @@ import com.google.inject.name.Names;
 import icecite.guice.IceciteBaseModule;
 import icecite.guice.IceciteServiceModule;
 import icecite.models.PdfDocument;
+import icecite.models.PdfParagraph;
 import icecite.parse.PdfParser;
 import icecite.parse.PdfParser.PdfParserFactory;
 import icecite.parse.stream.pdfbox.guice.OperatorProcessorModule;
 import icecite.semanticize.PdfTextSemanticizer;
 import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.serializer.PdfSerializer;
-import icecite.tokenize.PdfTextTokenizer;
+import icecite.tokenize.PdfDocumentTokenizer;
+import icecite.tokenize.PdfPageTokenizer;
 import icecite.visualizer.PdfVisualizer;
 import icecite.visualizer.PdfVisualizer.PdfVisualizerFactory;
 
@@ -96,7 +98,9 @@ public class IcecitePdfParserMain {
     PdfSerializer serializer = injector
         .getInstance(Key.get(PdfSerializer.class, Names.named("txt")));
     PdfParser pdfParser = factory.create();
-    PdfTextTokenizer tokenizer = injector.getInstance(PdfTextTokenizer.class);
+    PdfPageTokenizer tokenizer = injector.getInstance(PdfPageTokenizer.class);
+    PdfDocumentTokenizer tokenizer2 = 
+        injector.getInstance(PdfDocumentTokenizer.class);
     PdfTextSemanticizerFactory semanticizerFactory = injector
         .getInstance(PdfTextSemanticizerFactory.class);
 
@@ -104,10 +108,12 @@ public class IcecitePdfParserMain {
 
     PdfDocument document = pdfParser.parsePdf(inputPdf);
     
-    tokenizer.tokenizePdfDocument(document);
+    tokenizer.tokenizePdfPages(document);
     
     PdfTextSemanticizer semanticizer = semanticizerFactory.create(document);
     semanticizer.semanticize();
+    
+    tokenizer2.tokenizePdfDocument(document);
     
     Path vis = Paths.get("/home/korzen/Downloads/zzz.pdf");
     try (OutputStream stream = Files.newOutputStream(vis)) {
@@ -117,6 +123,10 @@ public class IcecitePdfParserMain {
     Path vis2 = Paths.get("/home/korzen/Downloads/xxx.txt");
     try (OutputStream stream = Files.newOutputStream(vis2)) {
       serializer.serialize(document, stream);
+    }
+    
+    for (PdfParagraph para : document.getParagraphs()) {
+      System.out.println(para.getText() + "\n");
     }
   }
 }

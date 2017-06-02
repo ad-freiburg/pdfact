@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfParagraph;
-import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
@@ -20,7 +19,7 @@ import icecite.utils.geometric.Rectangle.RectangleFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
+public class PlainPdfParagraph implements PdfParagraph {
   /**
    * The words of this paragraph.
    */
@@ -31,7 +30,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
    */
   protected String text;
 
-  // ==========================================================================
+  // ========================================================================
   // Constructors.
 
   /**
@@ -45,11 +44,10 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @AssistedInject
   public PlainPdfParagraph(RectangleFactory rectangleFactory,
       PdfWordListFactory wordListFactory) {
-    this.boundingBox = rectangleFactory.create();
     this.words = wordListFactory.create();
   }
 
-  // ==========================================================================
+  // ========================================================================
 
   @Override
   public PdfWordList getWords() {
@@ -75,9 +73,6 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void setWords(PdfWordList words) {
     this.words = words;
-    for (PdfWord word : words) {
-      this.boundingBox.extend(word);
-    }
   }
 
   @Override
@@ -90,10 +85,9 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public void addWord(PdfWord word) {
     this.words.add(word);
-    this.boundingBox.extend(word);
   }
 
-  // ==========================================================================
+  // ========================================================================
 
   @Override
   public String getText() {
@@ -105,27 +99,14 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
     this.text = text;
   }
 
-  // ==========================================================================
+  // ========================================================================
 
-  @Override
-  public Rectangle getRectangle() {
-    return this.boundingBox;
-  }
+//  @Override
+//  public PdfType getType() {
+//    return PdfType.PARAGRAPHS;
+//  }
 
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the text lines of this paragraph.
-    throw new UnsupportedOperationException();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfType getType() {
-    return PdfType.PARAGRAPHS;
-  }
-
-  // ==========================================================================
+  // ========================================================================
 
   @Override
   public String toString() {
@@ -138,8 +119,6 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
       PdfParagraph otherParagraph = (PdfParagraph) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getPage(), otherParagraph.getPage());
-      builder.append(getRectangle(), otherParagraph.getRectangle());
       builder.append(getText(), otherParagraph.getText());
 
       return builder.isEquals();
@@ -150,8 +129,6 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getPage());
-    builder.append(getRectangle());
     builder.append(getText());
     return builder.hashCode();
   }

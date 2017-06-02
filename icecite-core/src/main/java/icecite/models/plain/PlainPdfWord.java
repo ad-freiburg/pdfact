@@ -1,5 +1,7 @@
 package icecite.models.plain;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -8,7 +10,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
-import icecite.models.PdfPage;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.utils.geometric.Rectangle;
@@ -31,33 +32,32 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
    */
   protected String text;
 
+  /**
+   * The boolean flag that indicates if this word is hyphenated.
+   */
+  protected boolean isHyphenated;
+
+  /**
+   * The boolean flag that indicates if this word is dehyphenated.
+   */
+  protected boolean isDehyphenated;
+
+  /**
+   * The list of rectangles of the hyphenated syllables.
+   */
+  protected List<Rectangle> syllableRectangles;
+
   // ==========================================================================
 
   /**
    * Creates a new word.
    * 
-   * @param page
-   *        The page in which this word is located.
    * @param characters
    *        The characters of this word.
    */
   @AssistedInject
-  public PlainPdfWord(@Assisted PdfPage page,
-      @Assisted PdfCharacterList characters) {
-    this.page = page;
+  public PlainPdfWord(@Assisted PdfCharacterList characters) {
     this.characters = characters;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfPage getPage() {
-    return this.page;
-  }
-
-  @Override
-  public void setPage(PdfPage page) {
-    this.page = page;
   }
 
   // ==========================================================================
@@ -99,14 +99,37 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public Rectangle getRectangle() {
-    return this.characters.getRectangle();
+  public boolean isHyphenated() {
+    return this.isHyphenated;
   }
 
   @Override
-  public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the characters of this text block.
-    throw new UnsupportedOperationException();
+  public void setIsHyphenated(boolean isHyphenated) {
+    this.isHyphenated = isHyphenated;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean isDehyphenated() {
+    return this.isDehyphenated;
+  }
+
+  @Override
+  public void setIsDehyphenated(boolean isDehyphenated) {
+    this.isDehyphenated = isDehyphenated;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<Rectangle> getSyllableRectangles() {
+    return this.syllableRectangles;
+  }
+
+  @Override
+  public void setSyllableRectangles(List<Rectangle> rectangles) {
+    this.syllableRectangles = rectangles;
   }
 
   // ==========================================================================

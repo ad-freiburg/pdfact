@@ -16,16 +16,16 @@ import com.google.inject.Inject;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfFigure;
-import icecite.models.PdfPage;
 import icecite.models.PdfFigure.PdfFigureFactory;
+import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.color.ColorUtils;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
-import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * Do: Invoke a named xobject.
@@ -54,9 +54,9 @@ public class Invoke extends OperatorProcessor {
   protected PointFactory pointFactory;
 
   /**
-   * The factory to create instances of {@link Rectangle}.
+   * The factory to create instances of {@link PdfPosition}.
    */
-  protected RectangleFactory rectangleFactory;
+  protected PdfPositionFactory positionFactory;
 
   // ==========================================================================
   // Constructors.
@@ -65,31 +65,33 @@ public class Invoke extends OperatorProcessor {
    * Creates a new OperatorProcessor to process the operation "Invoke".
    * 
    * @param figureFactory
-   *        The factory to create instances of PdfFigure.
+   *        The factory to create instances of {@link PdfFigure}.
    * @param colorFactory
-   *        The factory to create instances of PdfColor.
+   *        The factory to create instances of {@link PdfColor}.
    * @param shapeFactory
-   *        The factory to create instances of PdfShape.
+   *        The factory to create instances of {@link PdfShape}.
    * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Point}.
+   * @param positionactory
+   *        The factory to create instances of {@link PdfPosition}.
    */
   @Inject
   public Invoke(PdfFigureFactory figureFactory, PdfColorFactory colorFactory,
       PdfShapeFactory shapeFactory, PointFactory pointFactory,
-      RectangleFactory rectangleFactory) {
+      PdfPositionFactory positionactory) {
     this.figureFactory = figureFactory;
     this.colorFactory = colorFactory;
     this.shapeFactory = shapeFactory;
     this.pointFactory = pointFactory;
-    this.rectangleFactory = rectangleFactory;
+    this.positionFactory = positionactory;
   }
 
   // ==========================================================================
 
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
+    PdfPage pdfPage = this.engine.getCurrentPdfPage();
+    
     // Get the name of the PDXOject.
     COSName name = (COSName) args.get(0);
 
@@ -138,22 +140,22 @@ public class Invoke extends OperatorProcessor {
       float maxY = minY + at.getScaleY() * imageHeight;
       Point ll = this.pointFactory.create(minX, minY);
       Point ur = this.pointFactory.create(maxX, maxY);
-      Rectangle boundBox = this.rectangleFactory.create(ll, ur);
+      PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
 
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
-      PdfPage pdfPage = this.engine.getCurrentPdfPage();
+      
       if (exclusiveColor != null) {
         PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);
-        PdfShape shape = this.shapeFactory.create(pdfPage);
-        shape.setRectangle(boundBox);
+        PdfShape shape = this.shapeFactory.create();
+        shape.setPosition(position);
         shape.setColor(color);
         this.engine.handlePdfShape(shape);
       } else {
-        PdfFigure figure = this.figureFactory.create(pdfPage);
-        figure.setRectangle(boundBox);
+        PdfFigure figure = this.figureFactory.create();
+        figure.setPosition(position);
         this.engine.handlePdfFigure(figure);
       }
     }

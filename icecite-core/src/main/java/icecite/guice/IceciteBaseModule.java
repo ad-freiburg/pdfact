@@ -22,6 +22,8 @@ import icecite.models.PdfPage;
 import icecite.models.PdfPage.PdfPageFactory;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfParagraph.PdfParagraphFactory;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.models.PdfTextBlock;
@@ -43,6 +45,7 @@ import icecite.models.plain.PlainPdfFont;
 import icecite.models.plain.PlainPdfFontFace;
 import icecite.models.plain.PlainPdfPage;
 import icecite.models.plain.PlainPdfParagraph;
+import icecite.models.plain.PlainPdfPosition;
 import icecite.models.plain.PlainPdfShape;
 import icecite.models.plain.PlainPdfTextBlock;
 import icecite.models.plain.PlainPdfTextLine;
@@ -69,10 +72,14 @@ import icecite.semanticize.plain.modules.TitleModule;
 import icecite.tokenize.PdfTextAreaTokenizer;
 import icecite.tokenize.PdfTextBlockTokenizer;
 import icecite.tokenize.PdfTextLineTokenizer;
-import icecite.tokenize.PdfTextTokenizer;
+import icecite.tokenize.PdfDocumentTokenizer;
+import icecite.tokenize.PdfPageTokenizer;
+import icecite.tokenize.PdfParagraphTokenizer;
 import icecite.tokenize.PdfWordTokenizer;
+import icecite.tokenize.PlainPdfDocumentTokenizer;
 import icecite.tokenize.PlainPdfTextBlockTokenizer;
-import icecite.tokenize.PlainPdfTextTokenizer;
+import icecite.tokenize.PlainPdfPageTokenizer;
+import icecite.tokenize.PlainPdfParagraphTokenizer;
 import icecite.tokenize.XYCutPdfTextAreaTokenizer;
 import icecite.tokenize.XYCutPdfTextLineTokenizer;
 import icecite.tokenize.XYCutPdfWordTokenizer;
@@ -104,11 +111,13 @@ public class IceciteBaseModule extends AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    bind(PdfTextTokenizer.class).to(PlainPdfTextTokenizer.class);
+    bind(PdfDocumentTokenizer.class).to(PlainPdfDocumentTokenizer.class);
+    bind(PdfPageTokenizer.class).to(PlainPdfPageTokenizer.class);
     bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
     bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
+    bind(PdfParagraphTokenizer.class).to(PlainPdfParagraphTokenizer.class);
 
     // Bind the semanticizer.
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
@@ -140,6 +149,7 @@ public class IceciteBaseModule extends AbstractModule {
     fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
 
     // Bind the geometric model factories.
+    fc(PdfPosition.class, PdfPositionFactory.class, PlainPdfPosition.class);
     fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);
     fc(Line.class, LineFactory.class, PlainLine.class);
     fc(Point.class, PointFactory.class, PlainPoint.class);

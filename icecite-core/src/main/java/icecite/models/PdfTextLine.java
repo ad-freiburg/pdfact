@@ -37,13 +37,11 @@ public interface PdfTextLine
     /**
      * Creates a PdfTextLine.
      * 
-     * @param page
-     *        The page in which the line is located.
      * @param characters
      *        The characters of the text line to create.
      * 
      * @return An instance of {@link PdfTextLine}.
      */
-    PdfTextLine create(PdfPage page, PdfCharacterList characters);
+    PdfTextLine create(PdfCharacterList characters);
   }
 }

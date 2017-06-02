@@ -14,12 +14,9 @@ public interface PdfShape extends PdfElement, HasColor {
   public interface PdfShapeFactory {
     /**
      * Creates a new PdfShape.
-     * 
-     * @param page
-     *        The page in which the shape is located.
-     * 
+     *  
      * @return An instance of {@link PdfShape}.
      */
-    PdfShape create(PdfPage page);
+    PdfShape create();
   }
 }

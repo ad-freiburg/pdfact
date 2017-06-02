@@ -1,13 +1,11 @@
 package icecite.models;
 
-import icecite.utils.geometric.HasRectangle;
-
 /**
  * Any (visual) element in a PDF document (character, image, shape, etc.).
  * 
  * @author Claudius Korzen
  */
-public interface PdfElement extends HasRectangle, HasPage {
+public interface PdfElement extends HasPosition {
   /**
    * Returns the type of this PDF element.
    * 

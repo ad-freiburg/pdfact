@@ -35,11 +35,8 @@ public interface PdfCharacter
     /**
      * Creates a PdfCharacter.
      * 
-     * @param page
-     *        The page in which the characters is located.
-     * 
      * @return An instance of {@link PdfCharacter}.
      */
-    PdfCharacter create(PdfPage page);
+    PdfCharacter create();
   }
 }

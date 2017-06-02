@@ -6,7 +6,7 @@ package icecite.models;
  * @author Claudius Korzen
  */
 public interface PdfTextBlock
-    extends PdfElement, HasPage, HasCharacters, HasTextLines, HasText {
+    extends PdfElement, HasCharacters, HasTextLines, HasText {
   /**
    * The factory to create instances of {@link PdfTextBlock}.
    * 
@@ -16,11 +16,8 @@ public interface PdfTextBlock
     /**
      * Creates a PdfTextBlock.
      * 
-     * @param page
-     *        The page in which the block is located.
-     *
      * @return An instance of {@link PdfTextBlock}.
      */
-    PdfTextBlock create(PdfPage page);
+    PdfTextBlock create();
   }
 }

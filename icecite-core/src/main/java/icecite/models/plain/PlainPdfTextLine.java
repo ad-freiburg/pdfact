@@ -8,14 +8,12 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
-import icecite.models.PdfPage;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.utils.geometric.Line;
-import icecite.utils.geometric.Rectangle;
 
 // TODO: Do not derive the bounding box in the model.
 
@@ -50,32 +48,16 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   /**
    * Creates a new text line.
    * 
-   * @param page
-   *        The page in which this line is located.
    * @param characters
    *        The characters of this text line.
    * @param wordListFactory
    *        The factory to create instances of {@link PdfWordList}.
    */
   @AssistedInject
-  public PlainPdfTextLine(@Assisted PdfPage page,
-      @Assisted PdfCharacterList characters,
+  public PlainPdfTextLine(@Assisted PdfCharacterList characters,
       PdfWordListFactory wordListFactory) {
-    this.page = page;
     this.characters = characters;
     this.words = wordListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfPage getPage() {
-    return this.page;
-  }
-
-  @Override
-  public void setPage(PdfPage page) {
-    this.page = page;
   }
 
   // ==========================================================================
@@ -152,19 +134,6 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   @Override
   public void setText(String text) {
     this.text = text;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public Rectangle getRectangle() {
-    return this.characters.getRectangle();
-  }
-
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the characters of this text block.
-    throw new UnsupportedOperationException();
   }
 
   // ==========================================================================

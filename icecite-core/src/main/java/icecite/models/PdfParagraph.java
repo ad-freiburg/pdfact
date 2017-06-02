@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfElement, HasWords, HasText {
+public interface PdfParagraph extends HasWords, HasText {
   /**
    * The factory to create instances of {@link PdfParagraph}.
    * 

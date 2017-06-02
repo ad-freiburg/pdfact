@@ -3,6 +3,7 @@ package icecite.semanticize.plain.modules;
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfFontFace;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
@@ -28,7 +29,13 @@ public class BodyTextHeadingModule extends SectionHeadingModule {
 
   @Override
   public boolean test(PdfTextBlock block) {
-    return super.test(block) && block.getRole() == null;
+    if (block == null) {
+      return false;
+    }
+
+    PdfFontFace fontFace = block.getCharacters().getMostCommonFontFace();
+        
+    return fontFace == this.sectionHeadingFontFace && block.getRole() == null;
   }
 
   @Override

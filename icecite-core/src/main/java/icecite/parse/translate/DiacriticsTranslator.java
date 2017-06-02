@@ -23,13 +23,13 @@ public class DiacriticsTranslator {
    * 
    * @param diacritic
    *        The diacritic in question.
-   * @param leftCharacter
+   * @param leftChar
    *        The character to the left of the diacritic.
-   * @param rightCharacter
+   * @param rightChar
    *        The character to the right of the diacritic.
    */
   public static void resolveDiacritic(PdfCharacter diacritic,
-      PdfCharacter leftCharacter, PdfCharacter rightCharacter) {
+      PdfCharacter leftChar, PdfCharacter rightChar) {
     // Don't proceed if the character in question is not a diacritic.
     if (!isDiacritic(diacritic)) {
       return;
@@ -44,23 +44,23 @@ public class DiacriticsTranslator {
     // Choose the belonging base character:
     // (1) Compute the horizontal overlap with the left character.
     float leftOverlap = 0;
-    if (leftCharacter != null) {
+    if (leftChar != null) {
       leftOverlap = diacriticBoundingBox
-          .computeHorizontalOverlapLength(leftCharacter.getRectangle());
+          .computeHorizontalOverlapLength(leftChar.getRectangle());
     }
 
     // (2) Compute the horizontal overlap with the right character.
     float rightOverlap = 0;
-    if (rightCharacter != null) {
+    if (rightChar != null) {
       rightOverlap = diacriticBoundingBox
-          .computeHorizontalOverlapLength(rightCharacter.getRectangle());
+          .computeHorizontalOverlapLength(rightChar.getRectangle());
     }
 
     // Merge the diacritic to the base character with the largest overlap.
     if (leftOverlap > 0 && leftOverlap >= rightOverlap) {
-      mergeDiacritic(diacritic, leftCharacter);
+      mergeDiacritic(diacritic, leftChar);
     } else if (rightOverlap > 0 && rightOverlap > leftOverlap) {
-      mergeDiacritic(diacritic, rightCharacter);
+      mergeDiacritic(diacritic, rightChar);
     }
   }
 

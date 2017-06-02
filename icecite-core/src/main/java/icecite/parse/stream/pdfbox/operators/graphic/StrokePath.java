@@ -16,14 +16,14 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfColor;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfShape;
 import icecite.models.PdfShape.PdfShapeFactory;
 import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
-import icecite.utils.geometric.Rectangle;
-import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * S: Stroke the path.
@@ -47,9 +47,9 @@ public class StrokePath extends OperatorProcessor {
   protected PointFactory pointFactory;
 
   /**
-   * The factory to create instances of {@link Rectangle}.
+   * The factory to create instances of {@link PdfPosition}.
    */
-  protected RectangleFactory rectangleFactory;
+  protected PdfPositionFactory positionFactory;
 
   // ==========================================================================
   // Constructors.
@@ -60,20 +60,20 @@ public class StrokePath extends OperatorProcessor {
    * @param colorConverter
    *        The converter to convert PDColor objects into PdfColor objects.
    * @param shapeFactory
-   *        The factory to create instances of PdfShapeFactory.
+   *        The factory to create instances of {@link PdfShape}.
    * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
+   *        The factory to create instances of {@link Point}.
+   * @param positionFactory
+   *        The factory to create instances of {@link PdfPosition}.
    */
   @Inject
   public StrokePath(PDColorConverter colorConverter,
       PdfShapeFactory shapeFactory, PointFactory pointFactory,
-      RectangleFactory rectangleFactory) {
+      PdfPositionFactory positionFactory) {
     this.colorConverter = colorConverter;
     this.shapeFactory = shapeFactory;
     this.pointFactory = pointFactory;
-    this.rectangleFactory = rectangleFactory;
+    this.positionFactory = positionFactory;
   }
 
   // ==========================================================================
@@ -144,10 +144,10 @@ public class StrokePath extends OperatorProcessor {
           // TODO: Check if ll and ur is indeed ll and ur.
           Point ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
-          Rectangle rect = this.rectangleFactory.create(ll, ur);
+          PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
 
-          PdfShape shape = this.shapeFactory.create(pdfPage);
-          shape.setRectangle(rect);
+          PdfShape shape = this.shapeFactory.create();
+          shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 
@@ -159,10 +159,10 @@ public class StrokePath extends OperatorProcessor {
           // TODO: Check if ll and ur is indeed ll and ur.
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
-          rect = this.rectangleFactory.create(ll, ur);
+          position = this.positionFactory.create(pdfPage, ll, ur);
 
-          shape = this.shapeFactory.create(pdfPage);
-          shape.setRectangle(rect);
+          shape = this.shapeFactory.create();
+          shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 
@@ -179,10 +179,10 @@ public class StrokePath extends OperatorProcessor {
           // TODO: Check if ll and ur is indeed ll and ur.
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
-          rect = this.rectangleFactory.create(ll, ur);
+          position = this.positionFactory.create(pdfPage, ll, ur);
 
-          shape = this.shapeFactory.create(pdfPage);
-          shape.setRectangle(rect);
+          shape = this.shapeFactory.create();
+          shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(shape);
 

@@ -8,9 +8,11 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.tokenize.xycut.XYCut;
 import icecite.utils.character.PdfCharacterUtils;
@@ -27,6 +29,11 @@ import icecite.utils.geometric.Line.LineFactory;
  */
 public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
     implements PdfTextLineTokenizer {
+  /**
+   * The factory to create instances of {@link PdfPositionFactory}.
+   */
+  protected PdfPositionFactory positionFactory;
+
   /**
    * The factory to create instances of PdfTextLineList.
    */
@@ -64,7 +71,8 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
 
   /**
    * Creates a new text line tokenizer.
-   * 
+   * @param positionFactory 
+   *        The factory to create instance of {@link PdfPosition}.
    * @param textLineListFactory
    *        The factory to create instance of {@link PdfTextLineList}.
    * @param textLineFactory
@@ -73,9 +81,11 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
    *        The factory to create instances of {@link Line}.
    */
   @Inject
-  public XYCutPdfTextLineTokenizer(PdfTextLineListFactory textLineListFactory,
+  public XYCutPdfTextLineTokenizer(PdfPositionFactory positionFactory,
+      PdfTextLineListFactory textLineListFactory,
       PdfTextLineFactory textLineFactory, LineFactory lineFactory) {
     super();
+    this.positionFactory = positionFactory;
     this.textLineListFactory = textLineListFactory;
     this.textLineFactory = textLineFactory;
     this.lineFactory = lineFactory;
@@ -114,10 +124,11 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   // ==========================================================================
 
   @Override
-  public PdfTextLine pack(PdfPage page, PdfCharacterList characters) {
-    PdfTextLine textLine = this.textLineFactory.create(page, characters);
-    textLine.setBaseline(computeBaseline(textLine));
-    return textLine;
+  public PdfTextLine pack(PdfPage page, PdfCharacterList chars) {
+    PdfTextLine line = this.textLineFactory.create(chars);
+    line.setPosition(this.positionFactory.create(page, chars.getRectangle()));
+    line.setBaseline(computeBaseline(line));
+    return line;
   }
 
   // ==========================================================================

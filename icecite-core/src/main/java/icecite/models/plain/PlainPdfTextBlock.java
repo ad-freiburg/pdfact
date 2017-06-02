@@ -3,18 +3,15 @@ package icecite.models.plain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
-import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
-import icecite.utils.geometric.Rectangle;
 
 // TODO: Don't derive the bounding box in the model.
 
@@ -48,27 +45,12 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    *        The factory to create instances of {@link PdfCharacter}.
    * @param textLineListFactory
    *        The factory to create instances of {@link PdfTextLine}.
-   * @param page
-   *        The page in which this text block is located.
    */
   @AssistedInject
   public PlainPdfTextBlock(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory, @Assisted PdfPage page) {
+      PdfTextLineListFactory textLineListFactory) {
     this.characters = characterListFactory.create();
     this.textLines = textLineListFactory.create();
-    this.page = page;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfPage getPage() {
-    return this.page;
-  }
-
-  @Override
-  public void setPage(PdfPage page) {
-    this.page = page;
   }
 
   // ==========================================================================
@@ -122,22 +104,8 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   // ==========================================================================
 
   @Override
-  public Rectangle getRectangle() {
-    return this.textLines.getRectangle();
-  }
-
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the characters of this text block.
-    throw new UnsupportedOperationException();
-  }
-
-  // ==========================================================================
-
-  @Override
   public String toString() {
-    return "PlainPdfTextBlock(page: " + this.page.getPageNumber() + ", rect: "
-        + this.boundingBox + ")";
+    return "PlainPdfTextBlock(pos: " + getPosition() + ")";
   }
 
   @Override
@@ -146,8 +114,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
       PdfTextBlock otherTextBlock = (PdfTextBlock) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getPage(), otherTextBlock.getPage());
-      builder.append(getRectangle(), otherTextBlock.getRectangle());
+      builder.append(getPosition(), otherTextBlock.getPosition());
       builder.append(getTextLines(), otherTextBlock.getTextLines());
 
       return builder.isEquals();
@@ -158,8 +125,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getPage());
-    builder.append(getRectangle());
+    builder.append(getPosition());
     builder.append(getTextLines());
     return builder.hashCode();
   }

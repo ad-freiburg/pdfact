@@ -18,19 +18,19 @@ public class MaxYComparator implements Comparator<HasRectangle>, Serializable {
   protected static final long serialVersionUID = -8263437216397294221L;
 
   @Override
-  public int compare(HasRectangle box1, HasRectangle box2) {
-    if (box1 == null && box2 == null) {
+  public int compare(HasRectangle pos1, HasRectangle pos2) {
+    if (pos1 == null && pos2 == null) {
       return 0;
     }
-    if (box1 == null) {
+    if (pos1 == null) {
       return 1;
     }
-    if (box2 == null) {
+    if (pos2 == null) {
       return -1;
     }
 
-    Rectangle rect1 = box1.getRectangle();
-    Rectangle rect2 = box2.getRectangle();
+    Rectangle rect1 = pos1.getRectangle();
+    Rectangle rect2 = pos2.getRectangle();
     if (rect1 == null && rect2 == null) {
       return 0;
     }

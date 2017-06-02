@@ -29,7 +29,8 @@ public class PdfTextLineUtils {
       return Float.NaN;
     }
 
-    if (firstLine.getPage() != secondLine.getPage()) {
+    if (firstLine.getPosition().getPage() != secondLine.getPosition()
+        .getPage()) {
       return Float.NaN;
     }
 
@@ -140,13 +141,13 @@ public class PdfTextLineUtils {
     if (line1 == null || line2 == null) {
       return false;
     }
-    
+
     Rectangle rectangle1 = line1.getRectangle();
     Rectangle rectangle2 = line2.getRectangle();
     if (rectangle1 == null || rectangle2 == null) {
       return false;
     }
-    
+
     // TODO
     return Math.abs(rectangle1.getMinX() - rectangle2.getMinX()) < 1;
   }

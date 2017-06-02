@@ -37,6 +37,8 @@ import icecite.models.PdfColor;
 import icecite.models.PdfFont;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.convert.PDFontConverter;
 import icecite.parse.stream.pdfbox.convert.PDFontFaceConverter;
@@ -65,6 +67,11 @@ public class ShowText extends OperatorProcessor {
    */
   protected RectangleFactory rectangleFactory;
 
+  /**
+   * The factory to create instances of {@link PdfPosition}.
+   */
+  protected PdfPositionFactory positionFactory;
+  
   /**
    * The factory to create instances of {@link Point}.
    */
@@ -100,18 +107,21 @@ public class ShowText extends OperatorProcessor {
    *        The factory to create instances of {@link Rectangle}.
    * @param pointFactory
    *        The factory to create instances of {@link Point}.
+   * @param positionFactory 
+   *        The factory to create instances of {@link PdfPosition}.
    */
   @Inject
   public ShowText(PdfCharacterFactory characterFactory,
       PDFontConverter fontTranslator, PDFontFaceConverter fontFaceConverter,
       PDColorConverter colorTranslator, RectangleFactory rectangleFactory,
-      PointFactory pointFactory) {
+      PointFactory pointFactory, PdfPositionFactory positionFactory) {
     this.characterFactory = characterFactory;
     this.fontTranslator = fontTranslator;
     this.fontFaceConverter = fontFaceConverter;
     this.colorTranslator = colorTranslator;
     this.rectangleFactory = rectangleFactory;
     this.pointFactory = pointFactory;
+    this.positionFactory = positionFactory;
   }
 
   // ==========================================================================
@@ -346,11 +356,13 @@ public class ShowText extends OperatorProcessor {
     boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
     boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
 
-    PdfCharacter character = this.characterFactory.create(pdfPage);
+    PdfPosition position = this.positionFactory.create(pdfPage, boundBox);
+    
+    PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontFace(fontFace);
     character.setColor(color);
-    character.setRectangle(boundBox);
+    character.setPosition(position);
 
     this.engine.handlePdfCharacter(character);
   }

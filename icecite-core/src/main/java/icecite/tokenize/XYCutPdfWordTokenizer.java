@@ -7,6 +7,8 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
@@ -22,12 +24,17 @@ import icecite.tokenize.xycut.XYCut;
 public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
     implements PdfWordTokenizer {
   /**
-   * The factory to create instances of PdfWordList.
+   * The factory to create instances of {@link PdfPositionFactory}.
+   */
+  protected PdfPositionFactory positionFactory;
+  
+  /**
+   * The factory to create instances of {@link PdfWordList}.
    */
   protected PdfWordListFactory wordListFactory;
 
   /**
-   * The factory to create instances of PdfWord.
+   * The factory to create instances of {@link PdfWord}.
    */
   protected PdfWordFactory wordFactory;
 
@@ -36,16 +43,18 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
 
   /**
    * Creates a new word tokenizer.
-   *
+   * @param positionFactory 
+   *        The factory to create instance of {@link PdfPosition}.
    * @param wordListFactory
    *        The factory to create instance of {@link PdfWordList}.
    * @param wordFactory
    *        The factory to create instance of {@link PdfWord}.
    */
   @Inject
-  public XYCutPdfWordTokenizer(PdfWordListFactory wordListFactory,
-      PdfWordFactory wordFactory) {
+  public XYCutPdfWordTokenizer(PdfPositionFactory positionFactory, 
+      PdfWordListFactory wordListFactory, PdfWordFactory wordFactory) {
     super();
+    this.positionFactory = positionFactory;
     this.wordListFactory = wordListFactory;
     this.wordFactory = wordFactory;
   }
@@ -87,8 +96,10 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWord pack(PdfPage page, PdfCharacterList characters) {
-    return this.wordFactory.create(page, characters);
+  public PdfWord pack(PdfPage page, PdfCharacterList chars) {
+    PdfWord word = this.wordFactory.create(chars);
+    word.setPosition(this.positionFactory.create(page, chars.getRectangle()));
+    return word;
   }
 
   // ==========================================================================

@@ -29,7 +29,7 @@ public class PdfCharacterFilter {
     if (DiacriticsTranslator.isDiacritic(character)) {
       return true;
     }
-
+    
     // Ignore the character, if the width of its bounding box is <= 0.
     if (character.getRectangle().getWidth() <= 0) {
       return true;

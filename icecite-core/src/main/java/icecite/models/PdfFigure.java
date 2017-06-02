@@ -14,12 +14,9 @@ public interface PdfFigure extends PdfElement {
   public interface PdfFigureFactory {
     /**
      * Creates a new PdfFigure.
-     * 
-     * @param page
-     *        The page in which the figure is located.
-     * 
+     *  
      * @return An instance of {@link PdfFigure}.
      */
-    PdfFigure create(PdfPage page);
+    PdfFigure create();
   }
 }

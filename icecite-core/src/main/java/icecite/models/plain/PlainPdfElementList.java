@@ -111,7 +111,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   /**
    * The bounding box around the elements in this list.
    */
-  protected Rectangle boundingBox;
+  protected Rectangle rectangle;
 
   /**
    * A flag that indicates whether the statistics are outdated.
@@ -167,7 +167,10 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public boolean addAll(Collection<? extends T> c) {
-    boolean added = super.addAll(c);
+    boolean added = false;
+    for (T t : c) {
+      added |= add(t);  
+    }
     if (added) {
       this.isStatisticsOutdated = true;
     }
@@ -176,7 +179,13 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public boolean addAll(int index, Collection<? extends T> c) {
-    boolean added = super.addAll(index, c);
+    int oldSize = size();
+    int i = 0;
+    for (T t : c) {
+      add(index + (i++), t);  
+    }
+    int newSize = size();
+    boolean added = newSize > oldSize;
     if (added) {
       this.isStatisticsOutdated = true;
     }
@@ -242,23 +251,29 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     FloatCounter widthsCounter = new FloatCounter();
 
     for (T element : this) {
-      heightsCounter.add(element.getRectangle().getHeight());
-      widthsCounter.add(element.getRectangle().getWidth());
-
-      if (element.getRectangle().getMinX() < this.smallestMinX) {
-        this.smallestMinX = element.getRectangle().getMinX();
+      if (element == null) {
+        continue;
       }
 
-      if (element.getRectangle().getMinY() < this.smallestMinY) {
-        this.smallestMinY = element.getRectangle().getMinY();
+      Rectangle rectangle = element.getRectangle();
+
+      heightsCounter.add(rectangle.getHeight());
+      widthsCounter.add(rectangle.getWidth());
+
+      if (rectangle.getMinX() < this.smallestMinX) {
+        this.smallestMinX = rectangle.getMinX();
       }
 
-      if (element.getRectangle().getMaxX() > this.largestMaxX) {
-        this.largestMaxX = element.getRectangle().getMaxX();
+      if (rectangle.getMinY() < this.smallestMinY) {
+        this.smallestMinY = rectangle.getMinY();
       }
 
-      if (element.getRectangle().getMaxY() > this.largestMaxY) {
-        this.largestMaxY = element.getRectangle().getMaxY();
+      if (rectangle.getMaxX() > this.largestMaxX) {
+        this.largestMaxX = rectangle.getMaxX();
+      }
+
+      if (rectangle.getMaxY() > this.largestMaxY) {
+        this.largestMaxY = rectangle.getMaxY();
       }
     }
     // TODO: Move the computation of the smallest / largest values into the
@@ -460,20 +475,20 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
 
   @Override
   public Rectangle getRectangle() {
-    if (this.boundingBox == null || this.isStatisticsOutdated) {
-      this.boundingBox = this.rectangleFactory.create();
-      this.boundingBox.setMinX(getSmallestMinX());
-      this.boundingBox.setMinY(getSmallestMinY());
-      this.boundingBox.setMaxX(getLargestMaxX());
-      this.boundingBox.setMaxY(getLargestMaxY());
+    if (this.rectangle == null || this.isStatisticsOutdated) {
+      float minX = getSmallestMinX();
+      float minY = getSmallestMinY();
+      float maxX = getLargestMaxX();
+      float maxY = getLargestMaxY();
+      this.rectangle = this.rectangleFactory.create(minX, minY, maxX, maxY);
     }
-    return this.boundingBox;
+    return this.rectangle;
   }
 
   @Override
-  public void setRectangle(Rectangle boundingBox) {
-    // The bounding box results from the elements in this list. Hence, it is
-    // not allowed to set the bounding box explicitly.
+  public void setRectangle(Rectangle rectangle) {
+    // The rectangle results from the elements in this list. Hence, it is
+    // not allowed to set the rectangle explicitly.
     throw new UnsupportedOperationException();
   }
 

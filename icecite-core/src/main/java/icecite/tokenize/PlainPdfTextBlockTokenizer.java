@@ -6,13 +6,19 @@ import java.util.regex.Pattern;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
 import icecite.models.PdfPage;
+import icecite.models.PdfPosition;
+import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.models.PdfTextLine;
+import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
+import icecite.models.PdfTextLineList.PdfTextLineListFactory;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.textlines.PdfTextLineUtils;
 
@@ -23,6 +29,21 @@ import icecite.utils.textlines.PdfTextLineUtils;
  */
 public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
+   * The factory to create instances of {@link PdfTextLineFactory}.
+   */
+  protected PdfTextLineListFactory textLineFactory;
+
+  /**
+   * The factory to create instances of {@link PdfCharacterListFactory}.
+   */
+  protected PdfCharacterListFactory characterListFactory;
+
+  /**
+   * The factory to create instances of {@link PdfPositionFactory}.
+   */
+  protected PdfPositionFactory positionFactory;
+
+  /**
    * The factory to create instances of {@link PdfTextBlock}.
    */
   protected PdfTextBlockFactory textBlockFactory;
@@ -30,12 +51,24 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
    * Creates a new tokenizer that tokenizes text lines into text blocks.
    * 
+   * @param textLineFactory
+   *        The factory to create instances of {@link PdfTextLineList}.
+   * @param characterListFactory
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param textBlockFactory
    *        The factory to create instances of {@link PdfTextBlock}.
+   * @param positionFactory
+   *        The factory to create instances of {@link PdfPosition}.
    */
   @Inject
-  public PlainPdfTextBlockTokenizer(PdfTextBlockFactory textBlockFactory) {
+  public PlainPdfTextBlockTokenizer(PdfTextLineListFactory textLineFactory,
+      PdfCharacterListFactory characterListFactory,
+      PdfTextBlockFactory textBlockFactory,
+      PdfPositionFactory positionFactory) {
+    this.textLineFactory = textLineFactory;
+    this.characterListFactory = characterListFactory;
     this.textBlockFactory = textBlockFactory;
+    this.positionFactory = positionFactory;
   }
 
   // ==========================================================================
@@ -43,7 +76,9 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   @Override
   public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page) {
     List<PdfTextBlock> textBlocks = new ArrayList<>();
-    PdfTextBlock textBlock = null;
+
+    PdfTextLineList blockLines = null;
+    PdfCharacterList blockCharacters = null;
 
     List<PdfTextLine> lines = page.getTextLines();
     for (int i = 0; i < lines.size(); i++) {
@@ -51,21 +86,32 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
 
-      if (introducesTextBlock(pdf, textBlock, prevLine, line, nextLine)) {
-        if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
+      if (introducesTextBlock(pdf, blockLines, prevLine, line, nextLine)) {
+        if (blockLines != null && !blockLines.isEmpty()) {
+          PdfTextBlock textBlock = this.textBlockFactory.create();
+          textBlock.setCharacters(blockCharacters);
+          textBlock.setTextLines(blockLines);
+          textBlock.setPosition(
+              this.positionFactory.create(page, blockLines.getRectangle()));
           textBlocks.add(textBlock);
         }
 
         // Create a new text block.
-        textBlock = this.textBlockFactory.create(page);
+        blockLines = this.textLineFactory.create();
+        blockCharacters = this.characterListFactory.create();
       }
       // Add the word of the current line to the current text block.
-      textBlock.addTextLine(line);
-      textBlock.addCharacters(line.getCharacters());
+      blockLines.add(line);
+      blockCharacters.addAll(line.getCharacters());
     }
 
     // Don't forget the remaining text block.
-    if (textBlock != null && !textBlock.getTextLines().isEmpty()) {
+    if (blockLines != null && !blockLines.isEmpty()) {
+      PdfTextBlock textBlock = this.textBlockFactory.create();
+      textBlock.setCharacters(blockCharacters);
+      textBlock.setTextLines(blockLines);
+      textBlock.setPosition(
+          this.positionFactory.create(page, blockLines.getRectangle()));
       textBlocks.add(textBlock);
     }
 
@@ -77,8 +123,8 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * 
    * @param pdf
    *        The PDF document.
-   * @param block
-   *        The current text block.
+   * @param blockLines
+   *        The text lines of the current text block.
    * @param prevLine
    *        The previous text line.
    * @param line
@@ -88,8 +134,9 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @return True, if the given current line introduces a new text block; false
    *         otherwise.
    */
-  protected boolean introducesTextBlock(PdfDocument pdf, PdfTextBlock block,
-      PdfTextLine prevLine, PdfTextLine line, PdfTextLine nextLine) {
+  protected boolean introducesTextBlock(PdfDocument pdf,
+      PdfTextLineList blockLines, PdfTextLine prevLine, PdfTextLine line,
+      PdfTextLine nextLine) {
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
       return false;
@@ -101,19 +148,19 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
     }
 
     // The line introduces a text block, if there is no current text block.
-    if (block == null) {
+    if (blockLines == null) {
       return true;
     }
 
     // The line does *not* introduce a text block, if the current text block is
     // empty.
-    if (block.getTextLines().isEmpty()) {
+    if (blockLines.isEmpty()) {
       return false;
     }
 
     // The line introduces a text block, if it doesn't overlap the text
     // block horizontally.
-    if (!overlapsHorizontally(block, line)) {
+    if (!overlapsHorizontally(blockLines, line)) {
       return true;
     }
 
@@ -152,19 +199,20 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
    * Checks, if the given line overlaps the given text block horizontally.
    * 
-   * @param block
-   *        The text block to process.
+   * @param blockLines
+   *        The text lines of the text block to process.
    * @param line
    *        The line to process.
    * @return True, if the given line overlaps the given text block
    *         horizontally, false otherwise.
    */
-  protected boolean overlapsHorizontally(PdfTextBlock block, PdfTextLine line) {
-    if (block == null || line == null) {
+  protected boolean overlapsHorizontally(PdfTextLineList blockLines,
+      PdfTextLine line) {
+    if (blockLines == null || line == null) {
       return false;
     }
 
-    Rectangle blockBoundingBox = block.getRectangle();
+    Rectangle blockBoundingBox = blockLines.getRectangle();
     Rectangle lineBoundingBox = line.getRectangle();
     if (blockBoundingBox == null || lineBoundingBox == null) {
       return false;
