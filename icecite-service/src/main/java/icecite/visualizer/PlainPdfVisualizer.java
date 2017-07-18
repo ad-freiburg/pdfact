@@ -12,6 +12,7 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.drawer.PdfDrawer;
 import icecite.drawer.PdfDrawerFactory;
+import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
 import icecite.models.PdfFigure;
@@ -19,7 +20,9 @@ import icecite.models.PdfPage;
 import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextLine;
 import icecite.models.PdfType;
+import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
 
 /**
@@ -135,37 +138,37 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     
     // Visualize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
-      if (isVisualizePdfElement(block)) {
-        visualizePdfElement(page, block, drawer, Color.RED);
-      }
-//      for (PdfTextLine line : block.getTextLines()) {
+//      if (isVisualizePdfElement(block)) {
+//        visualizePdfElement(page, block, drawer, Color.RED);
+//      }
+      for (PdfTextLine line : block.getTextLines()) {
 //        if (isVisualizePdfElement(line)) {
 //          visualizePdfElement(page, line, drawer, Color.BLUE);
 //        }
-//        for (PdfWord word : line.getWords()) {
+        for (PdfWord word : line.getWords()) {
 //          if (isVisualizePdfElement(word)) {
 //            visualizePdfElement(page, word, drawer, Color.ORANGE);
 //          }
-//          for (PdfCharacter character : word.getCharacters()) {
-//            if (isVisualizePdfElement(character)) {
-//              visualizePdfElement(page, character, drawer, Color.GRAY);
-//            }
-//          }
-//        }
-//      }
+          for (PdfCharacter character : word.getCharacters()) {
+            if (isVisualizePdfElement(character)) {
+              visualizePdfElement(page, character, drawer, Color.BLUE);
+            }
+          }
+        }
+      }
     }
         
-    // Visualize the graphical elements.
-    for (PdfFigure figure : page.getFigures()) {
-      if (isVisualizePdfElement(figure)) {
-        visualizePdfElement(page, figure, drawer, Color.CYAN);
-      }
-    }
-    for (PdfShape shape : page.getShapes()) {
-      if (isVisualizePdfElement(shape)) {
-        visualizePdfElement(page, shape, drawer, Color.MAGENTA);
-      }
-    }
+//    // Visualize the graphical elements.
+//    for (PdfFigure figure : page.getFigures()) {
+//      if (isVisualizePdfElement(figure)) {
+//        visualizePdfElement(page, figure, drawer, Color.CYAN);
+//      }
+//    }
+//    for (PdfShape shape : page.getShapes()) {
+//      if (isVisualizePdfElement(shape)) {
+//        visualizePdfElement(page, shape, drawer, Color.MAGENTA);
+//      }
+//    }
   }
 
   /**
