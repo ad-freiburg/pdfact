@@ -82,9 +82,7 @@ public class CollectionUtils {
       return null;
     }
 
-    if (delimiter == null) {
-      delimiter = DEFAULT_DELIMITER;
-    }
+    String delim = delimiter != null ? delimiter : DEFAULT_DELIMITER;
 
     StringBuilder result = new StringBuilder();
 
@@ -92,7 +90,7 @@ public class CollectionUtils {
     while (iterator.hasNext()) {
       Object element = iterator.next();
       result.append(element != null ? element.toString() : null);
-      result.append(iterator.hasNext() ? delimiter : "");
+      result.append(iterator.hasNext() ? delim : "");
     }
 
     return result.toString();

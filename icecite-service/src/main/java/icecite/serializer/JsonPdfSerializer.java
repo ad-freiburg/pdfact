@@ -51,6 +51,7 @@ import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
+import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
@@ -74,7 +75,7 @@ public class JsonPdfSerializer implements PdfSerializer {
   /**
    * The set of roles of PDF elements to serialize.
    */
-  protected Set<PdfType> roles;
+  protected Set<PdfRole> roles;
 
   /**
    * The set of utilized fonts while serializing a PDF document.
@@ -120,7 +121,7 @@ public class JsonPdfSerializer implements PdfSerializer {
    */
   @AssistedInject
   public JsonPdfSerializer(@Assisted("types") Set<PdfType> types,
-      @Assisted("roles") Set<PdfType> roles) {
+      @Assisted("roles") Set<PdfRole> roles) {
     this.types = types;
     this.roles = roles;
   }
