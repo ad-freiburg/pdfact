@@ -1,4 +1,4 @@
-package icecite.drawer;
+package icecite.visualize;
 
 import java.awt.Color;
 import java.io.IOException;

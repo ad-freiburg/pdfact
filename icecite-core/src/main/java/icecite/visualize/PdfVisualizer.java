@@ -1,4 +1,4 @@
-package icecite.visualizer;
+package icecite.visualize;
 
 import java.io.IOException;
 import java.io.OutputStream;

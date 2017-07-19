@@ -1,4 +1,4 @@
-package icecite.visualizer;
+package icecite.visualize;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -10,8 +10,6 @@ import java.util.Set;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.drawer.PdfDrawer;
-import icecite.drawer.PdfDrawerFactory;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;

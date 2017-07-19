@@ -1,4 +1,4 @@
-package icecite.drawer.pdfbox;
+package icecite.visualize.pdfbox;
 
 import java.awt.Color;
 import java.io.File;
@@ -21,7 +21,6 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.drawer.PdfDrawer;
 import icecite.utils.geometric.HasRectangle;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
@@ -29,6 +28,7 @@ import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
+import icecite.visualize.PdfDrawer;
 
 /**
  * An implementation of PdfVisualizer using PdfBox.

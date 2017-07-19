@@ -1,4 +1,4 @@
-package icecite.serializer;
+package icecite.serialize;
 
 import java.io.IOException;
 import java.io.OutputStream;

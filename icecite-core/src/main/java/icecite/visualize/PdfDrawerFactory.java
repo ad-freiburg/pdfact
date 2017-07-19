@@ -1,4 +1,4 @@
-package icecite.drawer;
+package icecite.visualize;
 
 import java.io.File;
 import java.nio.file.Path;

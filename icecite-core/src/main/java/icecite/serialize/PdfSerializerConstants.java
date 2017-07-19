@@ -1,4 +1,4 @@
-package icecite.serializer;
+package icecite.serialize;
 
 /**
  * Collection of some constants that are needed on serialization.

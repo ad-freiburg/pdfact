@@ -3,6 +3,7 @@ package icecite.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
@@ -69,6 +70,10 @@ import icecite.semanticize.plain.modules.BodyTextModule;
 import icecite.semanticize.plain.modules.PdfTextSemanticizerModule;
 import icecite.semanticize.plain.modules.ReferencesHeadingModule;
 import icecite.semanticize.plain.modules.TitleModule;
+import icecite.serialize.JsonPdfSerializer;
+import icecite.serialize.PdfSerializer;
+import icecite.serialize.TxtPdfSerializer;
+import icecite.serialize.XmlPdfSerializer;
 import icecite.tokenize.PdfTextAreaTokenizer;
 import icecite.tokenize.PdfTextBlockTokenizer;
 import icecite.tokenize.PdfTextLineTokenizer;
@@ -92,6 +97,12 @@ import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.geometric.plain.PlainLine;
 import icecite.utils.geometric.plain.PlainPoint;
 import icecite.utils.geometric.plain.PlainRectangle;
+import icecite.visualize.PdfDrawer;
+import icecite.visualize.PdfDrawerFactory;
+import icecite.visualize.PdfVisualizer;
+import icecite.visualize.PlainPdfVisualizer;
+import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
+import icecite.visualize.pdfbox.PdfBoxDrawer;
 
 // TODO: Find out how to dynamically update bindings (needed for the parser,
 // where PdfBox needs extra bindings.
@@ -101,7 +112,7 @@ import icecite.utils.geometric.plain.PlainRectangle;
  * 
  * @author Claudius Korzen
  */
-public class IceciteBaseModule extends AbstractModule {
+public class IceciteCoreModule extends AbstractModule {
 
   @Override
   protected void configure() {
@@ -165,6 +176,19 @@ public class IceciteBaseModule extends AbstractModule {
     binder.addBinding().to(ReferencesHeadingModule.class);
     binder.addBinding().to(BodyTextHeadingModule.class);
     binder.addBinding().to(BodyTextModule.class);
+    
+    // Bind the serializers.
+    bind(PdfSerializer.class).annotatedWith(Names.named("txt"))
+        .to(TxtPdfSerializer.class);
+    bind(PdfSerializer.class).annotatedWith(Names.named("xml"))
+        .to(XmlPdfSerializer.class);
+    bind(PdfSerializer.class).annotatedWith(Names.named("json"))
+        .to(JsonPdfSerializer.class);
+    
+    // Bind the visualizer.
+    fc(PdfDrawer.class, PdfDrawerFactory.class, PdfBoxDrawer.class);
+    fc(PdfVisualizer.class, PdfVisualizerFactory.class,
+        PlainPdfVisualizer.class);
   }
 
   /**
