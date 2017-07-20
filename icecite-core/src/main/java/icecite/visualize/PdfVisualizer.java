@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 
-import com.google.inject.assistedinject.Assisted;
-
 import icecite.models.PdfDocument;
+import icecite.models.PdfFeature;
 import icecite.models.PdfRole;
-import icecite.models.PdfType;
 
 /**
  * The interface for all concrete implementations to visualize the features of
@@ -29,6 +27,23 @@ public interface PdfVisualizer {
    */
   void visualize(PdfDocument pdf, OutputStream stream) throws IOException;
 
+  /**
+   * Visualizes all features of the given document to the given stream.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * @param stream
+   *        The stream to write to.
+   * @param features
+   *        The features to visualize.
+   * @param roles
+   *        The roles to consider on visualization.
+   * @throws IOException
+   *         If something went wrong while visualizing.
+   */
+  void visualize(PdfDocument pdf, OutputStream stream, Set<PdfFeature> features,
+      Set<PdfRole> roles) throws IOException;
+
   // ==========================================================================
 
   /**
@@ -43,26 +58,5 @@ public interface PdfVisualizer {
      * @return An instance of PdfVisualizer.
      */
     PdfVisualizer create();
-
-    /**
-     * Creates a new PdfVisualizer.
-     * 
-     * @param types
-     *        The types of PDF elements to visualize.
-     * @return An instance of PdfVisualizer.
-     */
-    PdfVisualizer create(@Assisted Set<PdfType> types);
-
-    /**
-     * Creates a new PdfVisualizer.
-     * 
-     * @param types
-     *        The types of PDF elements to visualize.
-     * @param roles
-     *        The roles of PDF elements to visualize.
-     * @return An instance of PdfVisualizer.
-     */
-    PdfVisualizer create(@Assisted("types") Set<PdfType> types,
-        @Assisted("roles") Set<PdfRole> roles);
   }
 }

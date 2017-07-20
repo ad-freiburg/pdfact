@@ -3,7 +3,8 @@ package icecite.tokenize;
 import icecite.models.PdfDocument;
 
 /**
- * A tokenizer, that tokenizes the PDF document into paragraphs.
+ * A tokenizer, that tokenizes the PDF document into paragraphs *after* the
+ * semantics were identified.
  * 
  * @author Claudius Korzen
  */

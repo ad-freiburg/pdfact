@@ -10,7 +10,7 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
-import icecite.models.PdfType;
+import icecite.models.PdfFeature;
 import icecite.models.PdfWord;
 import icecite.utils.geometric.Rectangle;
 
@@ -135,8 +135,8 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public PdfType getType() {
-    return PdfType.WORDS;
+  public PdfFeature getFeature() {
+    return PdfFeature.WORD;
   }
 
   // ==========================================================================

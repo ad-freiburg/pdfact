@@ -4,7 +4,7 @@ import icecite.models.PdfDocument;
 
 /**
  * A tokenizer, that tokenizes pages of PDF documents into text blocks, text
- * lines and words.
+ * lines and words *before* semantics were identified.
  * 
  * @author Claudius Korzen
  */

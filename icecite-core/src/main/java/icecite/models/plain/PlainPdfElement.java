@@ -4,10 +4,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import icecite.models.PdfElement;
+import icecite.models.PdfFeature;
 import icecite.models.PdfPage;
 import icecite.models.PdfPosition;
 import icecite.models.PdfRole;
-import icecite.models.PdfType;
 import icecite.utils.geometric.Rectangle;
 
 /**
@@ -81,7 +81,7 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
 
   @Override
-  public PdfType getType() {
+  public PdfFeature getFeature() {
     return null;
   }
 

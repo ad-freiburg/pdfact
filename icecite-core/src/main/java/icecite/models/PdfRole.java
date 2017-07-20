@@ -1,5 +1,9 @@
 package icecite.models;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * An enumeration of semantic roles for paragraphs of PDF documents.
  * 
@@ -118,5 +122,14 @@ public enum PdfRole {
    */
   public String getName() {
     return this.name;
+  }
+  
+  /**
+   * Returns all roles in a set.
+   * 
+   * @return all roles in a set.
+   */
+  public static Set<PdfRole> valuesAsSet() {
+    return new HashSet<PdfRole>(Arrays.asList(values()));
   }
 }

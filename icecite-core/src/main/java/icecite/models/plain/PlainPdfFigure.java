@@ -3,8 +3,8 @@ package icecite.models.plain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import icecite.models.PdfFeature;
 import icecite.models.PdfFigure;
-import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfFigure}.
@@ -13,8 +13,8 @@ import icecite.models.PdfType;
  */
 public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   @Override
-  public PdfType getType() {
-    return PdfType.FIGURES;
+  public PdfFeature getFeature() {
+    return PdfFeature.FIGURE;
   }
 
   // ==========================================================================

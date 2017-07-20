@@ -37,7 +37,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.HasColor;
@@ -47,6 +46,7 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
+import icecite.models.PdfFeature;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
 import icecite.models.PdfFontFace;
@@ -55,7 +55,6 @@ import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
-import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.geometric.Rectangle;
@@ -67,16 +66,6 @@ import icecite.utils.geometric.Rectangle;
  * @author Claudius Korzen
  */
 public class JsonPdfSerializer implements PdfSerializer {
-  /**
-   * The set of types of the PDF elements to serialize.
-   */
-  protected Set<PdfType> types;
-
-  /**
-   * The set of roles of PDF elements to serialize.
-   */
-  protected Set<PdfRole> roles;
-
   /**
    * The set of utilized fonts while serializing a PDF document.
    */
@@ -95,41 +84,19 @@ public class JsonPdfSerializer implements PdfSerializer {
    */
   @AssistedInject
   public JsonPdfSerializer() {
-    this.types = new HashSet<>();
-    this.roles = new HashSet<>();
-  }
 
-  /**
-   * Creates a new serializer that serializes PDF documents to JSON format.
-   * 
-   * @param types
-   *        The types of the PDF elements to serialize.
-   */
-  @AssistedInject
-  public JsonPdfSerializer(Set<PdfType> types) {
-    this.types = types;
-    this.roles = new HashSet<>();
-  }
-
-  /**
-   * Creates a new serializer that serializes PDF documents to JSON format.
-   * 
-   * @param types
-   *        The type of the PDF elements to serialize.
-   * @param roles
-   *        The roles of the PDF elements to serialize.
-   */
-  @AssistedInject
-  public JsonPdfSerializer(@Assisted("types") Set<PdfType> types,
-      @Assisted("roles") Set<PdfRole> roles) {
-    this.types = types;
-    this.roles = roles;
   }
 
   // ==========================================================================
 
   @Override
   public void serialize(PdfDocument pdf, OutputStream os) throws IOException {
+    serialize(pdf, os, null, null);
+  }
+
+  @Override
+  public void serialize(PdfDocument pdf, OutputStream os,
+      Set<PdfFeature> features, Set<PdfRole> roles) throws IOException {
     if (pdf == null) {
       return;
     }
@@ -145,7 +112,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     JSONObject json = new JSONObject();
 
     // Serialize the pages.
-    JSONArray serializedPages = serializePages(pdf);
+    JSONArray serializedPages = serializePages(pdf, features, roles);
     if (serializedPages != null && serializedPages.length() > 0) {
       json.put(CONTEXT_NAME_PAGES, serializedPages);
     }
@@ -173,10 +140,15 @@ public class JsonPdfSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
+   * @param features
+   *        The featurs to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return An JSON array representing the serialized pages of the PDF
    *         document.
    */
-  protected JSONArray serializePages(PdfDocument pdf) {
+  protected JSONArray serializePages(PdfDocument pdf, Set<PdfFeature> features,
+      Set<PdfRole> roles) {
     if (pdf == null) {
       return null;
     }
@@ -189,7 +161,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     // Serialize each single page.
     JSONArray json = new JSONArray();
     for (PdfPage page : pages) {
-      JSONObject serialized = serializePage(page);
+      JSONObject serialized = serializePage(page, features, roles);
       if (serialized != null && serialized.length() > 0) {
         json.put(serialized);
       }
@@ -202,9 +174,14 @@ public class JsonPdfSerializer implements PdfSerializer {
    * 
    * @param page
    *        The page to serialize.
+   * @param features
+   *        The features to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return A JSON object representing the serialized page.
    */
-  protected JSONObject serializePage(PdfPage page) {
+  protected JSONObject serializePage(PdfPage page, Set<PdfFeature> features,
+      Set<PdfRole> roles) {
     if (page == null) {
       return null;
     }
@@ -222,28 +199,28 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     // Serialize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
-      if (isSerializePdfElement(block)) {
+      if (isSerializePdfElement(block, features, roles)) {
         JSONObject serializedParagraph = serializePdfElement(page, block);
         if (serializedParagraph != null && serializedParagraph.length() > 0) {
           paragraphs.put(serializedParagraph);
         }
       }
       for (PdfTextLine line : block.getTextLines()) {
-        if (isSerializePdfElement(line)) {
+        if (isSerializePdfElement(line, features, roles)) {
           JSONObject serializedTextLine = serializePdfElement(page, line);
           if (serializedTextLine != null && serializedTextLine.length() > 0) {
             textLines.put(serializedTextLine);
           }
         }
         for (PdfWord word : line.getWords()) {
-          if (isSerializePdfElement(word)) {
+          if (isSerializePdfElement(word, features, roles)) {
             JSONObject serializedTextWord = serializePdfElement(page, word);
             if (serializedTextWord != null && serializedTextWord.length() > 0) {
               words.put(serializedTextWord);
             }
           }
           for (PdfCharacter character : word.getCharacters()) {
-            if (isSerializePdfElement(character)) {
+            if (isSerializePdfElement(character, features, roles)) {
               JSONObject serializedChar = serializePdfElement(page, character);
               if (serializedChar != null && serializedChar.length() > 0) {
                 characters.put(serializedChar);
@@ -256,7 +233,7 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     // Serialize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
-      if (isSerializePdfElement(figure)) {
+      if (isSerializePdfElement(figure, features, roles)) {
         JSONObject serializedFigure = serializePdfElement(page, figure);
         if (serializedFigure != null && serializedFigure.length() > 0) {
           figures.put(serializedFigure);
@@ -264,7 +241,7 @@ public class JsonPdfSerializer implements PdfSerializer {
       }
     }
     for (PdfShape shape : page.getShapes()) {
-      if (isSerializePdfElement(shape)) {
+      if (isSerializePdfElement(shape, features, roles)) {
         JSONObject serializedShapes = serializePdfElement(page, shape);
         if (serializedShapes != null && serializedShapes.length() > 0) {
           shapes.put(serializedShapes);
@@ -501,19 +478,24 @@ public class JsonPdfSerializer implements PdfSerializer {
    * 
    * @param element
    *        The PDF element to check.
+   * @param features
+   *        The features to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return True, if the given PDF element should be serialized, false
    *         otherwise.
    */
-  protected boolean isSerializePdfElement(PdfElement element) {
+  protected boolean isSerializePdfElement(PdfElement element,
+      Set<PdfFeature> features, Set<PdfRole> roles) {
     // Check if the type of the given element was registered to be serialized.
-    boolean isTypeGiven = !CollectionUtils.isNullOrEmpty(this.types);
-    if (isTypeGiven && !this.types.contains(element.getType())) {
+    boolean isFeatureGiven = !CollectionUtils.isNullOrEmpty(features);
+    if (isFeatureGiven && !features.contains(element.getFeature())) {
       return false;
     }
 
     // Check if the role of the given element was registered to be serialized.
-    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(this.roles);
-    if (isRoleGiven && !this.roles.contains(element.getRole())) {
+    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    if (isRoleGiven && !roles.contains(element.getRole())) {
       return false;
     }
     return true;

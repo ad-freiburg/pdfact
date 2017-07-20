@@ -4,8 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import icecite.models.PdfColor;
+import icecite.models.PdfFeature;
 import icecite.models.PdfShape;
-import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfShape}.
@@ -38,8 +38,8 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   // ==========================================================================
 
   @Override
-  public PdfType getType() {
-    return PdfType.SHAPES;
+  public PdfFeature getFeature() {
+    return PdfFeature.SHAPE;
   }
 
   // ==========================================================================

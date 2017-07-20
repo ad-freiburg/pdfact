@@ -11,7 +11,7 @@ public interface PdfElement extends HasPosition {
    * 
    * @return The type of this PDF element.
    */
-  PdfType getType();
+  PdfFeature getFeature();
 
   // ==========================================================================
 

@@ -8,8 +8,8 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfFeature;
 import icecite.models.PdfTextLine;
-import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
@@ -151,8 +151,8 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   // ==========================================================================
 
   @Override
-  public PdfType getType() {
-    return PdfType.TEXTLINES;
+  public PdfFeature getFeature() {
+    return PdfFeature.TEXT_LINE;
   }
 
   // ==========================================================================

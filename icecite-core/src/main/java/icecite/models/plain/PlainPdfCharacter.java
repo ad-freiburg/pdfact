@@ -5,8 +5,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
+import icecite.models.PdfFeature;
 import icecite.models.PdfFontFace;
-import icecite.models.PdfType;
 
 /**
  * A plain implementation of {@link PdfCharacter}.
@@ -85,8 +85,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public PdfType getType() {
-    return PdfType.CHARACTERS;
+  public PdfFeature getFeature() {
+    return PdfFeature.CHARACTER;
   }
 
   // ==========================================================================

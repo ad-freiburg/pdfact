@@ -37,7 +37,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.HasColor;
@@ -47,6 +46,7 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfColor;
 import icecite.models.PdfDocument;
 import icecite.models.PdfElement;
+import icecite.models.PdfFeature;
 import icecite.models.PdfFigure;
 import icecite.models.PdfFont;
 import icecite.models.PdfFontFace;
@@ -55,7 +55,6 @@ import icecite.models.PdfRole;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
-import icecite.models.PdfType;
 import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.geometric.Rectangle;
@@ -68,16 +67,6 @@ import icecite.utils.text.StringUtils;
  * @author Claudius Korzen
  */
 public class XmlPdfSerializer implements PdfSerializer {
-  /**
-   * The types of the PDF elements to serialize.
-   */
-  protected Set<PdfType> types;
-
-  /**
-   * The roles of PDF elements to serialize.
-   */
-  protected Set<PdfRole> roles;
-
   /**
    * The fonts which were utilized on serializing a PDF document.
    */
@@ -96,41 +85,18 @@ public class XmlPdfSerializer implements PdfSerializer {
    */
   @AssistedInject
   public XmlPdfSerializer() {
-    this.types = new HashSet<>();
-    this.roles = new HashSet<>();
-  }
-
-  /**
-   * Creates a new serializer that serializes PDF documents to XML format.
-   * 
-   * @param types
-   *        The types of the PDF elements to serialize.
-   */
-  @AssistedInject
-  public XmlPdfSerializer(Set<PdfType> types) {
-    this.types = types;
-    this.roles = new HashSet<>();
-  }
-
-  /**
-   * Creates a new serializer that serializes PDF documents to XML format.
-   * 
-   * @param types
-   *        The types of the PDF elements to serialize.
-   * @param roles
-   *        The roles of the PDF elements to serialize.
-   */
-  @AssistedInject
-  public XmlPdfSerializer(@Assisted("types") Set<PdfType> types,
-      @Assisted("roles") Set<PdfRole> roles) {
-    this.types = types;
-    this.roles = roles;
   }
 
   // ==========================================================================
 
   @Override
   public void serialize(PdfDocument pdf, OutputStream os) throws IOException {
+    serialize(pdf, os, null, null);
+  }
+
+  @Override
+  public void serialize(PdfDocument pdf, OutputStream os,
+      Set<PdfFeature> features, Set<PdfRole> roles) throws IOException {
     if (pdf == null) {
       return;
     }
@@ -150,7 +116,7 @@ public class XmlPdfSerializer implements PdfSerializer {
     // Start an XML tag to introduce the pages: <pages>
     lines.add(indent("<" + CONTEXT_NAME_PAGES + ">", 1));
     // Serialize each single page.
-    List<String> serializedPages = serializePages(pdf, 2);
+    List<String> serializedPages = serializePages(pdf, 2, features, roles);
     if (serializedPages != null && !serializedPages.isEmpty()) {
       lines.addAll(serializedPages);
     }
@@ -201,10 +167,15 @@ public class XmlPdfSerializer implements PdfSerializer {
    *        The PDF document to serialize.
    * @param level
    *        The current indentation level.
+   * @param features
+   *        The features to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return The text lines that represent the serialized pages of the PDF
    *         document.
    */
-  protected List<String> serializePages(PdfDocument pdf, int level) {
+  protected List<String> serializePages(PdfDocument pdf, int level,
+      Set<PdfFeature> features, Set<PdfRole> roles) {
     if (pdf == null) {
       return null;
     }
@@ -220,7 +191,8 @@ public class XmlPdfSerializer implements PdfSerializer {
       lines.add(indent("<" + CONTEXT_NAME_ELEMENT_PAGE + " id=\""
           + page.getPageNumber() + "\">", level));
       // Serialize each single page.
-      List<String> serializedPage = serializePage(page, level + 1);
+      List<String> serializedPage = serializePage(page, level + 1, features,
+          roles);
       for (String s : serializedPage) {
         if (s != null && !s.isEmpty()) {
           lines.add(s);
@@ -239,9 +211,14 @@ public class XmlPdfSerializer implements PdfSerializer {
    *        The page to serialize.
    * @param l
    *        The current indentation level.
+   * @param features
+   *        The features to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return The serialization string representing the given page.
    */
-  protected List<String> serializePage(PdfPage page, int l) {
+  protected List<String> serializePage(PdfPage page, int l,
+      Set<PdfFeature> features, Set<PdfRole> roles) {
     if (page == null) {
       return null;
     }
@@ -251,19 +228,19 @@ public class XmlPdfSerializer implements PdfSerializer {
     List<PdfTextBlock> blocks = page.getTextBlocks();
     if (blocks != null) {
       for (PdfTextBlock block : blocks) {
-        if (isSerializePdfElement(block)) {
+        if (isSerializePdfElement(block, features, roles)) {
           lines.add(serializeElement(page, block, CONTEXT_NAME_PARAGRAPH, l));
         }
         for (PdfTextLine line : block.getTextLines()) {
-          if (isSerializePdfElement(line)) {
+          if (isSerializePdfElement(line, features, roles)) {
             lines.add(serializeElement(page, line, CONTEXT_NAME_TEXTLINE, l));
           }
           for (PdfWord word : line.getWords()) {
-            if (isSerializePdfElement(word)) {
+            if (isSerializePdfElement(word, features, roles)) {
               lines.add(serializeElement(page, word, CONTEXT_NAME_WORD, l));
             }
             for (PdfCharacter c : word.getCharacters()) {
-              if (isSerializePdfElement(c)) {
+              if (isSerializePdfElement(c, features, roles)) {
                 lines.add(serializeElement(page, c, CONTEXT_NAME_CHARACTER, l));
               }
             }
@@ -274,12 +251,12 @@ public class XmlPdfSerializer implements PdfSerializer {
 
     // Serialize the graphical elements.
     for (PdfFigure figure : page.getFigures()) {
-      if (isSerializePdfElement(figure)) {
+      if (isSerializePdfElement(figure, features, roles)) {
         lines.add(serializeElement(page, figure, CONTEXT_NAME_FIGURE, l));
       }
     }
     for (PdfShape shape : page.getShapes()) {
-      if (isSerializePdfElement(shape)) {
+      if (isSerializePdfElement(shape, features, roles)) {
         lines.add(serializeElement(page, shape, CONTEXT_NAME_SHAPE, l));
       }
     }
@@ -564,26 +541,31 @@ public class XmlPdfSerializer implements PdfSerializer {
    * 
    * @param element
    *        The PDF element to check.
+   * @param features
+   *        The features to serialize.
+   * @param roles
+   *        The roles to consider on serialization.
    * @return True, if the given PDF element should be serialized, false
    *         otherwise.
    */
-  protected boolean isSerializePdfElement(PdfElement element) {
+  protected boolean isSerializePdfElement(PdfElement element,
+      Set<PdfFeature> features, Set<PdfRole> roles) {
     // Check if the type of the given element was registered to be serialized.
-    boolean isTypeGiven = !CollectionUtils.isNullOrEmpty(this.types);
-    if (isTypeGiven && !this.types.contains(element.getType())) {
+    boolean isTypeGiven = !CollectionUtils.isNullOrEmpty(features);
+    if (isTypeGiven && !features.contains(element.getFeature())) {
       return false;
     }
 
     // Check if the role of the given element was registered to be serialized.
-    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(this.roles);
-    if (isRoleGiven && !this.roles.contains(element.getRole())) {
+    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    if (isRoleGiven && !roles.contains(element.getRole())) {
       return false;
     }
     return true;
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the output format of this serializer.
    * 
