@@ -2,8 +2,8 @@ package icecite.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
@@ -74,17 +74,17 @@ import icecite.serialize.JsonPdfSerializer;
 import icecite.serialize.PdfSerializer;
 import icecite.serialize.TxtPdfSerializer;
 import icecite.serialize.XmlPdfSerializer;
-import icecite.tokenize.PdfTextAreaTokenizer;
-import icecite.tokenize.PdfTextBlockTokenizer;
-import icecite.tokenize.PdfTextLineTokenizer;
 import icecite.tokenize.PdfDocumentTokenizer;
 import icecite.tokenize.PdfPageTokenizer;
 import icecite.tokenize.PdfParagraphTokenizer;
+import icecite.tokenize.PdfTextAreaTokenizer;
+import icecite.tokenize.PdfTextBlockTokenizer;
+import icecite.tokenize.PdfTextLineTokenizer;
 import icecite.tokenize.PdfWordTokenizer;
 import icecite.tokenize.PlainPdfDocumentTokenizer;
-import icecite.tokenize.PlainPdfTextBlockTokenizer;
 import icecite.tokenize.PlainPdfPageTokenizer;
 import icecite.tokenize.PlainPdfParagraphTokenizer;
+import icecite.tokenize.PlainPdfTextBlockTokenizer;
 import icecite.tokenize.XYCutPdfTextAreaTokenizer;
 import icecite.tokenize.XYCutPdfTextLineTokenizer;
 import icecite.tokenize.XYCutPdfWordTokenizer;
@@ -100,8 +100,8 @@ import icecite.utils.geometric.plain.PlainRectangle;
 import icecite.visualize.PdfDrawer;
 import icecite.visualize.PdfDrawerFactory;
 import icecite.visualize.PdfVisualizer;
-import icecite.visualize.PlainPdfVisualizer;
 import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
+import icecite.visualize.PlainPdfVisualizer;
 import icecite.visualize.pdfbox.PdfBoxDrawer;
 
 // TODO: Find out how to dynamically update bindings (needed for the parser,
@@ -177,12 +177,16 @@ public class IceciteCoreModule extends AbstractModule {
     binder.addBinding().to(BodyTextHeadingModule.class);
     binder.addBinding().to(BodyTextModule.class);
     
+    
+    MapBinder<String, PdfSerializer> serializerBinder = MapBinder
+        .newMapBinder(binder(), String.class, PdfSerializer.class);
+    
     // Bind the serializers.
-    bind(PdfSerializer.class).annotatedWith(Names.named("txt"))
+    serializerBinder.addBinding(TxtPdfSerializer.getOutputFormat())
         .to(TxtPdfSerializer.class);
-    bind(PdfSerializer.class).annotatedWith(Names.named("xml"))
+    serializerBinder.addBinding(XmlPdfSerializer.getOutputFormat())
         .to(XmlPdfSerializer.class);
-    bind(PdfSerializer.class).annotatedWith(Names.named("json"))
+    serializerBinder.addBinding(JsonPdfSerializer.getOutputFormat())
         .to(JsonPdfSerializer.class);
     
     // Bind the visualizer.

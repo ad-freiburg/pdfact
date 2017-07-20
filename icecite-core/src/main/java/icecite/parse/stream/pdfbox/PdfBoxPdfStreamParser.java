@@ -27,11 +27,13 @@ import org.apache.pdfbox.util.Matrix;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.exception.IceciteException;
+import icecite.exception.IceciteParseException;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
-import icecite.models.PdfShape;
 import icecite.models.PdfPage.PdfPageFactory;
+import icecite.models.PdfShape;
 import icecite.parse.stream.HasPdfStreamParserHandlers;
 import icecite.parse.stream.PdfStreamParser;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
@@ -165,16 +167,18 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    * 
    * @param pdf
    *        The PDF file to process.
-   * @throws IOException
+   * @throws IceciteException
    *         if something went wrong on processing the PDF file.
    */
-  public void parsePdf(File pdf) throws IOException {
+  public void parsePdf(File pdf) throws IceciteException {
     try (PDDocument doc = PDDocument.load(pdf)) {
       handlePdfFileStart(pdf);
       for (int i = 0; i < doc.getPages().getCount(); i++) {
         processPage(doc.getPages().get(i), i + 1);
       }
       handlePdfFileEnd(pdf);
+    } catch (IOException e) {
+      throw new IceciteParseException("Couldn't parse the PDF.", e);
     }
   }
 
@@ -294,8 +298,8 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
   protected void processStreamOperators(PDContentStream stream)
       throws IOException {
     List<COSBase> arguments = new ArrayList<COSBase>();
-    PDFStreamParser parser = new PDFStreamParser(stream);
 
+    PDFStreamParser parser = new PDFStreamParser(stream);
     parser.parse();
 
     for (Object token : parser.getTokens()) {
@@ -347,7 +351,7 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
         processor.setStreamEngine(this);
         processor.process(op, args);
       } catch (IOException e) {
-        LOG.error("Error on processing operator " + op.getName(), e);
+        LOG.error("Error on processing operator '" + op + "'. ", e);
       }
     } else {
       LOG.warn("Unsupported operator: " + op);

@@ -263,4 +263,15 @@ public class TxtPdfSerializer implements PdfSerializer {
     }
     return true;
   }
+  
+  // ==========================================================================
+  
+  /**
+   * Returns the output format of this serializer.
+   * 
+   * @return The output format of this serializer.
+   */
+  public static String getOutputFormat() {
+    return "txt";
+  }
 }

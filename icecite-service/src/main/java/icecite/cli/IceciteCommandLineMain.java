@@ -17,7 +17,10 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import icecite.Icecite;
+import icecite.exception.IceciteException;
+import icecite.guice.IceciteCoreModule;
 import icecite.guice.IceciteServiceModule;
+import icecite.parse.stream.pdfbox.guice.OperatorProcessorModule;
 
 /**
  * The main class to manage the Icecite parser from the command line.
@@ -26,14 +29,16 @@ import icecite.guice.IceciteServiceModule;
  */
 public class IceciteCommandLineMain {
   /**
-   * The main method.
+   * The main method to start Icecite from the command line.
    * 
    * @param args
    *        The command line arguments.
    */
   public static void main(String[] args) {
     // Create the injector.
-    Injector injector = Guice.createInjector(new IceciteServiceModule());
+    // TODO: Avoid to inject all needed modules here.
+    Injector injector = Guice.createInjector(new IceciteCoreModule(), 
+        new OperatorProcessorModule(), new IceciteServiceModule());
 
     // Create a new instance of Icecite.
     Icecite icecite = injector.getInstance(Icecite.class);
@@ -67,7 +72,7 @@ public class IceciteCommandLineMain {
       printUsage(hf, options);
       System.exit(1);
     }
-    
+
     // Make sure that there is a path to an output file given.
     String outputFilePath = args.length > 1 ? args[1] : null;
     if (outputFilePath == null || outputFilePath.isEmpty()) {
@@ -75,42 +80,48 @@ public class IceciteCommandLineMain {
       printUsage(hf, options);
       System.exit(1);
     }
-    
+
     // Pass the options to the parser.
-    icecite.setInputFile(Paths.get(inputFilePath));
-    icecite.setOutputFile(Paths.get(outputFilePath));
-    icecite.setOutputFormat(cmd.getOptionValue(OPTION_OUTPUT_FORMAT));
-    
+    icecite.setInputFile(Paths.get(inputFilePath).toAbsolutePath());
+    icecite.setSerializationFile(Paths.get(outputFilePath).toAbsolutePath());
+    icecite.setSerializationFormat(cmd.getOptionValue(OPTION_OUTPUT_FORMAT));
+
     try {
       icecite.run();
-    } catch (Exception e) {
-      System.err.println("An error occured: " + e.getMessage());
-      System.exit(1);
+    } catch (IceciteException e) {
+      String message = e.getMessage();
+      Throwable cause = e.getCause();
+      int statusCode = e.getStatusCode();
+
+      System.err.println("An error occured: " + message);
+      if (cause != null) {
+        cause.printStackTrace();
+      }
+      System.exit(statusCode);
     }
   }
 
   // ===========================================================================
-  
+
   /**
    * Defines the available command line options.
    * 
-   * @return A list of the available command line options. 
+   * @return A list of the available command line options.
    */
   protected static List<Option> defineOptions() {
     List<Option> options = new ArrayList<>();
 
     // Add an option to define the output format.
     options.add(Option.builder()
-      .argName(OPTION_OUTPUT_FORMAT)
-      .longOpt(OPTION_OUTPUT_FORMAT)
-      .hasArg(true)
-      .desc("The output format. One of:.") // TODO: List the choices.
-      .build()
-    );
+        .argName(OPTION_OUTPUT_FORMAT)
+        .longOpt(OPTION_OUTPUT_FORMAT)
+        .hasArg(true)
+        .desc("The output format. One of:.") // TODO: List the choices.
+        .build());
 
     return options;
   }
-  
+
   // ===========================================================================
   // Utility methods.
 

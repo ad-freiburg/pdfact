@@ -1,16 +1,19 @@
 package icecite.parse;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.exception.IceciteException;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfDocument;
 import icecite.models.PdfDocument.PdfDocumentFactory;
+import icecite.models.PdfFigure;
+import icecite.models.PdfPage;
+import icecite.models.PdfShape;
 import icecite.parse.filter.PdfCharacterFilter;
 import icecite.parse.filter.PdfFigureFilter;
 import icecite.parse.filter.PdfShapeFilter;
@@ -19,9 +22,6 @@ import icecite.parse.stream.PdfStreamParser;
 import icecite.parse.stream.PdfStreamParser.PdfStreamParserFactory;
 import icecite.parse.translate.DiacriticsTranslator;
 import icecite.parse.translate.LigaturesTranslator;
-import icecite.models.PdfFigure;
-import icecite.models.PdfPage;
-import icecite.models.PdfShape;
 
 /**
  * A plain implementation of {@link PdfParser}.
@@ -129,12 +129,12 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   // Parse methods.
 
   @Override
-  public PdfDocument parsePdf(Path pdf) throws IOException {
+  public PdfDocument parsePdf(Path pdf) throws IceciteException {
     return parsePdf(pdf != null ? pdf.toFile() : null);
   }
 
   @Override
-  public PdfDocument parsePdf(File pdf) throws IOException {
+  public PdfDocument parsePdf(File pdf) throws IceciteException {
     PdfStreamParser streamParser = this.streamParserFactory.create(this);
 
     // Parse the PDF file.

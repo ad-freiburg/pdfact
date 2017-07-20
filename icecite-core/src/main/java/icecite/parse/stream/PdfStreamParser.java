@@ -1,7 +1,8 @@
 package icecite.parse.stream;
 
 import java.io.File;
-import java.io.IOException;
+
+import icecite.exception.IceciteException;
 
 /**
  * A PDF stream parser.
@@ -14,10 +15,10 @@ public interface PdfStreamParser {
    *
    * @param pdf
    *        The PDF file to parse.
-   * @throws IOException
+   * @throws IceciteException
    *         If something went wrong while parsing the PDF:
    */
-  void parsePdf(File pdf) throws IOException;
+  void parsePdf(File pdf) throws IceciteException;
 
   // ==========================================================================
 

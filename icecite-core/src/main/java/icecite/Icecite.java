@@ -1,15 +1,27 @@
 package icecite;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+import icecite.exception.IceciteException;
+import icecite.exception.IceciteSerializeException;
+import icecite.exception.IceciteValidateException;
+import icecite.exception.IceciteVisualizeException;
 import icecite.models.PdfDocument;
-
-// TODO: Validate the input file.
-// TODO: Validate the output file.
+import icecite.parse.PdfParser.PdfParserFactory;
+import icecite.serialize.PdfSerializer;
+import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
 
 /**
- * The central class of Icecite that can be used to handle and manage the
- * extraction process(es) from PDF file(s).
+ * The main entry point of Icecite. This class can be used to wiring up all
+ * steps needed to handle and manage the extraction process(es) from PDF
+ * file(s).
  * 
  * @author Claudius Korzen
  */
@@ -20,43 +32,192 @@ public class Icecite {
   protected Path inputFile;
 
   /**
-   * The path to the output file.
+   * The path to the output file for the serialization.
    */
-  protected Path outputFile;
+  protected Path serializationFile;
+
+  /**
+   * The path to the output file for the visualization.
+   */
+  protected Path visualizationFile;
 
   /**
    * The output format.
    */
-  protected String outputFormat;
+  protected String serializationFormat = "xml";
 
-  // ===========================================================================
+  /**
+   * The factory to create instances of PdfParser.
+   */
+  protected PdfParserFactory parserFactory;
+
+  /**
+   * The factory to create instances of PdfSerializer.
+   */
+  protected Map<String, Provider<PdfSerializer>> serializers;
+
+  /**
+   * The factory to create instances of PdfVisualizer.
+   */
+  protected PdfVisualizerFactory visualizerFactory;
+  
+  // ==========================================================================
 
   /**
    * The default constructor.
+   * 
+   * @param parserFactory
+   *        The factory to create instances of PdfParser.
+   * @param serializerBindings
+   *        The map of available serializers.
+   * @param visualizerFactory
+   *        The factory to create instances of PdfVisualizer.
    */
-  public Icecite() {
-
+  @Inject
+  public Icecite(PdfParserFactory parserFactory,
+      Map<String, Provider<PdfSerializer>> serializerBindings,
+      PdfVisualizerFactory visualizerFactory) {
+    this.parserFactory = parserFactory;
+    this.serializers = serializerBindings;
+    this.visualizerFactory = visualizerFactory;
   }
 
-  // ===========================================================================
+  // ==========================================================================
 
   /**
    * Starts the extraction process.
    * 
    * @return The parsed PDF document.
+   * 
+   * @throws IceciteException
+   *         If something went wrong on the extraction process.
    */
-  public PdfDocument run() {
-    System.out.println(this.inputFile + " " + this.outputFile + " "
-        + getOutputFormat());
-    return null;
+  public PdfDocument run() throws IceciteException {
+    PdfDocument document = parse(this.inputFile);
+    if (this.serializationFile != null) {
+      serialize(document, this.serializationFile);
+    }
+    if (this.visualizationFile != null) {
+      visualize(document, this.visualizationFile);
+    }
+
+    return document;
   }
 
-  // ===========================================================================
+  /**
+   * Parses the given input PDF file.
+   *
+   * @param file
+   *        The input file to parse.
+   *
+   * @return The parsed PDF document.
+   * 
+   * @throws IceciteException
+   *         If something went wrong on parsing the file.
+   */
+  protected PdfDocument parse(Path file) throws IceciteException {
+    // Check if there is an input file given.
+    if (file == null) {
+      throw new IceciteValidateException("No input file given.");
+    }
+
+    // Check if the file exists.
+    if (!Files.isRegularFile(file)) {
+      throw new IceciteValidateException("The input file doesn't exist.");
+    }
+
+    // Check if the file exists.
+    if (!Files.isReadable(file)) {
+      throw new IceciteValidateException("The input file can't be read.");
+    }
+
+    return this.parserFactory.create().parsePdf(file);
+  }
+
+  /**
+   * Serializes the given PDF document to the given target file.
+   * 
+   * @param pdf
+   *        The PDF document to serialize.
+   * @param target
+   *        The path to the target file for the serialization.
+   *
+   * @throws IceciteException
+   *         If something went wrong on serializing the PDF document.
+   */
+  protected void serialize(PdfDocument pdf, Path target)
+      throws IceciteException {
+    // Check if the serialization file already exists.
+    if (Files.exists(target)) {
+      // Make sure that the existing serialization file is a regular file.
+      if (!Files.isRegularFile(target)) {
+        throw new IceciteValidateException(
+            "The serialization file already exists, but is no regular file.");
+      }
+
+      // Make sure that the existing serialization file is writable.
+      if (!Files.isWritable(target)) {
+        throw new IceciteValidateException(
+            "The serialization file already exists, but isn't writable.");
+      }
+    }
+
+    // Check if the serialization format is valid.
+    if (!this.serializers.containsKey(this.serializationFormat)) {
+      throw new IceciteValidateException("The serialization format '"
+          + this.serializationFormat + "' is not valid.");
+    }
+    
+    // Serialize the PDF document.
+    try (OutputStream os = Files.newOutputStream(target)) {
+      this.serializers.get(this.serializationFormat).get().serialize(pdf, os);
+    } catch (IOException e) {
+      throw new IceciteSerializeException("Couldn't open file '" + target + "'.", e);
+    }
+  }
+
+  /**
+   * Visualizes the given PDF document to the given target file.
+   * 
+   * @param pdf
+   *        The PDF document to visualize.
+   * @param target
+   *        The path to the target file for the visualization.
+   *
+   * @throws IceciteException
+   *         If something went wrong on visualizing the PDF document.
+   */
+  protected void visualize(PdfDocument pdf, Path target)
+      throws IceciteException {
+    // Check if the visualization file already exists.
+    if (Files.exists(target)) {
+      // Make sure that the existing visualization file is a regular file.
+      if (!Files.isRegularFile(target)) {
+        throw new IceciteValidateException(
+            "The visualization file already exists, but is no regular file.");
+      }
+
+      // Make sure that the existing visualization file is writable.
+      if (!Files.isWritable(target)) {
+        throw new IceciteValidateException(
+            "The visualization file already exists, but isn't writable.");
+      }
+    }
+    
+    // Serialize the PDF document.
+    try (OutputStream os = Files.newOutputStream(target)) {
+      this.visualizerFactory.create().visualize(pdf, os);
+    } catch (IOException e) {
+      throw new IceciteVisualizeException("Couldn't open file '" + target + "'.", e);
+    }
+  }
+
+  // ==========================================================================
   // Setters methods.
 
   /**
    * Sets the input file to process.
-   *  
+   * 
    * @param inputFile
    *        The input file to process.
    */
@@ -65,76 +226,75 @@ public class Icecite {
   }
 
   /**
-   * Sets the output file to process.
+   * Sets the path to the output file for the serialization.
    * 
-   * @param outputFile
-   *        The output file to process.
+   * @param serializationFile
+   *        The path to the output file for the serialization.
    */
-  public void setOutputFile(Path outputFile) {
-    this.outputFile = outputFile;
+  public void setSerializationFile(Path serializationFile) {
+    this.serializationFile = serializationFile;
   }
 
   /**
-   * Sets the output format to use.
+   * Sets the format to use on serialization.
    * 
-   * @param outputFormat
-   *        The output format to use.
+   * @param serializationFormat
+   *        The format to use on serialization.
    */
-  public void setOutputFormat(String outputFormat) {
-    this.outputFormat = outputFormat;
+  public void setSerializationFormat(String serializationFormat) {
+    this.serializationFormat = serializationFormat;
   }
 
-  // ===========================================================================
+  /**
+   * Sets the path to the output file for the visualization.
+   * 
+   * @param visualizationFile
+   *        The path to the output file for the visualization.
+   */
+  public void setVisualizationFile(Path visualizationFile) {
+    this.visualizationFile = visualizationFile;
+  }
+
+  // ==========================================================================
   // Getter methods.
 
   /**
-   * Returns the input file.
+   * Returns the path to the input file.
    * 
-   * @return The input file.
+   * @return The path to the input file.
    */
   public Path getInputFile() {
     return this.inputFile;
   }
 
   /**
-   * Returns the output file.
+   * Returns the path to the output file for the serialization.
    * 
-   * @return The output file.
+   * @return The path to the output file for the serialization.
    */
-  public Path getOutputFile() {
-    return this.outputFile;
+  public Path getSerializationFile() {
+    return this.serializationFile;
   }
 
   /**
-   * Returns the output format.
+   * Returns the format to use on the serialization.
    * 
-   * @return The output format.
+   * @return The format to use on the serialization.
    */
-  public String getOutputFormat() {
-    return this.outputFormat;
+  public String getSerializationFormat() {
+    return this.serializationFormat;
   }
 
-  // ===========================================================================
+  /**
+   * Returns the path to the output file for the visualization.
+   * 
+   * @return The path to the output file for the visualization.
+   */
+  public Path getVisualizationFile() {
+    return this.visualizationFile;
+  }
 
-  // /**
-  // * The input PDF file.
-  // */
-  // protected static Path inputPdf;
-  //
-  // /**
-  // * The output file for serialization.
-  // */
-  // protected static Path outputSerialization;
-  //
-  // /**
-  // * The output file for visualization.
-  // */
-  // protected static Path outputVisualization;
-  //
-  // /**
-  // * The parser.
-  // */
-  // protected static PdfParser pdfParser;
+  // ==========================================================================
 
   // /**
   // * The main method.
