@@ -103,6 +103,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     if (os == null) {
       return;
     }
+    
     // The used fonts on serializing the PDF document.
     this.usedFonts = new HashSet<>();
     // The used colors on serializing the PDF document.
@@ -197,6 +198,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     JSONArray figures = new JSONArray();
     JSONArray shapes = new JSONArray();
 
+    
     // Serialize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
       if (isSerializePdfElement(block, features, roles)) {

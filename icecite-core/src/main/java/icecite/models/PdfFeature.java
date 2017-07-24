@@ -17,32 +17,32 @@ public enum PdfFeature {
   /**
    * The feature that describes paragraphs.
    */
-  PARAGRAPH("paragraph"),
+  PARAGRAPH("paragraphs"),
 
   /**
    * The feature that describes text lines.
    */
-  TEXT_LINE("line"),
+  TEXT_LINE("lines"),
 
   /**
    * The feature that describes words.
    */
-  WORD("word"),
+  WORD("words"),
 
   /**
    * The feature that describes characters.
    */
-  CHARACTER("character"),
+  CHARACTER("characters"),
 
   /**
    * The feature that describes figures.
    */
-  FIGURE("figure"),
+  FIGURE("figures"),
 
   /**
    * The feature that describes shapes.
    */
-  SHAPE("shape");
+  SHAPE("shapes");
 
   /**
    * The name of this feature.
@@ -77,7 +77,7 @@ public enum PdfFeature {
     features = new HashMap<>();
 
     for (PdfFeature feature : values()) {
-      features.put(feature.name(), feature);
+      features.put(feature.getName(), feature);
     }
   }
 
@@ -106,14 +106,14 @@ public enum PdfFeature {
    * 
    * @param names
    *        The names of features to fetch.
-   * @return The list of fetched features.
+   * @return A set of fetched features.
    */
-  public static List<PdfFeature> fromNames(String... names) {
+  public static Set<PdfFeature> fromNames(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
-    List<PdfFeature> features = new ArrayList<>();
+    Set<PdfFeature> features = new HashSet<>();
     for (String name : names) {
       PdfFeature feature = fromName(name);
       if (feature != null) {

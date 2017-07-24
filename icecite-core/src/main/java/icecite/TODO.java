@@ -17,4 +17,5 @@ public class TODO {
   // TODO: In PdfElementList, accelerate cut method.
   // TODO: Write a PDColorTranslator, as for PDFont
   // TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
+  // TODO: On serialization and visualization, characters are not available if tokenizer was called.
 }

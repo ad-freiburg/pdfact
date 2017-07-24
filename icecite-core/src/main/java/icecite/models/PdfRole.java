@@ -1,7 +1,11 @@
 package icecite.models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -122,6 +126,79 @@ public enum PdfRole {
    */
   public String getName() {
     return this.name;
+  }
+  
+  // ==========================================================================
+  
+  /**
+   * The roles by name.
+   */
+  protected static Map<String, PdfRole> roles;
+
+  static {
+    roles = new HashMap<>();
+
+    for (PdfRole role : values()) {
+      roles.put(role.getName(), role);
+    }
+  }
+  
+  /**
+   * Returns a list with the names of all roles.
+   * 
+   * @return A list with the names of all roles.
+   */
+  public static List<String> getNames() {
+    return new ArrayList<>(roles.keySet());
+  }
+  
+  /**
+   * Returns true, if the given name is a valid name of an existing role.
+   * 
+   * @param name
+   *        The name to check.
+   * @return True, if the given name is a valid name of an existing role.
+   */
+  public static boolean isValidRole(String name) {
+    return roles.containsKey(name.toLowerCase());
+  }
+  
+  /**
+   * Returns the roles that are associated with the given names.
+   * 
+   * @param names
+   *        The names of roles to fetch.
+   * @return A set of fetched roles.
+   */
+  public static Set<PdfRole> fromNames(String... names) {
+    if (names == null || names.length == 0) {
+      return null;
+    }
+
+    Set<PdfRole> roles = new HashSet<>();
+    for (String name : names) {
+      PdfRole role = fromName(name);
+      if (role != null) {
+        roles.add(role);
+      }
+    }
+    return roles;
+  }
+  
+  /**
+   * Returns the role that is associated with the given name.
+   * 
+   * @param name
+   *        The name of the role to fetch.
+   * @return The role that is associated with the given name.
+   */
+  public static PdfRole fromName(String name) {
+    if (!isValidRole(name)) {
+      throw new IllegalArgumentException(
+          "\"" + name + "\" is not a valid feature");
+    }
+
+    return roles.get(name.toLowerCase());
   }
   
   /**
