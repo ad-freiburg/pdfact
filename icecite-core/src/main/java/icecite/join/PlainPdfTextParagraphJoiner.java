@@ -1,4 +1,4 @@
-package icecite.tokenize;
+package icecite.join;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +16,11 @@ import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
 
 /**
- * A plain implementation of {@link PdfParagraphTokenizer}.
+ * A plain implementation of {@link PdfTextParagraphJoiner}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
+public class PlainPdfTextParagraphJoiner implements PdfTextParagraphJoiner {
   /**
    * The factory to create instances of {@link PdfParagraph}.
    */
@@ -29,20 +29,20 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   // ==========================================================================
 
   /**
-   * Creates a new {@link PlainPdfParagraphTokenizer}.
+   * Creates a new {@link PlainPdfTextParagraphJoiner}.
    * 
    * @param paragraphFactory
    *        The factory to create instances of {@link PdfParagraph}.
    */
   @Inject
-  public PlainPdfParagraphTokenizer(PdfParagraphFactory paragraphFactory) {
+  public PlainPdfTextParagraphJoiner(PdfParagraphFactory paragraphFactory) {
     this.paragraphFactory = paragraphFactory;
   }
 
   // ==========================================================================
 
   @Override
-  public List<PdfParagraph> tokenize(PdfDocument pdf) {
+  public List<PdfParagraph> join(PdfDocument pdf) {
     if (pdf == null) {
       return null;
     }

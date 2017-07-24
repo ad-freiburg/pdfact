@@ -8,7 +8,7 @@ import icecite.models.PdfDocument;
  * 
  * @author Claudius Korzen
  */
-public interface PdfPageTokenizer {
+public interface PdfTextTokenizer {
   /**
    * Identifies text blocks, text lines and words in each page of the given PDF
    * document.
@@ -16,5 +16,19 @@ public interface PdfPageTokenizer {
    * @param pdf
    *        The PDF document to process.
    */
-  void tokenizePdfPages(PdfDocument pdf);
+  void tokenize(PdfDocument pdf);
+  
+  /**
+   * The factory to create instance of {@link PdfTextTokenizer}.
+   * 
+   * @author Claudius Korzen
+   */
+  public interface PdfTextTokenizerFactory {
+    /**
+     * Creates a PdfTokenizer.
+     * 
+     * @return An instance of {@link PdfTextTokenizer}.
+     */
+    PdfTextTokenizer create();
+  }
 }

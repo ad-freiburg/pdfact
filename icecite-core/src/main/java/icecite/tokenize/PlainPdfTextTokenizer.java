@@ -18,11 +18,11 @@ import icecite.utils.comparators.MinXComparator;
 import icecite.utils.comparators.MinYComparator;
 
 /**
- * A plain implementation of {@link PdfPageTokenizer}.
+ * A plain implementation of {@link PdfTextTokenizer}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfPageTokenizer implements PdfPageTokenizer {
+public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   /**
    * The text area tokenizer.
    */
@@ -36,7 +36,7 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
   /**
    * The word tokenizer.
    */
-  protected PdfWordTokenizer wordTokenizer;
+  protected PdfTextWordTokenizer wordTokenizer;
 
   /**
    * The text block tokenizer.
@@ -59,8 +59,8 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
    *        The tokenizer to identify paragraphs.
    */
   @Inject
-  public PlainPdfPageTokenizer(PdfTextAreaTokenizer textBlockTokenizer,
-      PdfTextLineTokenizer textLineTokenizer, PdfWordTokenizer wordTokenizer,
+  public PlainPdfTextTokenizer(PdfTextAreaTokenizer textBlockTokenizer,
+      PdfTextLineTokenizer textLineTokenizer, PdfTextWordTokenizer wordTokenizer,
       PdfTextBlockTokenizer paragraphTokenizer) {
     this.textAreaTokenizer = textBlockTokenizer;
     this.textLineTokenizer = textLineTokenizer;
@@ -71,7 +71,7 @@ public class PlainPdfPageTokenizer implements PdfPageTokenizer {
   // ==========================================================================
 
   @Override
-  public void tokenizePdfPages(PdfDocument document) {
+  public void tokenize(PdfDocument document) {
     if (document == null) {
       return;
     }

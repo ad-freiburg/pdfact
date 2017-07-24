@@ -17,12 +17,12 @@ import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.tokenize.xycut.XYCut;
 
 /**
- * An implementation of {@link PdfWordTokenizer} based on XYCut.
+ * An implementation of {@link PdfTextWordTokenizer} based on XYCut.
  * 
  * @author Claudius Korzen
  */
-public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
-    implements PdfWordTokenizer {
+public class XYCutPdfTextWordTokenizer extends XYCut<PdfWord>
+    implements PdfTextWordTokenizer {
   /**
    * The factory to create instances of {@link PdfPositionFactory}.
    */
@@ -51,7 +51,7 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
    *        The factory to create instance of {@link PdfWord}.
    */
   @Inject
-  public XYCutPdfWordTokenizer(PdfPositionFactory positionFactory, 
+  public XYCutPdfTextWordTokenizer(PdfPositionFactory positionFactory, 
       PdfWordListFactory wordListFactory, PdfWordFactory wordFactory) {
     super();
     this.positionFactory = positionFactory;

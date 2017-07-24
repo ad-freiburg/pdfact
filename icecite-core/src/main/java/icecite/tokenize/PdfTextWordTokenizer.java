@@ -10,7 +10,7 @@ import icecite.models.PdfWordList;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWordTokenizer {
+public interface PdfTextWordTokenizer {
   /**
    * Tokenizes the given text line into words.
    * 

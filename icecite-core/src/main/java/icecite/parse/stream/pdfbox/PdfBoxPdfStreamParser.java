@@ -351,10 +351,10 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
         processor.setStreamEngine(this);
         processor.process(op, args);
       } catch (IOException e) {
-        LOG.error("Error on processing operator '" + op + "'. ", e);
+        LOG.warn("Error on processing operator '" + op + "'. ", e);
       }
     } else {
-      LOG.warn("Unsupported operator: " + op);
+      LOG.trace("Unsupported operator: " + op);
     }
   }
 

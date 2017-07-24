@@ -1,5 +1,7 @@
 package icecite.cli;
 
+import java.io.ByteArrayOutputStream;
+
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -47,6 +49,7 @@ public class IceciteCommandLineInterface {
   // TODO: List the choices in the usage.
   @Option(
     name = "--format",
+    metaVar = "<format>",
     usage = "The output format.")
   protected String outputFormat;
 
@@ -55,6 +58,7 @@ public class IceciteCommandLineInterface {
    */
   @Option(
     name = "--visualize",
+    metaVar = "<path>",
     usage = "The path to the visualization file.")
   protected String visualizationFilePath;
 
@@ -64,6 +68,7 @@ public class IceciteCommandLineInterface {
   // TODO: List the choices in the usage.
   @Option(
     name = "--feature",
+    metaVar = "<feature>",
     handler = StringArrayOptionHandler.class,
     usage = "The feature(s) to extract.")
   protected String[] features = {};
@@ -74,11 +79,24 @@ public class IceciteCommandLineInterface {
   // TODO: List the choices in the usage.
   @Option(
     name = "--role",
+    metaVar = "<role>",
     handler = StringArrayOptionHandler.class,
     usage = "The role(s) to consider on extraction.")
   protected String[] roles = {};
 
   // ==========================================================================
+
+  /**
+   * The parser to parse the command line arguments.
+   */
+  protected CmdLineParser parser;
+
+  /**
+   * The default constructor.
+   */
+  public IceciteCommandLineInterface() {
+    this.parser = new CmdLineParser(this);
+  }
 
   /**
    * Runs this command line interface.
@@ -93,7 +111,7 @@ public class IceciteCommandLineInterface {
    */
   public void run(String[] args) throws CmdLineException, IceciteException {
     // Parse the command line arguments.
-    new CmdLineParser(this).parseArgument(args);
+    this.parser.parseArgument(args);
 
     // Create the injector.
     // TODO: Avoid to inject all needed modules here.
@@ -102,10 +120,10 @@ public class IceciteCommandLineInterface {
 
     // Create a new instance of Icecite and pass the parameters to it.
     Icecite icecite = injector.getInstance(Icecite.class);
-    
+
     icecite.setInputFilePath(this.inputFilePath);
     icecite.setSerializationFilePath(this.outputFilePath);
-    
+
     if (this.outputFormat != null) {
       icecite.setSerializationFormat(this.outputFormat);
     }
@@ -118,8 +136,24 @@ public class IceciteCommandLineInterface {
     if (this.roles != null && this.roles.length > 0) {
       icecite.setRoles(this.roles);
     }
-    
+
     icecite.run();
+  }
+
+  /**
+   * Returns the usage info for this command line interface.
+   * 
+   * @return The usage info for this command line interface.
+   */
+  public String getUsageInfo() {
+    String usageHeader = "Usage: java -jar *.jar [<options>] inputFile outputFile\n";
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      baos.write(usageHeader.getBytes(), 0, usageHeader.length());
+      this.parser.printUsage(baos);
+      return baos.toString("utf-8");
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   // ==========================================================================
@@ -132,24 +166,34 @@ public class IceciteCommandLineInterface {
    *        The command line arguments.
    */
   public static void main(String[] args) {
-    try {
-      new IceciteCommandLineInterface().run(args);
-    } catch (IceciteException e) {
-      String message = e.getMessage();
-      Throwable cause = e.getCause();
-      int statusCode = e.getStatusCode();
+    int statusCode = 0;
+    String errorMessage = null;
+    Throwable errorCause = null;
+    boolean showUsageInfo = false;
 
-      System.err.println("An error occured: " + message);
-      if (cause != null) {
-        cause.printStackTrace();
-      }
-      System.exit(statusCode);
+    IceciteCommandLineInterface cli = new IceciteCommandLineInterface();
+    try {
+      cli.run(args);
+    } catch (IceciteException e) {
+      errorMessage = e.getMessage();
+      errorCause = e.getCause();
+      statusCode = e.getStatusCode();
     } catch (CmdLineException e) {
-      System.err.println("An error occured: " + e.getMessage());
-      // TODO: Print usage.
-      // parser.printUsage(System.out);
-      System.exit(1);
+      errorMessage = e.getMessage();
+      errorCause = e.getCause();
+      statusCode = 1;
+      showUsageInfo = true;
     }
 
+    if (statusCode != 0) {
+      System.err.println("An error occured: " + errorMessage);
+      if (errorCause != null) {
+        errorCause.printStackTrace();
+      }
+      if (showUsageInfo) {
+        System.out.println(cli.getUsageInfo());
+      }
+    }
+    System.exit(statusCode);
   }
 }

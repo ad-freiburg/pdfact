@@ -5,6 +5,12 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 
+import icecite.join.PdfTextJoiner;
+import icecite.join.PdfTextJoiner.PdfTextJoinerFactory;
+import icecite.join.PdfTextParagraphJoiner.PdfTextParagraphJoinerFactory;
+import icecite.join.PdfTextParagraphJoiner;
+import icecite.join.PlainPdfTextJoiner;
+import icecite.join.PlainPdfTextParagraphJoiner;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
@@ -74,20 +80,17 @@ import icecite.serialize.JsonPdfSerializer;
 import icecite.serialize.PdfSerializer;
 import icecite.serialize.TxtPdfSerializer;
 import icecite.serialize.XmlPdfSerializer;
-import icecite.tokenize.PdfDocumentTokenizer;
-import icecite.tokenize.PdfPageTokenizer;
-import icecite.tokenize.PdfParagraphTokenizer;
+import icecite.tokenize.PdfTextTokenizer;
+import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import icecite.tokenize.PdfTextAreaTokenizer;
 import icecite.tokenize.PdfTextBlockTokenizer;
 import icecite.tokenize.PdfTextLineTokenizer;
-import icecite.tokenize.PdfWordTokenizer;
-import icecite.tokenize.PlainPdfDocumentTokenizer;
-import icecite.tokenize.PlainPdfPageTokenizer;
-import icecite.tokenize.PlainPdfParagraphTokenizer;
+import icecite.tokenize.PdfTextWordTokenizer;
+import icecite.tokenize.PlainPdfTextTokenizer;
 import icecite.tokenize.PlainPdfTextBlockTokenizer;
 import icecite.tokenize.XYCutPdfTextAreaTokenizer;
 import icecite.tokenize.XYCutPdfTextLineTokenizer;
-import icecite.tokenize.XYCutPdfWordTokenizer;
+import icecite.tokenize.XYCutPdfTextWordTokenizer;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
@@ -122,17 +125,18 @@ public class IceciteCoreModule extends AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    bind(PdfDocumentTokenizer.class).to(PlainPdfDocumentTokenizer.class);
-    bind(PdfPageTokenizer.class).to(PlainPdfPageTokenizer.class);
+    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class, PlainPdfTextTokenizer.class);
     bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
-    bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
+    bind(PdfTextWordTokenizer.class).to(XYCutPdfTextWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
-    bind(PdfParagraphTokenizer.class).to(PlainPdfParagraphTokenizer.class);
 
     // Bind the semanticizer.
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
         PlainPdfTextSemanticizer.class);
+
+    fc(PdfTextJoiner.class, PdfTextJoinerFactory.class, PlainPdfTextJoiner.class);
+    fc(PdfTextParagraphJoiner.class, PdfTextParagraphJoinerFactory.class, PlainPdfTextParagraphJoiner.class);
 
     // Bind the PDF model factories.
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);

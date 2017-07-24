@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -16,22 +18,20 @@ import icecite.exception.IceciteException;
 import icecite.exception.IceciteSerializeException;
 import icecite.exception.IceciteValidateException;
 import icecite.exception.IceciteVisualizeException;
+import icecite.join.PdfTextJoiner.PdfTextJoinerFactory;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFeature;
 import icecite.models.PdfRole;
 import icecite.parse.PdfParser.PdfParserFactory;
 import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.serialize.PdfSerializer;
-import icecite.tokenize.PdfDocumentTokenizer;
-import icecite.tokenize.PdfPageTokenizer;
+import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import icecite.visualize.PdfVisualizer;
 import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
 
-// TODO: Log output.
-
 /**
- * The main entry point of Icecite. This class wires up all necessary steps 
- * in order to handle the extraction process(es) from PDF file(s).
+ * The main entry point of Icecite. This class wires up all necessary steps in
+ * order to handle the extraction process(es) from PDF file(s).
  * 
  * @author Claudius Korzen
  */
@@ -42,9 +42,9 @@ public class Icecite {
   protected PdfParserFactory parserFactory;
 
   /**
-   * The tokenizer.
+   * The factory to create instances of PdfTokenizer.
    */
-  protected PdfPageTokenizer pageTokenizer; // TODO: Create a factory.
+  protected PdfTextTokenizerFactory tokenizerFactory;
 
   /**
    * The factory to create instances of PdfTextSemanticizer.
@@ -52,9 +52,9 @@ public class Icecite {
   protected PdfTextSemanticizerFactory semanticizerFactory;
 
   /**
-   * The document tokenizer.
+   * The factory to create instances of PdfTextJoiner.
    */
-  protected PdfDocumentTokenizer documentTokenizer; // TODO: Create a factory.
+  protected PdfTextJoinerFactory textJoinerFactory;
 
   /**
    * The available classes of type PdfSerializer, per output format.
@@ -66,23 +66,28 @@ public class Icecite {
    */
   protected PdfVisualizerFactory visualizerFactory;
 
+  /**
+   * The logger.
+   */
+  protected static Logger LOG = Logger.getLogger(Icecite.class);
+  
   // ==========================================================================
   // The input arguments defined by the user.
 
   /**
    * The path to the input file.
    */
-  protected Path inputFilePath;
+  protected Path inputFile;
 
   /**
    * The path to the output file for the serialization.
    */
-  protected Path serializationFilePath;
+  protected Path serializationFile;
 
   /**
    * The path to the output file for the visualization.
    */
-  protected Path visualizationFilePath;
+  protected Path visualizationFile;
 
   /**
    * The serialization format.
@@ -106,27 +111,28 @@ public class Icecite {
    * 
    * @param parserFactory
    *        The factory to create instances of PdfParser.
-   * @param pageTokenizer
-   *        The page tokenizer.
+   * @param tokenizerFactory
+   *        The factory to create instances of PdfTokenizer.
    * @param semanticizerFactory
    *        The factory to create instances of PdfTextSemanticizer.
-   * @param documentTokenizer
-   *        The document tokenizer.
+   * @param textJoinerFactory
+   *        The factory to create instances of PdfTextJoinerFactory.
    * @param serializers
    *        The map of all available serializers.
    * @param visualizerFactory
    *        The factory to create instances of PdfVisualizer.
    */
   @Inject
-  public Icecite(PdfParserFactory parserFactory, PdfPageTokenizer pageTokenizer,
+  public Icecite(PdfParserFactory parserFactory,
+      PdfTextTokenizerFactory tokenizerFactory,
       PdfTextSemanticizerFactory semanticizerFactory,
-      PdfDocumentTokenizer documentTokenizer,
+      PdfTextJoinerFactory textJoinerFactory,
       Map<String, Provider<PdfSerializer>> serializers,
       PdfVisualizerFactory visualizerFactory) {
     this.parserFactory = parserFactory;
-    this.pageTokenizer = pageTokenizer;
+    this.tokenizerFactory = tokenizerFactory;
     this.semanticizerFactory = semanticizerFactory;
-    this.documentTokenizer = documentTokenizer;
+    this.textJoinerFactory = textJoinerFactory;
     this.serializers = serializers;
     this.visualizerFactory = visualizerFactory;
   }
@@ -140,9 +146,40 @@ public class Icecite {
    *         If something went wrong on the extraction process.
    */
   public PdfDocument run() throws IceciteException {
+    long start = System.currentTimeMillis();
+    LOG.info("Welcome to Icecite.");
+    LOG.info("--------------------------------------------------------------");
+    LOG.info("Arguments:");
+    LOG.info("--------------------------------------------------------------");
+    LOG.info("Input: " + this.inputFile);
+    if (this.serializationFile != null) {
+      LOG.info("Serialization target: " + this.serializationFile);
+      LOG.info("Serialization format: " + this.serializationFormat);
+    }
+    if (this.visualizationFile != null) {
+      LOG.info("Visualization target: " + this.visualizationFile);
+    }
+    LOG.info("Features: " + (this.features != null ? this.features : "none"));
+    LOG.info("Roles: " + (this.roles != null ? this.roles : "none"));
+    LOG.info("--------------------------------------------------------------");
+    LOG.info("Progress:");
+    LOG.info("--------------------------------------------------------------");
+    
+    // Parse the PDF "as it is".
     PdfDocument pdf = parse();
+    // Tokenize the PDF into words, lines and text blocks.
+    tokenize(pdf);
+    // Identify the semantics of text blocks.
+    semanticize(pdf);
+    // Join the text blocks to paragraphs.
+    join(pdf);
+    // Serialize the PDF document to file.
     serialize(pdf);
+    // Visualize the PDF document.
     visualize(pdf);
+    
+    long end = System.currentTimeMillis();
+    LOG.info("Finished in " + (end - start) + " ms.");
     return pdf;
   }
 
@@ -157,13 +194,54 @@ public class Icecite {
    *         If something went wrong on parsing the input file.
    */
   protected PdfDocument parse() throws IceciteException {
+    LOG.info("Parsing the PDF...");
+    
     // Check if a (validated) input path is given.
-    if (this.inputFilePath == null) {
+    if (this.inputFile == null) {
       throw new IceciteValidateException("No input file given.");
     }
-    return this.parserFactory.create().parsePdf(this.inputFilePath);
+    return this.parserFactory.create().parsePdf(this.inputFile);
   }
 
+  /**
+   * Tokenizes the given PDF document into words, lines and text blocks.
+   * 
+   * @param pdf The PDF document to process.
+   * 
+   * @throws IceciteException
+   *         If something went wrong on tokenizing the PDF.
+   */
+  protected void tokenize(PdfDocument pdf) throws IceciteException {
+    LOG.info("Identifying words, text lines and text blocks...");
+    this.tokenizerFactory.create().tokenize(pdf);
+  }
+  
+  /**
+   * Identifies the semantic of text blocks in the given PDF document.
+   * 
+   * @param pdf The PDF document to process.
+   * 
+   * @throws IceciteException
+   *         If something went wrong on identifying the semantics.
+   */
+  protected void semanticize(PdfDocument pdf) throws IceciteException {
+    LOG.info("Identifying the semantics of the text blocks...");
+    this.semanticizerFactory.create(pdf).semanticize();
+  }
+  
+  /**
+   * Joins the text blocks in the given PDF document to paragraphs.
+   * 
+   * @param pdf The PDF document to process.
+   * 
+   * @throws IceciteException
+   *         If something went wrong on joining the text blocks.
+   */
+  protected void join(PdfDocument pdf) throws IceciteException {
+    LOG.info("Identifying the text paragraphs...");
+    this.textJoinerFactory.create().join(pdf);
+  }
+  
   /**
    * Serializes the given PDF document to the given target file.
    * 
@@ -175,26 +253,27 @@ public class Icecite {
    */
   protected void serialize(PdfDocument pdf) throws IceciteException {
     // Check if a (validated) input path is given.
-    Path file = this.serializationFilePath;
+    Path file = this.serializationFile;
     if (file == null) {
-      // Abort, but don't throw an exception, because serialization is optional.
+      // Don't throw an exception, because serialization is optional.
       return;
     }
-    
+
+    LOG.info("Serializing...");
     // Check if a (validated) serialization format is given.
     String format = this.serializationFormat;
     if (format == null) {
       throw new IceciteValidateException("No serialization format given.");
     }
-    
+
     // Obtain the serializer to use.
     Provider<PdfSerializer> serializerProvider = this.serializers.get(format);
     if (serializerProvider == null) {
       throw new IceciteSerializeException(
           "Couldn't find a serializer for the format '" + format + "'.");
     }
-    
-    // Serialize the PDF document.
+
+    // Serialize the PDF document.    
     try (OutputStream os = Files.newOutputStream(file)) {
       serializerProvider.get().serialize(pdf, os, this.features, this.roles);
     } catch (IOException e) {
@@ -214,14 +293,16 @@ public class Icecite {
    */
   protected void visualize(PdfDocument pdf) throws IceciteException {
     // Check if a (validated) input path is given.
-    Path file = this.visualizationFilePath;
+    Path file = this.visualizationFile;
     if (file == null) {
-      // Abort, but don't throw an exception, because visualization is optional.
+      // Don't throw an exception, because visualization is optional.
       return;
     }
     
+    LOG.info("Visualizing...");
+    
     // Create the visualizer and visualize the PDF document.
-    PdfVisualizer visualizer = this.visualizerFactory.create(); 
+    PdfVisualizer visualizer = this.visualizerFactory.create();
     try (OutputStream os = Files.newOutputStream(file)) {
       visualizer.visualize(pdf, os, this.features, this.roles);
     } catch (IOException e) {
@@ -234,7 +315,7 @@ public class Icecite {
   // Setters methods.
 
   /**
-   * Sets the path to the input file to process.
+   * Validates and sets the path to the input file to process.
    * 
    * @param path
    *        The path to the input file to process.
@@ -260,18 +341,18 @@ public class Icecite {
       throw new IceciteValidateException(
           "The input file '" + path + "' is not a regular file.");
     }
-    
+
     // Check if the file exists.
     if (!Files.isReadable(file)) {
       throw new IceciteValidateException(
           "The input file '" + path + "' can't be read.");
     }
 
-    this.inputFilePath = file;
+    this.inputFile = file;
   }
 
   /**
-   * Sets the path to the output file for the serialization.
+   * Validates and sets the path to the output file for the serialization.
    * 
    * @param path
    *        The path to the output file for the serialization.
@@ -300,12 +381,11 @@ public class Icecite {
             "The serialization file already exists, but isn't writable.");
       }
     }
-
-    this.serializationFilePath = file;
+    this.serializationFile = file;
   }
 
   /**
-   * Sets the format to use on serialization.
+   * Validates and sets the format to use on serialization.
    * 
    * @param format
    *        The format to use on serialization.
@@ -328,10 +408,11 @@ public class Icecite {
   }
 
   /**
-   * Sets the path to the output file for the visualization.
+   * Validates and sets the output file for the visualization.
    * 
    * @param path
    *        The path to the output file for the visualization.
+   *
    * @throws IceciteException
    *         If the given path is not valid.
    */
@@ -356,11 +437,11 @@ public class Icecite {
             "The visualization file already exists, but isn't writable.");
       }
     }
-    this.visualizationFilePath = file;
+    this.visualizationFile = file;
   }
 
   /**
-   * Sets the features to extract.
+   * Validates and sets the features to extract.
    * 
    * @param features
    *        The names of features to extract.
@@ -383,15 +464,15 @@ public class Icecite {
       }
       featureSet.add(PdfFeature.fromName(feature));
     }
-
     this.features = featureSet;
   }
 
   /**
-   * Sets the roles to consider.
+   * Validates and sets the given roles to consider.
    * 
    * @param roles
    *        The names of roles to consider.
+   *
    * @throws IceciteException
    *         If at least one of the given roles is not valid.
    */
@@ -410,7 +491,6 @@ public class Icecite {
       }
       roleSet.add(PdfRole.fromName(role));
     }
-
     this.roles = roleSet;
   }
 
@@ -418,21 +498,21 @@ public class Icecite {
   // Getter methods.
 
   /**
-   * Returns the path to the input file.
+   * Returns the input file.
    * 
-   * @return The path to the input file.
+   * @return The input file.
    */
-  public Path getInputFilePath() {
-    return this.inputFilePath;
+  public Path getInputFile() {
+    return this.inputFile;
   }
 
   /**
-   * Returns the path to the output file for the serialization.
+   * Returns the output file for the serialization.
    * 
-   * @return The path to the output file for the serialization.
+   * @return The output file for the serialization.
    */
-  public Path getSerializationFilePath() {
-    return this.serializationFilePath;
+  public Path getSerializationFile() {
+    return this.serializationFile;
   }
 
   /**
@@ -445,12 +525,12 @@ public class Icecite {
   }
 
   /**
-   * Returns the path to the output file for the visualization.
+   * Returns the output file for the visualization.
    * 
-   * @return The path to the output file for the visualization.
+   * @return The output file for the visualization.
    */
-  public Path getVisualizationFilePath() {
-    return this.visualizationFilePath;
+  public Path getVisualizationFile() {
+    return this.visualizationFile;
   }
 
   /**

@@ -2,3 +2,6 @@ icecite
 injector
 serializers
 serializer
+tokenizer
+tokenizes
+tokenizing
