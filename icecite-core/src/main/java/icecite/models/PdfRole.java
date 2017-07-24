@@ -1,10 +1,8 @@
 package icecite.models;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -148,8 +146,8 @@ public enum PdfRole {
    * 
    * @return A list with the names of all roles.
    */
-  public static List<String> getNames() {
-    return new ArrayList<>(roles.keySet());
+  public static Set<String> getNames() {
+    return roles.keySet();
   }
   
   /**

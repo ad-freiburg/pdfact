@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -449,9 +450,9 @@ public class Icecite {
    * @throws IceciteException
    *         If at least one of the given features is not valid.
    */
-  public void setFeatures(String[] features) throws IceciteException {
+  public void setFeatures(List<String> features) throws IceciteException {
     // Check if at least one feature is given.
-    if (features == null || features.length == 0) {
+    if (features == null || features.size() == 0) {
       throw new IceciteValidateException("No features given.");
     }
 
@@ -476,9 +477,9 @@ public class Icecite {
    * @throws IceciteException
    *         If at least one of the given roles is not valid.
    */
-  public void setRoles(String[] roles) throws IceciteException {
+  public void setRoles(List<String> roles) throws IceciteException {
     // Check if at least one role is given.
-    if (roles == null || roles.length == 0) {
+    if (roles == null || roles.size() == 0) {
       throw new IceciteValidateException("No roles given.");
     }
 
@@ -525,6 +526,15 @@ public class Icecite {
   }
 
   /**
+   * Returns the supported serialization formats.
+   * 
+   * @return The supported serialization formats.
+   */
+  public Set<String> getSerializationFormatChoices() {
+    return this.serializers.keySet();
+  }
+  
+  /**
    * Returns the output file for the visualization.
    * 
    * @return The output file for the visualization.
@@ -543,11 +553,29 @@ public class Icecite {
   }
 
   /**
+   * Returns the features to extract.
+   * 
+   * @return The list of features to extract.
+   */
+  public Set<String> getFeatureNameChoices() {
+    return PdfFeature.getNames();
+  }
+  
+  /**
    * Returns the roles to consider.
    * 
    * @return The list of roles to consider.
    */
   public Set<PdfRole> getRoles() {
     return this.roles;
+  }
+  
+  /**
+   * Returns the features to extract.
+   * 
+   * @return The list of features to extract.
+   */
+  public Set<String> getRoleNameChoices() {
+    return PdfRole.getNames();
   }
 }

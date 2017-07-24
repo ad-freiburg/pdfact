@@ -1,12 +1,9 @@
 package icecite.cli;
 
-import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Set;
 
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.spi.StringArrayOptionHandler;
+import org.apache.log4j.Logger;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -16,6 +13,11 @@ import icecite.exception.IceciteException;
 import icecite.guice.IceciteCoreModule;
 import icecite.guice.IceciteServiceModule;
 import icecite.parse.stream.pdfbox.guice.OperatorProcessorModule;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.Argument;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 
 /**
  * The command line interface of Icecite.
@@ -24,141 +26,42 @@ import icecite.parse.stream.pdfbox.guice.OperatorProcessorModule;
  */
 public class IceciteCommandLineInterface {
   /**
-   * The path to the input PDF file.
+   * The logger.
    */
-  @Argument(
-    index = 0,
-    required = true,
-    metaVar = "inputFile",
-    usage = "The path to the input PDF file.")
-  protected String inputFilePath;
-
+  static Logger LOG = Logger.getLogger(IceciteCommandLineInterface.class);
+  
   /**
-   * The path to the output file.
+   * The name of the option to define the input file.
    */
-  @Argument(
-    index = 1,
-    required = true,
-    metaVar = "outputFile",
-    usage = "The path to the output file.")
-  protected String outputFilePath;
-
+  protected static final String INPUT_FILE_OPTION = "inputFile";
+  
   /**
-   * The output format.
+   * The name of the option to define the output file.
    */
-  // TODO: List the choices in the usage.
-  @Option(
-    name = "--format",
-    metaVar = "<format>",
-    usage = "The output format.")
-  protected String outputFormat;
-
+  protected static final String OUTPUT_FILE_OPTION = "outputFile";
+  
   /**
-   * The path to the visualization file.
+   * The name of the option to define the output format.
    */
-  @Option(
-    name = "--visualize",
-    metaVar = "<path>",
-    usage = "The path to the visualization file.")
-  protected String visualizationFilePath;
-
+  protected static final String OUTPUT_FORMAT_OPTION = "format";
+  
   /**
-   * The feature(s) to extract.
+   * The name of the option to define the visualization file.
    */
-  // TODO: List the choices in the usage.
-  @Option(
-    name = "--feature",
-    metaVar = "<feature>",
-    handler = StringArrayOptionHandler.class,
-    usage = "The feature(s) to extract.")
-  protected String[] features = {};
-
+  protected static final String VISUALIZATION_FILE_OPTION = "visualize";
+  
   /**
-   * The role(s) to consider on extraction.
+   * The name of the option to define a feature.
    */
-  // TODO: List the choices in the usage.
-  @Option(
-    name = "--role",
-    metaVar = "<role>",
-    handler = StringArrayOptionHandler.class,
-    usage = "The role(s) to consider on extraction.")
-  protected String[] roles = {};
-
+  protected static final String FEATURE_OPTION = "feature";
+  
+  /**
+   * The name of the option to define a semantic role.
+   */
+  protected static final String ROLE_OPTION = "role";
+  
   // ==========================================================================
-
-  /**
-   * The parser to parse the command line arguments.
-   */
-  protected CmdLineParser parser;
-
-  /**
-   * The default constructor.
-   */
-  public IceciteCommandLineInterface() {
-    this.parser = new CmdLineParser(this);
-  }
-
-  /**
-   * Runs this command line interface.
-   * 
-   * @param args
-   *        The command line arguments.
-   * @throws CmdLineException
-   *         If parsing the command line arguments has failed.
-   * @throws IceciteException
-   *         If running Icecite using the given arguments has failed.
-   * 
-   */
-  public void run(String[] args) throws CmdLineException, IceciteException {
-    // Parse the command line arguments.
-    this.parser.parseArgument(args);
-
-    // Create the injector.
-    // TODO: Avoid to inject all needed modules here.
-    Injector injector = Guice.createInjector(new IceciteCoreModule(),
-        new OperatorProcessorModule(), new IceciteServiceModule());
-
-    // Create a new instance of Icecite and pass the parameters to it.
-    Icecite icecite = injector.getInstance(Icecite.class);
-
-    icecite.setInputFilePath(this.inputFilePath);
-    icecite.setSerializationFilePath(this.outputFilePath);
-
-    if (this.outputFormat != null) {
-      icecite.setSerializationFormat(this.outputFormat);
-    }
-    if (this.visualizationFilePath != null) {
-      icecite.setVisualizationFilePath(this.visualizationFilePath);
-    }
-    if (this.features != null && this.features.length > 0) {
-      icecite.setFeatures(this.features);
-    }
-    if (this.roles != null && this.roles.length > 0) {
-      icecite.setRoles(this.roles);
-    }
-
-    icecite.run();
-  }
-
-  /**
-   * Returns the usage info for this command line interface.
-   * 
-   * @return The usage info for this command line interface.
-   */
-  public String getUsageInfo() {
-    String usageHeader = "Usage: java -jar *.jar [<options>] inputFile outputFile\n";
-    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      baos.write(usageHeader.getBytes(), 0, usageHeader.length());
-      this.parser.printUsage(baos);
-      return baos.toString("utf-8");
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-  // ==========================================================================
-  // The main method.
-
+  
   /**
    * The main method that starts the command line interface.
    * 
@@ -166,34 +69,110 @@ public class IceciteCommandLineInterface {
    *        The command line arguments.
    */
   public static void main(String[] args) {
-    int statusCode = 0;
-    String errorMessage = null;
-    Throwable errorCause = null;
-    boolean showUsageInfo = false;
+    // Create the injector.
+    // TODO: Avoid to inject all needed modules here.
+    Injector injector = Guice.createInjector(new IceciteCoreModule(),
+        new OperatorProcessorModule(), new IceciteServiceModule());
 
-    IceciteCommandLineInterface cli = new IceciteCommandLineInterface();
+    // Create an instance of Icecite.
+    Icecite icecite = injector.getInstance(Icecite.class);
+
+    // Create the argument parser.
+    ArgumentParser argParser = createArgumentParser(icecite);
+
+    // Parse the command line arguments.
+    Namespace ns = null;
     try {
-      cli.run(args);
-    } catch (IceciteException e) {
-      errorMessage = e.getMessage();
-      errorCause = e.getCause();
-      statusCode = e.getStatusCode();
-    } catch (CmdLineException e) {
-      errorMessage = e.getMessage();
-      errorCause = e.getCause();
-      statusCode = 1;
-      showUsageInfo = true;
+      ns = argParser.parseArgs(args);
+    } catch (ArgumentParserException e) {
+      argParser.handleError(e);
+      System.exit(1);
     }
 
-    if (statusCode != 0) {
-      System.err.println("An error occured: " + errorMessage);
-      if (errorCause != null) {
-        errorCause.printStackTrace();
+    try {
+      // Set the path to the input file.
+      icecite.setInputFilePath(ns.getString(INPUT_FILE_OPTION));
+      
+      // Set the path to the output file.
+      icecite.setSerializationFilePath(ns.getString(OUTPUT_FILE_OPTION));
+      
+      // Set the output format if it is given.
+      String outputFormat = ns.getString(OUTPUT_FORMAT_OPTION);
+      if (outputFormat != null) {
+        icecite.setSerializationFormat(outputFormat);
       }
-      if (showUsageInfo) {
-        System.out.println(cli.getUsageInfo());
+      
+      // Set the path to the visualization path if it is given.
+      String visualizationFilePath = ns.getString(VISUALIZATION_FILE_OPTION);
+      if (visualizationFilePath != null) {
+        icecite.setVisualizationFilePath(visualizationFilePath);
       }
+      
+      // Set the features to extract.
+      List<String> features = ns.getList(FEATURE_OPTION);
+      if (features != null) {
+        icecite.setFeatures(features);
+      }
+      
+      // Set the roles to consider on extraction.
+      List<String> roles = ns.getList(ROLE_OPTION);
+      if (roles != null) {
+        icecite.setRoles(roles);
+      }
+      
+      // Run Icecite.
+      icecite.run();
+    } catch (IceciteException e) {
+      LOG.error("An error occured: " + e.getMessage(), e.getCause());
+      System.exit(e.getStatusCode());
     }
-    System.exit(statusCode);
+  }
+
+  /**
+   * Creates an argument parser for the given instance of Icecite.
+   * 
+   * @param icecite
+   *        The instance of Icecite to process.
+   * @return The created argument parser.
+   */
+  protected static ArgumentParser createArgumentParser(Icecite icecite) {
+    ArgumentParser parser = ArgumentParsers.newArgumentParser("Icecite");
+
+    Argument inputFile = parser.addArgument(INPUT_FILE_OPTION);
+    inputFile.required(true);
+    inputFile.help("The path to the input file.");
+    
+    Argument outputFile = parser.addArgument(OUTPUT_FILE_OPTION);
+    outputFile.required(true);
+    outputFile.help("The path to the output file.");
+    
+    Argument outputFormat = parser.addArgument("--" + OUTPUT_FORMAT_OPTION);
+    Set<String> formatChoices = icecite.getSerializationFormatChoices();
+    outputFormat.choices(formatChoices);
+    outputFormat.required(false);
+    outputFormat.help("The output format, one of " + formatChoices + ".");
+    outputFormat.metavar("<FORMAT>");
+    
+    Argument visFile = parser.addArgument("--" + VISUALIZATION_FILE_OPTION);
+    visFile.required(false);
+    visFile.help("The path to the visualization file.");
+    visFile.metavar("<FILE>");
+    
+    Argument features = parser.addArgument("--" + FEATURE_OPTION);
+    features.choices(icecite.getFeatureNameChoices());
+    features.required(false);
+    features.nargs("*");
+    features.help("The feature(s) to extract. Choices: " 
+        + icecite.getFeatureNameChoices());
+    features.metavar("<FEATURE>", "<FEATURE>");
+    
+    Argument roles = parser.addArgument("--" + ROLE_OPTION);
+    roles.choices(icecite.getRoleNameChoices());
+    roles.required(false);
+    roles.nargs("*");
+    roles.help("The semantic role(s) to consider on extraction. Choices: " 
+        + icecite.getRoleNameChoices());
+    roles.metavar("<ROLE>", "<ROLE>");
+    return parser;
   }
 }
