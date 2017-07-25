@@ -2,7 +2,6 @@ package icecite.semanticize.plain.modules;
 
 import com.google.inject.Inject;
 
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfRole;
@@ -18,7 +17,7 @@ public class BodyTextHeadingModule extends SectionHeadingModule {
    * Creates a new BodyTextHeadingModule.
    * 
    * @param charListFactory
-   *        The factory to create instance of {@link PdfCharacterList}.
+   *        The factory to create instance of PdfCharacterList.
    */
   @Inject
   public BodyTextHeadingModule(PdfCharacterListFactory charListFactory) {

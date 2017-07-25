@@ -10,7 +10,6 @@ import icecite.models.PdfFontFace;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.utils.counter.FloatCounter;
-import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.textlines.PdfTextLineUtils;
 
@@ -47,7 +46,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    * Creates a new PlainPdfTextLineList.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
+   *        The factory to create instances of Rectangle.
    * @param initialCapacity
    *        The initial capacity of this list.
    */

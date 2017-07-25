@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
@@ -30,7 +29,7 @@ public class AbstractHeadingModule extends SectionHeadingModule {
    * Creates a new AbstractHeadingModule.
    * 
    * @param charListFactory
-   *        The factory to create instance of {@link PdfCharacterList}.
+   *        The factory to create instance of PdfCharacterList.
    */
   @Inject
   public AbstractHeadingModule(PdfCharacterListFactory charListFactory) {

@@ -38,6 +38,11 @@ import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
  */
 public class Icecite {
   /**
+   * The logger.
+   */
+  protected static final Logger LOG = Logger.getLogger(Icecite.class);
+  
+  /**
    * The factory to create instances of PdfParser.
    */
   protected PdfParserFactory parserFactory;
@@ -66,11 +71,6 @@ public class Icecite {
    * The factory to create instances of PdfVisualizer.
    */
   protected PdfVisualizerFactory visualizerFactory;
-
-  /**
-   * The logger.
-   */
-  protected static Logger LOG = Logger.getLogger(Icecite.class);
   
   // ==========================================================================
   // The input arguments defined by the user.
@@ -201,6 +201,7 @@ public class Icecite {
     if (this.inputFile == null) {
       throw new IceciteValidateException("No input file given.");
     }
+    
     return this.parserFactory.create().parsePdf(this.inputFile);
   }
 
@@ -214,6 +215,7 @@ public class Icecite {
    */
   protected void tokenize(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying words, text lines and text blocks...");
+    
     this.tokenizerFactory.create().tokenize(pdf);
   }
   
@@ -227,6 +229,7 @@ public class Icecite {
    */
   protected void semanticize(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying the semantics of the text blocks...");
+    
     this.semanticizerFactory.create(pdf).semanticize();
   }
   
@@ -240,6 +243,7 @@ public class Icecite {
    */
   protected void join(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying the text paragraphs...");
+    
     this.textJoinerFactory.create().join(pdf);
   }
   
@@ -485,12 +489,11 @@ public class Icecite {
 
     // Check if all given roles are valid.
     Set<PdfRole> roleSet = new HashSet<>();
-    for (String role : roles) {
-      if (!PdfFeature.isValidFeature(role)) {
-        throw new IceciteValidateException(
-            "The role '" + role + "' is not valid.");
+    for (String r : roles) {
+      if (!PdfRole.isValidRole(r)) {
+        throw new IceciteValidateException("The role '" + r + "' isn't valid.");
       }
-      roleSet.add(PdfRole.fromName(role));
+      roleSet.add(PdfRole.fromName(r));
     }
     this.roles = roleSet;
   }
@@ -553,9 +556,9 @@ public class Icecite {
   }
 
   /**
-   * Returns the features to extract.
+   * Returns the names of the supported features.
    * 
-   * @return The list of features to extract.
+   * @return The names of the supported features.
    */
   public Set<String> getFeatureNameChoices() {
     return PdfFeature.getNames();
@@ -571,9 +574,9 @@ public class Icecite {
   }
   
   /**
-   * Returns the features to extract.
+   * Returns the names of the supported semantic roles.
    * 
-   * @return The list of features to extract.
+   * @return The names of the supported semantic roles.
    */
   public Set<String> getRoleNameChoices() {
     return PdfRole.getNames();

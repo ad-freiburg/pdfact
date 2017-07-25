@@ -8,7 +8,6 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfPosition;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
@@ -72,7 +71,7 @@ public class XYCutPdfTextLineTokenizer extends XYCut<PdfTextLine>
   /**
    * Creates a new text line tokenizer.
    * @param positionFactory 
-   *        The factory to create instance of {@link PdfPosition}.
+   *        The factory to create instance of PdfPosition.
    * @param textLineListFactory
    *        The factory to create instance of {@link PdfTextLineList}.
    * @param textLineFactory

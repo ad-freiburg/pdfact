@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import com.google.inject.assistedinject.Assisted;
 
 import icecite.exception.IceciteException;
-import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
 
 /**
@@ -48,14 +47,14 @@ public interface PdfParser {
    */
   public interface PdfParserFactory {
     /**
-     * Creates a PdfCharacter.
+     * Creates a PdfParser.
      * 
-     * @return An instance of {@link PdfCharacter}.
+     * @return An instance of PdfParser.
      */
     PdfParser create();
 
     /**
-     * Creates a PdfCharacter.
+     * Creates a PdfParser.
      * 
      * @param resolveLigatures
      *        The boolean flag to indicate whether ligatures should be resolved
@@ -64,7 +63,7 @@ public interface PdfParser {
      *        The boolean flag to indicate whether characters with diacritics
      *        should be resolved or not.
      * 
-     * @return An instance of {@link PdfCharacter}.
+     * @return An instance of PdfParser.
      */
     PdfParser create(@Assisted("resolveLigatures") boolean resolveLigatures,
         @Assisted("resolveDiacritics") boolean resolveDiacritics);

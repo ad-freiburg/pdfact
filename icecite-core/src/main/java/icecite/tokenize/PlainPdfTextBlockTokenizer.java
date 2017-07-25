@@ -10,12 +10,10 @@ import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
 import icecite.models.PdfPage;
-import icecite.models.PdfPosition;
 import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.models.PdfTextLine;
-import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
@@ -29,7 +27,7 @@ import icecite.utils.textlines.PdfTextLineUtils;
  */
 public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
-   * The factory to create instances of {@link PdfTextLineFactory}.
+   * The factory to create instances of PdfTextLineFactory.
    */
   protected PdfTextLineListFactory textLineFactory;
 
@@ -58,7 +56,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @param textBlockFactory
    *        The factory to create instances of {@link PdfTextBlock}.
    * @param positionFactory
-   *        The factory to create instances of {@link PdfPosition}.
+   *        The factory to create instances of PdfPosition.
    */
   @Inject
   public PlainPdfTextBlockTokenizer(PdfTextLineListFactory textLineFactory,

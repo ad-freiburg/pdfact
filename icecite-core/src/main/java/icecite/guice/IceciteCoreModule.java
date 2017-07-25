@@ -125,7 +125,8 @@ public class IceciteCoreModule extends AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class, PlainPdfTextTokenizer.class);
+    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class,
+        PlainPdfTextTokenizer.class);
     bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
     bind(PdfTextWordTokenizer.class).to(XYCutPdfTextWordTokenizer.class);
@@ -135,8 +136,10 @@ public class IceciteCoreModule extends AbstractModule {
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
         PlainPdfTextSemanticizer.class);
 
-    fc(PdfTextJoiner.class, PdfTextJoinerFactory.class, PlainPdfTextJoiner.class);
-    fc(PdfTextParagraphJoiner.class, PdfTextParagraphJoinerFactory.class, PlainPdfTextParagraphJoiner.class);
+    fc(PdfTextJoiner.class, PdfTextJoinerFactory.class,
+        PlainPdfTextJoiner.class);
+    fc(PdfTextParagraphJoiner.class, PdfTextParagraphJoinerFactory.class,
+        PlainPdfTextParagraphJoiner.class);
 
     // Bind the PDF model factories.
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);
@@ -180,11 +183,10 @@ public class IceciteCoreModule extends AbstractModule {
     binder.addBinding().to(ReferencesHeadingModule.class);
     binder.addBinding().to(BodyTextHeadingModule.class);
     binder.addBinding().to(BodyTextModule.class);
-    
-    
+
     MapBinder<String, PdfSerializer> serializerBinder = MapBinder
         .newMapBinder(binder(), String.class, PdfSerializer.class);
-    
+
     // Bind the serializers.
     serializerBinder.addBinding(TxtPdfSerializer.getOutputFormat())
         .to(TxtPdfSerializer.class);
@@ -192,7 +194,7 @@ public class IceciteCoreModule extends AbstractModule {
         .to(XmlPdfSerializer.class);
     serializerBinder.addBinding(JsonPdfSerializer.getOutputFormat())
         .to(JsonPdfSerializer.class);
-    
+
     // Bind the visualizer.
     fc(PdfDrawer.class, PdfDrawerFactory.class, PdfBoxDrawer.class);
     fc(PdfVisualizer.class, PdfVisualizerFactory.class,

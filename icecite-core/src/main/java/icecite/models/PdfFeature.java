@@ -53,7 +53,7 @@ public enum PdfFeature {
    * @param name
    *        The name of the feature.
    */
-  private PdfFeature(String name) {
+  PdfFeature(String name) {
     this.name = name;
   }
 

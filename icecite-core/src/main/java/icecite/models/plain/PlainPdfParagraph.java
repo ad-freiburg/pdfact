@@ -9,7 +9,6 @@ import icecite.models.PdfParagraph;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
-import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 // TODO: Do not extend the bounding box in the model.
@@ -37,9 +36,9 @@ public class PlainPdfParagraph implements PdfParagraph {
    * Creates an empty paragraph.
    * 
    * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
+   *        The factory to create instances of Rectangle.
    * @param wordListFactory
-   *        The factory to create instances of {@link PdfWordList}.
+   *        The factory to create instances of PdfWordList.
    */
   @AssistedInject
   public PlainPdfParagraph(RectangleFactory rectangleFactory,

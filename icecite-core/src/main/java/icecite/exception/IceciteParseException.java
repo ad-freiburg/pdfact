@@ -14,7 +14,7 @@ public class IceciteParseException extends IceciteException {
   /**
    * The default status code of this exception.
    */
-  protected static final int statusCode = 20;
+  protected static final int STATUS_CODE = 20;
 
   /**
    * The default constructor.
@@ -23,7 +23,7 @@ public class IceciteParseException extends IceciteException {
    *        The message of this exception.
    */
   public IceciteParseException(String message) {
-    super(statusCode, message);
+    super(STATUS_CODE, message);
   }
 
   /**
@@ -35,6 +35,6 @@ public class IceciteParseException extends IceciteException {
    *        The cause of this exception.
    */
   public IceciteParseException(String message, Throwable cause) {
-    super(statusCode, message, cause);
+    super(STATUS_CODE, message, cause);
   }
 }

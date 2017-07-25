@@ -60,7 +60,8 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
    */
   @Inject
   public PlainPdfTextTokenizer(PdfTextAreaTokenizer textBlockTokenizer,
-      PdfTextLineTokenizer textLineTokenizer, PdfTextWordTokenizer wordTokenizer,
+      PdfTextLineTokenizer textLineTokenizer,
+      PdfTextWordTokenizer wordTokenizer,
       PdfTextBlockTokenizer paragraphTokenizer) {
     this.textAreaTokenizer = textBlockTokenizer;
     this.textLineTokenizer = textLineTokenizer;
@@ -117,7 +118,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
 
     // Compute the texts for text blocks, text lines and words.
     computeTexts2(page);
-    
+
     // Tokenize the page into text blocks.
     page.setTextBlocks(tokenizeIntoTextBlocks(pdf, page));
 

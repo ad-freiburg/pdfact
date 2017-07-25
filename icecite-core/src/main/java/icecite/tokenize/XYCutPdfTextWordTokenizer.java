@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfPosition;
 import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
@@ -44,7 +43,7 @@ public class XYCutPdfTextWordTokenizer extends XYCut<PdfWord>
   /**
    * Creates a new word tokenizer.
    * @param positionFactory 
-   *        The factory to create instance of {@link PdfPosition}.
+   *        The factory to create instance of PdfPosition.
    * @param wordListFactory
    *        The factory to create instance of {@link PdfWordList}.
    * @param wordFactory
