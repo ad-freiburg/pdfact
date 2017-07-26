@@ -1,14 +1,13 @@
 package icecite.guice;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 
 import icecite.join.PdfTextJoiner;
 import icecite.join.PdfTextJoiner.PdfTextJoinerFactory;
-import icecite.join.PdfTextParagraphJoiner.PdfTextParagraphJoinerFactory;
 import icecite.join.PdfTextParagraphJoiner;
+import icecite.join.PdfTextParagraphJoiner.PdfTextParagraphJoinerFactory;
 import icecite.join.PlainPdfTextJoiner;
 import icecite.join.PlainPdfTextParagraphJoiner;
 import icecite.models.PdfCharacter;
@@ -68,26 +67,30 @@ import icecite.parse.stream.pdfbox.PdfBoxPdfStreamParser;
 import icecite.semanticize.PdfTextSemanticizer;
 import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.semanticize.plain.PlainPdfTextSemanticizer;
-import icecite.semanticize.plain.modules.AbstractHeadingModule;
-import icecite.semanticize.plain.modules.AcknowledgmentsHeadingModule;
-import icecite.semanticize.plain.modules.AppendixHeadingModule;
-import icecite.semanticize.plain.modules.BodyTextHeadingModule;
+import icecite.semanticize.plain.modules.AbstractModule;
+import icecite.semanticize.plain.modules.AcknowledgmentsModule;
 import icecite.semanticize.plain.modules.BodyTextModule;
+import icecite.semanticize.plain.modules.CaptionModule;
+import icecite.semanticize.plain.modules.CategoriesModule;
+import icecite.semanticize.plain.modules.FootnoteModule;
+import icecite.semanticize.plain.modules.GeneralTermsModule;
+import icecite.semanticize.plain.modules.HeadingModule;
+import icecite.semanticize.plain.modules.KeywordsModule;
 import icecite.semanticize.plain.modules.PdfTextSemanticizerModule;
-import icecite.semanticize.plain.modules.ReferencesHeadingModule;
+import icecite.semanticize.plain.modules.ReferencesModule;
 import icecite.semanticize.plain.modules.TitleModule;
 import icecite.serialize.JsonPdfSerializer;
 import icecite.serialize.PdfSerializer;
 import icecite.serialize.TxtPdfSerializer;
 import icecite.serialize.XmlPdfSerializer;
-import icecite.tokenize.PdfTextTokenizer;
-import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import icecite.tokenize.PdfTextAreaTokenizer;
 import icecite.tokenize.PdfTextBlockTokenizer;
 import icecite.tokenize.PdfTextLineTokenizer;
+import icecite.tokenize.PdfTextTokenizer;
+import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import icecite.tokenize.PdfTextWordTokenizer;
-import icecite.tokenize.PlainPdfTextTokenizer;
 import icecite.tokenize.PlainPdfTextBlockTokenizer;
+import icecite.tokenize.PlainPdfTextTokenizer;
 import icecite.tokenize.XYCutPdfTextAreaTokenizer;
 import icecite.tokenize.XYCutPdfTextLineTokenizer;
 import icecite.tokenize.XYCutPdfTextWordTokenizer;
@@ -115,7 +118,7 @@ import icecite.visualize.pdfbox.PdfBoxDrawer;
  * 
  * @author Claudius Korzen
  */
-public class IceciteCoreModule extends AbstractModule {
+public class IceciteCoreModule extends com.google.inject.AbstractModule {
 
   @Override
   protected void configure() {
@@ -177,11 +180,15 @@ public class IceciteCoreModule extends AbstractModule {
 
     // Bind semantic role testers.
     binder.addBinding().to(TitleModule.class);
-    binder.addBinding().to(AbstractHeadingModule.class);
-    binder.addBinding().to(AcknowledgmentsHeadingModule.class);
-    binder.addBinding().to(AppendixHeadingModule.class);
-    binder.addBinding().to(ReferencesHeadingModule.class);
-    binder.addBinding().to(BodyTextHeadingModule.class);
+    binder.addBinding().to(HeadingModule.class);
+    binder.addBinding().to(AbstractModule.class);
+    binder.addBinding().to(KeywordsModule.class);
+    binder.addBinding().to(CategoriesModule.class);
+    binder.addBinding().to(GeneralTermsModule.class);
+    binder.addBinding().to(AcknowledgmentsModule.class);
+    binder.addBinding().to(ReferencesModule.class);
+    binder.addBinding().to(CaptionModule.class);
+    binder.addBinding().to(FootnoteModule.class);
     binder.addBinding().to(BodyTextModule.class);
 
     MapBinder<String, PdfSerializer> serializerBinder = MapBinder

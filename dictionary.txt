@@ -5,3 +5,12 @@ serializer
 tokenizer
 tokenizes
 tokenizing
+tokenize
+diacritic
+claudius
+korzen
+diacritics
+ligatures
+semanticizes
+semanticize
+semanticizer

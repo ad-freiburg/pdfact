@@ -8,90 +8,31 @@ import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
 
 /**
- * A semantic role tester that tests for the role "title".
+ * A module that identifies the text blocks with the semantic role "title".
  * 
  * @author Claudius Korzen
  */
-public class TitleModule extends PdfTextSemanticizerModule {
-  /**
-   * The title candidate of the given PDF document.
-   */
-  protected PdfTextBlock titleCandidate;
-  
-  /**
-   * A boolean flag that indicates whether the title was already found for the
-   * given PDF document.
-   */
-  protected boolean isTitleFound;
-  
-  // ==========================================================================
-
+public class TitleModule implements PdfTextSemanticizerModule {
   @Override
-  public void setPdfDocument(PdfDocument pdf) {
-    super.setPdfDocument(pdf);
-    // Find the title candidate.
-    this.titleCandidate = findTitleCandidate();
-    this.isTitleFound = false;
-  }
-  
-  // ==========================================================================
-
-  @Override
-  public boolean test(PdfTextBlock block) {
-    // Check if the title was already found.
-    if (this.isTitleFound) {
-      return false;
-    }
-        
-    if (block == null) {
-      return false;
+  public void semanticize(PdfDocument pdf) {
+    if (pdf == null) {
+      return;
     }
     
-    // Do *not* overwrite an existing role.
-    if (block.getRole() != null) {
-      return false;
-    }
-    
-    // Check if the block is equal to the found title candidate.
-    if (block == this.titleCandidate) {
-      this.isTitleFound = true;
-      return true;
-    }
-    
-    return false;
-  }
-
-  @Override
-  public PdfRole getRole() {
-    return PdfRole.TITLE;
-  }
-  
-  // ==========================================================================
-  
-  /**
-   * Searches the PDF document for a title candidate.
-   * 
-   * @return The title candidate.
-   */
-  protected PdfTextBlock findTitleCandidate() {
-    if (this.pdf == null) {
-      return null;
-    }
-    
-    List<PdfPage> pages = this.pdf.getPages();
+    List<PdfPage> pages = pdf.getPages();
     if (pages == null || pages.isEmpty()) {
-      return null;
+      return;
     }
     
     // Search the text blocks of only the first page.
     PdfPage firstPage = pages.get(0);
     if (firstPage == null) {
-      return null;
+      return;
     }
     
     List<PdfTextBlock> textBlocks = firstPage.getTextBlocks();
     if (textBlocks == null) {
-      return null;
+      return;
     }
     
     // Find the block with largest font size in the first page.
@@ -110,6 +51,8 @@ public class TitleModule extends PdfTextSemanticizerModule {
       }
     }
     
-    return largestFontSizeBlock;
+    if (largestFontSizeBlock != null) {
+      largestFontSizeBlock.setRole(PdfRole.TITLE);
+    }
   }
 }

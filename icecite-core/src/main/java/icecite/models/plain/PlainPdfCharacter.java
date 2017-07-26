@@ -73,12 +73,12 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public void setPositionInExtractionOrder(int pos) {
+  public void setSequenceNumber(int pos) {
     this.posInExtractionOrder = pos;
   }
 
   @Override
-  public int getPositionInExtractionOrder() {
+  public int getSequenceNumber() {
     return this.posInExtractionOrder;
   }
 

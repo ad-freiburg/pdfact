@@ -26,6 +26,11 @@ public class PlainPdfElement implements PdfElement {
    */
   protected PdfRole role;
 
+  /**
+   * The secondary role of this PDF element.
+   */
+  protected PdfRole secondaryRole;
+
   // ==========================================================================
 
   @Override
@@ -76,6 +81,18 @@ public class PlainPdfElement implements PdfElement {
   @Override
   public void setRole(PdfRole role) {
     this.role = role;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfRole getSecondaryRole() {
+    return this.secondaryRole;
+  }
+
+  @Override
+  public void setSecondaryRole(PdfRole secondaryRole) {
+    this.secondaryRole = secondaryRole;
   }
 
   // ==========================================================================

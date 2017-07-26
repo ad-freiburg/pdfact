@@ -57,12 +57,12 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   /**
    * The predecessor of the current character (needed to resolve diacritics).
    */
-  protected PdfCharacter prevCharacter;
+  protected PdfCharacter prevChar;
 
   /**
    * The predecessor of prevCharacter (needed to resolve diacritics).
    */
-  protected PdfCharacter prevPrevCharacter;
+  protected PdfCharacter prevPrevChar;
 
   /**
    * The boolean flag to indicate whether ligatures should be resolved or not.
@@ -81,19 +81,18 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   /**
    * Creates a new PDF parser.
    * 
-   * @param pdfStreamParserFactory
+   * @param streamParserFactory
    *        The PDF stream parser.
-   * @param pdfDocFactory
+   * @param docFactory
    *        The factory to create instances of PdfDocument.
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
    */
   @AssistedInject
-  public PlainPdfParser(PdfStreamParserFactory pdfStreamParserFactory,
-      PdfDocumentFactory pdfDocFactory,
+  public PlainPdfParser(PdfStreamParserFactory streamParserFactory,
+      PdfDocumentFactory docFactory,
       PdfCharacterListFactory characterListFactory) {
-    this(pdfStreamParserFactory, pdfDocFactory, characterListFactory, true,
-        true);
+    this(streamParserFactory, docFactory, characterListFactory, true, true);
   }
 
   /**
@@ -190,10 +189,10 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   }
 
   @Override
-  public void handlePdfCharacter(PdfCharacter character) {
+  public void handlePdfCharacter(PdfCharacter chaar) {
     // Check if the character is a ligature. If so, resolve it.
     if (isResolveLigatures()) {
-      LigaturesTranslator.resolveLigature(character);
+      LigaturesTranslator.resolveLigature(chaar);
     }
 
     // Check if the character is a diacritic. If so, resolve it.
@@ -210,35 +209,33 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     // (prePreviousCharacter) and (b) the diacritic and the character "behind"
     // the character (the current character).
     if (isResolveDiacritics()) {
-      DiacriticsTranslator.resolveDiacritic(this.prevCharacter,
-          this.prevPrevCharacter, character);
+      DiacriticsTranslator.translate(this.prevChar, this.prevPrevChar, chaar);
     }
 
-    if (!PdfCharacterFilter.filterPdfCharacter(character)) {
-      // TODO
-      character.setPositionInExtractionOrder(this.page.getCharacters().size());
-
-      this.page.addCharacter(character);
-      this.pdfDocument.addCharacter(character);
+    if (!PdfCharacterFilter.filterPdfCharacter(chaar)) {
+      this.page.addCharacter(chaar);
+      this.pdfDocument.addCharacter(chaar);
     }
 
-    this.prevPrevCharacter = this.prevCharacter;
-    this.prevCharacter = character;
+    this.prevPrevChar = this.prevChar;
+    this.prevChar = chaar;
   }
 
   @Override
   public void handlePdfFigure(PdfFigure figure) {
-    if (!PdfFigureFilter.filterPdfFigure(figure)) {
-      this.page.addFigure(figure);
-      this.pdfDocument.addFigure(figure);
+    if (PdfFigureFilter.filterPdfFigure(figure)) {
+      return;
     }
+    this.page.addFigure(figure);
+    this.pdfDocument.addFigure(figure);
   }
 
   @Override
   public void handlePdfShape(PdfShape shape) {
-    if (!PdfShapeFilter.filterPdfShape(shape)) {
-      this.page.addShape(shape);
-      this.pdfDocument.addShape(shape);
+    if (PdfShapeFilter.filterPdfShape(shape)) {
+      return;
     }
+    this.page.addShape(shape);
+    this.pdfDocument.addShape(shape);
   }
 }

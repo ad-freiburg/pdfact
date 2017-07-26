@@ -1,45 +1,19 @@
 package icecite.semanticize.plain.modules;
 
 import icecite.models.PdfDocument;
-import icecite.models.PdfRole;
-import icecite.models.PdfTextBlock;
 
 /**
- * A semantic role tester that tests text blocks if they match a specific
- * semantic role.
+ * A semantic role module that identifies the text blocks of a specific
+ * semantic role in a PDF document.
  * 
  * @author Claudius Korzen
  */
-public abstract class PdfTextSemanticizerModule {
+public interface PdfTextSemanticizerModule {
   /**
-   * The PDF document.
-   */
-  protected PdfDocument pdf;
-
-  /**
-   * Sets the PDF document for this tester.
+   * Identifies the text blocks of a specific semantic role.
    * 
    * @param pdf
-   *        The PDF document.
+   *        The PDF document to semanticize.
    */
-  public void setPdfDocument(PdfDocument pdf) {
-    this.pdf = pdf;
-  }
-
-  /**
-   * Checks if the given text block matches the role defined by getRole().
-   * 
-   * @param block
-   *        The text block to test.
-   * @return True, if the given text block matches the role defined by
-   *         getRole(), false otherwise.
-   */
-  public abstract boolean test(PdfTextBlock block);
-
-  /**
-   * Returns the specific role of this tester.
-   * 
-   * @return The role of this tester.
-   */
-  public abstract PdfRole getRole();
+  public void semanticize(PdfDocument pdf);
 }

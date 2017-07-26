@@ -108,10 +108,10 @@ public class XYCutPdfTextAreaTokenizer extends XYCut<PdfCharacterList>
     Set<PdfCharacter> rightChars = right.getElementsWithSmallestMinX();
 
     for (PdfCharacter leftChar : leftChars) {
-      int leftCharNum = leftChar.getPositionInExtractionOrder();
+      int leftCharNum = leftChar.getSequenceNumber();
       Rectangle leftCharBox = leftChar.getRectangle();
       for (PdfCharacter rightChar : rightChars) {
-        int rightCharNum = rightChar.getPositionInExtractionOrder();
+        int rightCharNum = rightChar.getSequenceNumber();
         Rectangle rightCharNox = rightChar.getRectangle();
 
         // Check if the characters are consecutive.

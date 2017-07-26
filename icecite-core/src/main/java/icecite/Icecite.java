@@ -181,6 +181,7 @@ public class Icecite {
     
     long end = System.currentTimeMillis();
     LOG.info("Finished in " + (end - start) + " ms.");
+    
     return pdf;
   }
 

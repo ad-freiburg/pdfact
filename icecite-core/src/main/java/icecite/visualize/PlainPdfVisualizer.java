@@ -97,24 +97,24 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     
     // Visualize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
-      if (isVisualizePdfElement(block, features, roles)) {
+      // if (isVisualizePdfElement(block, features, roles)) {
         visualizePdfElement(page, block, drawer, Color.RED);
-      }
-      for (PdfTextLine line : block.getTextLines()) {
-        if (isVisualizePdfElement(line, features, roles)) {
-          visualizePdfElement(page, line, drawer, Color.BLUE);
-        }
-        for (PdfWord word : line.getWords()) {
-          if (isVisualizePdfElement(word, features, roles)) {
-            visualizePdfElement(page, word, drawer, Color.ORANGE);
-          }
-          for (PdfCharacter character : word.getCharacters()) {
-            if (isVisualizePdfElement(character, features, roles)) {
-              visualizePdfElement(page, character, drawer, Color.BLUE);
-            }
-          }
-        }
-      }
+      //}
+//      for (PdfTextLine line : block.getTextLines()) {
+//        if (isVisualizePdfElement(line, features, roles)) {
+//          visualizePdfElement(page, line, drawer, Color.BLUE);
+//        }
+//        for (PdfWord word : line.getWords()) {
+//          if (isVisualizePdfElement(word, features, roles)) {
+//            visualizePdfElement(page, word, drawer, Color.ORANGE);
+//          }
+//          for (PdfCharacter character : word.getCharacters()) {
+//            if (isVisualizePdfElement(character, features, roles)) {
+//              visualizePdfElement(page, character, drawer, Color.BLUE);
+//            }
+//          }
+//        }
+//      }
     }
 
     // Visualize the graphical elements.
@@ -173,7 +173,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
           nonStrokingColor);
       if (element.getRole() != null) {
         // Visualize the role.
-        drawer.drawText(element.getRole().getName(), page.getPageNumber(),
+        drawer.drawText(element.getRole().getIdentifier(), page.getPageNumber(),
             element.getRectangle().getUpperLeft(), strokingColor, 8);
       }
     }

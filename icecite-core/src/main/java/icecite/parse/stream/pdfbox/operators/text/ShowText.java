@@ -1,5 +1,6 @@
 package icecite.parse.stream.pdfbox.operators.text;
 
+import static icecite.parse.PdfParserSettings.FLOATING_NUMBER_PRECISION;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -92,6 +93,12 @@ public class ShowText extends OperatorProcessor {
    */
   protected PDColorConverter colorTranslator;
 
+  /**
+   * The number of already processed characters (needed to define the sequence
+   * number of a character).
+   */
+  protected int sequenceNumber;
+  
   /**
    * Creates a new OperatorProcessor to process the operation "ShowText".
    * 
@@ -239,7 +246,7 @@ public class ShowText extends OperatorProcessor {
     // Compute a bounding box that indeed surrounds the whole glyph, even in
     // case of ascenders (e.g., "l") and descenders (e.g., "g").
     // TODO: Make it faster.
-    Rectangle boundBox = computeGlyphBoundingBox(code, pdFont, trm);
+    Rectangle box = computeGlyphBoundingBox(code, pdFont, trm);
 
     // Compute the bounding box of the glyph by the method of PdfBox, where all
     // bounding boxes in a text line share the same baseline, even in case of
@@ -247,23 +254,23 @@ public class ShowText extends OperatorProcessor {
     // TODO: Make it faster.
     Rectangle pdfBoxBoundBox = computePdfBoxGlyphBoundingBox(code, pdFont, trm);
 
-    if (boundBox != null) {
+    if (box != null) {
       // Bounding boxes need some adjustments.
       if (MathUtils.isEqual(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
         // Don't adjust bounding box if the width is 0.
-        boundBox.setMinX(pdfBoxBoundBox.getMinX());
-        boundBox.setMaxX(pdfBoxBoundBox.getMaxX());
+        box.setMinX(pdfBoxBoundBox.getMinX());
+        box.setMaxX(pdfBoxBoundBox.getMaxX());
       } else if (MathUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
-        if (pdfBoxBoundBox.getMinX() < boundBox.getMinX()) {
-          boundBox.setMinX(pdfBoxBoundBox.getMinX());
+        if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
+          box.setMinX(pdfBoxBoundBox.getMinX());
         }
-        if (pdfBoxBoundBox.getMaxX() > boundBox.getMaxX()) {
-          boundBox.setMaxX(pdfBoxBoundBox.getMaxX());
+        if (pdfBoxBoundBox.getMaxX() > box.getMaxX()) {
+          box.setMaxX(pdfBoxBoundBox.getMaxX());
         }
       }
     } else {
       // Use the bounding box of PdfBox.
-      boundBox = pdfBoxBoundBox;
+      box = pdfBoxBoundBox;
     }
 
     // In some pdfs, fontsize is equal to '1.0' for every character.
@@ -346,24 +353,25 @@ public class ShowText extends OperatorProcessor {
 
     // Convert the font.
     PdfFont font = this.fontTranslator.convert(pdFont);
-    // TODO: Round the font size.
-    fontSize = MathUtils.round(fontSize, 1);
+    // Round the font size.
+    fontSize = MathUtils.round(fontSize, FLOATING_NUMBER_PRECISION);
     PdfFontFace fontFace = this.fontFaceConverter.convert(font, fontSize);
     
-    // TODO: Round the values of boundingbox.
-    boundBox.setMinX(MathUtils.round(boundBox.getMinX(), 1));
-    boundBox.setMinY(MathUtils.round(boundBox.getMinY(), 1));
-    boundBox.setMaxX(MathUtils.round(boundBox.getMaxX(), 1));
-    boundBox.setMaxY(MathUtils.round(boundBox.getMaxY(), 1));
+    // Round the values of boundingbox.
+    box.setMinX(MathUtils.round(box.getMinX(), FLOATING_NUMBER_PRECISION));
+    box.setMinY(MathUtils.round(box.getMinY(), FLOATING_NUMBER_PRECISION));
+    box.setMaxX(MathUtils.round(box.getMaxX(), FLOATING_NUMBER_PRECISION));
+    box.setMaxY(MathUtils.round(box.getMaxY(), FLOATING_NUMBER_PRECISION));
 
-    PdfPosition position = this.positionFactory.create(pdfPage, boundBox);
+    PdfPosition position = this.positionFactory.create(pdfPage, box);
     
     PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontFace(fontFace);
     character.setColor(color);
     character.setPosition(position);
-
+    character.setSequenceNumber(this.sequenceNumber++);
+    
     this.engine.handlePdfCharacter(character);
   }
     

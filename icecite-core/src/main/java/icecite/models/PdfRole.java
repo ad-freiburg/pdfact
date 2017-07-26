@@ -17,17 +17,9 @@ public enum PdfRole {
    */
   ABSTRACT("abstract"),
   /**
-   * The heading of the abstract.
-   */
-  ABSTRACT_HEADING("abstract heading"),
-  /**
    * The acknowledgments.
    */
   ACKNOWLEDGMENTS("acknowledgments"),
-  /**
-   * The heading of the acknowledgments.
-   */
-  ACKNOWLEDGMENTS_HEADING("acknowledgments heading"),
   /**
    * The affiliation.
    */
@@ -37,29 +29,25 @@ public enum PdfRole {
    */
   APPENDIX("appendix"),
   /**
-   * A heading of an appendix.
-   */
-  APPENDIX_HEADING("appendix heading"),
-  /**
    * The authors.
    */
   AUTHORS("authors"),
   /**
    * A part of the body text.
    */
-  BODY_TEXT("body text"),
-  /**
-   * A heading of a body text section.
-   */
-  BODY_TEXT_HEADING("body text heading"),
+  BODY_TEXT("body"),
   /**
    * A caption.
    */
   CAPTION("caption"),
   /**
-   * A caption of a figure.
+   * The categories.
    */
-  FIGURE_CAPTION("figure caption"),
+  CATEGORIES("categories"),
+  /**
+   * A figure.
+   */
+  FIGURE("figure"),
   /**
    * A footnote.
    */
@@ -69,43 +57,56 @@ public enum PdfRole {
    */
   FORMULA("formula"),
   /**
+   * General terms.
+   */
+  GENERAL_TERMS("general-terms"),
+  /**
+   * Heading.
+   */
+  HEADING("heading"),
+  /**
+   * Itemize.
+   */
+  ITEMIZE("itemize"),
+  /**
+   * The keywords.
+   */
+  KEYWORDS("keywords"),
+  /**
    * An item of a list.
    */
-  LIST_ITEM("list item"),
+  LIST_ITEM("list-item"),
   /**
    * A page header.
    */
-  PAGE_HEADER("page header"),
+  PAGE_HEADER("header"),
   /**
    * A page footer.
    */
-  PAGE_FOOTER("page footer"),
-  /**
-   * The title.
-   */
-  TITLE("title"),
+  PAGE_FOOTER("footer"),
   /**
    * A reference.
    */
   REFERENCE("reference"),
   /**
-   * The heading of the references section.
-   */
-  REFERENCES_HEADING("references heading"),
-  /**
    * A table.
    */
   TABLE("table"),
   /**
-   * A caption of a table.
+   * The table of contents.
    */
-  TABLE_CAPTION("table caption");
+  TABLE_OF_CONTENTS("toc"),
+  /**
+   * The title.
+   */
+  TITLE("title");
   
+  // ==========================================================================
   
   /**
-   * The name of this role.
+   * The identifier of this role.
    */
-  protected String name;
+  protected String identifier;
 
   /**
    * Creates a new PDF role.
@@ -114,18 +115,18 @@ public enum PdfRole {
    *        The name of the role.
    */
   PdfRole(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Returns the name of this role.
-   * 
-   * @return The name of this role.
-   */
-  public String getName() {
-    return this.name;
+    this.identifier = name;
   }
   
+  /**
+   * Returns the identifier of this role.
+   * 
+   * @return The identifier of this role.
+   */
+  public String getIdentifier() {
+    return this.identifier;
+  }
+
   // ==========================================================================
   
   /**
@@ -137,7 +138,7 @@ public enum PdfRole {
     roles = new HashMap<>();
 
     for (PdfRole role : values()) {
-      roles.put(role.getName(), role);
+      roles.put(role.getIdentifier(), role);
     }
   }
   

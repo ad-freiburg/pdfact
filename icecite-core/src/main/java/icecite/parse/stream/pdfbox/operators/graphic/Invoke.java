@@ -1,5 +1,6 @@
 package icecite.parse.stream.pdfbox.operators.graphic;
 
+import static icecite.parse.PdfParserSettings.FLOATING_NUMBER_PRECISION;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +27,7 @@ import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.color.ColorUtils;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
+import icecite.utils.math.MathUtils;
 
 /**
  * Do: Invoke a named xobject.
@@ -138,6 +140,13 @@ public class Invoke extends OperatorProcessor {
       float minY = ctm.getTranslateY();
       float maxX = minX + at.getScaleX() * imageWidth;
       float maxY = minY + at.getScaleY() * imageHeight;
+      
+      // Round the values.
+      minX = MathUtils.round(minX, FLOATING_NUMBER_PRECISION);
+      minY = MathUtils.round(minY, FLOATING_NUMBER_PRECISION);
+      maxX = MathUtils.round(maxX, FLOATING_NUMBER_PRECISION);
+      maxY = MathUtils.round(maxY, FLOATING_NUMBER_PRECISION);
+      
       Point ll = this.pointFactory.create(minX, minY);
       Point ur = this.pointFactory.create(maxX, maxY);
       PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);

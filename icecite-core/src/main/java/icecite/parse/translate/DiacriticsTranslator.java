@@ -28,7 +28,7 @@ public class DiacriticsTranslator {
    * @param rightChar
    *        The character to the right of the diacritic.
    */
-  public static void resolveDiacritic(PdfCharacter diacritic,
+  public static void translate(PdfCharacter diacritic,
       PdfCharacter leftChar, PdfCharacter rightChar) {
     // Don't proceed if the character in question is not a diacritic.
     if (!isDiacritic(diacritic)) {

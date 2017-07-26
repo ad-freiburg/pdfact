@@ -1,5 +1,6 @@
 package icecite.parse.stream.pdfbox.operators.graphic;
 
+import static icecite.parse.PdfParserSettings.FLOATING_NUMBER_PRECISION;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import icecite.parse.stream.pdfbox.convert.PDColorConverter;
 import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
+import icecite.utils.math.MathUtils;
 
 /**
  * S: Stroke the path.
@@ -141,9 +143,15 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_CUBICTO:
           float[] curveEnd = Arrays.copyOfRange(coordinates, 4, 6);
 
-          // TODO: Check if ll and ur is indeed ll and ur.
           Point ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
+          
+          // Round the values.
+          ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
+          ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
+          ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
+          ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
+          
           PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
 
           PdfShape shape = this.shapeFactory.create();
@@ -156,9 +164,15 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_LINETO:
           float[] lineEnd = Arrays.copyOf(coordinates, 2);
 
-          // TODO: Check if ll and ur is indeed ll and ur.
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
+          
+          // Round the values.
+          ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
+          ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
+          ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
+          ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
+          
           position = this.positionFactory.create(pdfPage, ll, ur);
 
           shape = this.shapeFactory.create();
@@ -176,9 +190,15 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_QUADTO:
           float[] quadEnd = Arrays.copyOfRange(coordinates, 2, 4);
 
-          // TODO: Check if ll and ur is indeed ll and ur.
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
+          
+          // Round the values.
+          ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
+          ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
+          ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
+          ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
+          
           position = this.positionFactory.create(pdfPage, ll, ur);
 
           shape = this.shapeFactory.create();

@@ -19,6 +19,7 @@ import icecite.models.PdfElementList;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
+import icecite.utils.math.MathUtils;
 import icecite.utils.sort.Quicksort;
 
 // TODO: Accelerate cut method.
@@ -430,7 +431,8 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     float largestMaxX = getLargestMaxX();
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
-      if (element.getRectangle().getMaxX() == largestMaxX) {
+      // TODO: Allow a tolerance value.
+      if (MathUtils.isEqual(element.getRectangle().getMaxX(), largestMaxX, 1f)) {
         elements.add(element);
       }
     }

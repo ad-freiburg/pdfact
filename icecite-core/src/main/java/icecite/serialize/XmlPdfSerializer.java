@@ -345,7 +345,7 @@ public class XmlPdfSerializer implements PdfSerializer {
 
     PdfRole role = element.getRole();
     if (role != null) {
-      String roleName = role.getName();
+      String roleName = role.getIdentifier();
       // Append the role: <character ... role="foo"
       xml.append(" " + CONTEXT_NAME_ELEMENT_ROLE + "=\"" + roleName + "\"");
     }

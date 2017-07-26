@@ -1,5 +1,7 @@
 package icecite.parse.stream.pdfbox.operators.graphic;
 
+import static icecite.parse.PdfParserSettings.FLOATING_NUMBER_PRECISION;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import icecite.parse.stream.pdfbox.operators.OperatorProcessor;
 import icecite.utils.color.ColorUtils;
 import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Point.PointFactory;
+import icecite.utils.math.MathUtils;
 
 /**
  * BI: Begin inline image.
@@ -100,12 +103,17 @@ public class BeginInlineImage extends OperatorProcessor {
     int height = params.getInt(COSName.H, COSName.HEIGHT, -1);
 
     // TODO: use engine.transform().
-
     float minX = ctm.getTranslateX();
     float maxX = minX + (width * ctm.getScaleX());
     float minY = ctm.getTranslateY();
     float maxY = minY + (height * ctm.getScaleY());
 
+    // Round the values.
+    minX = MathUtils.round(minX, FLOATING_NUMBER_PRECISION);
+    minY = MathUtils.round(minY, FLOATING_NUMBER_PRECISION);
+    maxX = MathUtils.round(maxX, FLOATING_NUMBER_PRECISION);
+    maxY = MathUtils.round(maxY, FLOATING_NUMBER_PRECISION);
+    
     // Type3 streams may contain BI operands, but we don't want to consider
     // those.
     if (!this.engine.isType3Stream()) {
