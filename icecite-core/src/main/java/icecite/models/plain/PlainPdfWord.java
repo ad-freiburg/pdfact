@@ -123,13 +123,19 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public List<Rectangle> getSyllableRectangles() {
-    return this.syllableRectangles;
+  public PdfCharacter getFirstCharacter() {
+    if (this.characters == null || this.characters.isEmpty()) {
+      return null;
+    }
+    return this.characters.get(0);
   }
 
   @Override
-  public void setSyllableRectangles(List<Rectangle> rectangles) {
-    this.syllableRectangles = rectangles;
+  public PdfCharacter getLastCharacter() {
+    if (this.characters == null || this.characters.isEmpty()) {
+      return null;
+    }
+    return this.characters.get(this.characters.size() - 1);
   }
 
   // ==========================================================================

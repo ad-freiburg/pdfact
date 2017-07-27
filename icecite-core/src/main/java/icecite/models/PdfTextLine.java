@@ -27,6 +27,38 @@ public interface PdfTextLine
   void setBaseline(Line baseLine);
 
   // ==========================================================================
+  
+  /**
+   * Returns the first word.
+   * 
+   * @return The first word or null if there are no words.
+   */
+  PdfWord getFirstWord();
+
+  /**
+   * Returns the last word.
+   * 
+   * @return The last word or null if there are no words.
+   */
+  PdfWord getLastWord();
+  
+  // ==========================================================================
+  
+  /**
+   * Returns the first character.
+   * 
+   * @return the first character.
+   */
+  PdfCharacter getFirstCharacter();
+  
+  /**
+   * Returns the last character.
+   * 
+   * @return the last character.
+   */
+  PdfCharacter getLastCharacter();
+  
+  // ==========================================================================
 
   /**
    * The factory to create instances of {@link PdfTextLine}.

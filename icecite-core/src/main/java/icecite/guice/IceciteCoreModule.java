@@ -4,12 +4,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 
-import icecite.join.PdfTextJoiner;
-import icecite.join.PdfTextJoiner.PdfTextJoinerFactory;
-import icecite.join.PdfTextParagraphJoiner;
-import icecite.join.PdfTextParagraphJoiner.PdfTextParagraphJoinerFactory;
-import icecite.join.PlainPdfTextJoiner;
-import icecite.join.PlainPdfTextParagraphJoiner;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
@@ -85,17 +79,23 @@ import icecite.serialize.JsonPdfSerializer;
 import icecite.serialize.PdfSerializer;
 import icecite.serialize.TxtPdfSerializer;
 import icecite.serialize.XmlPdfSerializer;
-import icecite.tokenize.PdfTextAreaTokenizer;
-import icecite.tokenize.PdfTextBlockTokenizer;
-import icecite.tokenize.PdfTextLineTokenizer;
 import icecite.tokenize.PdfTextTokenizer;
 import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
-import icecite.tokenize.PdfTextWordTokenizer;
-import icecite.tokenize.PlainPdfTextBlockTokenizer;
 import icecite.tokenize.PlainPdfTextTokenizer;
-import icecite.tokenize.XYCutPdfTextAreaTokenizer;
-import icecite.tokenize.XYCutPdfTextLineTokenizer;
-import icecite.tokenize.XYCutPdfTextWordTokenizer;
+import icecite.tokenize.areas.PdfTextAreaTokenizer;
+import icecite.tokenize.areas.XYCutPdfTextAreaTokenizer;
+import icecite.tokenize.blocks.PdfTextBlockTokenizer;
+import icecite.tokenize.blocks.PlainPdfTextBlockTokenizer;
+import icecite.tokenize.lines.PdfTextLineTokenizer;
+import icecite.tokenize.lines.XYCutPdfTextLineTokenizer;
+import icecite.tokenize.paragraphs.PdfParagraphTokenizer;
+import icecite.tokenize.paragraphs.PdfParagraphTokenizer.PdfParagraphTokenizerFactory;
+import icecite.tokenize.paragraphs.PlainPdfParagraphTokenizer;
+import icecite.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator;
+import icecite.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator.PdfWordDehyphenatorFactory;
+import icecite.tokenize.paragraphs.dehyphenate.PlainPdfWordDehyphenator;
+import icecite.tokenize.words.PdfWordTokenizer;
+import icecite.tokenize.words.XYCutPdfWordTokenizer;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
@@ -134,17 +134,17 @@ public class IceciteCoreModule extends com.google.inject.AbstractModule {
         PlainPdfTextTokenizer.class);
     bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
     bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
-    bind(PdfTextWordTokenizer.class).to(XYCutPdfTextWordTokenizer.class);
+    bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
-
+    
+    fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class, 
+        PlainPdfParagraphTokenizer.class);
+    fc(PdfWordDehyphenator.class, PdfWordDehyphenatorFactory.class, 
+        PlainPdfWordDehyphenator.class);
+    
     // Bind the semanticizer.
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
         PlainPdfTextSemanticizer.class);
-
-    fc(PdfTextJoiner.class, PdfTextJoinerFactory.class,
-        PlainPdfTextJoiner.class);
-    fc(PdfTextParagraphJoiner.class, PdfTextParagraphJoinerFactory.class,
-        PlainPdfTextParagraphJoiner.class);
 
     // Bind the PDF model factories.
     fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);

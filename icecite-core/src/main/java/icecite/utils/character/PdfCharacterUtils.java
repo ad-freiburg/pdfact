@@ -16,43 +16,48 @@ public class PdfCharacterUtils {
   /**
    * The punctuation marks that are aligned to the base line.
    */
-  static final TCharSet BASELINE_PUNCTUATION_MARKS = new TCharHashSet();
+  public static final TCharSet BASELINE_PUNCTUATION_MARKS = new TCharHashSet();
 
   /**
    * The punctuation marks that are aligned to the mean line.
    */
-  static final TCharSet MEANLINE_PUNCTUATION_MARKS = new TCharHashSet();
+  public static final TCharSet MEANLINE_PUNCTUATION_MARKS = new TCharHashSet();
 
   /**
    * The characters that aren't aligned to the baseline of a text line.
    */
-  static final TCharSet DESCENDERS = new TCharHashSet();
+  public static final TCharSet DESCENDERS = new TCharHashSet();
 
   /**
    * The characters that aren't aligned to the meanline of a text line.
    */
-  static final TCharSet ASCENDERS = new TCharHashSet();
+  public static final TCharSet ASCENDERS = new TCharHashSet();
 
   /**
    * The characters that are aligned to the baseline of a text line.
    */
-  static final TCharSet BASELINE_CHARACTERS = new TCharHashSet();
+  public static final TCharSet BASELINE_CHARACTERS = new TCharHashSet();
 
   /**
    * The characters that are aligned to the baseline of a text line.
    */
-  static final TCharSet MEANLINE_CHARACTERS = new TCharHashSet();
+  public static final TCharSet MEANLINE_CHARACTERS = new TCharHashSet();
 
   /**
    * The math character.
    */
-  static final Set<String> MATH_SYMBOLS = new HashSet<>();
+  public static final Set<String> MATH_SYMBOLS = new HashSet<>();
 
   /**
    * The math operators (all symbols that must be surrounded by white spaces).
    */
-  static final Set<String> MATH_OPERATORS = new HashSet<>();
+  public static final Set<String> MATH_OPERATORS = new HashSet<>();
 
+  /**
+   * The hyphens.
+   */
+  static final TCharSet HYPHENS = new TCharHashSet();
+  
   static {
     BASELINE_PUNCTUATION_MARKS.add('.');
     BASELINE_PUNCTUATION_MARKS.add('?');
@@ -363,6 +368,9 @@ public class PdfCharacterUtils {
     MATH_OPERATORS.add("gcd");
     MATH_OPERATORS.add("det");
     MATH_OPERATORS.add("Pr");
+    
+    HYPHENS.add('-');
+    HYPHENS.add('–');
   }
 
   /**
@@ -555,5 +563,16 @@ public class PdfCharacterUtils {
   public static boolean isMathSymbol(PdfCharacter character) {
     String ch = character.getText();
     return MATH_SYMBOLS.contains(ch) || MATH_OPERATORS.contains(ch);
+  }
+  
+  /**
+   * Returns true if the given character is a hyphen.
+   * 
+   * @param character
+   *        The character to process.
+   * @return True if the given character is a hyphen; False otherwise.
+   */
+  public static boolean isHyphen(PdfCharacter character) {
+    return HYPHENS.contains(character.getText().charAt(0));
   }
 }

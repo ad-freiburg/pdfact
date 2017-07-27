@@ -14,3 +14,9 @@ ligatures
 semanticizes
 semanticize
 semanticizer
+hyphenated
+precompute
+dehyphenate
+haystack
+dehyphenated
+subword

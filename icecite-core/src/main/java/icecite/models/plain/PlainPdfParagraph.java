@@ -1,14 +1,19 @@
 package icecite.models.plain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacter;
+import icecite.models.PdfFeature;
 import icecite.models.PdfParagraph;
+import icecite.models.PdfTextBlock;
+import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
-import icecite.models.PdfWordList;
-import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 // TODO: Do not extend the bounding box in the model.
@@ -18,11 +23,11 @@ import icecite.utils.geometric.Rectangle.RectangleFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraph implements PdfParagraph {
+public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   /**
-   * The words of this paragraph.
+   * The text blocks of this paragraph.
    */
-  protected PdfWordList words;
+  protected List<PdfTextBlock> textBlocks;
 
   /**
    * The text of this paragraph.
@@ -37,55 +42,110 @@ public class PlainPdfParagraph implements PdfParagraph {
    * 
    * @param rectangleFactory
    *        The factory to create instances of Rectangle.
-   * @param wordListFactory
-   *        The factory to create instances of PdfWordList.
    */
   @AssistedInject
-  public PlainPdfParagraph(RectangleFactory rectangleFactory,
-      PdfWordListFactory wordListFactory) {
-    this.words = wordListFactory.create();
+  public PlainPdfParagraph(RectangleFactory rectangleFactory) {
+    this.textBlocks = new ArrayList<>();
   }
 
   // ========================================================================
 
   @Override
-  public PdfWordList getWords() {
-    return this.words;
+  public List<PdfTextBlock> getTextBlocks() {
+    return this.textBlocks;
   }
 
   @Override
-  public PdfWord getFirstWord() {
-    if (this.words != null && !this.words.isEmpty()) {
-      return this.words.get(0);
+  public PdfTextBlock getFirstTextBlock() {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
+      return null;
     }
-    return null;
+    return this.textBlocks.get(0);
+  }
+
+  @Override
+  public PdfTextBlock getLastTextBlock() {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
+      return null;
+    }
+    return this.textBlocks.get(this.textBlocks.size() - 1);
+  }
+
+  @Override
+  public void setTextBlocks(List<PdfTextBlock> blocks) {
+    this.textBlocks = blocks;
+  }
+
+  @Override
+  public void addTextBlocks(List<PdfTextBlock> blocks) {
+    this.textBlocks.addAll(blocks);
+  }
+
+  @Override
+  public void addTextBlock(PdfTextBlock block) {
+    this.textBlocks.add(block);
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfTextLine getFirstTextLine() {
+    PdfTextBlock firstTextBlock = getFirstTextBlock();
+    if (firstTextBlock == null) {
+      return null;
+    }
+    return firstTextBlock.getFirstTextLine();
+  }
+
+  @Override
+  public PdfTextLine getLastTextLine() {
+    PdfTextBlock lastTextBlock = getLastTextBlock();
+    if (lastTextBlock == null) {
+      return null;
+    }
+    return lastTextBlock.getLastTextLine();
+  }
+  
+  // ==========================================================================
+  
+  @Override
+  public PdfWord getFirstWord() {
+    PdfTextBlock firstTextBlock = getFirstTextBlock();
+    if (firstTextBlock == null) {
+      return null;
+    }
+    return firstTextBlock.getFirstWord();
   }
 
   @Override
   public PdfWord getLastWord() {
-    if (this.words != null && !this.words.isEmpty()) {
-      return this.words.get(this.words.size() - 1);
+    PdfTextBlock lastTextBlock = getLastTextBlock();
+    if (lastTextBlock == null) {
+      return null;
     }
-    return null;
+    return lastTextBlock.getLastWord();
   }
 
-  @Override
-  public void setWords(PdfWordList words) {
-    this.words = words;
-  }
+  // ==========================================================================
 
   @Override
-  public void addWords(PdfWordList words) {
-    for (PdfWord word : words) {
-      addWord(word);
+  public PdfCharacter getFirstCharacter() {
+    PdfTextBlock firstTextBlock = getFirstTextBlock();
+    if (firstTextBlock == null) {
+      return null;
     }
+    return firstTextBlock.getFirstCharacter();
   }
 
   @Override
-  public void addWord(PdfWord word) {
-    this.words.add(word);
+  public PdfCharacter getLastCharacter() {
+    PdfTextBlock lastTextBlock = getLastTextBlock();
+    if (lastTextBlock == null) {
+      return null;
+    }
+    return lastTextBlock.getLastCharacter();
   }
-
+  
   // ========================================================================
 
   @Override
@@ -100,10 +160,10 @@ public class PlainPdfParagraph implements PdfParagraph {
 
   // ========================================================================
 
-//  @Override
-//  public PdfType getType() {
-//    return PdfType.PARAGRAPHS;
-//  }
+  @Override
+  public PdfFeature getFeature() {
+    return PdfFeature.PARAGRAPH;
+  }
 
   // ========================================================================
 

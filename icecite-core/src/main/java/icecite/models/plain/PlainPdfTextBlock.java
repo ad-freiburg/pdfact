@@ -8,10 +8,12 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfParagraph;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
+import icecite.models.PdfWord;
 
 // TODO: Don't derive the bounding box in the model.
 
@@ -21,6 +23,11 @@ import icecite.models.PdfTextLineList.PdfTextLineListFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
+  /**
+   * The parent paragraph.
+   */
+  protected PdfParagraph parentParagraph;
+  
   /**
    * The characters of this text block.
    */
@@ -53,6 +60,18 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
     this.textLines = textLineListFactory.create();
   }
 
+  // ==========================================================================
+  
+  @Override
+  public PdfParagraph getParentPdfParagraph() {
+    return this.parentParagraph;
+  }
+
+  @Override
+  public void setParentPdfParagraph(PdfParagraph paragraph) {
+    this.parentParagraph = paragraph;
+  }
+  
   // ==========================================================================
 
   @Override
@@ -99,6 +118,64 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @Override
   public void addTextLine(PdfTextLine line) {
     this.textLines.add(line);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfTextLine getFirstTextLine() {
+    if (this.textLines == null || this.textLines.isEmpty()) {
+      return null;
+    }
+    return this.textLines.get(0);
+  }
+
+  @Override
+  public PdfTextLine getLastTextLine() {
+    if (this.textLines == null || this.textLines.isEmpty()) {
+      return null;
+    }
+    return this.textLines.get(this.textLines.size() - 1);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfWord getFirstWord() {
+    PdfTextLine firstLine = getFirstTextLine();
+    if (firstLine == null) {
+      return null;
+    }
+    return firstLine.getFirstWord();
+  }
+
+  @Override
+  public PdfWord getLastWord() {
+    PdfTextLine lastLine = getLastTextLine();
+    if (lastLine == null) {
+      return null;
+    }
+    return lastLine.getLastWord();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfCharacter getFirstCharacter() {
+    PdfWord firstWord = getFirstWord();
+    if (firstWord == null) {
+      return null;
+    }
+    return firstWord.getFirstCharacter();
+  }
+
+  @Override
+  public PdfCharacter getLastCharacter() {
+    PdfWord lastWord = getLastWord();
+    if (lastWord == null) {
+      return null;
+    }
+    return lastWord.getLastCharacter();
   }
 
   // ==========================================================================

@@ -125,6 +125,26 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   }
 
   // ==========================================================================
+  
+  @Override
+  public PdfCharacter getFirstCharacter() {
+    PdfWord firstWord = getFirstWord();
+    if (firstWord == null) {
+      return null;
+    }
+    return firstWord.getFirstCharacter();
+  }
+
+  @Override
+  public PdfCharacter getLastCharacter() {
+    PdfWord lastWord = getLastWord();
+    if (lastWord == null) {
+      return null;
+    }
+    return lastWord.getLastCharacter();
+  }
+  
+  // ==========================================================================
 
   @Override
   public String getText() {

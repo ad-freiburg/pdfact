@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
@@ -13,6 +14,11 @@ import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
+import icecite.tokenize.areas.PdfTextAreaTokenizer;
+import icecite.tokenize.blocks.PdfTextBlockTokenizer;
+import icecite.tokenize.lines.PdfTextLineTokenizer;
+import icecite.tokenize.words.PdfWordTokenizer;
+import icecite.utils.character.PdfCharacterUtils;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.comparators.MinXComparator;
 import icecite.utils.comparators.MinYComparator;
@@ -36,7 +42,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   /**
    * The word tokenizer.
    */
-  protected PdfTextWordTokenizer wordTokenizer;
+  protected PdfWordTokenizer wordTokenizer;
 
   /**
    * The text block tokenizer.
@@ -61,7 +67,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   @Inject
   public PlainPdfTextTokenizer(PdfTextAreaTokenizer textBlockTokenizer,
       PdfTextLineTokenizer textLineTokenizer,
-      PdfTextWordTokenizer wordTokenizer,
+      PdfWordTokenizer wordTokenizer,
       PdfTextBlockTokenizer paragraphTokenizer) {
     this.textAreaTokenizer = textBlockTokenizer;
     this.textLineTokenizer = textLineTokenizer;
@@ -120,8 +126,10 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     computeTexts2(page);
 
     // Tokenize the page into text blocks.
-    page.setTextBlocks(tokenizeIntoTextBlocks(pdf, page));
-
+    List<PdfTextBlock> textBlocks = tokenizeIntoTextBlocks(pdf, page);
+    page.setTextBlocks(textBlocks);
+    pdf.addTextBlocks(textBlocks);
+    
     // Compute the texts for text blocks, text lines and words.
     computeTexts(page);
   }
@@ -221,13 +229,21 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
 
         for (PdfWord word : words) {
           // Compute the text for the word.
-          Collections.sort(word.getCharacters(), new MinXComparator());
-          word.setText(CollectionUtils.join(word.getCharacters(), ""));
+          PdfCharacterList characters = word.getCharacters();
+          Collections.sort(characters, new MinXComparator());
+          word.setText(CollectionUtils.join(characters, ""));
         }
 
         // Compute the text for the line.
         Collections.sort(words, new MinXComparator());
         line.setText(CollectionUtils.join(words, " "));
+        
+        // Check if the last word in the line is hyphenated.
+        PdfWord lastWord = line.getLastWord();
+        if (lastWord != null) {
+          PdfCharacter lastCharacter = lastWord.getLastCharacter();
+          lastWord.setIsHyphenated(PdfCharacterUtils.isHyphen(lastCharacter));
+        }
       }
 
       // Compute the text for the block.

@@ -1,9 +1,5 @@
 package icecite.models;
 
-import java.util.List;
-
-import icecite.utils.geometric.Rectangle;
-
 /**
  * A word in a PDF document.
  * 
@@ -44,24 +40,21 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
   void setIsDehyphenated(boolean isDehyphenated);
 
   // ==========================================================================
-
+  
   /**
-   * Returns a list of the rectangles of the hyphenated syllables of this word.
-   * In case of the word is not hyphenated, the list contains only a single
-   * rectangle (the bounding box of this word).
+   * Returns the first character of this word.
    * 
-   * @return The rectangles of the hyphenated syllables of this word.
+   * @return the first character of this word.
    */
-  List<Rectangle> getSyllableRectangles();
-
+  public PdfCharacter getFirstCharacter();
+  
   /**
-   * Sets the rectangles of the hyphenated syllables of this word.
+   * Returns the last character of this word.
    * 
-   * @param rectangles
-   *        The rectangles of the hyphenated syllables of this word.
+   * @return the last character of this word.
    */
-  void setSyllableRectangles(List<Rectangle> rectangles);
-
+  public PdfCharacter getLastCharacter();
+  
   // ==========================================================================
 
   /**

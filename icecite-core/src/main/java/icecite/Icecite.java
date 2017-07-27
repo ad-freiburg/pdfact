@@ -19,7 +19,6 @@ import icecite.exception.IceciteException;
 import icecite.exception.IceciteSerializeException;
 import icecite.exception.IceciteValidateException;
 import icecite.exception.IceciteVisualizeException;
-import icecite.join.PdfTextJoiner.PdfTextJoinerFactory;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFeature;
 import icecite.models.PdfRole;
@@ -27,6 +26,7 @@ import icecite.parse.PdfParser.PdfParserFactory;
 import icecite.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import icecite.serialize.PdfSerializer;
 import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
+import icecite.tokenize.paragraphs.PdfParagraphTokenizer.PdfParagraphTokenizerFactory;
 import icecite.visualize.PdfVisualizer;
 import icecite.visualize.PdfVisualizer.PdfVisualizerFactory;
 
@@ -58,9 +58,9 @@ public class Icecite {
   protected PdfTextSemanticizerFactory semanticizerFactory;
 
   /**
-   * The factory to create instances of PdfTextJoiner.
+   * The factory to create instances of PdfParagraphTokenizerFactory.
    */
-  protected PdfTextJoinerFactory textJoinerFactory;
+  protected PdfParagraphTokenizerFactory paragraphTokenizerFactory;
 
   /**
    * The available classes of type PdfSerializer, per output format.
@@ -116,8 +116,8 @@ public class Icecite {
    *        The factory to create instances of PdfTokenizer.
    * @param semanticizerFactory
    *        The factory to create instances of PdfTextSemanticizer.
-   * @param textJoinerFactory
-   *        The factory to create instances of PdfTextJoinerFactory.
+   * @param paragraphTokenizerFactory
+   *        The factory to create instances of PdfParagraphTokenizerFactory..
    * @param serializers
    *        The map of all available serializers.
    * @param visualizerFactory
@@ -127,13 +127,13 @@ public class Icecite {
   public Icecite(PdfParserFactory parserFactory,
       PdfTextTokenizerFactory tokenizerFactory,
       PdfTextSemanticizerFactory semanticizerFactory,
-      PdfTextJoinerFactory textJoinerFactory,
+      PdfParagraphTokenizerFactory paragraphTokenizerFactory,
       Map<String, Provider<PdfSerializer>> serializers,
       PdfVisualizerFactory visualizerFactory) {
     this.parserFactory = parserFactory;
     this.tokenizerFactory = tokenizerFactory;
     this.semanticizerFactory = semanticizerFactory;
-    this.textJoinerFactory = textJoinerFactory;
+    this.paragraphTokenizerFactory = paragraphTokenizerFactory;
     this.serializers = serializers;
     this.visualizerFactory = visualizerFactory;
   }
@@ -173,7 +173,7 @@ public class Icecite {
     // Identify the semantics of text blocks.
     semanticize(pdf);
     // Join the text blocks to paragraphs.
-    join(pdf);
+    paragraphify(pdf);
     // Serialize the PDF document to file.
     serialize(pdf);
     // Visualize the PDF document.
@@ -235,17 +235,17 @@ public class Icecite {
   }
   
   /**
-   * Joins the text blocks in the given PDF document to paragraphs.
+   * Identifies the paragraphs in the given PDF document.
    * 
    * @param pdf The PDF document to process.
    * 
    * @throws IceciteException
-   *         If something went wrong on joining the text blocks.
+   *         If something went wrong on identifying the paragraphs.
    */
-  protected void join(PdfDocument pdf) throws IceciteException {
+  protected void paragraphify(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying the text paragraphs...");
     
-    this.textJoinerFactory.create().join(pdf);
+    this.paragraphTokenizerFactory.create().tokenize(pdf);
   }
   
   /**
