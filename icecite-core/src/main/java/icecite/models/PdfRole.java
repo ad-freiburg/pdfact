@@ -67,15 +67,11 @@ public enum PdfRole {
   /**
    * Itemize.
    */
-  ITEMIZE("itemize"),
+  ITEMIZE_ITEM("itemize-item"),
   /**
    * The keywords.
    */
   KEYWORDS("keywords"),
-  /**
-   * An item of a list.
-   */
-  LIST_ITEM("list-item"),
   /**
    * A page header.
    */

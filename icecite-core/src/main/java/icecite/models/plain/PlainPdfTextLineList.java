@@ -9,6 +9,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
+import icecite.models.PdfWord;
+import icecite.models.PdfWordList;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.geometric.Rectangle.RectangleFactory;
 import icecite.utils.textlines.PdfTextLineUtils;
@@ -31,6 +33,11 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
    */
   protected Map<PdfFontFace, FloatCounter> linePitchesPerFontFace;
 
+  /**
+   * The average whitespace width.
+   */
+  protected float averageWhitespaceWidth;
+  
   /**
    * Creates a new PlainPdfTextLineList.
    * 
@@ -65,6 +72,9 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   protected void computeStatistics() {
     super.computeStatistics();
 
+    float sumWhitespaceWidths = 0;
+    float numWhitespaceWidths = 0;
+    
     for (int i = 1; i < this.size(); i++) {
       PdfTextLine prevLine = this.get(i - 1);
       PdfTextLine line = this.get(i);
@@ -85,8 +95,30 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
       // Add a new float counter if there is none for the given font face.
       this.linePitchesPerFontFace.putIfAbsent(fontFace, new FloatCounter());
       this.linePitchesPerFontFace.get(fontFace).add(linePitch);
+      
+      // Compute the average whitespace width.
+      PdfWordList words = line.getWords();
+      if (words == null) {
+        continue;
+      }
+      for (int j = 1; j < words.size(); j++) {
+        PdfWord prevWord = words.get(j - 1);
+        PdfWord word = words.get(j);
+        if (prevWord == null || word == null) {
+          continue;
+        }
+        float wordMinX = word.getRectangle().getMinX();
+        float prevWordMaxX = prevWord.getRectangle().getMaxX();
+        float whitespaceWidth = wordMinX - prevWordMaxX;
+        sumWhitespaceWidths += whitespaceWidth;
+        numWhitespaceWidths++;
+      }
     }
 
+    if (numWhitespaceWidths > 0) {
+      this.averageWhitespaceWidth = sumWhitespaceWidths / numWhitespaceWidths;
+    }
+    
     this.isStatisticsOutdated = false;
   }
 
@@ -102,6 +134,14 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
     return Float.NaN;
   }
 
+  @Override
+  public float getAverageWhitespaceWidth() {
+    if (this.isStatisticsOutdated) {
+      computeStatistics();
+    }
+    return this.averageWhitespaceWidth;
+  }
+  
   // ==========================================================================
 
   @Override

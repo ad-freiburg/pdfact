@@ -12,7 +12,7 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public class ReferencesModule implements PdfTextSemanticizerModule {
+public class ReferenceModule implements PdfTextSemanticizerModule {
   /**
    * A boolean flag that indicates whether the current text block is a member
    * of the Reference section or not.

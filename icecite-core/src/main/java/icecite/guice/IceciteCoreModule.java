@@ -75,9 +75,11 @@ import icecite.semanticize.plain.modules.CategoriesModule;
 import icecite.semanticize.plain.modules.FootnoteModule;
 import icecite.semanticize.plain.modules.GeneralTermsModule;
 import icecite.semanticize.plain.modules.HeadingModule;
+import icecite.semanticize.plain.modules.ItemizeItemModule;
 import icecite.semanticize.plain.modules.KeywordsModule;
 import icecite.semanticize.plain.modules.PdfTextSemanticizerModule;
-import icecite.semanticize.plain.modules.ReferencesModule;
+import icecite.semanticize.plain.modules.ReferenceModule;
+import icecite.semanticize.plain.modules.TableModule;
 import icecite.semanticize.plain.modules.TitleModule;
 import icecite.serialize.JsonPdfSerializer;
 import icecite.serialize.PdfSerializer;
@@ -186,9 +188,11 @@ public class IceciteCoreModule extends com.google.inject.AbstractModule {
     binder.addBinding().to(CategoriesModule.class);
     binder.addBinding().to(GeneralTermsModule.class);
     binder.addBinding().to(AcknowledgmentsModule.class);
-    binder.addBinding().to(ReferencesModule.class);
+    binder.addBinding().to(ReferenceModule.class);
     binder.addBinding().to(CaptionModule.class);
     binder.addBinding().to(FootnoteModule.class);
+    binder.addBinding().to(ItemizeItemModule.class);
+    binder.addBinding().to(TableModule.class);
     binder.addBinding().to(BodyTextModule.class);
 
     MapBinder<String, PdfSerializer> serializerBinder = MapBinder

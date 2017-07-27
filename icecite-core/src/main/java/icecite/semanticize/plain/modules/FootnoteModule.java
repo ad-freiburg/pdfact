@@ -13,6 +13,7 @@ import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Rectangle;
+import icecite.utils.math.MathUtils;
 
 /**
  * A module that identifies the text blocks with the semantic role "footnote".
@@ -65,9 +66,12 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
         }
         PdfCharacter firstChar = firstLineCharacters.get(0);
         Rectangle firstCharBox = firstChar.getPosition().getRectangle();
+        float firstCharMinY = firstCharBox.getMinY();
+        float lineBaseLineY = firstBaseLine.getStartY();
         
         // The block is *not* a footnote, if the first char is not raised.
-        if (firstCharBox.getMinY() <= firstBaseLine.getStartY()) {
+        // TODO
+        if (MathUtils.isSmallerOrEqual(firstCharMinY, lineBaseLineY, 1)) {
           continue;
         }
 

@@ -1,14 +1,15 @@
+package icecite.semanticize.plain.modules;
 //package icecite.semanticize.plain.modules;
 //
 //import icecite.models.PdfRole;
 //import icecite.models.PdfTextBlock;
 //
 ///**
-// * A semantic module that tests for tables.
+// * A semantic module that tests for figures.
 // * 
 // * @author Claudius Korzen
 // */
-//public class TablesModule extends PdfTextSemanticizerModule {
+//public class FiguresModule extends PdfTextSemanticizerModule {
 //
 //  @Override
 //  public boolean test(PdfTextBlock block) {
@@ -18,6 +19,6 @@
 //
 //  @Override
 //  public PdfRole getRole() {
-//    return PdfRole.TABLE;
+//    return PdfRole.FIGURE;
 //  }
 //}

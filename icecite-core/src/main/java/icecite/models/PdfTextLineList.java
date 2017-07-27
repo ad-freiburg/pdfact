@@ -19,6 +19,15 @@ public interface PdfTextLineList extends PdfElementList<PdfTextLine> {
   float getMostCommonLinePitch(PdfTextLine line);
 
   /**
+   * Returns the average width of white spaces between the words within the
+   * lines.
+   * 
+   * @return The average width of white spaces between the words within the
+   * lines.
+   */
+  float getAverageWhitespaceWidth();
+
+  /**
    * The factory to create instances of {@link PdfTextLineList}.
    * 
    * @author Claudius Korzen
