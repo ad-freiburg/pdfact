@@ -468,7 +468,7 @@ public class Icecite {
         throw new IceciteValidateException(
             "The feature '" + feature + "' is not valid.");
       }
-      featureSet.add(PdfFeature.fromName(feature));
+      featureSet.add(PdfFeature.getFeature(feature));
     }
     this.features = featureSet;
   }
@@ -494,7 +494,7 @@ public class Icecite {
       if (!PdfRole.isValidRole(r)) {
         throw new IceciteValidateException("The role '" + r + "' isn't valid.");
       }
-      roleSet.add(PdfRole.fromName(r));
+      roleSet.add(PdfRole.getRole(r));
     }
     this.roles = roleSet;
   }

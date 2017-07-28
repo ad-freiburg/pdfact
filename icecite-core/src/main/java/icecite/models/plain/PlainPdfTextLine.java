@@ -15,8 +15,6 @@ import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.utils.geometric.Line;
 
-// TODO: Do not derive the bounding box in the model.
-
 /**
  * A plain implementation of {@link PdfTextLine}.
  * 
@@ -189,6 +187,9 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getCharacters(), otherTextLine.getCharacters());
+      builder.append(getWords(), otherTextLine.getWords());
+      builder.append(getText(), otherTextLine.getText());
+      builder.append(getPosition(), otherTextLine.getPosition());
 
       return builder.isEquals();
     }
@@ -199,6 +200,9 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getCharacters());
+    builder.append(getWords());
+    builder.append(getText());
+    builder.append(getPosition());
     return builder.hashCode();
   }
 }

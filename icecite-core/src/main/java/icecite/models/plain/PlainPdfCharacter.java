@@ -15,14 +15,9 @@ import icecite.models.PdfFontFace;
  */
 public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
-   * The position of this character in the sequence of extracted PDF elements.
+   * The sequence number of this characters in the extraction order.
    */
-  protected int posInExtractionOrder;
-
-  /**
-   * The text of this character.
-   */
-  protected String text;
+  protected int sequenceNumber;
 
   /**
    * The font face of this character.
@@ -34,6 +29,11 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
    */
   protected PdfColor color;
   
+  /**
+   * The text of this character.
+   */
+  protected String text;
+
   // ==========================================================================
 
   @Override
@@ -74,12 +74,12 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
 
   @Override
   public void setSequenceNumber(int pos) {
-    this.posInExtractionOrder = pos;
+    this.sequenceNumber = pos;
   }
 
   @Override
   public int getSequenceNumber() {
-    return this.posInExtractionOrder;
+    return this.sequenceNumber;
   }
 
   // ==========================================================================
@@ -102,10 +102,12 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
       PdfCharacter otherCharacter = (PdfCharacter) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getText(), otherCharacter.getText());
-      builder.append(getPosition(), otherCharacter.getPosition());
-      builder.append(getFontFace(), otherCharacter.getFontFace());
       builder.append(getColor(), otherCharacter.getColor());
+      builder.append(getFontFace(), otherCharacter.getFontFace());
+      builder.append(getText(), otherCharacter.getText());
+      builder.append(getSequenceNumber(), otherCharacter.getSequenceNumber());
+      builder.append(getFeature(), otherCharacter.getFeature());
+      builder.append(getPosition(), otherCharacter.getPosition());
       builder.append(getText(), otherCharacter.getText());
 
       return builder.isEquals();
@@ -116,10 +118,12 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getText());
-    builder.append(getPosition());
-    builder.append(getFontFace());
     builder.append(getColor());
+    builder.append(getFontFace());
+    builder.append(getText());
+    builder.append(getSequenceNumber());
+    builder.append(getFeature());
+    builder.append(getPosition());
     builder.append(getText());
     return builder.hashCode();
   }

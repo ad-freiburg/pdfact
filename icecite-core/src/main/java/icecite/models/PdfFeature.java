@@ -1,6 +1,5 @@
 package icecite.models;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,7 +47,7 @@ public enum PdfFeature {
   String name;
 
   /**
-   * The default constructor.
+   * Creates a new feature.
    * 
    * @param name
    *        The name of the feature.
@@ -74,46 +73,49 @@ public enum PdfFeature {
   static {
     features = new HashMap<>();
 
+    // Fill the map of features per name.
     for (PdfFeature feature : values()) {
       features.put(feature.getName(), feature);
     }
   }
 
   /**
-   * Returns a list with the names of all features.
+   * Returns a set of the names of all features.
    * 
-   * @return A list with the names of all features.
+   * @return A set of the names of all features.
    */
   public static Set<String> getNames() {
     return features.keySet();
   }
 
   /**
-   * Returns true, if the given name is a valid name of a existing feature.
+   * Checks if the given name is a name of a existing feature.
    * 
    * @param name
    *        The name to check.
-   * @return True, if the given name is a valid name of a existing feature.
+   * 
+   * @return True, if the given name is a name of an existing feature.
    */
   public static boolean isValidFeature(String name) {
     return features.containsKey(name.toLowerCase());
   }
 
   /**
-   * Returns the features that is associated with the given names.
+   * Returns the features that are associated with the given names.
    * 
    * @param names
    *        The names of features to fetch.
-   * @return A set of fetched features.
+   *
+   * @return A set of the fetched features.
    */
-  public static Set<PdfFeature> fromNames(String... names) {
+  public static Set<PdfFeature> getFeatures(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
     Set<PdfFeature> features = new HashSet<>();
     for (String name : names) {
-      PdfFeature feature = fromName(name);
+      PdfFeature feature = getFeature(name);
       if (feature != null) {
         features.add(feature);
       }
@@ -126,23 +128,13 @@ public enum PdfFeature {
    * 
    * @param name
    *        The name of the feature to fetch.
+   *
    * @return The feature that is associated with the given name.
    */
-  public static PdfFeature fromName(String name) {
+  public static PdfFeature getFeature(String name) {
     if (!isValidFeature(name)) {
-      throw new IllegalArgumentException(
-          "\"" + name + "\" is not a valid feature");
+      throw new IllegalArgumentException(name + " isn't a valid feature.");
     }
-
     return features.get(name.toLowerCase());
-  }
-
-  /**
-   * Returns all features in a set.
-   * 
-   * @return all features in a set.
-   */
-  public static Set<PdfFeature> valuesAsSet() {
-    return new HashSet<PdfFeature>(Arrays.asList(values()));
   }
 }

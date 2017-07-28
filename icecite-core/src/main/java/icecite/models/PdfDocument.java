@@ -4,6 +4,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
+// TODO: Eliminate all Interfaces except HasParagraphs.
+
 /**
  * A PDF document.
  * 

@@ -14,7 +14,6 @@ import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MAX_
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_X;
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_MIN_Y;
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_PAGE;
-import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_ELEMENT_ROLE;
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_FIGURE;
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_FONT;
 import static icecite.serialize.PdfSerializerConstants.CONTEXT_NAME_FONTS;
@@ -343,12 +342,13 @@ public class XmlPdfSerializer implements PdfSerializer {
       }
     }
 
-    PdfRole role = element.getRole();
-    if (role != null) {
-      String roleName = role.getIdentifier();
-      // Append the role: <character ... role="foo"
-      xml.append(" " + CONTEXT_NAME_ELEMENT_ROLE + "=\"" + roleName + "\"");
-    }
+    // TODO
+//    PdfRole role = element.getRole();
+//    if (role != null) {
+//      String roleName = role.getIdentifier();
+//      // Append the role: <character ... role="foo"
+//      xml.append(" " + CONTEXT_NAME_ELEMENT_ROLE + "=\"" + roleName + "\"");
+//    }
 
     // Check if there is text to display.
     if (text == null || text.isEmpty()) {
@@ -557,10 +557,11 @@ public class XmlPdfSerializer implements PdfSerializer {
     }
 
     // Check if the role of the given element was registered to be serialized.
-    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-    if (isRoleGiven && !roles.contains(element.getRole())) {
-      return false;
-    }
+    // TODO
+//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+//    if (isRoleGiven && !roles.contains(element.getRole())) {
+//      return false;
+//    }
     return true;
   }
 

@@ -13,8 +13,6 @@ public interface HasWords {
    */
   PdfWordList getWords();
 
-  // ==========================================================================
-
   /**
    * Sets the given words.
    * 

@@ -72,6 +72,8 @@ public interface PdfCharacterList
    */
   Set<PdfCharacter> getCharactersWithMostCommonFontsize();
 
+  // ==========================================================================
+  
   /**
    * Returns the average font size of the characters in this list.
    * 

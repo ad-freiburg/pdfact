@@ -15,19 +15,6 @@ import icecite.utils.geometric.HasRectangle;
  */
 public interface PdfElementList<T extends PdfElement>
     extends List<T>, HasRectangle {
-
-  /**
-   * Swaps the elements at index i and j.
-   * 
-   * @param i
-   *        The index of the first element to swap.
-   * @param j
-   *        The index of the second element to swap.
-   */
-  void swap(int i, int j);
-
-  // ==========================================================================
-
   /**
    * Returns the most common height of the PDF elements in this list.
    * 
@@ -35,6 +22,7 @@ public interface PdfElementList<T extends PdfElement>
    */
   float getMostCommonHeight();
 
+  // TODO: Uncomment this piece of code.
   // /**
   // * Returns all elements with the most common height.
   // *
@@ -58,6 +46,7 @@ public interface PdfElementList<T extends PdfElement>
    */
   float getMostCommonWidth();
 
+  // TODO: Uncomment this piece of code.
   // /**
   // * Returns all elements with the most common width.
   // *
@@ -138,6 +127,16 @@ public interface PdfElementList<T extends PdfElement>
 
   // ==========================================================================
 
+  /**
+   * Swaps the elements at index i and j.
+   * 
+   * @param i
+   *        The index of the first element to swap.
+   * @param j
+   *        The index of the second element to swap.
+   */
+  void swap(int i, int j);
+  
   /**
    * Splits this list at the given index into two halves. Both halves are views
    * of the related portion of the list, that is (1) the portion between index

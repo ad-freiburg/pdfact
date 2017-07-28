@@ -1,13 +1,12 @@
 package icecite.models;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * An enumeration of semantic roles for paragraphs of PDF documents.
+ * An enumeration of available semantic roles.
  * 
  * @author Claudius Korzen
  */
@@ -133,25 +132,27 @@ public enum PdfRole {
   static {
     roles = new HashMap<>();
 
+    // Fill the map of roles per name.
     for (PdfRole role : values()) {
       roles.put(role.getIdentifier(), role);
     }
   }
   
   /**
-   * Returns a list with the names of all roles.
+   * Returns a set of the names of all roles.
    * 
-   * @return A list with the names of all roles.
+   * @return A set of the names of all roles.
    */
   public static Set<String> getNames() {
     return roles.keySet();
   }
   
   /**
-   * Returns true, if the given name is a valid name of an existing role.
+   * Checks if the given name is a valid name of an existing role.
    * 
    * @param name
    *        The name to check.
+   *
    * @return True, if the given name is a valid name of an existing role.
    */
   public static boolean isValidRole(String name) {
@@ -165,14 +166,14 @@ public enum PdfRole {
    *        The names of roles to fetch.
    * @return A set of fetched roles.
    */
-  public static Set<PdfRole> fromNames(String... names) {
+  public static Set<PdfRole> getRoles(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
     Set<PdfRole> roles = new HashSet<>();
     for (String name : names) {
-      PdfRole role = fromName(name);
+      PdfRole role = getRole(name);
       if (role != null) {
         roles.add(role);
       }
@@ -187,21 +188,10 @@ public enum PdfRole {
    *        The name of the role to fetch.
    * @return The role that is associated with the given name.
    */
-  public static PdfRole fromName(String name) {
+  public static PdfRole getRole(String name) {
     if (!isValidRole(name)) {
-      throw new IllegalArgumentException(
-          "\"" + name + "\" is not a valid feature");
+      throw new IllegalArgumentException(name + " isn't a valid role.");
     }
-
     return roles.get(name.toLowerCase());
-  }
-  
-  /**
-   * Returns all roles in a set.
-   * 
-   * @return all roles in a set.
-   */
-  public static Set<PdfRole> valuesAsSet() {
-    return new HashSet<PdfRole>(Arrays.asList(values()));
   }
 }

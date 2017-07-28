@@ -14,9 +14,9 @@ import icecite.models.PdfShape;
  */
 public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   /**
-   * The position of this shape in the extraction order of PDF elements.
+   * The sequence number of this shape in the extraction order of PDF elements.
    */
-  protected int posInExtractionOrder;
+  protected int sequenceNumber;
 
   /**
    * The color of this shape.
@@ -58,6 +58,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherShape.getPosition());
       builder.append(getColor(), otherShape.getColor());
+      builder.append(getFeature(), otherShape.getFeature());
 
       return builder.isEquals();
     }
@@ -69,6 +70,7 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
     builder.append(getColor());
+    builder.append(getFeature());
     return builder.hashCode();
   }
 }

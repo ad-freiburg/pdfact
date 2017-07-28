@@ -8,10 +8,10 @@ package icecite.models;
 public interface PdfCharacter
     extends PdfElement, HasColor, HasFontFace, HasText {
   /**
-   * Returns the sequence number of this character, that is the rank in the 
+   * Returns the sequence number of this character, that is the rank in the
    * extraction order of characters.
    *
-   * @return The position.
+   * @return The sequence number.
    */
   int getSequenceNumber();
 

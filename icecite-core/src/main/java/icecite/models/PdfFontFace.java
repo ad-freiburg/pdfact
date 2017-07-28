@@ -1,7 +1,7 @@
 package icecite.models;
 
 /**
- * A pair of font and font size.
+ * A font face, that is a pair of font and font size.
  * 
  * @author Claudius Korzen
  */

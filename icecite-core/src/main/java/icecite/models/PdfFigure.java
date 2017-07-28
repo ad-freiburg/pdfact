@@ -1,5 +1,7 @@
 package icecite.models;
 
+// TODO: Add some more properties for a figure.
+
 /**
  * A figure in a PDF document.
  * 

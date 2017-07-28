@@ -9,14 +9,11 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfFeature;
 import icecite.models.PdfWord;
 import icecite.utils.geometric.Rectangle;
-
-// TODO: Do not derive the bounding box in the model.
 
 /**
  * A plain implementation of {@link PdfWord}.
@@ -53,12 +50,15 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
 
   /**
    * Creates a new word.
+   * 
+   * @param characterListFactory
+   *        The factory to create instances of {@link PdfCharacterList}.
    */
   @AssistedInject
   public PlainPdfWord(PdfCharacterListFactory characterListFactory) {
     this.characters = characterListFactory.create();
   }
-  
+
   /**
    * Creates a new word.
    * 
@@ -169,7 +169,10 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getCharacters(), otherWord.getCharacters());
-
+      builder.append(getFeature(), otherWord.getFeature());
+      builder.append(getPosition(), otherWord.getPosition());
+      builder.append(getText(), otherWord.getText());
+      
       return builder.isEquals();
     }
     return false;
@@ -179,6 +182,9 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getCharacters());
+    builder.append(getFeature());
+    builder.append(getPosition());
+    builder.append(getText());
     return builder.hashCode();
   }
 }

@@ -6,5 +6,5 @@ package icecite.models;
  * @author Claudius Korzen
  */
 public interface PdfResource {
-
+  // TODO: Add some properties to PDF resources.
 }

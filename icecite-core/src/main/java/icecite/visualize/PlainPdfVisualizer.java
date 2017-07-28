@@ -171,11 +171,6 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (element != null) {
       drawer.drawBoundingBox(element, page.getPageNumber(), strokingColor,
           nonStrokingColor);
-      if (element.getRole() != null) {
-        // Visualize the role.
-        drawer.drawText(element.getRole().getIdentifier(), page.getPageNumber(),
-            element.getRectangle().getUpperLeft(), strokingColor, 8);
-      }
     }
   }
 
@@ -203,10 +198,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     // Check if the role of the given element was registered to be serialized.
-    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-    if (isRoleGiven && !roles.contains(element.getRole())) {
-      return false;
-    }
+    // TODO
+//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+//    if (isRoleGiven && !roles.contains(element.getRole())) {
+//      return false;
+//    }
     return true;
   }
 }

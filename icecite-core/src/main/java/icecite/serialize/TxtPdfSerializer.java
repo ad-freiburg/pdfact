@@ -242,10 +242,11 @@ public class TxtPdfSerializer implements PdfSerializer {
     }
 
     // Check if the role of the given element was registered to be serialized.
-    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-    if (isRoleGiven && !roles.contains(element.getRole())) {
-      return false;
-    }
+    // TODO
+//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+//    if (isRoleGiven && !roles.contains(element.getRole())) {
+//      return false;
+//    }
     return true;
   }
 

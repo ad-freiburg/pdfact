@@ -8,11 +8,10 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfFeature;
 import icecite.models.PdfParagraph;
+import icecite.models.PdfRole;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
-
-// TODO: Do not extend the bounding box in the model.
 
 /**
  * A plain implementation of {@link PdfParagraph}.
@@ -29,6 +28,16 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
    * The text of this paragraph.
    */
   protected String text;
+
+  /**
+   * The role of this paragraph.
+   */
+  protected PdfRole role;
+
+  /**
+   * The secondary role of this paragraph.
+   */
+  protected PdfRole secondaryRole;
 
   // ========================================================================
   // Constructors.
@@ -116,6 +125,30 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
     this.text = text;
   }
 
+  // ==========================================================================
+
+  @Override
+  public PdfRole getRole() {
+    return this.role;
+  }
+
+  @Override
+  public void setRole(PdfRole role) {
+    this.role = role;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfRole getSecondaryRole() {
+    return this.secondaryRole;
+  }
+
+  @Override
+  public void setSecondaryRole(PdfRole secondaryRole) {
+    this.secondaryRole = secondaryRole;
+  }
+
   // ========================================================================
 
   @Override
@@ -137,7 +170,9 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getText(), otherParagraph.getText());
-
+      builder.append(getFeature(), otherParagraph.getFeature());
+      builder.append(getPosition(), otherParagraph.getPosition());
+      
       return builder.isEquals();
     }
     return false;
@@ -147,6 +182,8 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getText());
+    builder.append(getFeature());
+    builder.append(getPosition());
     return builder.hashCode();
   }
 }

@@ -1,5 +1,7 @@
 package icecite.models;
 
+// MAYBE: Add Interface HasWords?
+
 /**
  * A page in a PDF document.
  * 

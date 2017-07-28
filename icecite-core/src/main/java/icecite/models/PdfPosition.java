@@ -6,7 +6,7 @@ import icecite.utils.geometric.Point;
 import icecite.utils.geometric.Rectangle;
 
 /**
- * A position in a PDF document, with a rectangle and a page.
+ * A position in a PDF document, consisting of a page and a bounding box.
  * 
  * @author Claudius Korzen
  */

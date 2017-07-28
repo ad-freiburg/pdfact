@@ -1,11 +1,13 @@
 package icecite.models;
 
+// TODO: Move the getFirst* and getLast* methods to the related interfaces.
+
 /**
  * A text paragraph in a PDF document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfElement, HasWords, HasText {
+public interface PdfParagraph extends PdfElement, HasRole, HasWords, HasText {
   /**
    * Returns the first word.
    * 

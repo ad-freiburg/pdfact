@@ -24,8 +24,7 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
   // ==========================================================================
 
   /**
-   * Returns true, if this word was dehyphenated (this can only be the case if
-   * the word is hyphenated).
+   * Returns true, if this word was dehyphenated.
    * 
    * @return True, if this word was dehyphenated, false otherwise.
    */

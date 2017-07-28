@@ -8,17 +8,17 @@ package icecite.models;
  */
 public interface HasPage {
   /**
-   * Returns the page.
+   * Returns the PDF page.
    * 
-   * @return The page.
+   * @return The PDF page.
    */
   PdfPage getPage();
 
   /**
-   * Sets the given page.
+   * Sets the given PDF page.
    * 
    * @param page
-   *        The page.
+   *        The PDF page.
    */
   void setPage(PdfPage page);
 }

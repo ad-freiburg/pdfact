@@ -1,15 +1,18 @@
 package icecite.models;
 
+// TODO: Eliminate Interfaces HasCharacters and HasTextLines and add HasWords.
+
 /**
  * A text block in a page of a PDF document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextBlock
-    extends PdfElement, HasCharacters, HasTextLines, HasText {
+public interface PdfTextBlock extends PdfElement, HasRole, HasCharacters,
+    HasTextLines, HasText {
   
   /**
-   * Returns the parent paragraph, which this block is a member of.
+   * Returns the parent paragraph, which this block is a member of (needed to 
+   * decide whether this text block was already matched to a paragraph).
    * 
    * @return The parent paragraph.
    */
@@ -21,23 +24,6 @@ public interface PdfTextBlock
    * @param paragraph The parent paragraph.
    */
   void setParentPdfParagraph(PdfParagraph paragraph);
-  
-  // ==========================================================================
-  
-  /**
-   * Returns the role of this PDF element.
-   * 
-   * @return The role of this PDF element.
-   */
-  PdfRole getRole();
-
-  /**
-   * Sets the role of this PDF element.
-   * 
-   * @param role
-   *        The role of this PDF element.
-   */
-  void setRole(PdfRole role);
 
   // ==========================================================================
   

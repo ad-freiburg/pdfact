@@ -36,14 +36,13 @@ public class PlainPdfPosition implements PdfPosition {
    * 
    * @param page
    *        The page.
-   * @param rectangle
+   * @param rect
    *        The rectangle.
    */
   @AssistedInject
-  public PlainPdfPosition(@Assisted PdfPage page,
-      @Assisted Rectangle rectangle) {
+  public PlainPdfPosition(@Assisted PdfPage page, @Assisted Rectangle rect) {
     this.page = page;
-    this.rectangle = rectangle;
+    this.rectangle = rect;
   }
 
   /**
@@ -65,8 +64,10 @@ public class PlainPdfPosition implements PdfPosition {
    */
   @AssistedInject
   public PlainPdfPosition(RectangleFactory rectangleFactory,
-      @Assisted("page") PdfPage page, @Assisted("minX") float minX,
-      @Assisted("minY") float minY, @Assisted("maxX") float maxX,
+      @Assisted("page") PdfPage page,
+      @Assisted("minX") float minX,
+      @Assisted("minY") float minY,
+      @Assisted("maxX") float maxX,
       @Assisted("maxY") float maxY) {
     this.page = page;
     this.rectangle = rectangleFactory.create(minX, minY, maxX, maxY);
@@ -87,7 +88,8 @@ public class PlainPdfPosition implements PdfPosition {
    */
   @AssistedInject
   public PlainPdfPosition(RectangleFactory rectangleFactory,
-      @Assisted("page") PdfPage page, @Assisted("point1") Point point1,
+      @Assisted("page") PdfPage page,
+      @Assisted("point1") Point point1,
       @Assisted("point2") Point point2) {
     this.page = page;
     this.rectangle = rectangleFactory.create(point1, point2);

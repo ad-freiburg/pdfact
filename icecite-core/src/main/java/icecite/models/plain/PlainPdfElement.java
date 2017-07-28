@@ -7,7 +7,6 @@ import icecite.models.PdfElement;
 import icecite.models.PdfFeature;
 import icecite.models.PdfPage;
 import icecite.models.PdfPosition;
-import icecite.models.PdfRole;
 import icecite.utils.geometric.Rectangle;
 
 /**
@@ -20,16 +19,6 @@ public class PlainPdfElement implements PdfElement {
    * The position of this PDF element.
    */
   protected PdfPosition position;
-
-  /**
-   * The role of this PDF element.
-   */
-  protected PdfRole role;
-
-  /**
-   * The secondary role of this PDF element.
-   */
-  protected PdfRole secondaryRole;
 
   // ==========================================================================
 
@@ -44,11 +33,14 @@ public class PlainPdfElement implements PdfElement {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfPage getPage() {
     return this.position != null ? this.position.getPage() : null;
   }
+
+  // TODO: Create PdfPositionFactory and create a PdfPosition if position ==
+  // null on setting for example the page.
 
   @Override
   public void setPage(PdfPage page) {
@@ -56,9 +48,9 @@ public class PlainPdfElement implements PdfElement {
       this.position.setPage(page);
     }
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public Rectangle getRectangle() {
     return this.position != null ? this.position.getRectangle() : null;
@@ -69,30 +61,6 @@ public class PlainPdfElement implements PdfElement {
     if (this.position != null) {
       this.position.setRectangle(rectangle);
     }
-  }
-  
-  // ==========================================================================
-
-  @Override
-  public PdfRole getRole() {
-    return this.role;
-  }
-
-  @Override
-  public void setRole(PdfRole role) {
-    this.role = role;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfRole getSecondaryRole() {
-    return this.secondaryRole;
-  }
-
-  @Override
-  public void setSecondaryRole(PdfRole secondaryRole) {
-    this.secondaryRole = secondaryRole;
   }
 
   // ==========================================================================
@@ -116,6 +84,7 @@ public class PlainPdfElement implements PdfElement {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherElement.getPosition());
+      builder.append(getFeature(), otherElement.getFeature());
 
       return builder.isEquals();
     }
@@ -126,6 +95,7 @@ public class PlainPdfElement implements PdfElement {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
+    builder.append(getFeature());
     return builder.hashCode();
   }
 }

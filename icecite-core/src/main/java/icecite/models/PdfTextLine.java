@@ -2,6 +2,8 @@ package icecite.models;
 
 import icecite.utils.geometric.Line;
 
+// TODO: Eliminate the interface HasCharacters.
+
 /**
  * A text line in a PDF document.
  * 

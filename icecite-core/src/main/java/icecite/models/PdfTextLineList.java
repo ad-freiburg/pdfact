@@ -22,8 +22,7 @@ public interface PdfTextLineList extends PdfElementList<PdfTextLine> {
    * Returns the average width of white spaces between the words within the
    * lines.
    * 
-   * @return The average width of white spaces between the words within the
-   * lines.
+   * @return The average width of white spaces between the words.
    */
   float getAverageWhitespaceWidth();
 

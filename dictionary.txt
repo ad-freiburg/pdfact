@@ -20,3 +20,4 @@ dehyphenate
 haystack
 dehyphenated
 subword
+lowercased

@@ -9,13 +9,12 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfParagraph;
+import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfWord;
-
-// TODO: Don't derive the bounding box in the model.
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -27,7 +26,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    * The parent paragraph.
    */
   protected PdfParagraph parentParagraph;
-  
+
   /**
    * The characters of this text block.
    */
@@ -42,6 +41,16 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
    * The text of this text block.
    */
   protected String text;
+
+  /**
+   * The role of this paragraph.
+   */
+  protected PdfRole role;
+
+  /**
+   * The secondary role of this paragraph.
+   */
+  protected PdfRole secondaryRole;
 
   // ==========================================================================
 
@@ -61,7 +70,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfParagraph getParentPdfParagraph() {
     return this.parentParagraph;
@@ -71,7 +80,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public void setParentPdfParagraph(PdfParagraph paragraph) {
     this.parentParagraph = paragraph;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -181,6 +190,42 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   // ==========================================================================
 
   @Override
+  public String getText() {
+    return this.text;
+  }
+
+  @Override
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfRole getRole() {
+    return this.role;
+  }
+
+  @Override
+  public void setRole(PdfRole role) {
+    this.role = role;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfRole getSecondaryRole() {
+    return this.secondaryRole;
+  }
+
+  @Override
+  public void setSecondaryRole(PdfRole secondaryRole) {
+    this.secondaryRole = secondaryRole;
+  }
+
+  // ==========================================================================
+
+  @Override
   public String toString() {
     return "PlainPdfTextBlock(pos: " + getPosition() + ")";
   }
@@ -205,15 +250,5 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
     builder.append(getPosition());
     builder.append(getTextLines());
     return builder.hashCode();
-  }
-
-  @Override
-  public String getText() {
-    return this.text;
-  }
-
-  @Override
-  public void setText(String text) {
-    this.text = text;
   }
 }

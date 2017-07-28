@@ -7,14 +7,14 @@ package icecite.models;
  */
 public interface PdfFont extends PdfResource {
   /**
-   * Returns the id of this font (needed for serialization).
+   * Returns the id of this font (needed for referencing on serialization).
    * 
    * @return The id of this font.
    */
   String getId();
 
   /**
-   * Sets the id of this font (needed for serialization).
+   * Sets the id of this font (needed for referencing on serialization).
    * 
    * @param id
    *        The id of this font.
