@@ -59,6 +59,9 @@ import icecite.models.PdfWord;
 import icecite.utils.collection.CollectionUtils;
 import icecite.utils.geometric.Rectangle;
 
+// TODO: Fix the serializers.
+// TODO: Serialize the paragraphs.
+
 /**
  * An implementation of PdfSerializer that serializes a PDF document to JSON
  * format.

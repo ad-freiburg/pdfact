@@ -5,6 +5,8 @@ import java.util.Set;
 
 import icecite.utils.geometric.HasRectangle;
 
+// TODO: In PdfElementList, accelerate cut method.
+
 /**
  * A list of PDF elements.
  * 

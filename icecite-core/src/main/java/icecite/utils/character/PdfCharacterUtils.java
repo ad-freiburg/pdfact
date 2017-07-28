@@ -7,6 +7,8 @@ import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
 import icecite.models.PdfCharacter;
 
+// TODO: Restructure the util methods.
+
 /**
  * A collection of utility methods that deal with PdfCharacter objects.
  * 

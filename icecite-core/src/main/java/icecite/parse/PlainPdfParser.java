@@ -23,6 +23,8 @@ import icecite.parse.stream.PdfStreamParser.PdfStreamParserFactory;
 import icecite.parse.translate.DiacriticsTranslator;
 import icecite.parse.translate.LigaturesTranslator;
 
+// TODO: In parser, use more custom models.
+
 /**
  * A plain implementation of {@link PdfParser}.
  *

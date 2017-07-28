@@ -20,6 +20,8 @@ import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.textlines.PdfTextLineUtils;
 
+//TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
+
 /**
  * A plain implementation of {@link PdfTextBlockTokenizer}.
  * 

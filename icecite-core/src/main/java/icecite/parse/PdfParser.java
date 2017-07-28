@@ -8,6 +8,8 @@ import com.google.inject.assistedinject.Assisted;
 import icecite.exception.IceciteException;
 import icecite.models.PdfDocument;
 
+// TODO: Add a feature to read "invisible" tokens -> Needed for "synctex"
+
 /**
  * A PDF parser that parses the characters, figures and shapes of a PDF file.
  *
