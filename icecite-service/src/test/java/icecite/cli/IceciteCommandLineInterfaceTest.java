@@ -1,10 +1,5 @@
 package icecite.cli;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 import icecite.exception.IceciteParseCommandLineException;
@@ -78,34 +73,34 @@ public class IceciteCommandLineInterfaceTest {
     new IceciteCommandLineInterface().process(new String[] {path, "bar"});
   }
   
-  /**
-   * Tests the run method, where the first argument is a folder.
-   * 
-   * @throws Exception If running the test fails.
-   */
-  @Test
-  public void testRunTwoValidArguments() throws Exception {
-    ClassLoader classLoader = getClass().getClassLoader();
-    
-    String pdfFolder = classLoader.getResource("pdfs").getPath();
-    Path inputPath = Paths.get(pdfFolder, "file-1.pdf");
-    
-    String outputFolder = classLoader.getResource("serializations").getPath();
-    Path outputPath = Paths.get(outputFolder, "file-1.xml");
-    
-    // Delete the output path if it already exists (from another test run). 
-    if (Files.exists(outputPath)) {
-      Files.delete(outputPath);
-    }
-    
-    // make sure that the input path exists and the output path does not exist.
-    Assert.assertTrue(Files.exists(inputPath));
-    Assert.assertFalse(Files.exists(outputPath));
-    
-    new IceciteCommandLineInterface().process(
-        new String[] { inputPath.toString(), outputPath.toString() }
-    );
-    
-    Assert.assertTrue(Files.exists(outputPath));
-  }
+//  /**
+//   * Tests the run method, where the first argument is a folder.
+//   * 
+//   * @throws Exception If running the test fails.
+//   */
+//  @Test
+//  public void testRunTwoValidArguments() throws Exception {
+//    ClassLoader classLoader = getClass().getClassLoader();
+//    
+//    String pdfFolder = classLoader.getResource("pdfs").getPath();
+//    Path inputPath = Paths.get(pdfFolder, "file-1.pdf");
+//    
+//    String outputFolder = classLoader.getResource("serializations").getPath();
+//    Path outputPath = Paths.get(outputFolder, "file-1.xml");
+//    
+//    // Delete the output path if it already exists (from another test run). 
+//    if (Files.exists(outputPath)) {
+//      Files.delete(outputPath);
+//    }
+//    
+//    make sure that the input path exists and the output path does not exist.
+//    Assert.assertTrue(Files.exists(inputPath));
+//    Assert.assertFalse(Files.exists(outputPath));
+//    
+//    new IceciteCommandLineInterface().process(
+//        new String[] { inputPath.toString(), outputPath.toString() }
+//    );
+//    
+//    Assert.assertTrue(Files.exists(outputPath));
+//  }
 }

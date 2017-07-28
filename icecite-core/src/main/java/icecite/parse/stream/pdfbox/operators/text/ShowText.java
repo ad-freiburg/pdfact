@@ -568,7 +568,7 @@ public class ShowText extends OperatorProcessor {
    *        The current text rendering matrix.
    * @return The bounding box.
    * @throws IOException
-   *         if obtaining the defualt bounding box fails.
+   *         if obtaining the default bounding box fails.
    */
   protected Rectangle computePdfBoxGlyphBoundingBox(int code, PDFont font,
       Matrix trm) throws IOException {

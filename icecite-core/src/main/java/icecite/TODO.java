@@ -13,4 +13,5 @@ public class TODO {
   // TODO: Write a PDColorTranslator, as for PDFont
   // TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
   // TODO: Serialize the paragraphs.
+  // TODO: Add a feature to read "invisible" tokens -> Needed for "synctex"
 }

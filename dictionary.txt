@@ -21,3 +21,4 @@ haystack
 dehyphenated
 subword
 lowercased
+ligature

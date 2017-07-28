@@ -15,7 +15,6 @@
 
   <properties>
     <baseDir>${project.parent.basedir}</baseDir>
-    <mainClass>icecite.cli.IceciteCommandLineInterface</mainClass>
   </properties>
 
   <dependencies>
@@ -33,31 +32,30 @@
 
   <build>
     <plugins>
-      <!-- Configure the assembly plugin. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4.1</version>
-        <configuration>
-          <!-- get all project dependencies -->
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <!-- MainClass in mainfest make a executable jar -->
-          <archive>
-            <manifest>
-              <mainClass>${mainClass}</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id>
-            <!-- bind to the packaging phase -->
+            <id>build-cli</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>icecite.cli.IceciteCommandLineInterface</mainClass>
+                </manifest>
+              </archive>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <finalName>icecite-cli</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <attach>false</attach>
+            </configuration>
           </execution>
         </executions>
       </plugin>
