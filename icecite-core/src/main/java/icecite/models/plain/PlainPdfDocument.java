@@ -19,7 +19,6 @@ import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfShape;
-import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
@@ -61,11 +60,6 @@ public class PlainPdfDocument implements PdfDocument {
   protected PdfTextLineList textLines;
 
   /**
-   * All text blocks of this PDF document.
-   */
-  protected List<PdfTextBlock> textBlocks;
-
-  /**
    * All paragraphs of this PDF document.
    */
   protected List<PdfParagraph> paragraphs;
@@ -88,7 +82,6 @@ public class PlainPdfDocument implements PdfDocument {
     this.pages = new ArrayList<>();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
-    this.textBlocks = new ArrayList<>();
     this.paragraphs = new ArrayList<>();
   }
 
@@ -259,30 +252,6 @@ public class PlainPdfDocument implements PdfDocument {
   @Override
   public void addTextLine(PdfTextLine line) {
     this.textLines.add(line);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public List<PdfTextBlock> getTextBlocks() {
-    return this.textBlocks;
-  }
-
-  @Override
-  public void setTextBlocks(List<PdfTextBlock> textBlocks) {
-    this.textBlocks = textBlocks;
-  }
-
-  @Override
-  public void addTextBlocks(List<PdfTextBlock> textBlocks) {
-    for (PdfTextBlock textBlock : textBlocks) {
-      addTextBlock(textBlock);
-    }
-  }
-
-  @Override
-  public void addTextBlock(PdfTextBlock textBlock) {
-    this.textBlocks.add(textBlock);
   }
 
   // ==========================================================================

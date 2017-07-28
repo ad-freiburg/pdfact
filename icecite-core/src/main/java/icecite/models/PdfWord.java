@@ -66,6 +66,13 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
     /**
      * Creates a PdfWord.
      * 
+     * @return An instance of {@link PdfWord}.
+     */
+    PdfWord create();
+    
+    /**
+     * Creates a PdfWord.
+     * 
      * @param characters
      *        The characters of the word to create.
      * 

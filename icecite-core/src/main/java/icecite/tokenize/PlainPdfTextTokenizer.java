@@ -126,9 +126,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     computeTexts2(page);
 
     // Tokenize the page into text blocks.
-    List<PdfTextBlock> textBlocks = tokenizeIntoTextBlocks(pdf, page);
-    page.setTextBlocks(textBlocks);
-    pdf.addTextBlocks(textBlocks);
+    page.setTextBlocks(tokenizeIntoTextBlocks(pdf, page));
     
     // Compute the texts for text blocks, text lines and words.
     computeTexts(page);

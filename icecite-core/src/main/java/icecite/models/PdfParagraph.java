@@ -5,39 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfElement, HasTextBlocks, HasText {
-  /**
-   * Returns the first text block.
-   * 
-   * @return The first text block or null if there are no text blocks.
-   */
-  PdfTextBlock getFirstTextBlock();
-
-  /**
-   * Returns the last text block.
-   * 
-   * @return The last text block or null if there are no text blocks.
-   */
-  PdfTextBlock getLastTextBlock();
-  
-  // ==========================================================================
-  
-  /**
-   * Returns the first text line.
-   * 
-   * @return The first text line or null if there are no text lines.
-   */
-  PdfTextLine getFirstTextLine();
-
-  /**
-   * Returns the last text line.
-   * 
-   * @return The last text line or null if there are no text lines.
-   */
-  PdfTextLine getLastTextLine();
-  
-  // ==========================================================================
-  
+public interface PdfParagraph extends PdfElement, HasWords, HasText {
   /**
    * Returns the first word.
    * 

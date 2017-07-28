@@ -9,7 +9,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfCharacter;
+import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfFeature;
 import icecite.models.PdfWord;
 import icecite.utils.geometric.Rectangle;
@@ -49,6 +51,14 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
 
   // ==========================================================================
 
+  /**
+   * Creates a new word.
+   */
+  @AssistedInject
+  public PlainPdfWord(PdfCharacterListFactory characterListFactory) {
+    this.characters = characterListFactory.create();
+  }
+  
   /**
    * Creates a new word.
    * 

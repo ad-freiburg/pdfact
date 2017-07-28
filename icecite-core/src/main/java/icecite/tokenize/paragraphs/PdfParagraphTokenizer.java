@@ -6,7 +6,7 @@ import icecite.models.PdfDocument;
 import icecite.models.PdfParagraph;
 
 /**
- * A tokenizer that identifies the paragraphs of PDF documents. This tokenizer
+ * A tokenizer that identifies the paragraphs in PDF documents. This tokenizer
  * needs identified text blocks with identified semantics.
  * 
  * @author Claudius Korzen
