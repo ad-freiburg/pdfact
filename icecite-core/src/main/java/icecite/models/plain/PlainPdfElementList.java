@@ -432,7 +432,8 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     Set<T> elements = new HashSet<>(); // TODO: Choose capacity.
     for (T element : this) {
       // TODO: Allow a tolerance value.
-      if (MathUtils.isEqual(element.getRectangle().getMaxX(), largestMaxX, 1f)) {
+      float maxX = element.getRectangle().getMaxX();
+      if (MathUtils.isEqual(maxX, largestMaxX, 1f)) {
         elements.add(element);
       }
     }

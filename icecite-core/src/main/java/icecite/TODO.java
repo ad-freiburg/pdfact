@@ -6,13 +6,11 @@ package icecite;
  * @author Claudius Korzen
  */
 public class TODO {
-  // TODO: Identify the semantics of paragraphs.
-  // TODO: Merge the paragraphs that are split by column- and / or page breaks
   // TODO: Restructure the util methods.
   // TODO: Fix the serializers.
-  // TODO: On Paragraph identification, identify itemize items
-  // TODO: In parser, use mor custom models.
+  // TODO: In parser, use more custom models.
   // TODO: In PdfElementList, accelerate cut method.
   // TODO: Write a PDColorTranslator, as for PDFont
   // TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
+  // TODO: Serialize the paragraphs.
 }

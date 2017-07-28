@@ -107,7 +107,8 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
         dehyphenated.addCharacter(word1.getCharacters().get(i));
       }
       dehyphenated.addCharacters(word2.getCharacters());
-      dehyphenated.setText(word1.getText().substring(0, word1.getText().length() - 1) + word2.getText());
+      dehyphenated.setText(word1.getText().substring(0, 
+          word1.getText().length() - 1) + word2.getText());
     }
 
     dehyphenated.setIsDehyphenated(true);

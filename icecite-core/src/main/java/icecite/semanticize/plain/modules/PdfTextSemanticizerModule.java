@@ -15,5 +15,5 @@ public interface PdfTextSemanticizerModule {
    * @param pdf
    *        The PDF document to semanticize.
    */
-  public void semanticize(PdfDocument pdf);
+  void semanticize(PdfDocument pdf);
 }

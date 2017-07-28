@@ -70,7 +70,6 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
   /**
    * The current page in the PDF file.
    */
-  // TODO: Replace this.page (PDPage) by pdfPage.
   protected PdfPage pdfPage;
 
   /**
@@ -509,7 +508,7 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    * @param m
    *        The matrix to apply.
    * 
-   * @TODO: Maybe its a better idea to make the transformation *not* in place.
+   * TODO: Maybe its a better idea to make the transformation *not* in place.
    */
   public void transform(Point p, Matrix m) {
     if (p != null && m != null) {

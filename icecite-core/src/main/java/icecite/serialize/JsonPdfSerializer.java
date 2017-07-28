@@ -198,7 +198,6 @@ public class JsonPdfSerializer implements PdfSerializer {
     JSONArray figures = new JSONArray();
     JSONArray shapes = new JSONArray();
 
-    
     // Serialize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
       if (isSerializePdfElement(block, features, roles)) {

@@ -97,7 +97,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     
     // Visualize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
-       if (isVisualizePdfElement(block, features, roles)) {
+      if (isVisualizePdfElement(block, features, roles)) {
         visualizePdfElement(page, block, drawer, Color.RED);
       }
       for (PdfTextLine line : block.getTextLines()) {

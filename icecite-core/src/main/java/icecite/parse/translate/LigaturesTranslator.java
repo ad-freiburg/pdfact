@@ -17,7 +17,7 @@ public class LigaturesTranslator {
   static final Map<String, String> LIGATURES;
 
   static {
-    // Fill the ligatures DIACRITICS.
+    // Fill the ligatures DIACRITICS. // TODO: Move to PdfCharacterUtils.
     LIGATURES = new HashMap<String, String>();
     LIGATURES.put("\u00C6", "AE");
     LIGATURES.put("\u00E6", "ae");
@@ -57,7 +57,7 @@ public class LigaturesTranslator {
    * @param character
    *        The PDF character to process.
    */
-  public static void resolveLigature(PdfCharacter character) {
+  public static void translateLigature(PdfCharacter character) {
     if (isLigature(character)) {
       character.setText(getResolvedLigatureText(character));
     }

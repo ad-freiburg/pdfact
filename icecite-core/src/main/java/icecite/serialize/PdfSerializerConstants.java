@@ -22,7 +22,7 @@ public class PdfSerializerConstants {
   static final String CONTEXT_NAME_PARAGRAPH = "paragraph";
   /** The name of context where to put the text lines. */
   static final String CONTEXT_NAME_TEXTLINES = "textlines";
-  /** The name of context where to put a single textline. */
+  /** The name of context where to put a single text line. */
   static final String CONTEXT_NAME_TEXTLINE = "textline";
   /** The name of context where to put the words. */
   static final String CONTEXT_NAME_WORDS = "words";

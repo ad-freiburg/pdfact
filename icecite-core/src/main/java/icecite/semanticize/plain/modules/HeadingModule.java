@@ -186,7 +186,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
           continue;
         }
 
-        // TODO: Find a reliable criteria to distinguish headings from the rest. 
+        // TODO:Find a reliable criteria to distinguish headings from the rest.
         if (fontFace.getFontSize() - pdfFontFace.getFontSize() > 1) {
           headingCharacters.addCharacters(block.getCharacters());
         }

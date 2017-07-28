@@ -55,25 +55,25 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   protected PdfPage page;
 
   /**
-   * The predecessor of the current character (needed to resolve diacritics).
+   * The predecessor of the current character (needed to translate diacritics).
    */
   protected PdfCharacter prevChar;
 
   /**
-   * The predecessor of prevCharacter (needed to resolve diacritics).
+   * The predecessor of prevCharacter (needed to translate diacritics).
    */
   protected PdfCharacter prevPrevChar;
 
   /**
-   * The boolean flag to indicate whether ligatures should be resolved or not.
+   * The boolean flag to indicate whether ligatures should be translated or not.
    */
-  protected boolean resolveLigatures;
+  protected boolean translateLigatures;
 
   /**
    * The boolean flag to indicate whether characters with diacritics should be
-   * resolved or not.
+   * translated or not.
    */
-  protected boolean resolveDiacritics;
+  protected boolean translateDiacritics;
 
   // ==========================================================================
   // Constructors.
@@ -104,24 +104,24 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
    *        The factory to create instances of PdfDocument.
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
-   * @param resolveLigatures
-   *        The boolean flag to indicate whether ligatures should be resolved
+   * @param translateLigatures
+   *        The boolean flag to indicate whether ligatures should be translated
    *        or not.
-   * @param resolveDiacritics
+   * @param translateDiacritics
    *        The boolean flag to indicate whether characters with diacritics
-   *        should be resolved or not.
+   *        should be translated or not.
    */
   @AssistedInject
   public PlainPdfParser(PdfStreamParserFactory pdfStreamParserFactory,
       PdfDocumentFactory pdfDocumentFactory,
       PdfCharacterListFactory characterListFactory,
-      @Assisted("resolveLigatures") boolean resolveLigatures,
-      @Assisted("resolveDiacritics") boolean resolveDiacritics) {
+      @Assisted("translateLigatures") boolean translateLigatures,
+      @Assisted("translateDiacritics") boolean translateDiacritics) {
     this.streamParserFactory = pdfStreamParserFactory;
     this.documentFactory = pdfDocumentFactory;
     this.characterListFactory = characterListFactory;
-    this.resolveLigatures = resolveLigatures;
-    this.resolveDiacritics = resolveDiacritics;
+    this.translateLigatures = translateLigatures;
+    this.translateDiacritics = translateDiacritics;
   }
 
   // ==========================================================================
@@ -146,24 +146,29 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   // ==========================================================================
   // Getter methods.
 
-  /**
-   * Returns true, if ligatures should be resolved; false otherwise.
-   * 
-   * @return true, if ligatures should be resolved; false otherwise.
-   */
-  public boolean isResolveLigatures() {
-    return this.resolveLigatures;
+  @Override
+  public boolean isTranslateLigatures() {
+    return this.translateLigatures;
   }
 
-  /**
-   * Returns true, if diacritics should be resolved; false otherwise.
-   * 
-   * @return true, if diacritics should be resolved; false otherwise.
-   */
-  public boolean isResolveDiacritics() {
-    return this.resolveDiacritics;
+  @Override
+  public boolean isTranslateDiacritics() {
+    return this.translateDiacritics;
   }
 
+  // ==========================================================================
+  // Setter methods.
+
+  @Override
+  public void setIsTranslateLigatures(boolean translateLigatures) {
+    this.translateLigatures = translateLigatures;
+  }
+
+  @Override
+  public void setIsTranslateDiacritics(boolean translateDiacritics) {
+    this.translateDiacritics = translateDiacritics;
+  }
+  
   // ==========================================================================
   // Handler methods.
 
@@ -190,12 +195,12 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
   @Override
   public void handlePdfCharacter(PdfCharacter chaar) {
-    // Check if the character is a ligature. If so, resolve it.
-    if (isResolveLigatures()) {
-      LigaturesTranslator.resolveLigature(chaar);
+    // Check if the character is a ligature. If so, translate it.
+    if (isTranslateLigatures()) {
+      LigaturesTranslator.translateLigature(chaar);
     }
 
-    // Check if the character is a diacritic. If so, resolve it.
+    // Check if the character is a diacritic. If so, translate it.
     // In most cases, diacritic characters are represented in its decomposed
     // form. For example, "è" may be represented as the two characters "'e" or
     // "e'". To merge such characters the base character must be followed by
@@ -208,7 +213,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     // diacritic and the character "in front" of the character
     // (prePreviousCharacter) and (b) the diacritic and the character "behind"
     // the character (the current character).
-    if (isResolveDiacritics()) {
+    if (isTranslateDiacritics()) {
       DiacriticsTranslator.translate(this.prevChar, this.prevPrevChar, chaar);
     }
 

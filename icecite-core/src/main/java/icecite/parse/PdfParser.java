@@ -41,6 +41,44 @@ public interface PdfParser {
   // ==========================================================================
 
   /**
+   * Returns true, if ligatures should be translated; False otherwise.
+   * 
+   * @return true, if ligatures should be translated; False otherwise.
+   */
+  boolean isTranslateLigatures();
+
+  /**
+   * Sets the flag that indicates whether ligatures should be translated or
+   * not.
+   * 
+   * @param translateLigatures
+   *        the flag that indicates whether ligatures should be translated or
+   *        not.
+   */
+  void setIsTranslateLigatures(boolean translateLigatures);
+
+  // ==========================================================================
+  
+  /**
+   * Returns true, if diacritics should be translated; False otherwise.
+   * 
+   * @return true, if diacritics should be translated; False otherwise.
+   */
+  boolean isTranslateDiacritics();
+
+  /**
+   * Sets the flag that indicates whether diacritics should be translated or
+   * not.
+   * 
+   * @param translateDiacritics
+   *        the flag that indicates whether diacritics should be translated or
+   *        not.
+   */
+  void setIsTranslateDiacritics(boolean translateDiacritics);
+  
+  // ==========================================================================
+
+  /**
    * The factory to create instance of {@link PdfParser}.
    * 
    * @author Claudius Korzen
@@ -56,16 +94,16 @@ public interface PdfParser {
     /**
      * Creates a PdfParser.
      * 
-     * @param resolveLigatures
-     *        The boolean flag to indicate whether ligatures should be resolved
-     *        or not.
-     * @param resolveDiacritics
+     * @param translateLigatures
+     *        The boolean flag to indicate whether ligatures should be
+     *        translated or not.
+     * @param translateDiacritics
      *        The boolean flag to indicate whether characters with diacritics
-     *        should be resolved or not.
+     *        should be translated or not.
      * 
      * @return An instance of PdfParser.
      */
-    PdfParser create(@Assisted("resolveLigatures") boolean resolveLigatures,
-        @Assisted("resolveDiacritics") boolean resolveDiacritics);
+    PdfParser create(@Assisted("translateLigatures") boolean translateLigatures,
+        @Assisted("translateDiacritics") boolean translateDiacritics);
   }
 }

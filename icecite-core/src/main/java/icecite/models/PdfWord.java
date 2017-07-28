@@ -45,14 +45,14 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
    * 
    * @return the first character of this word.
    */
-  public PdfCharacter getFirstCharacter();
+  PdfCharacter getFirstCharacter();
   
   /**
    * Returns the last character of this word.
    * 
    * @return the last character of this word.
    */
-  public PdfCharacter getLastCharacter();
+  PdfCharacter getLastCharacter();
   
   // ==========================================================================
 
