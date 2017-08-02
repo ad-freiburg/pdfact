@@ -2,6 +2,7 @@ package icecite.semanticize.plain.modules;
 
 import java.util.List;
 
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -13,38 +14,40 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public class BodyTextModule implements PdfTextSemanticizerModule {  
+public class BodyTextModule implements PdfTextSemanticizerModule {
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
-    // Compute the most common font face in the PDF document. 
-    PdfFontFace pdfFontFace = pdf.getCharacters().getMostCommonFontFace();
-    
+
+    // Compute the most common font face in the PDF document.
+    PdfCharacterStatistics pdfCharStats = pdf.getCharacterStatistics();
+    PdfFontFace pdfFontFace = pdfCharStats.getMostCommonFontFace();
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
         }
-        
+
         if (block.getRole() != null) {
           continue;
         }
-        
-        // The text block is a member of the body text if its font face is 
+
+        // The text block is a member of the body text if its font face is
         // equal to the most common font face.
-        PdfFontFace fontFace = block.getCharacters().getMostCommonFontFace();
+        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         if (fontFace == pdfFontFace) {
           block.setRole(PdfRole.BODY_TEXT);
         }

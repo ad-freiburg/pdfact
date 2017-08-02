@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import icecite.models.HasCharacters;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
@@ -17,12 +16,9 @@ import icecite.utils.comparators.MinXComparator;
  * A class that cuts a list of characters horizontally and vertically into
  * (smaller) blocks.
  * 
- * @param <T>
- *        The type in which the resulting character blocks should be packed.
- * 
  * @author Claudius Korzen
  */
-public abstract class XYCut<T extends HasCharacters> {
+public abstract class XYCut {
   /**
    * Cuts the given characters into blocks of type T.
    * 
@@ -30,15 +26,16 @@ public abstract class XYCut<T extends HasCharacters> {
    *        The PDF document to which the characters belong to.
    * @param page
    *        The page in which the characters are located.
-   * @param chars
+   * @param characters
    *        The characters to cut.
    * 
    * @return The list of resulting blocks.
    */
-  public List<T> cut(PdfDocument pdf, PdfPage page, PdfCharacterList chars) {
-    List<T> blocks = new ArrayList<>();
-    cut(pdf, page, chars, blocks);
-    return blocks;
+  public List<PdfCharacterList> cut(PdfDocument pdf, PdfPage page,
+      PdfCharacterList characters) {
+    List<PdfCharacterList> target = new ArrayList<>();
+    cut(pdf, page, characters, target);
+    return target;
   }
 
   /**
@@ -49,15 +46,15 @@ public abstract class XYCut<T extends HasCharacters> {
    *        The PDF document to which the characters belong to.
    * @param page
    *        The page in which the characters are located.
-   * @param characters
+   * @param origin
    *        The characters to be cut.
-   * @param blocks
+   * @param target
    *        The list of blocks to fill.
    */
-  protected void cut(PdfDocument pdf, PdfPage page, PdfCharacterList characters,
-      List<T> blocks) {
+  protected void cut(PdfDocument pdf, PdfPage page, PdfCharacterList origin,
+      List<PdfCharacterList> target) {
     // Cut the characters vertically (x-cut).
-    List<PdfCharacterList> xBlocks = xCut(pdf, page, characters);
+    List<PdfCharacterList> xBlocks = xCut(pdf, page, origin);
 
     for (PdfCharacterList xBlock : xBlocks) {
       // Cut the characters horizontally (y-cut).
@@ -67,12 +64,12 @@ public abstract class XYCut<T extends HasCharacters> {
         // be cut. Pack them and add them to the result list.
         PdfCharacterList block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
-          blocks.add(pack(page, block));
+          target.add(block);
         }
       } else {
         // The characters could be cut. Cut the resulted blocks recursively.
         for (PdfCharacterList yBlock : yBlocks) {
-          cut(pdf, page, yBlock, blocks);
+          cut(pdf, page, yBlock, target);
         }
       }
     }
@@ -119,10 +116,11 @@ public abstract class XYCut<T extends HasCharacters> {
 
           if (cutScore < 0) {
             break;
-          } else if (cutScore > bestCutScore) {
-            bestCutScore = cutScore;
-            bestCutIndex = index;
-          }
+          } else
+            if (cutScore > bestCutScore) {
+              bestCutScore = cutScore;
+              bestCutIndex = index;
+            }
           halves = chars.cut(++index);
         }
         if (bestCutIndex > -1) {
@@ -176,10 +174,11 @@ public abstract class XYCut<T extends HasCharacters> {
 
           if (cutScore < 0) {
             break;
-          } else if (cutScore > bestCutScore) {
-            bestCutScore = cutScore;
-            bestCutIndex = index;
-          }
+          } else
+            if (cutScore > bestCutScore) {
+              bestCutScore = cutScore;
+              bestCutIndex = index;
+            }
           halves = chars.cut(++index);
         }
         if (bestCutIndex > -1) {
@@ -227,15 +226,15 @@ public abstract class XYCut<T extends HasCharacters> {
   public abstract float assessHorizontalCut(PdfDocument pdf, PdfPage page,
       List<PdfCharacterList> halves);
 
-  /**
-   * Packs the given characters into the target type.
-   * 
-   * @param page
-   *        The page in which the characters are located.
-   * @param characters
-   *        The characters to pack.
-   * 
-   * @return An object of given target type.
-   */
-  public abstract T pack(PdfPage page, PdfCharacterList characters);
+  // /**
+  // * Packs the given characters into the target type.
+  // *
+  // * @param page
+  // * The page in which the characters are located.
+  // * @param characters
+  // * The characters to pack.
+  // *
+  // * @return An object of given target type.
+  // */
+  // public abstract T pack(PdfPage page, PdfCharacterList characters);
 }

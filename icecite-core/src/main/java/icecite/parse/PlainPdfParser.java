@@ -67,7 +67,8 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   protected PdfCharacter prevPrevChar;
 
   /**
-   * The boolean flag to indicate whether ligatures should be translated or not.
+   * The boolean flag to indicate whether ligatures should be translated or
+   * not.
    */
   protected boolean translateLigatures;
 
@@ -170,7 +171,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   public void setIsTranslateDiacritics(boolean translateDiacritics) {
     this.translateDiacritics = translateDiacritics;
   }
-  
+
   // ==========================================================================
   // Handler methods.
 
@@ -221,7 +222,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
 
     if (!PdfCharacterFilter.filterPdfCharacter(chaar)) {
       this.page.addCharacter(chaar);
-      this.pdfDocument.addCharacter(chaar);
     }
 
     this.prevPrevChar = this.prevChar;
@@ -234,7 +234,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
       return;
     }
     this.page.addFigure(figure);
-    this.pdfDocument.addFigure(figure);
   }
 
   @Override
@@ -243,6 +242,5 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
       return;
     }
     this.page.addShape(shape);
-    this.pdfDocument.addShape(shape);
   }
 }

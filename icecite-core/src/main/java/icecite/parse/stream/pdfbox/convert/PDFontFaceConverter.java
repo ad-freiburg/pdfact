@@ -56,7 +56,7 @@ public class PDFontFaceConverter {
     if (font == null) {
       return null;
     }
-    
+
     String key = font.getId() + ":" + fontSize;
     if (this.knownFontFaces.containsKey(key)) {
       return this.knownFontFaces.get(key);
@@ -64,7 +64,7 @@ public class PDFontFaceConverter {
 
     PdfFontFace fontFace = this.fontFaceFactory.create(font, fontSize);
     this.knownFontFaces.put(key, fontFace);
-    
+
     return fontFace;
   }
 }

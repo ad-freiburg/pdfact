@@ -13,34 +13,34 @@ import icecite.models.PdfTextBlock;
  * 
  * @author Claudius Korzen
  */
-public class TableModule implements PdfTextSemanticizerModule {  
+public class TableModule implements PdfTextSemanticizerModule {
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       List<PdfShape> shapes = page.getShapes();
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
         }
-        
+
         if (block.getRole() != null) {
           continue;
         }
-        
+
         for (PdfShape shape : shapes) {
           // The block is a part of a table if there is a shape that overlaps
           // the block, but the shape is not completely included in the block

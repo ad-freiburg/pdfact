@@ -59,9 +59,10 @@ public class DiacriticsTranslator {
     // Merge the diacritic to the base character with the largest overlap.
     if (leftOverlap > 0 && leftOverlap >= rightOverlap) {
       mergeDiacritic(diacritic, leftChar);
-    } else if (rightOverlap > 0 && rightOverlap > leftOverlap) {
-      mergeDiacritic(diacritic, rightChar);
-    }
+    } else
+      if (rightOverlap > 0 && rightOverlap > leftOverlap) {
+        mergeDiacritic(diacritic, rightChar);
+      }
   }
 
   /**

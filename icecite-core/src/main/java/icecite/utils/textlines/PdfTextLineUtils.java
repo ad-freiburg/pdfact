@@ -1,7 +1,5 @@
 package icecite.utils.textlines;
 
-import icecite.models.PdfCharacterList;
-import icecite.models.PdfFont;
 import icecite.models.PdfTextLine;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Rectangle;
@@ -41,41 +39,6 @@ public class PdfTextLineUtils {
     }
 
     return Math.abs(firstBaseLine.getStartY() - secondBaseLine.getStartY());
-  }
-
-  /**
-   * Computes the font face of the given line, that is a string containing the
-   * font name and the font size.
-   * 
-   * @param line
-   *        The text line to process.
-   * 
-   * @return The font face of the given line.
-   */
-  // TODO: Use the PdfFontFace class.
-  public static String computeFontFace(PdfTextLine line) {
-    if (line == null) {
-      return null;
-    }
-
-    PdfCharacterList characters = line.getCharacters();
-    if (characters == null) {
-      return null;
-    }
-
-    PdfFont font = characters.getMostCommonFont();
-    if (font == null) {
-      return null;
-    }
-
-    String fontName = font.getBaseName();
-    if (fontName == null) {
-      return null;
-    }
-
-    float fontsize = characters.getMostCommonFontsize();
-
-    return fontName + "" + fontsize;
   }
 
   /**

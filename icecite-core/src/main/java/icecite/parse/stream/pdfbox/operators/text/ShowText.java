@@ -72,7 +72,7 @@ public class ShowText extends OperatorProcessor {
    * The factory to create instances of {@link PdfPosition}.
    */
   protected PdfPositionFactory positionFactory;
-  
+
   /**
    * The factory to create instances of {@link Point}.
    */
@@ -87,7 +87,7 @@ public class ShowText extends OperatorProcessor {
    * The converter to create instances of {@link PdfFontFace}.
    */
   protected PDFontFaceConverter fontFaceConverter;
-  
+
   /**
    * The translator to translate PDColor objects to PdfColor objects.
    */
@@ -98,7 +98,7 @@ public class ShowText extends OperatorProcessor {
    * number of a character).
    */
   protected int sequenceNumber;
-  
+
   /**
    * Creates a new OperatorProcessor to process the operation "ShowText".
    * 
@@ -114,7 +114,7 @@ public class ShowText extends OperatorProcessor {
    *        The factory to create instances of {@link Rectangle}.
    * @param pointFactory
    *        The factory to create instances of {@link Point}.
-   * @param positionFactory 
+   * @param positionFactory
    *        The factory to create instances of {@link PdfPosition}.
    */
   @Inject
@@ -260,14 +260,15 @@ public class ShowText extends OperatorProcessor {
         // Don't adjust bounding box if the width is 0.
         box.setMinX(pdfBoxBoundBox.getMinX());
         box.setMaxX(pdfBoxBoundBox.getMaxX());
-      } else if (MathUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
-        if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
-          box.setMinX(pdfBoxBoundBox.getMinX());
+      } else
+        if (MathUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
+          if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
+            box.setMinX(pdfBoxBoundBox.getMinX());
+          }
+          if (pdfBoxBoundBox.getMaxX() > box.getMaxX()) {
+            box.setMaxX(pdfBoxBoundBox.getMaxX());
+          }
         }
-        if (pdfBoxBoundBox.getMaxX() > box.getMaxX()) {
-          box.setMaxX(pdfBoxBoundBox.getMaxX());
-        }
-      }
     } else {
       // Use the bounding box of PdfBox.
       box = pdfBoxBoundBox;
@@ -342,7 +343,7 @@ public class ShowText extends OperatorProcessor {
         return;
       }
     }
-    
+
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
 
     PDColor pdColor = graphicsState.getNonStrokingColor();
@@ -356,7 +357,7 @@ public class ShowText extends OperatorProcessor {
     // Round the font size.
     fontSize = MathUtils.round(fontSize, FLOATING_NUMBER_PRECISION);
     PdfFontFace fontFace = this.fontFaceConverter.convert(font, fontSize);
-    
+
     // Round the values of boundingbox.
     box.setMinX(MathUtils.round(box.getMinX(), FLOATING_NUMBER_PRECISION));
     box.setMinY(MathUtils.round(box.getMinY(), FLOATING_NUMBER_PRECISION));
@@ -364,17 +365,17 @@ public class ShowText extends OperatorProcessor {
     box.setMaxY(MathUtils.round(box.getMaxY(), FLOATING_NUMBER_PRECISION));
 
     PdfPosition position = this.positionFactory.create(pdfPage, box);
-    
+
     PdfCharacter character = this.characterFactory.create();
     character.setText(unicode);
     character.setFontFace(fontFace);
     character.setColor(color);
     character.setPosition(position);
     character.setSequenceNumber(this.sequenceNumber++);
-    
+
     this.engine.handlePdfCharacter(character);
   }
-    
+
   // ==========================================================================
 
   /**

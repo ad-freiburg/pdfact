@@ -5,13 +5,30 @@ package icecite.models;
  *
  * @author Claudius Korzen
  */
-public interface HasTextLines {
+public interface HasTextLines extends HasTextLineStatistics,
+    HasCharacterStatistics {
   /**
    * Returns the text lines.
    * 
    * @return The text lines.
    */
   PdfTextLineList getTextLines();
+
+  /**
+   * Returns the first text line.
+   * 
+   * @return the first text line.
+   */
+  PdfTextLine getFirstTextLine();
+
+  /**
+   * Returns the last text line.
+   * 
+   * @return the last text line.
+   */
+  PdfTextLine getLastTextLine();
+
+  // ==========================================================================
 
   /**
    * Sets the given text lines.

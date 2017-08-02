@@ -61,6 +61,22 @@ public class ObjectCounter<T> extends TObjectIntHashMap<T> {
   }
 
   /**
+   * Adds the given ObjectCounter to this counter.
+   * 
+   * @param o
+   *        The object to add.
+   */
+  public void add(ObjectCounter<T> o) {
+    TObjectIntIterator<T> itr = o.iterator();
+    while (itr.hasNext()) {
+      itr.advance();
+      T key = itr.key();
+      int count = itr.value();
+      adjustOrPutValue(key, count, count);
+    }
+  }
+
+  /**
    * Returns the most common object.
    * 
    * @return The most common object in this counter or null if the counter is
@@ -106,7 +122,7 @@ public class ObjectCounter<T> extends TObjectIntHashMap<T> {
     }
     this.isStatisticsComputed = true;
   }
-  
+
   // ==========================================================================
 
   @Override

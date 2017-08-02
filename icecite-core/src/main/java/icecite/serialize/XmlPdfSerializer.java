@@ -343,12 +343,12 @@ public class XmlPdfSerializer implements PdfSerializer {
     }
 
     // TODO
-//    PdfRole role = element.getRole();
-//    if (role != null) {
-//      String roleName = role.getIdentifier();
-//      // Append the role: <character ... role="foo"
-//      xml.append(" " + CONTEXT_NAME_ELEMENT_ROLE + "=\"" + roleName + "\"");
-//    }
+    // PdfRole role = element.getRole();
+    // if (role != null) {
+    // String roleName = role.getIdentifier();
+    // // Append the role: <character ... role="foo"
+    // xml.append(" " + CONTEXT_NAME_ELEMENT_ROLE + "=\"" + roleName + "\"");
+    // }
 
     // Check if there is text to display.
     if (text == null || text.isEmpty()) {
@@ -558,10 +558,10 @@ public class XmlPdfSerializer implements PdfSerializer {
 
     // Check if the role of the given element was registered to be serialized.
     // TODO
-//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-//    if (isRoleGiven && !roles.contains(element.getRole())) {
-//      return false;
-//    }
+    // boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    // if (isRoleGiven && !roles.contains(element.getRole())) {
+    // return false;
+    // }
     return true;
   }
 

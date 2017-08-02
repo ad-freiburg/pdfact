@@ -1,45 +1,12 @@
 package icecite.models;
 
-// TODO: Move the getFirst* and getLast* methods to the related interfaces.
-
 /**
  * A text paragraph in a PDF document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfParagraph extends PdfElement, HasRole, HasWords, HasText {
-  /**
-   * Returns the first word.
-   * 
-   * @return The first word or null if there are no words.
-   */
-  PdfWord getFirstWord();
-
-  /**
-   * Returns the last word.
-   * 
-   * @return The last word or null if there are no words.
-   */
-  PdfWord getLastWord();
-  
-  // ==========================================================================
-  
-  /**
-   * Returns the first character.
-   * 
-   * @return the first character.
-   */
-  PdfCharacter getFirstCharacter();
-  
-  /**
-   * Returns the last character.
-   * 
-   * @return the last character.
-   */
-  PdfCharacter getLastCharacter();
-  
-  // ==========================================================================
-  
+public interface PdfParagraph extends HasTextBlocks, HasRole, HasText,
+    PdfElement {
   /**
    * The factory to create instances of {@link PdfParagraph}.
    * 

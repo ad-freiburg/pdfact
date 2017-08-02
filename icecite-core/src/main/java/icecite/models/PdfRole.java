@@ -22,7 +22,7 @@ public enum PdfRole {
   /**
    * The affiliation.
    */
-  AFFILIATION("affiliation"),  
+  AFFILIATION("affiliation"),
   /**
    * An appendix.
    */
@@ -95,9 +95,9 @@ public enum PdfRole {
    * The title.
    */
   TITLE("title");
-  
+
   // ==========================================================================
-  
+
   /**
    * The identifier of this role.
    */
@@ -112,7 +112,7 @@ public enum PdfRole {
   PdfRole(String name) {
     this.identifier = name;
   }
-  
+
   /**
    * Returns the identifier of this role.
    * 
@@ -123,7 +123,7 @@ public enum PdfRole {
   }
 
   // ==========================================================================
-  
+
   /**
    * The roles by name.
    */
@@ -137,7 +137,7 @@ public enum PdfRole {
       roles.put(role.getIdentifier(), role);
     }
   }
-  
+
   /**
    * Returns a set of the names of all roles.
    * 
@@ -146,7 +146,7 @@ public enum PdfRole {
   public static Set<String> getNames() {
     return roles.keySet();
   }
-  
+
   /**
    * Checks if the given name is a valid name of an existing role.
    * 
@@ -158,7 +158,7 @@ public enum PdfRole {
   public static boolean isValidRole(String name) {
     return roles.containsKey(name.toLowerCase());
   }
-  
+
   /**
    * Returns the roles that are associated with the given names.
    * 
@@ -180,7 +180,7 @@ public enum PdfRole {
     }
     return roles;
   }
-  
+
   /**
    * Returns the role that is associated with the given name.
    * 

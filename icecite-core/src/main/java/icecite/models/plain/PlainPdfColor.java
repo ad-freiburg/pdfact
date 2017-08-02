@@ -19,11 +19,6 @@ import icecite.models.PdfColor;
  */
 public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   /**
-   * The id of this color (needed for serialization).
-   */
-  protected String id;
-
-  /**
    * The name of this color.
    */
   protected String name;
@@ -53,18 +48,6 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   @AssistedInject
   public PlainPdfColor(@Assisted float[] rgb) {
     this.rgb = rgb;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public String getId() {
-    return this.id;
-  }
-
-  @Override
-  public void setId(String id) {
-    this.id = id;
   }
 
   // ==========================================================================

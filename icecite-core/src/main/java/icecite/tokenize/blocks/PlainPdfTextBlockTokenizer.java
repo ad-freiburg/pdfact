@@ -6,21 +6,20 @@ import java.util.regex.Pattern;
 
 import com.google.inject.Inject;
 
-import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFont;
+import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
-import icecite.models.PdfPosition.PdfPositionFactory;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextBlock.PdfTextBlockFactory;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
-import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfTextLineStatistics;
+import icecite.tokenize.lines.PdfTextLineTokenizer;
 import icecite.utils.geometric.Rectangle;
 import icecite.utils.textlines.PdfTextLineUtils;
-
-//TODO: Reimplement PlainTextBlockTokenizer like Semanticizer
 
 /**
  * A plain implementation of {@link PdfTextBlockTokenizer}.
@@ -29,19 +28,9 @@ import icecite.utils.textlines.PdfTextLineUtils;
  */
 public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   /**
-   * The factory to create instances of PdfTextLineFactory.
+   * The text line tokenizer.
    */
-  protected PdfTextLineListFactory textLineFactory;
-
-  /**
-   * The factory to create instances of {@link PdfCharacterListFactory}.
-   */
-  protected PdfCharacterListFactory characterListFactory;
-
-  /**
-   * The factory to create instances of {@link PdfPositionFactory}.
-   */
-  protected PdfPositionFactory positionFactory;
+  protected PdfTextLineTokenizer textLineTokenizer;
 
   /**
    * The factory to create instances of {@link PdfTextBlock}.
@@ -49,69 +38,99 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   protected PdfTextBlockFactory textBlockFactory;
 
   /**
-   * Creates a new tokenizer that tokenizes text lines into text blocks.
+   * The factory to create instances of PdfTextLineListFactory.
+   */
+  protected PdfTextLineListFactory textLineListFactory;
+
+  /**
+   * The default constructor.
    * 
-   * @param textLineFactory
-   *        The factory to create instances of {@link PdfTextLineList}.
-   * @param characterListFactory
-   *        The factory to create instances of {@link PdfCharacterList}.
+   * @param textLineTokenizer
+   *        The text line tokenizer.
    * @param textBlockFactory
    *        The factory to create instances of {@link PdfTextBlock}.
-   * @param positionFactory
-   *        The factory to create instances of PdfPosition.
+   * @param textLineListFactory
+   *        The text line list factory.
    */
   @Inject
-  public PlainPdfTextBlockTokenizer(PdfTextLineListFactory textLineFactory,
-      PdfCharacterListFactory characterListFactory,
+  public PlainPdfTextBlockTokenizer(PdfTextLineTokenizer textLineTokenizer,
       PdfTextBlockFactory textBlockFactory,
-      PdfPositionFactory positionFactory) {
-    this.textLineFactory = textLineFactory;
-    this.characterListFactory = characterListFactory;
+      PdfTextLineListFactory textLineListFactory) {
+    this.textLineTokenizer = textLineTokenizer;
     this.textBlockFactory = textBlockFactory;
-    this.positionFactory = positionFactory;
+    this.textLineListFactory = textLineListFactory;
+  }
+
+  @Override
+  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page) {
+    // First, identify the text lines.
+    PdfTextLineList lines = identifyTextLines(pdf, page);
+    // Then, identify the text blocks from the text lines.
+    return identifyTextBlocks(pdf, page, lines);
   }
 
   // ==========================================================================
 
-  @Override
-  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page) {
+  /**
+   * Identifies the text lines from the given PDF page.
+   * 
+   * @param pdf
+   *        The PDF document to which the page belongs to.
+   * @param page
+   *        The PDF page to process.
+   * 
+   * @return The list of identified text lines.
+   */
+  protected PdfTextLineList identifyTextLines(PdfDocument pdf, PdfPage page) {
+    return this.textLineTokenizer.tokenize(pdf, page);
+  }
+
+  // ==========================================================================
+
+  /**
+   * Identifies the text blocks from the given text lines.
+   * 
+   * @param pdf
+   *        The PDF document to which the text lines belong to.
+   * @param page
+   *        The PDF page to which the text lines belong to.
+   * @param lines
+   *        The text lines to process.
+   * 
+   * @return The list of identified text blocks.
+   */
+  protected List<PdfTextBlock> identifyTextBlocks(PdfDocument pdf, PdfPage page,
+      PdfTextLineList lines) {
     List<PdfTextBlock> textBlocks = new ArrayList<>();
-
-    PdfTextLineList blockLines = null;
-    PdfCharacterList blockCharacters = null;
-
-    List<PdfTextLine> lines = page.getTextLines();
+    PdfTextLineList blockLines = this.textLineListFactory.create();
+    
     for (int i = 0; i < lines.size(); i++) {
       PdfTextLine prevLine = i > 0 ? lines.get(i - 1) : null;
       PdfTextLine line = lines.get(i);
       PdfTextLine nextLine = i < lines.size() - 1 ? lines.get(i + 1) : null;
 
-      if (introducesTextBlock(pdf, blockLines, prevLine, line, nextLine)) {
+      if (introducesNewTextBlock(pdf, blockLines, prevLine, line, nextLine)) {
         if (blockLines != null && !blockLines.isEmpty()) {
           PdfTextBlock textBlock = this.textBlockFactory.create();
-          textBlock.setCharacters(blockCharacters);
           textBlock.setTextLines(blockLines);
-          textBlock.setPosition(
-              this.positionFactory.create(page, blockLines.getRectangle()));
+          // textBlock.setPosition(
+          // this.positionFactory.create(page, blockLines.getRectangle()));
           textBlocks.add(textBlock);
         }
 
         // Create a new text block.
-        blockLines = this.textLineFactory.create();
-        blockCharacters = this.characterListFactory.create();
+        blockLines = this.textLineListFactory.create();
       }
       // Add the word of the current line to the current text block.
       blockLines.add(line);
-      blockCharacters.addAll(line.getCharacters());
     }
 
     // Don't forget the remaining text block.
     if (blockLines != null && !blockLines.isEmpty()) {
       PdfTextBlock textBlock = this.textBlockFactory.create();
-      textBlock.setCharacters(blockCharacters);
       textBlock.setTextLines(blockLines);
-      textBlock.setPosition(
-          this.positionFactory.create(page, blockLines.getRectangle()));
+      // textBlock.setPosition(
+      // this.positionFactory.create(page, blockLines.getRectangle()));
       textBlocks.add(textBlock);
     }
 
@@ -134,7 +153,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @return True, if the given current line introduces a new text block; false
    *         otherwise.
    */
-  protected boolean introducesTextBlock(PdfDocument pdf,
+  protected boolean introducesNewTextBlock(PdfDocument pdf,
       PdfTextLineList blockLines, PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {
     // The line does *not* introduce a text block, if it is null.
@@ -211,14 +230,17 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
     if (blockLines == null || line == null) {
       return false;
     }
-
-    Rectangle blockBoundingBox = blockLines.getRectangle();
-    Rectangle lineBoundingBox = line.getRectangle();
-    if (blockBoundingBox == null || lineBoundingBox == null) {
-      return false;
-    }
-
-    return blockBoundingBox.overlapsHorizontally(lineBoundingBox);
+    
+    return false;
+    // TODO
+//    Rectangle blockBoundingBox = blockLines.getRectangle();
+//    Rectangle blockBoundingBox = null;
+//    Rectangle lineBoundingBox = line.getRectangle();
+//    if (blockBoundingBox == null || lineBoundingBox == null) {
+//      return false;
+//    }
+//
+//    return blockBoundingBox.overlapsHorizontally(lineBoundingBox);
   }
 
   /**
@@ -241,13 +263,12 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
       return false;
     }
 
-    PdfTextLineList textLines = pdf.getTextLines();
-    if (textLines == null) {
-      return false;
-    }
-
     // Obtain the expected and actual line pitch for the given line.
-    float expectedLinePitch = textLines.getMostCommonLinePitch(line);
+    PdfCharacterStatistics characterStats = pdf.getCharacterStatistics();
+    PdfTextLineStatistics textLineStats = pdf.getTextLineStatistics();
+
+    PdfFontFace fontFace = characterStats.getMostCommonFontFace();
+    float expectedLinePitch = textLineStats.getMostCommonLinePitch(fontFace);
     float actualLinePitch = PdfTextLineUtils.computeLinePitch(prevLine, line);
 
     // TODO
@@ -317,7 +338,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   }
 
   /**
-   * Checks if the given line has a special font face, comapred to the given
+   * Checks if the given line has a special font face, compared to the given
    * previous line.
    * 
    * @param prevLine
@@ -334,11 +355,17 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
 
     // If the font of the previous line and the font of the current line are
     // not from the same base, the line has a special font face.
-    PdfFont prevLineFont = prevLine.getCharacters().getMostCommonFont();
-    PdfFont lineFont = line.getCharacters().getMostCommonFont();
-    if (prevLineFont == null || lineFont == null) {
-      return false;
-    }
+    PdfCharacterStatistics prevLineCharStats = prevLine
+        .getCharacterStatistics();
+    PdfFontFace prevLineFontFace = prevLineCharStats.getMostCommonFontFace();
+    PdfFont prevLineFont = prevLineFontFace.getFont();
+    float prevLineFontsize = prevLineFontFace.getFontSize();
+
+    PdfCharacterStatistics lineCharStats = line.getCharacterStatistics();
+    PdfFontFace lineFontFace = lineCharStats.getMostCommonFontFace();
+    PdfFont lineFont = lineFontFace.getFont();
+    float lineFontsize = lineFontFace.getFontSize();
+
     String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
     String lineFontFamilyName = lineFont.getFontFamilyName();
     if (prevLineFontFamilyName == null || lineFontFamilyName == null) {
@@ -350,8 +377,6 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
 
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
-    float prevLineFontsize = prevLine.getCharacters().getMostCommonFontsize();
-    float lineFontsize = line.getCharacters().getMostCommonFontsize();
     if (prevLineFontsize != lineFontsize) {
       return true;
     }

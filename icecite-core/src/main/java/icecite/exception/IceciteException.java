@@ -35,15 +35,16 @@ public class IceciteException extends Exception {
    *        The status code of this exception.
    * @param message
    *        The message of this exception.
-   * @param cause The cause of this exception.
+   * @param cause
+   *        The cause of this exception.
    */
   public IceciteException(int statusCode, String message, Throwable cause) {
     super(message, cause);
     this.statusCode = statusCode;
   }
-  
+
   // ===========================================================================
-  
+
   /**
    * Returns the status code of this exception.
    * 

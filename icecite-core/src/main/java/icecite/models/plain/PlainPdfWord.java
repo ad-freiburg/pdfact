@@ -1,7 +1,5 @@
 package icecite.models.plain;
 
-import java.util.List;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -11,9 +9,9 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfFeature;
 import icecite.models.PdfWord;
-import icecite.utils.geometric.Rectangle;
 
 /**
  * A plain implementation of {@link PdfWord}.
@@ -42,9 +40,9 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   protected boolean isDehyphenated;
 
   /**
-   * The list of rectangles of the hyphenated syllables.
+   * The statistics about the characters in this word.
    */
-  protected List<Rectangle> syllableRectangles;
+  protected PdfCharacterStatistics characterStatistics;
 
   // ==========================================================================
 
@@ -151,6 +149,18 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
+  public PdfCharacterStatistics getCharacterStatistics() {
+    return this.characterStatistics;
+  }
+
+  @Override
+  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
+    this.characterStatistics = statistics;
+  }
+
+  // ==========================================================================
+
+  @Override
   public PdfFeature getFeature() {
     return PdfFeature.WORD;
   }
@@ -172,7 +182,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
       builder.append(getFeature(), otherWord.getFeature());
       builder.append(getPosition(), otherWord.getPosition());
       builder.append(getText(), otherWord.getText());
-      
+
       return builder.isEquals();
     }
     return false;

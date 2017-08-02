@@ -8,6 +8,23 @@ import icecite.models.PdfResource;
  * @author Claudius Korzen
  */
 public class PlainPdfResource implements PdfResource {
+  /**
+   * The id of this resource.
+   */
+  protected String id;
+
+  @Override
+  public String getId() {
+    return this.id;
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  // ==========================================================================
+
   @Override
   public String toString() {
     return "PlainPdfResource()";

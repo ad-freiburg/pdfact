@@ -18,23 +18,23 @@ public class ReferenceModule implements PdfTextSemanticizerModule {
    * of the Reference section or not.
    */
   protected boolean isReferences = false;
-  
+
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
@@ -48,12 +48,12 @@ public class ReferenceModule implements PdfTextSemanticizerModule {
         if (this.isReferences && role == PdfRole.HEADING) {
           this.isReferences = false;
         }
-        
+
         if (this.isReferences) {
           block.setRole(PdfRole.REFERENCE);
         }
 
-        // Check if the current block is the section heading of the Reference 
+        // Check if the current block is the section heading of the Reference
         // section (which would denote the end of the Reference section).
         if (role == PdfRole.HEADING && secondaryRole == PdfRole.REFERENCE) {
           this.isReferences = true;

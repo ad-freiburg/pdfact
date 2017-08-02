@@ -5,7 +5,7 @@ package icecite.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWord extends PdfElement, HasCharacters, HasText {
+public interface PdfWord extends HasCharacters, HasText, PdfElement {
   /**
    * Returns true, if this word is hyphenated.
    * 
@@ -39,22 +39,6 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
   void setIsDehyphenated(boolean isDehyphenated);
 
   // ==========================================================================
-  
-  /**
-   * Returns the first character of this word.
-   * 
-   * @return the first character of this word.
-   */
-  PdfCharacter getFirstCharacter();
-  
-  /**
-   * Returns the last character of this word.
-   * 
-   * @return the last character of this word.
-   */
-  PdfCharacter getLastCharacter();
-  
-  // ==========================================================================
 
   /**
    * The factory to create instances of {@link PdfWord}.
@@ -68,7 +52,7 @@ public interface PdfWord extends PdfElement, HasCharacters, HasText {
      * @return An instance of {@link PdfWord}.
      */
     PdfWord create();
-    
+
     /**
      * Creates a PdfWord.
      * 

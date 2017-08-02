@@ -12,13 +12,12 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextLine;
-import icecite.models.PdfTextLineList;
-import icecite.models.PdfTextLineList.PdfTextLineListFactory;
+import icecite.models.PdfTextLineStatistics;
 
 /**
  * A plain implementation of {@link PdfPage}.
@@ -52,9 +51,14 @@ public class PlainPdfPage implements PdfPage {
   protected List<PdfTextBlock> textBlocks;
 
   /**
-   * The text lines of this page.
+   * The statistics about the characters.
    */
-  protected PdfTextLineList textLines;
+  protected PdfCharacterStatistics characterStatistics;
+
+  /**
+   * The statistics about text lines.
+   */
+  protected PdfTextLineStatistics textLineStatistics;
 
   // ==========================================================================
   // Constructors.
@@ -64,14 +68,10 @@ public class PlainPdfPage implements PdfPage {
    * 
    * @param characterListFactory
    *        The factory to create instances of {@link PdfCharacterList}.
-   * @param textLineListFactory
-   *        The factory to create instances of {@link PdfTextLineList}.
    */
   @AssistedInject
-  public PlainPdfPage(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory) {
+  public PlainPdfPage(PdfCharacterListFactory characterListFactory) {
     this.characters = characterListFactory.create();
-    this.textLines = textLineListFactory.create();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
     this.textBlocks = new ArrayList<>();
@@ -82,15 +82,13 @@ public class PlainPdfPage implements PdfPage {
    * 
    * @param characterListFactory
    *        The factory to create instances of PdfCharacterList.
-   * @param textLineListFactory
-   *        The factory to create instances of PdfTextLineList.
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory, @Assisted int pageNumber) {
-    this(characterListFactory, textLineListFactory);
+      @Assisted int pageNumber) {
+    this(characterListFactory);
     this.pageNumber = pageNumber;
   }
 
@@ -99,6 +97,22 @@ public class PlainPdfPage implements PdfPage {
   @Override
   public PdfCharacterList getCharacters() {
     return this.characters;
+  }
+
+  @Override
+  public PdfCharacter getFirstCharacter() {
+    if (this.characters == null) {
+      return null;
+    }
+    return this.characters.get(0);
+  }
+
+  @Override
+  public PdfCharacter getLastCharacter() {
+    if (this.characters == null) {
+      return null;
+    }
+    return this.characters.get(this.characters.size() - 1);
   }
 
   @Override
@@ -126,6 +140,22 @@ public class PlainPdfPage implements PdfPage {
   }
 
   @Override
+  public PdfFigure getFirstFigure() {
+    if (this.figures == null) {
+      return null;
+    }
+    return this.figures.get(0);
+  }
+
+  @Override
+  public PdfFigure getLastFigure() {
+    if (this.figures == null) {
+      return null;
+    }
+    return this.figures.get(this.figures.size() - 1);
+  }
+
+  @Override
   public void setFigures(List<PdfFigure> figures) {
     this.figures = figures;
   }
@@ -147,6 +177,22 @@ public class PlainPdfPage implements PdfPage {
   @Override
   public List<PdfShape> getShapes() {
     return this.shapes;
+  }
+
+  @Override
+  public PdfShape getFirstShape() {
+    if (this.shapes == null) {
+      return null;
+    }
+    return this.shapes.get(0);
+  }
+
+  @Override
+  public PdfShape getLastShape() {
+    if (this.shapes == null) {
+      return null;
+    }
+    return this.shapes.get(this.shapes.size() - 1);
   }
 
   @Override
@@ -174,6 +220,22 @@ public class PlainPdfPage implements PdfPage {
   }
 
   @Override
+  public PdfTextBlock getFirstTextBlock() {
+    if (this.textBlocks == null) {
+      return null;
+    }
+    return this.textBlocks.get(0);
+  }
+
+  @Override
+  public PdfTextBlock getLastTextBlock() {
+    if (this.textBlocks == null) {
+      return null;
+    }
+    return this.textBlocks.get(this.textBlocks.size() - 1);
+  }
+
+  @Override
   public void setTextBlocks(List<PdfTextBlock> blocks) {
     this.textBlocks = blocks;
   }
@@ -193,25 +255,23 @@ public class PlainPdfPage implements PdfPage {
   // ==========================================================================
 
   @Override
-  public PdfTextLineList getTextLines() {
-    return this.textLines;
+  public PdfCharacterStatistics getCharacterStatistics() {
+    return this.characterStatistics;
   }
 
   @Override
-  public void setTextLines(PdfTextLineList lines) {
-    this.textLines = lines;
+  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
+    this.characterStatistics = statistics;
   }
 
   @Override
-  public void addTextLines(PdfTextLineList lines) {
-    for (PdfTextLine line : lines) {
-      addTextLine(line);
-    }
+  public PdfTextLineStatistics getTextLineStatistics() {
+    return this.textLineStatistics;
   }
 
   @Override
-  public void addTextLine(PdfTextLine line) {
-    this.textLines.add(line);
+  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
+    this.textLineStatistics = statistics;
   }
 
   // ==========================================================================

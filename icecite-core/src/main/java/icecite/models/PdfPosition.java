@@ -82,7 +82,7 @@ public interface PdfPosition {
     PdfPosition create(@Assisted("page") PdfPage page,
         @Assisted("minX") float minX, @Assisted("minY") float minY,
         @Assisted("maxX") float maxX, @Assisted("maxY") float maxY);
-    
+
     /**
      * Creates a new PdfPosition.
      * 

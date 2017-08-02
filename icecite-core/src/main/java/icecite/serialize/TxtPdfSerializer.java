@@ -197,7 +197,8 @@ public class TxtPdfSerializer implements PdfSerializer {
    *        The serialization of the PDF document.
    * @param os
    *        The stream to write to.
-   * @param features The features to serialize.
+   * @param features
+   *        The features to serialize.
    * @throws IOException
    *         If something went wrong while writing to the stream.
    */
@@ -243,10 +244,10 @@ public class TxtPdfSerializer implements PdfSerializer {
 
     // Check if the role of the given element was registered to be serialized.
     // TODO
-//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-//    if (isRoleGiven && !roles.contains(element.getRole())) {
-//      return false;
-//    }
+    // boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    // if (isRoleGiven && !roles.contains(element.getRole())) {
+    // return false;
+    // }
     return true;
   }
 

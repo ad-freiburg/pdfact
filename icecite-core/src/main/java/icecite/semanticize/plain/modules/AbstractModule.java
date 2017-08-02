@@ -18,23 +18,23 @@ public class AbstractModule implements PdfTextSemanticizerModule {
    * of the abstract or not.
    */
   protected boolean isAbstract = false;
-  
+
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
@@ -48,7 +48,7 @@ public class AbstractModule implements PdfTextSemanticizerModule {
         if (this.isAbstract && role == PdfRole.HEADING) {
           this.isAbstract = false;
         }
-        
+
         if (this.isAbstract) {
           block.setRole(PdfRole.ABSTRACT);
         }

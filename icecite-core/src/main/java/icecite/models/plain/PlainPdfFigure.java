@@ -12,8 +12,6 @@ import icecite.models.PdfFigure;
  * @author Claudius Korzen
  */
 public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
-  // ==========================================================================
-
   @Override
   public PdfFeature getFeature() {
     return PdfFeature.FIGURE;
@@ -34,7 +32,7 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherFigure.getPosition());
       builder.append(getFeature(), otherFigure.getFeature());
-      
+
       return builder.isEquals();
     }
     return false;

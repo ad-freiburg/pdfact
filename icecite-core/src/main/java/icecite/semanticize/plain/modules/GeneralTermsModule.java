@@ -8,8 +8,8 @@ import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
 
 /**
- * A module that identifies the text blocks with the semantic role 
- * "General Terms".
+ * A module that identifies the text blocks with the semantic role "General
+ * Terms".
  * 
  * @author Claudius Korzen
  */

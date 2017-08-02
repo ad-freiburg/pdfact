@@ -304,12 +304,13 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
     for (Object token : parser.getTokens()) {
       if (token instanceof COSObject) {
         arguments.add(((COSObject) token).getObject());
-      } else if (token instanceof Operator) {
-        processOperator((Operator) token, arguments);
-        arguments = new ArrayList<COSBase>();
-      } else {
-        arguments.add((COSBase) token);
-      }
+      } else
+        if (token instanceof Operator) {
+          processOperator((Operator) token, arguments);
+          arguments = new ArrayList<COSBase>();
+        } else {
+          arguments.add((COSBase) token);
+        }
     }
   }
 
@@ -508,7 +509,8 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    * @param m
    *        The matrix to apply.
    * 
-   * TODO: Maybe its a better idea to make the transformation *not* in place.
+   *        TODO: Maybe its a better idea to make the transformation *not* in
+   *        place.
    */
   public void transform(Point p, Matrix m) {
     if (p != null && m != null) {

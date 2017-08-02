@@ -1,12 +1,12 @@
 package icecite.tokenize.words;
 
+import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfTextLine;
 import icecite.models.PdfWordList;
 
 /**
- * A tokenizer that tokenizes lists of characters into words.
+ * Identifies words in PDF pages.
  * 
  * @author Claudius Korzen
  */
@@ -15,13 +15,13 @@ public interface PdfWordTokenizer {
    * Tokenizes the given text line into words.
    * 
    * @param pdf
-   *        The PDF document to which the given text lines belong to.
+   *        The PDF document to which the page belongs to.
    * @param page
-   *        The page in which the text lines are located.
-   * @param line
-   *        The text line to tokenize.
-   *
+   *        The PDF page to process.
+   * @param line 
+   *        The characters of a text line to process.
+   * 
    * @return The list of identified words.
    */
-  PdfWordList tokenize(PdfDocument pdf, PdfPage page, PdfTextLine line);
+  PdfWordList tokenize(PdfDocument pdf, PdfPage page, PdfCharacterList line);
 }

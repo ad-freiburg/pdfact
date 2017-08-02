@@ -93,7 +93,7 @@ public class Invoke extends OperatorProcessor {
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
-    
+
     // Get the name of the PDXOject.
     COSName name = (COSName) args.get(0);
 
@@ -140,13 +140,13 @@ public class Invoke extends OperatorProcessor {
       float minY = ctm.getTranslateY();
       float maxX = minX + at.getScaleX() * imageWidth;
       float maxY = minY + at.getScaleY() * imageHeight;
-      
+
       // Round the values.
       minX = MathUtils.round(minX, FLOATING_NUMBER_PRECISION);
       minY = MathUtils.round(minY, FLOATING_NUMBER_PRECISION);
       maxX = MathUtils.round(maxX, FLOATING_NUMBER_PRECISION);
       maxY = MathUtils.round(maxY, FLOATING_NUMBER_PRECISION);
-      
+
       Point ll = this.pointFactory.create(minX, minY);
       Point ur = this.pointFactory.create(maxX, maxY);
       PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
@@ -154,7 +154,7 @@ public class Invoke extends OperatorProcessor {
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
-      
+
       if (exclusiveColor != null) {
         PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);

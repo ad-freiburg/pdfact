@@ -4,15 +4,12 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-// TODO: Eliminate all Interfaces except HasParagraphs.
-
 /**
  * A PDF document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument
-    extends HasCharacters, HasFigures, HasShapes, HasTextLines, HasParagraphs {
+public interface PdfDocument extends HasParagraphs {
   /**
    * Returns the pages of this PDF document.
    * 

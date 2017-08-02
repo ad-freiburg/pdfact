@@ -5,16 +5,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterList;
-import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
-import icecite.models.PdfWord;
+import icecite.models.PdfTextLineStatistics;
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -22,16 +20,6 @@ import icecite.models.PdfWord;
  * @author Claudius Korzen
  */
 public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
-  /**
-   * The parent paragraph.
-   */
-  protected PdfParagraph parentParagraph;
-
-  /**
-   * The characters of this text block.
-   */
-  protected PdfCharacterList characters;
-
   /**
    * The text lines of this text block.
    */
@@ -43,66 +31,41 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   protected String text;
 
   /**
-   * The role of this paragraph.
+   * The parent paragraph.
+   */
+  protected PdfParagraph parentParagraph;
+
+  /**
+   * The role of this text block.
    */
   protected PdfRole role;
 
   /**
-   * The secondary role of this paragraph.
+   * The secondary role of this text block.
    */
   protected PdfRole secondaryRole;
+
+  /**
+   * The statistics about the characters.
+   */
+  protected PdfCharacterStatistics characterStatistics;
+
+  /**
+   * The statistics about text lines.
+   */
+  protected PdfTextLineStatistics textLineStatistics;
 
   // ==========================================================================
 
   /**
    * Creates a new text block.
    * 
-   * @param characterListFactory
-   *        The factory to create instances of {@link PdfCharacter}.
    * @param textLineListFactory
    *        The factory to create instances of {@link PdfTextLine}.
    */
   @AssistedInject
-  public PlainPdfTextBlock(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory) {
-    this.characters = characterListFactory.create();
+  public PlainPdfTextBlock(PdfTextLineListFactory textLineListFactory) {
     this.textLines = textLineListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfParagraph getParentPdfParagraph() {
-    return this.parentParagraph;
-  }
-
-  @Override
-  public void setParentPdfParagraph(PdfParagraph paragraph) {
-    this.parentParagraph = paragraph;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfCharacterList getCharacters() {
-    return this.characters;
-  }
-
-  @Override
-  public void setCharacters(PdfCharacterList characters) {
-    this.characters = characters;
-  }
-
-  @Override
-  public void addCharacters(PdfCharacterList characters) {
-    for (PdfCharacter character : characters) {
-      addCharacter(character);
-    }
-  }
-
-  @Override
-  public void addCharacter(PdfCharacter character) {
-    this.characters.add(character);
   }
 
   // ==========================================================================
@@ -111,25 +74,6 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public PdfTextLineList getTextLines() {
     return this.textLines;
   }
-
-  @Override
-  public void setTextLines(PdfTextLineList textLines) {
-    this.textLines = textLines;
-  }
-
-  @Override
-  public void addTextLines(PdfTextLineList textLines) {
-    for (PdfTextLine line : textLines) {
-      addTextLine(line);
-    }
-  }
-
-  @Override
-  public void addTextLine(PdfTextLine line) {
-    this.textLines.add(line);
-  }
-
-  // ==========================================================================
 
   @Override
   public PdfTextLine getFirstTextLine() {
@@ -147,44 +91,31 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
     return this.textLines.get(this.textLines.size() - 1);
   }
 
-  // ==========================================================================
-
   @Override
-  public PdfWord getFirstWord() {
-    PdfTextLine firstLine = getFirstTextLine();
-    if (firstLine == null) {
-      return null;
-    }
-    return firstLine.getFirstWord();
+  public void setTextLines(PdfTextLineList lines) {
+    this.textLines = lines;
   }
 
   @Override
-  public PdfWord getLastWord() {
-    PdfTextLine lastLine = getLastTextLine();
-    if (lastLine == null) {
-      return null;
-    }
-    return lastLine.getLastWord();
+  public void addTextLines(PdfTextLineList lines) {
+    this.textLines.addAll(lines);
+  }
+
+  @Override
+  public void addTextLine(PdfTextLine line) {
+    this.textLines.add(line);
   }
 
   // ==========================================================================
 
   @Override
-  public PdfCharacter getFirstCharacter() {
-    PdfWord firstWord = getFirstWord();
-    if (firstWord == null) {
-      return null;
-    }
-    return firstWord.getFirstCharacter();
+  public PdfParagraph getParentPdfParagraph() {
+    return this.parentParagraph;
   }
 
   @Override
-  public PdfCharacter getLastCharacter() {
-    PdfWord lastWord = getLastWord();
-    if (lastWord == null) {
-      return null;
-    }
-    return lastWord.getLastCharacter();
+  public void setParentPdfParagraph(PdfParagraph paragraph) {
+    this.parentParagraph = paragraph;
   }
 
   // ==========================================================================
@@ -197,6 +128,28 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @Override
   public void setText(String text) {
     this.text = text;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfCharacterStatistics getCharacterStatistics() {
+    return this.characterStatistics;
+  }
+
+  @Override
+  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
+    this.characterStatistics = statistics;
+  }
+
+  @Override
+  public PdfTextLineStatistics getTextLineStatistics() {
+    return this.textLineStatistics;
+  }
+
+  @Override
+  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
+    this.textLineStatistics = statistics;
   }
 
   // ==========================================================================
@@ -237,7 +190,6 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherTextBlock.getPosition());
-      builder.append(getTextLines(), otherTextBlock.getTextLines());
 
       return builder.isEquals();
     }
@@ -248,7 +200,6 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
-    builder.append(getTextLines());
     return builder.hashCode();
   }
 }

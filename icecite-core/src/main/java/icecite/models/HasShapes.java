@@ -16,6 +16,22 @@ public interface HasShapes {
   List<PdfShape> getShapes();
 
   /**
+   * Returns the first shape.
+   * 
+   * @return the first shape.
+   */
+  PdfShape getFirstShape();
+
+  /**
+   * Returns the last character.
+   * 
+   * @return the last character.
+   */
+  PdfShape getLastShape();
+
+  // ==========================================================================
+
+  /**
    * Sets the given shapes.
    * 
    * @param shapes

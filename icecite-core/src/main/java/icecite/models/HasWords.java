@@ -5,13 +5,29 @@ package icecite.models;
  *
  * @author Claudius Korzen
  */
-public interface HasWords {
+public interface HasWords extends HasCharacterStatistics {
   /**
    * Returns the words.
    * 
    * @return The words.
    */
   PdfWordList getWords();
+
+  /**
+   * Returns the first word.
+   * 
+   * @return The first word or null if there are no words.
+   */
+  PdfWord getFirstWord();
+
+  /**
+   * Returns the last word.
+   * 
+   * @return The last word or null if there are no words.
+   */
+  PdfWord getLastWord();
+
+  // ==========================================================================
 
   /**
    * Sets the given words.

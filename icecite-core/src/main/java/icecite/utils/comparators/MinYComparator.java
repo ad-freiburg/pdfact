@@ -16,7 +16,7 @@ public class MinYComparator implements Comparator<HasPosition>, Serializable {
    * The serial id.
    */
   protected static final long serialVersionUID = -6048171342968387350L;
-  
+
   @Override
   public int compare(HasPosition pos1, HasPosition pos2) {
     if (pos1 == null && pos2 == null) {

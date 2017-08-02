@@ -1,14 +1,16 @@
 package icecite.tokenize.words;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterStatistician;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfPosition.PdfPositionFactory;
-import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.PdfWordList;
@@ -16,33 +18,40 @@ import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.tokenize.xycut.XYCut;
 
 /**
- * An implementation of {@link PdfWordTokenizer} based on XYCut.
+ * An implementation of {@link PdfWordSegmenter} based on XYCut.
  * 
  * @author Claudius Korzen
  */
-public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
-    implements PdfWordTokenizer {
+public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
+  /**
+   * The factory to create instances of {@link PdfWordList}.
+   */
+  protected PdfWordListFactory wordListFactory;
+  
+  /**
+   * The factory to create instances of {@link PdfWord}.
+   */
+  protected PdfWordFactory wordFactory;
+  
   /**
    * The factory to create instances of {@link PdfPositionFactory}.
    */
   protected PdfPositionFactory positionFactory;
   
   /**
-   * The factory to create instances of {@link PdfWordList}.
+   * The statistician to compute statistics about characters.
    */
-  protected PdfWordListFactory wordListFactory;
-
-  /**
-   * The factory to create instances of {@link PdfWord}.
-   */
-  protected PdfWordFactory wordFactory;
+  protected PdfCharacterStatistician charStatistician;
 
   // ==========================================================================
   // Constructors.
 
   /**
    * Creates a new word tokenizer.
-   * @param positionFactory 
+   * 
+   * @param characterStatistician 
+   *        The statistician to compute statistics about characters.
+   * @param positionFactory
    *        The factory to create instance of PdfPosition.
    * @param wordListFactory
    *        The factory to create instance of {@link PdfWordList}.
@@ -50,9 +59,11 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
    *        The factory to create instance of {@link PdfWord}.
    */
   @Inject
-  public XYCutPdfWordTokenizer(PdfPositionFactory positionFactory, 
-      PdfWordListFactory wordListFactory, PdfWordFactory wordFactory) {
+  public XYCutPdfWordSegmenter(PdfCharacterStatistician characterStatistician,
+      PdfPositionFactory positionFactory, PdfWordListFactory wordListFactory,
+      PdfWordFactory wordFactory) {
     super();
+    this.charStatistician = characterStatistician;
     this.positionFactory = positionFactory;
     this.wordListFactory = wordListFactory;
     this.wordFactory = wordFactory;
@@ -61,11 +72,10 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   // ==========================================================================
 
   @Override
-  public PdfWordList tokenize(PdfDocument pdf, PdfPage page, PdfTextLine line) {
-    PdfWordList words = this.wordListFactory.create();
-    if (line != null) {
-      cut(pdf, page, line.getCharacters(), words);
-    }
+  public List<PdfCharacterList> segment(PdfDocument pdf, PdfPage page,
+      PdfCharacterList chars) {
+    List<PdfCharacterList> words = new ArrayList<>();
+    cut(pdf, page, chars, words);
     return words;
   }
 
@@ -74,10 +84,15 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
   @Override
   public float assessVerticalCut(PdfDocument pdf, PdfPage page,
       List<PdfCharacterList> halves) {
-    PdfCharacterList l = halves.get(0);
-    PdfCharacterList r = halves.get(1);
-
-    float width = r.getRectangle().getMinX() - l.getRectangle().getMaxX();
+    PdfCharacterList left = halves.get(0);
+    PdfCharacterStatistics leftStats = this.charStatistician.compute(left);
+    float leftMaxX = leftStats.getLargestMaxX();
+    
+    PdfCharacterList right = halves.get(1);
+    PdfCharacterStatistics rightStats = this.charStatistician.compute(right);
+    float rightMinX = rightStats.getSmallestMinX();
+    
+    float width = rightMinX - leftMaxX;
     if (width < 1f) {
       return -1;
     }
@@ -94,13 +109,23 @@ public class XYCutPdfWordTokenizer extends XYCut<PdfWord>
 
   // ==========================================================================
 
-  @Override
-  public PdfWord pack(PdfPage page, PdfCharacterList chars) {
-    PdfWord word = this.wordFactory.create(chars);
-    word.setPosition(this.positionFactory.create(page, chars.getRectangle()));
-    
-    return word;
-  }
+//   @Override
+//   public PdfWordList buildWords(List<PdfCharacterList> wordCharacters) {
+//     PdfWordList words = this.wordListFactory.create();
+//     
+//     for (PdfCharacterList characters : wordCharacters) {
+//       PdfWord word = this.wordFactory.create();
+//       word.setCharacters(characters);
+//       word.setCharacterStatistics(statistics);
+//       word.setIsHyphenated(isHyphenated);
+//       word.setPosition(position);
+//       word.setRectangle(rectangle);
+//       word.setText(text);
+//       words.add(word);
+//     }
+//     
+//     return words;
+//   }
 
   // ==========================================================================
 

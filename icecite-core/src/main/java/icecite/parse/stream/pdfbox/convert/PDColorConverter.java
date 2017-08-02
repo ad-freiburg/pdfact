@@ -71,12 +71,12 @@ public class PDColorConverter {
     if (rgb == null) {
       return null;
     }
-    
+
     PdfColor newColor = this.colorFactory.create();
     newColor.setId("color" + this.knownColors.size());
     newColor.setName(computeColorName(color, colorSpace));
     newColor.setRGB(rgb);
-    
+
     this.knownColors.put(newColor.getName(), newColor);
 
     return newColor;
@@ -126,7 +126,7 @@ public class PDColorConverter {
   protected String computeColorName(PDColor color, PDColorSpace colorSpace) {
     return Arrays.toString(computeRGB(color, colorSpace));
   }
-  
+
   /**
    * Computes a name for the given color.
    * 
@@ -140,7 +140,7 @@ public class PDColorConverter {
     if (color == null || colorSpace == null) {
       return null;
     }
-    
+
     try {
       return colorSpace.toRGB(color.getComponents());
     } catch (Exception e) {

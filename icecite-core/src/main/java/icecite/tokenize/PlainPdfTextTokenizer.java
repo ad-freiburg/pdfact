@@ -1,27 +1,16 @@
 package icecite.tokenize;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Inject;
 
-import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterStatistician;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
-import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextLine;
-import icecite.models.PdfTextLineList;
-import icecite.models.PdfWord;
-import icecite.models.PdfWordList;
-import icecite.tokenize.areas.PdfTextAreaTokenizer;
 import icecite.tokenize.blocks.PdfTextBlockTokenizer;
-import icecite.tokenize.lines.PdfTextLineTokenizer;
-import icecite.tokenize.words.PdfWordTokenizer;
-import icecite.utils.character.PdfCharacterUtils;
-import icecite.utils.collection.CollectionUtils;
-import icecite.utils.comparators.MinXComparator;
-import icecite.utils.comparators.MinYComparator;
 
 /**
  * A plain implementation of {@link PdfTextTokenizer}.
@@ -30,258 +19,338 @@ import icecite.utils.comparators.MinYComparator;
  */
 public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   /**
-   * The text area tokenizer.
+   * The statistician to compute statistics about characters.
    */
-  protected PdfTextAreaTokenizer textAreaTokenizer;
-
+  protected PdfCharacterStatistician characterStatistician;
+  
   /**
-   * The text line tokenizer.
+   * The text block identifier.
    */
-  protected PdfTextLineTokenizer textLineTokenizer;
-
-  /**
-   * The word tokenizer.
-   */
-  protected PdfWordTokenizer wordTokenizer;
-
-  /**
-   * The text block tokenizer.
-   */
-  protected PdfTextBlockTokenizer textBlockTokenizer;
+  protected PdfTextBlockTokenizer textBlockIdentifier;
 
   // ==========================================================================
   // Constructors.
 
   /**
    * Creates a new text tokenizer.
-   * 
-   * @param textBlockTokenizer
-   *        The tokenizer to identify text blocks.
-   * @param textLineTokenizer
-   *        The tokenizer to identify text lines.
-   * @param wordTokenizer
-   *        The tokenizer to identify words.
-   * @param paragraphTokenizer
-   *        The tokenizer to identify paragraphs.
+   *
+   * @param characterStatistican
+   *        The statistician to compute statistics about characters.
+   * @param textBlockIdentifier
+   *        The identifier to identify text blocks.
    */
   @Inject
-  public PlainPdfTextTokenizer(PdfTextAreaTokenizer textBlockTokenizer,
-      PdfTextLineTokenizer textLineTokenizer,
-      PdfWordTokenizer wordTokenizer,
-      PdfTextBlockTokenizer paragraphTokenizer) {
-    this.textAreaTokenizer = textBlockTokenizer;
-    this.textLineTokenizer = textLineTokenizer;
-    this.wordTokenizer = wordTokenizer;
-    this.textBlockTokenizer = paragraphTokenizer;
+  public PlainPdfTextTokenizer(PdfCharacterStatistician characterStatistican,
+      PdfTextBlockTokenizer textBlockIdentifier) {
+    this.characterStatistician = characterStatistican;
+    this.textBlockIdentifier = textBlockIdentifier;
   }
 
   // ==========================================================================
 
   @Override
-  public void tokenize(PdfDocument document) {
-    if (document == null) {
-      return;
-    }
-
-    List<PdfPage> pages = document.getPages();
-    if (pages == null) {
-      return;
-    }
-
-    // Tokenize each page separately.
-    for (PdfPage page : pages) {
-      tokenizePdfPage(document, page);
-    }
+  public void tokenize(PdfDocument pdf) {
+    computeCharacterStatistics(pdf);
+    tokenizePdfDocument(pdf);
   }
 
   // ==========================================================================
 
   /**
-   * Tokenizes the given page into text areas, text lines, words and text
-   * blocks.
+   * Computes the statistics about characters in the given PDF document.
    * 
    * @param pdf
-   *        The PDF document to which the PDF page belongs to.
-   * @param page
-   *        The page to process.
-   */
-  protected void tokenizePdfPage(PdfDocument pdf, PdfPage page) {
-    // Tokenize the given page into (loose) text areas.
-    List<PdfCharacterList> areas = tokenizeIntoTextAreas(pdf, page);
-    // Tokenize the text area into text lines.
-    for (PdfCharacterList area : areas) {
-      PdfTextLineList lines = tokenizeIntoTextLines(pdf, page, area);
-      // Tokenize the text lines into words.
-      for (PdfTextLine line : lines) {
-        // Identify the word in the given text line.
-        line.setWords(tokenizeIntoWords(pdf, page, line));
-
-        // Register the line to the page *and* the PDF document.
-        page.addTextLine(line);
-        pdf.addTextLine(line);
-      }
-    }
-
-    // Compute the texts for text blocks, text lines and words.
-    computeTexts2(page);
-
-    // Tokenize the page into text blocks.
-    page.setTextBlocks(tokenizeIntoTextBlocks(pdf, page));
-    
-    // Compute the texts for text blocks, text lines and words.
-    computeTexts(page);
-  }
-
-  /**
-   * Tokenizes the given page into (loose) text areas.
-   * 
-   * @param doc
-   *        The PDF document to which the page belongs to.
-   * @param page
-   *        The page to tokenize.
-   * 
-   * @return The list of identified text areas.
-   */
-  protected List<PdfCharacterList> tokenizeIntoTextAreas(PdfDocument doc,
-      PdfPage page) {
-    return this.textAreaTokenizer.tokenize(doc, page);
-  }
-
-  /**
-   * Tokenizes the given text area into text lines.
-   * 
-   * @param doc
-   *        The PDF document to which the text blocks belong to.
-   * @param page
-   *        The page in which the text blocks are located.
-   * @param area
-   *        The text area to tokenize.
-   * 
-   * @return The list of identified text lines.
-   */
-  protected PdfTextLineList tokenizeIntoTextLines(PdfDocument doc, PdfPage page,
-      PdfCharacterList area) {
-    return this.textLineTokenizer.tokenize(doc, page, area);
-  }
-
-  /**
-   * Tokenizes the given text line into words.
-   * 
-   * @param doc
-   *        The PDF document to which the text blocks belong to.
-   * @param page
-   *        The page in which the text blocks are located.
-   * @param line
-   *        The text line to tokenize.
-   *
-   * @return The list of identified words.
-   */
-  protected PdfWordList tokenizeIntoWords(PdfDocument doc, PdfPage page,
-      PdfTextLine line) {
-    return this.wordTokenizer.tokenize(doc, page, line);
-  }
-
-  /**
-   * Tokenizes the given page into text blocks.
-   * 
-   * @param doc
    *        The PDF document to process.
-   * @param page
-   *        The page to process.
-   * 
-   * @return The identified paragraphs.
    */
-  protected List<PdfTextBlock> tokenizeIntoTextBlocks(PdfDocument doc,
-      PdfPage page) {
-    return this.textBlockTokenizer.tokenize(doc, page);
+  protected void computeCharacterStatistics(PdfDocument pdf) {
+    List<PdfCharacterStatistics> pageStats = new ArrayList<>();
+    for (PdfPage page : pdf.getPages()) {
+      // Compute the character statistics per page.
+      PdfCharacterList chars = page.getCharacters();
+      PdfCharacterStatistics stats = this.characterStatistician.compute(chars);
+      // Add the statistics to the page and the list of statistics.
+      page.setCharacterStatistics(stats);
+      pageStats.add(stats);
+    }
+    // Compute the character statistics for the whole PDF document.
+    pdf.setCharacterStatistics(this.characterStatistician.aggregate(pageStats));
   }
+
+  // ==========================================================================
 
   /**
-   * Computes the texts of the text blocks, text lines and words of the given
-   * page.
+   * Tokenizes the given PDF document into text areas, text lines, words and
+   * text blocks.
    * 
-   * @param page
-   *        The page to process.
+   * @param pdf
+   *        The PDF document to process.
    */
-  protected void computeTexts(PdfPage page) {
-    if (page == null) {
-      return;
-    }
-
-    List<PdfTextBlock> textBlocks = page.getTextBlocks();
-    if (textBlocks == null) {
-      return;
-    }
-
-    for (PdfTextBlock block : textBlocks) {
-      PdfTextLineList lines = block.getTextLines();
-      if (lines == null) {
-        continue;
-      }
-
-      for (PdfTextLine line : lines) {
-        PdfWordList words = line.getWords();
-        if (words == null) {
-          continue;
-        }
-
-        for (PdfWord word : words) {
-          // Compute the text for the word.
-          PdfCharacterList characters = word.getCharacters();
-          Collections.sort(characters, new MinXComparator());
-          word.setText(CollectionUtils.join(characters, ""));
-        }
-
-        // Compute the text for the line.
-        Collections.sort(words, new MinXComparator());
-        line.setText(CollectionUtils.join(words, " "));
-        
-        // Check if the last word in the line is hyphenated.
-        PdfWord lastWord = line.getLastWord();
-        if (lastWord != null) {
-          PdfCharacter lastCharacter = lastWord.getLastCharacter();
-          lastWord.setIsHyphenated(PdfCharacterUtils.isHyphen(lastCharacter));
-        }
-      }
-
-      // Compute the text for the block.
-      Collections.sort(lines, Collections.reverseOrder(new MinYComparator()));
-      block.setText(CollectionUtils.join(lines, " "));
+  protected void tokenizePdfDocument(PdfDocument pdf) {
+    // Tokenize each page separately.
+    for (PdfPage page : pdf.getPages()) {
+      page.setTextBlocks(this.textBlockIdentifier.tokenize(pdf, page));
     }
   }
 
-  /**
-   * Computes the texts of the text blocks, text lines and words of the given
-   * page.
-   * 
-   * @param page
-   *        The page to process.
-   */
-  protected void computeTexts2(PdfPage page) {
-    if (page == null) {
-      return;
-    }
-
-    List<PdfTextBlock> textBlocks = page.getTextBlocks();
-    if (textBlocks == null) {
-      return;
-    }
-
-    for (PdfTextLine line : page.getTextLines()) {
-      PdfWordList words = line.getWords();
-      if (words == null) {
-        continue;
-      }
-
-      for (PdfWord word : words) {
-        // Compute the text for the word.
-        Collections.sort(word.getCharacters(), new MinXComparator());
-        word.setText(CollectionUtils.join(word.getCharacters(), ""));
-      }
-
-      // Compute the text for the line.
-      Collections.sort(words, new MinXComparator());
-      line.setText(CollectionUtils.join(words, " "));
-    }
-  }
+//  /**
+//   * Tokenizes the given PDF page.
+//   * 
+//   * @param pdf
+//   *        The PDF document to which the PDF page belongs to.
+//   * @param page
+//   *        The PDF page to process.
+//   */
+//  protected void tokenizePdfPage(PdfDocument pdf, PdfPage page) {
+//    page.setTextBlocks(identifyTextBlocks(pdf, page));
+//  }
+//
+//  /**
+//   * Identifies the text blocks in the given PDF page.
+//   * 
+//   * @param pdf
+//   *        The PDF document to which the PDF page belongs to.
+//   * @param page
+//   *        The PDF page to process.
+//   * 
+//   * @return The list of identified text blocks.
+//   */
+//  protected List<PdfTextBlock> identifyTextBlocks(PdfDocument pdf,
+//      PdfPage page) {
+//    // Identify the text lines in the given page.
+//    PdfTextLineList lines = identifyTextLines(pdf, page);
+//    // Build the text blocks from the text lines.
+//    return this.textBlockTokenizer.xxx(pdf, page, lines);
+//  }
+//
+//  /**
+//   * Identifies the text lines in the given PDF page.
+//   * 
+//   * @param pdf
+//   *        The PDF document to which the PDF page belongs to.
+//   * @param page
+//   *        The PDF page to process.
+//   * 
+//   * @return The list of identified text lines.
+//   */
+//  protected PdfTextLineList identifyTextLines(PdfDocument pdf, PdfPage page) {
+//    // Tokenize the given page into (loose) text areas.
+//    List<PdfCharacterList> areas = splitIntoTextAreas(pdf, page);
+//    // Tokenize the text areas into text lines.
+//    for (PdfCharacterList area : areas) {
+//      List<PdfCharacterList> lineChars = splitIntoTextLines(pdf, page, area);
+//      PdfTextLineList lines = buildLines(lineChars);
+//      // Tokenize the text lines into words.
+//      for (PdfCharacterList line : lineChars) {
+//        // Identify the word in the given text line.
+//        List<PdfCharacterList> wordChars = splitIntoWords(pdf, page, line);
+//        List<PdfWord> words = buildWords(pdf, page, wordChars);
+//      }
+//    }
+//  }
+//
+//  // ==========================================================================
+//
+//  /**
+//   * Splits the given page into text areas.
+//   * 
+//   * @param pdf
+//   *        The PDF document to which the page belong to.
+//   * @param page
+//   *        The PDF page to process.
+//   *
+//   * @return The lists of text areas.
+//   */
+//  protected List<PdfCharacterList> splitIntoTextAreas(PdfDocument pdf, PdfPage page) {
+//    return this.textAreaTokenizer.splitIntoTextAreas(pdf, page, page.getCharacters());
+//  }
+//
+//  /**
+//   * Splits the given text area into text lines.
+//   * 
+//   * @param doc
+//   *        The PDF document to which the text area belong to.
+//   * @param page
+//   *        The PDF page to which the text area belong to.
+//   * @param textArea
+//   *        The text area characters.
+//   *
+//   * @return The lists of line characters.
+//   */
+//  protected List<PdfCharacterList> splitIntoTextLines(PdfDocument doc,
+//      PdfPage page, PdfCharacterList textArea) {
+//    return this.textLineTokenizer.splitIntoTextLines(doc, page, textArea);
+//  }
+//  
+//  /**
+//   * Splits the given text line into words.
+//   * 
+//   * @param doc
+//   *        The PDF document to which the text line belong to.
+//   * @param page
+//   *        The PDF page to which the text line belong to.
+//   * @param line
+//   *        The text line to process.
+//   *
+//   * @return The lists of words.
+//   */
+//  protected List<PdfCharacterList> splitIntoWords(PdfDocument doc, PdfPage page,
+//      PdfCharacterList line) {
+//    return this.wordTokenizer.splitIntoWords(doc, page, line);
+//  }
+//  
+//  // ==========================================================================
+//
+//  /**
+//   * Builds PdfTextLine objects from the given lists of included words.
+//   * 
+//   * @param doc
+//   *        The PDF document to which the characters belong to.
+//   * @param page
+//   *        The PDF page to which the characters belong to.
+//   * @param words
+//   *        The lists of word characters.
+//   * 
+//   * @return The list of built words.
+//   */
+//  protected List<PdfWord> buildTextLines(PdfDocument doc, PdfPage page,
+//      List<PdfWord> words) {
+//    return this.textLineTokenizer.buildTextLines(words);
+//  }
+//
+//  // ==========================================================================
+//
+//
+//
+//  // ==========================================================================
+//
+//
+//
+//  /**
+//   * Builds PdfWord objects from the given lists of word characters.
+//   * 
+//   * @param doc
+//   *        The PDF document to which the characters belong to.
+//   * @param page
+//   *        The PDF page to which the characters belong to.
+//   * @param wordCharacters
+//   *        The lists of word characters.
+//   * 
+//   * @return The list of built words.
+//   */
+//  protected List<PdfWord> buildWords(PdfDocument doc, PdfPage page,
+//      List<PdfCharacterList> wordCharacters) {
+//    return this.wordTokenizer.buildWords(wordCharacters);
+//  }
+//
+//  // ==========================================================================
+//
+//  /**
+//   * Builds PdfTextBlock objects from the given list of lines.
+//   * 
+//   * @param doc
+//   *        The PDF document to which the lines belong to.
+//   * @param page
+//   *        The PDF page to which the lines belong to.
+//   * @param lines
+//   *        The lines to process.
+//   * 
+//   * @return The list of built PdfTextBlock objects.
+//   */
+//  protected List<PdfTextBlock> buildTextBlocks(PdfDocument doc,
+//      PdfPage page, List<PdfTextLine> lines) {
+//    return this.textBlockTokenizer.tokenize(doc, page, lines);
+//  }
+//
+//  // ==========================================================================
+//
+//  // /**
+//  // * Computes the texts of the text blocks, text lines and words of the given
+//  // * page.
+//  // *
+//  // * @param page
+//  // * The page to process.
+//  // */
+//  // protected void computeTexts(PdfPage page) {
+//  // if (page == null) {
+//  // return;
+//  // }
+//  //
+//  // List<PdfTextBlock> textBlocks = page.getTextBlocks();
+//  // if (textBlocks == null) {
+//  // return;
+//  // }
+//  //
+//  // for (PdfTextBlock block : textBlocks) {
+//  // PdfTextLineList lines = block.getTextLines();
+//  // if (lines == null) {
+//  // continue;
+//  // }
+//  //
+//  // for (PdfTextLine line : lines) {
+//  // PdfWordList words = line.getWords();
+//  // if (words == null) {
+//  // continue;
+//  // }
+//  //
+//  // for (PdfWord word : words) {
+//  // // Compute the text for the word.
+//  // PdfCharacterList characters = word.getCharacters();
+//  // Collections.sort(characters, new MinXComparator());
+//  // word.setText(CollectionUtils.join(characters, ""));
+//  // }
+//  //
+//  // // Compute the text for the line.
+//  // Collections.sort(words, new MinXComparator());
+//  // line.setText(CollectionUtils.join(words, " "));
+//  //
+//  // // Check if the last word in the line is hyphenated.
+//  // PdfWord lastWord = line.getLastWord();
+//  // if (lastWord != null) {
+//  // PdfCharacter lastCharacter = lastWord.getLastCharacter();
+//  // lastWord.setIsHyphenated(PdfCharacterUtils.isHyphen(lastCharacter));
+//  // }
+//  // }
+//  //
+//  // // Compute the text for the block.
+//  // Collections.sort(lines, Collections.reverseOrder(new MinYComparator()));
+//  // block.setText(CollectionUtils.join(lines, " "));
+//  // }
+//  // }
+//  //
+//  // /**
+//  // * Computes the texts of the text blocks, text lines and words of the given
+//  // * page.
+//  // *
+//  // * @param page
+//  // * The page to process.
+//  // */
+//  // protected void computeTexts2(PdfPage page) {
+//  // if (page == null) {
+//  // return;
+//  // }
+//  //
+//  // List<PdfTextBlock> textBlocks = page.getTextBlocks();
+//  // if (textBlocks == null) {
+//  // return;
+//  // }
+//  //
+//  // for (PdfTextBlock textBlock : textBlocks) {
+//  // for (PdfTextLine line : textBlock.getTextLines()) {
+//  // PdfWordList words = line.getWords();
+//  // if (words == null) {
+//  // continue;
+//  // }
+//  //
+//  // for (PdfWord word : words) {
+//  // // Compute the text for the word.
+//  // Collections.sort(word.getCharacters(), new MinXComparator());
+//  // word.setText(CollectionUtils.join(word.getCharacters(), ""));
+//  // }
+//  //
+//  // // Compute the text for the line.
+//  // Collections.sort(words, new MinXComparator());
+//  // line.setText(CollectionUtils.join(words, " "));
+//  // }
+//  // }
+//  // }
 }

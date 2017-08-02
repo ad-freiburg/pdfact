@@ -24,11 +24,11 @@ public class CaptionModule implements PdfTextSemanticizerModule {
 
   static {
     CAPTION_PATTERNS = new HashMap<>();
-    
+
     Pattern figureCaptionPattern = Pattern.compile(
         "^(fig(\\.?|ure)|abbildung)\\s*\\d+", Pattern.CASE_INSENSITIVE);
     CAPTION_PATTERNS.put(PdfRole.FIGURE, figureCaptionPattern);
-    
+
     Pattern tableCaptionPattern = Pattern.compile(
         "^(table|tabelle)\\s*\\d+(\\.|:)", Pattern.CASE_INSENSITIVE);
     CAPTION_PATTERNS.put(PdfRole.TABLE, tableCaptionPattern);
@@ -41,22 +41,22 @@ public class CaptionModule implements PdfTextSemanticizerModule {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
         }
-        
+
         // Don't overwrite existing roles.
         if (block.getRole() != null) {
           continue;
@@ -69,8 +69,9 @@ public class CaptionModule implements PdfTextSemanticizerModule {
           Matcher captionMatcher = captionPattern.matcher(block.getText());
           if (captionMatcher.find()) {
             block.setRole(PdfRole.CAPTION);
-            // Set also the secondary role, e.g. "figure" for a figures caption.
-            block.setSecondaryRole(role); 
+            // Set also the secondary role, e.g. "figure" for a figures
+            // caption.
+            block.setSecondaryRole(role);
             break;
           }
         }

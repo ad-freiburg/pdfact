@@ -5,7 +5,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import icecite.models.PdfElement;
 import icecite.models.PdfFeature;
-import icecite.models.PdfPage;
 import icecite.models.PdfPosition;
 import icecite.utils.geometric.Rectangle;
 
@@ -30,23 +29,6 @@ public class PlainPdfElement implements PdfElement {
   @Override
   public void setPosition(PdfPosition position) {
     this.position = position;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfPage getPage() {
-    return this.position != null ? this.position.getPage() : null;
-  }
-
-  // TODO: Create PdfPositionFactory and create a PdfPosition if position ==
-  // null on setting for example the page.
-
-  @Override
-  public void setPage(PdfPage page) {
-    if (this.position != null) {
-      this.position.setPage(page);
-    }
   }
 
   // ==========================================================================

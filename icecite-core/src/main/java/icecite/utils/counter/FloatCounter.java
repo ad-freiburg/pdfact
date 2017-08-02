@@ -63,6 +63,18 @@ public class FloatCounter extends TFloatIntHashMap {
   }
 
   /**
+   * Adds the given float counter to this counter.
+   * 
+   * @param f
+   *        The float to add.
+   */
+  public void add(FloatCounter f) {
+    for (float key : f.keys()) {
+      adjustOrPutValue(key, f.get(key), f.get(key));
+    }
+  }
+
+  /**
    * Returns the most common float.
    * 
    * @return The most common float in this counter or Float.NaN if the counter
@@ -126,14 +138,14 @@ public class FloatCounter extends TFloatIntHashMap {
     this.averageFloat = sumFreqs > 0 ? sumFloats / sumFreqs : 0;
     this.isStatisticsComputed = true;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     return super.equals(other);
   }
-  
+
   @Override
   public int hashCode() {
     return super.hashCode();

@@ -16,6 +16,22 @@ public interface HasFigures {
   List<PdfFigure> getFigures();
 
   /**
+   * Returns the first figure.
+   * 
+   * @return The first figure.
+   */
+  PdfFigure getFirstFigure();
+
+  /**
+   * Returns the last figure.
+   * 
+   * @return The last figure.
+   */
+  PdfFigure getLastFigure();
+
+  // ==========================================================================
+
+  /**
    * Sets the given figures.
    * 
    * @param figures

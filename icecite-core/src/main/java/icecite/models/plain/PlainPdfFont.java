@@ -10,12 +10,7 @@ import icecite.models.PdfFont;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfFont implements PdfFont {
-  /**
-   * The id of this font (needed for serialization).
-   */
-  protected String id;
-
+public class PlainPdfFont extends PlainPdfResource implements PdfFont {
   /**
    * The (normalized) name of this font.
    */

@@ -106,7 +106,7 @@ public class JsonPdfSerializer implements PdfSerializer {
     if (os == null) {
       return;
     }
-    
+
     // The used fonts on serializing the PDF document.
     this.usedFonts = new HashSet<>();
     // The used colors on serializing the PDF document.
@@ -499,10 +499,10 @@ public class JsonPdfSerializer implements PdfSerializer {
 
     // Check if the role of the given element was registered to be serialized.
     // TODO
-//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-//    if (isRoleGiven && !roles.contains(element.getRole())) {
-//      return false;
-//    }
+    // boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    // if (isRoleGiven && !roles.contains(element.getRole())) {
+    // return false;
+    // }
     return true;
   }
 

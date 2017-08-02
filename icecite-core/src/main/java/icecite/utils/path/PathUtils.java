@@ -332,25 +332,26 @@ public class PathUtils {
         Files.copy(file, targetDir.resolve(filename.toString()),
             StandardCopyOption.REPLACE_EXISTING);
       }
-    } else if (Files.isDirectory(file)) {
-      Files.createDirectories(targetDir);
-      try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
-        Iterator<Path> filesItr = files.iterator();
-        while (filesItr.hasNext()) {
-          Path f = filesItr.next();
-          Path filename = f.getFileName();
-          if (filename != null) {
-            Path target = targetDir.resolve(filename.toString());
+    } else
+      if (Files.isDirectory(file)) {
+        Files.createDirectories(targetDir);
+        try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
+          Iterator<Path> filesItr = files.iterator();
+          while (filesItr.hasNext()) {
+            Path f = filesItr.next();
+            Path filename = f.getFileName();
+            if (filename != null) {
+              Path target = targetDir.resolve(filename.toString());
 
-            if (Files.isDirectory(target)) {
-              clearDirectory(target);
+              if (Files.isDirectory(target)) {
+                clearDirectory(target);
+              }
+
+              Files.copy(f, target, StandardCopyOption.REPLACE_EXISTING);
             }
-
-            Files.copy(f, target, StandardCopyOption.REPLACE_EXISTING);
           }
         }
       }
-    }
   }
 
   /**
@@ -373,26 +374,27 @@ public class PathUtils {
         Files.move(file, targetDir.resolve(filename.toString()),
             StandardCopyOption.REPLACE_EXISTING);
       }
-    } else if (Files.isDirectory(file)) {
-      Files.createDirectories(targetDir);
-      try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
-        Iterator<Path> filesItr = files.iterator();
-        while (filesItr.hasNext()) {
-          Path f = filesItr.next();
-          Path filename = f.getFileName();
-          if (filename != null) {
-            Path target = targetDir.resolve(filename.toString());
+    } else
+      if (Files.isDirectory(file)) {
+        Files.createDirectories(targetDir);
+        try (DirectoryStream<Path> files = Files.newDirectoryStream(file)) {
+          Iterator<Path> filesItr = files.iterator();
+          while (filesItr.hasNext()) {
+            Path f = filesItr.next();
+            Path filename = f.getFileName();
+            if (filename != null) {
+              Path target = targetDir.resolve(filename.toString());
 
-            if (Files.isDirectory(target)) {
-              clearDirectory(target);
+              if (Files.isDirectory(target)) {
+                clearDirectory(target);
+              }
+
+              Files.move(f, target, StandardCopyOption.REPLACE_EXISTING);
             }
-
-            Files.move(f, target, StandardCopyOption.REPLACE_EXISTING);
           }
         }
+        Files.delete(file);
       }
-      Files.delete(file);
-    }
   }
 
   /**

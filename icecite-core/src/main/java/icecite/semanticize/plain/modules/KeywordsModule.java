@@ -18,23 +18,23 @@ public class KeywordsModule implements PdfTextSemanticizerModule {
    * of the Keywords section or not.
    */
   protected boolean isKeywords = false;
-  
+
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
@@ -48,12 +48,12 @@ public class KeywordsModule implements PdfTextSemanticizerModule {
         if (this.isKeywords && role == PdfRole.HEADING) {
           this.isKeywords = false;
         }
-        
+
         if (this.isKeywords) {
           block.setRole(PdfRole.KEYWORDS);
         }
 
-        // Check if the current block is the heading of the Keywords section 
+        // Check if the current block is the heading of the Keywords section
         // (which would denote the start of the Keywords section).
         if (role == PdfRole.HEADING && secondaryRole == PdfRole.KEYWORDS) {
           this.isKeywords = true;

@@ -7,26 +7,6 @@ package icecite.models;
  */
 public interface PdfTextLineList extends PdfElementList<PdfTextLine> {
   /**
-   * Returns the most common line pitch of lines with the same font face
-   * (font/font size) as of the given line.
-   * 
-   * @param line
-   *        The text line to process.
-   * 
-   * @return The most common line pitch of lines with the same font face as of
-   *         the given line.
-   */
-  float getMostCommonLinePitch(PdfTextLine line);
-
-  /**
-   * Returns the average width of white spaces between the words within the
-   * lines.
-   * 
-   * @return The average width of white spaces between the words.
-   */
-  float getAverageWhitespaceWidth();
-
-  /**
    * The factory to create instances of {@link PdfTextLineList}.
    * 
    * @author Claudius Korzen

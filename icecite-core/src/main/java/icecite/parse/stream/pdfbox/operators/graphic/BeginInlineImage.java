@@ -95,7 +95,7 @@ public class BeginInlineImage extends OperatorProcessor {
   @Override
   public void process(Operator op, List<COSBase> args) throws IOException {
     PdfPage pdfPage = this.engine.getCurrentPdfPage();
-    
+
     Matrix ctm = this.engine.getCurrentTransformationMatrix();
     COSDictionary params = op.getImageParameters();
 
@@ -113,7 +113,7 @@ public class BeginInlineImage extends OperatorProcessor {
     minY = MathUtils.round(minY, FLOATING_NUMBER_PRECISION);
     maxX = MathUtils.round(maxX, FLOATING_NUMBER_PRECISION);
     maxY = MathUtils.round(maxY, FLOATING_NUMBER_PRECISION);
-    
+
     // Type3 streams may contain BI operands, but we don't want to consider
     // those.
     if (!this.engine.isType3Stream()) {
@@ -123,12 +123,12 @@ public class BeginInlineImage extends OperatorProcessor {
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
-      
+
       Point ll = this.pointFactory.create(minX, minY);
       Point ur = this.pointFactory.create(maxX, maxY);
       // TODO: Check if we have to check if ur is indeed the upper right.
       PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
-      
+
       if (exclusiveColor != null) {
         PdfColor color = this.colorFactory.create();
         color.setRGB(exclusiveColor);

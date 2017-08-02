@@ -1,28 +1,24 @@
 package icecite.tokenize.lines;
 
-import icecite.models.PdfCharacterList;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfTextLineList;
 
 /**
- * A tokenizer that tokenizes lists of characters into text lines.
+ * Identifies text lines in PDF pages.
  * 
  * @author Claudius Korzen
  */
 public interface PdfTextLineTokenizer {
   /**
-   * Tokenizes the given text area (of characters) into text lines.
+   * Identifies text lines in the given PDF page.
    * 
    * @param pdf
-   *        The PDF document to which the given text lines belong to.
+   *        The PDF document to which the page belongs to.
    * @param page
-   *        The page in which the text lines are located.
-   * @param area
-   *        The text area (of characters) to tokenize.
+   *        The PDF page to process.
    * 
    * @return The list of identified text lines.
    */
-  PdfTextLineList tokenize(PdfDocument pdf, PdfPage page,
-      PdfCharacterList area);
+  PdfTextLineList tokenize(PdfDocument pdf, PdfPage page);
 }

@@ -308,7 +308,7 @@ public class PdfBoxDrawer implements PdfDrawer {
       PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
       graphicsState.setNonStrokingAlphaConstant(0.5f);
       stream.setGraphicsStateParameters(graphicsState);
-      
+
       stream.setNonStrokingColor(nonStrokingColor);
       stream.fill();
     }

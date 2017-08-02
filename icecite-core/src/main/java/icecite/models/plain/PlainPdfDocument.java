@@ -11,17 +11,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterList;
-import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
-import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
-import icecite.models.PdfShape;
-import icecite.models.PdfTextLine;
-import icecite.models.PdfTextLineList;
-import icecite.models.PdfTextLineList.PdfTextLineListFactory;
+import icecite.models.PdfTextLineStatistics;
 
 /**
  * A plain implementation of {@link PdfDocument}.
@@ -40,29 +34,19 @@ public class PlainPdfDocument implements PdfDocument {
   protected List<PdfPage> pages;
 
   /**
-   * All characters of this PDF document.
-   */
-  protected PdfCharacterList characters;
-
-  /**
-   * All figures of this PDF document.
-   */
-  protected List<PdfFigure> figures;
-
-  /**
-   * All shapes of this PDF document.
-   */
-  protected List<PdfShape> shapes;
-
-  /**
-   * All text lines of this PDF document.
-   */
-  protected PdfTextLineList textLines;
-
-  /**
-   * All paragraphs of this PDF document.
+   * The paragraphs in this PDF document.
    */
   protected List<PdfParagraph> paragraphs;
+
+  /**
+   * The statistics about characters.
+   */
+  protected PdfCharacterStatistics characterStatistics;
+
+  /**
+   * The statistics about text lines.
+   */
+  protected PdfTextLineStatistics textLineStatistics;
 
   // ==========================================================================
   // Constructors.
@@ -70,52 +54,24 @@ public class PlainPdfDocument implements PdfDocument {
   /**
    * Creates a new PDF document.
    * 
-   * @param characterListFactory
-   *        The factory to create instances of {@link PdfCharacterList}.
-   * @param textLineListFactory
-   *        The factory to create instances of {@link PdfTextLineList}.
+   * @param pdf
+   *        The PDF file given as a File object.
    */
-  protected PlainPdfDocument(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory) {
-    this.characters = characterListFactory.create();
-    this.textLines = textLineListFactory.create();
+  @AssistedInject
+  public PlainPdfDocument(@Assisted File pdf) {
+    this(pdf.toPath());
+  }
+
+  /**
+   * Creates a new PDF document.
+   *
+   * @param pdf
+   *        The PDF file given as a File object.
+   */
+  @AssistedInject
+  public PlainPdfDocument(@Assisted Path pdf) {
     this.pages = new ArrayList<>();
-    this.figures = new ArrayList<>();
-    this.shapes = new ArrayList<>();
     this.paragraphs = new ArrayList<>();
-  }
-
-  /**
-   * Creates a new PDF document.
-   * 
-   * @param characterListFactory
-   *        The factory to create instances of {@link PdfCharacterList}.
-   * @param textLineListFactory
-   *        The factory to create instances of {@link PdfTextLineList}.
-   * @param pdf
-   *        The PDF file given as a File object.
-   */
-  @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory, @Assisted File pdf) {
-    this(characterListFactory, textLineListFactory);
-    this.path = pdf.toPath();
-  }
-
-  /**
-   * Creates a new PDF document.
-   * 
-   * @param characterListFactory
-   *        The factory to create instances of {@link PdfCharacterList}.
-   * @param textLineListFactory
-   *        The factory to create instances of {@link PdfTextLineList}.
-   * @param pdf
-   *        The PDF file given as a File object.
-   */
-  @AssistedInject
-  public PlainPdfDocument(PdfCharacterListFactory characterListFactory,
-      PdfTextLineListFactory textLineListFactory, @Assisted Path pdf) {
-    this(characterListFactory, textLineListFactory);
     this.path = pdf;
   }
 
@@ -161,104 +117,24 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public PdfCharacterList getCharacters() {
-    return this.characters;
-  }
-
-  @Override
-  public void setCharacters(PdfCharacterList characters) {
-    this.characters = characters;
-  }
-
-  @Override
-  public void addCharacters(PdfCharacterList characters) {
-    for (PdfCharacter character : characters) {
-      addCharacter(character);
-    }
-  }
-
-  @Override
-  public void addCharacter(PdfCharacter character) {
-    this.characters.add(character);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public List<PdfFigure> getFigures() {
-    return this.figures;
-  }
-
-  @Override
-  public void setFigures(List<PdfFigure> figures) {
-    this.figures = figures;
-  }
-
-  @Override
-  public void addFigures(List<PdfFigure> figures) {
-    for (PdfFigure figure : figures) {
-      addFigure(figure);
-    }
-  }
-
-  @Override
-  public void addFigure(PdfFigure figure) {
-    this.figures.add(figure);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public List<PdfShape> getShapes() {
-    return this.shapes;
-  }
-
-  @Override
-  public void setShapes(List<PdfShape> shapes) {
-    this.shapes = shapes;
-  }
-
-  @Override
-  public void addShapes(List<PdfShape> shapes) {
-    for (PdfShape shape : shapes) {
-      addShape(shape);
-    }
-  }
-
-  @Override
-  public void addShape(PdfShape shape) {
-    this.shapes.add(shape);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfTextLineList getTextLines() {
-    return this.textLines;
-  }
-
-  @Override
-  public void setTextLines(PdfTextLineList lines) {
-    this.textLines = lines;
-  }
-
-  @Override
-  public void addTextLines(PdfTextLineList lines) {
-    for (PdfTextLine line : lines) {
-      addTextLine(line);
-    }
-  }
-
-  @Override
-  public void addTextLine(PdfTextLine line) {
-    this.textLines.add(line);
-  }
-
-  // ==========================================================================
-
-  @Override
   public List<PdfParagraph> getParagraphs() {
     return this.paragraphs;
+  }
+
+  @Override
+  public PdfParagraph getFirstParagraph() {
+    if (this.paragraphs == null || this.paragraphs.isEmpty()) {
+      return null;
+    }
+    return this.paragraphs.get(0);
+  }
+
+  @Override
+  public PdfParagraph getLastParagraph() {
+    if (this.paragraphs == null || this.paragraphs.isEmpty()) {
+      return null;
+    }
+    return this.paragraphs.get(this.paragraphs.size() - 1);
   }
 
   @Override
@@ -276,6 +152,30 @@ public class PlainPdfDocument implements PdfDocument {
   @Override
   public void addParagraph(PdfParagraph paragraph) {
     this.paragraphs.add(paragraph);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfCharacterStatistics getCharacterStatistics() {
+    return this.characterStatistics;
+  }
+
+  @Override
+  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
+    this.characterStatistics = statistics;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfTextLineStatistics getTextLineStatistics() {
+    return this.textLineStatistics;
+  }
+
+  @Override
+  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
+    this.textLineStatistics = statistics;
   }
 
   // ==========================================================================

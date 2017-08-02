@@ -84,7 +84,7 @@ public class PdfSerializerConstants {
   static final String CONTEXT_NAME_FONT_IS_ITALIC = "italic";
   /** The name of context where to put the type3 flag of a serialized font. */
   static final String CONTEXT_NAME_FONT_IS_TYPE3 = "type3";
-  
+
   /** The name of context where to put the color of a serialized element. */
   static final String CONTEXT_NAME_ELEMENT_COLOR = "color";
   /** The name of context where to put the id of a serialized color. */

@@ -5,8 +5,11 @@ import java.util.List;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
+import icecite.models.PdfParagraph;
+import icecite.models.PdfTextBlock;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
@@ -29,7 +32,7 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
    * The factory to create instances of {@link PdfWord}.
    */
   protected PdfWordFactory wordFactory;
-  
+
   /**
    * The counter for non hyphenated words.
    */
@@ -63,29 +66,35 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
    *        The pdf document to process.
    */
   protected void preprocess(PdfDocument pdf) {
-    PdfFontFace pdfFontFace = pdf.getCharacters().getMostCommonFontFace();
-    for (PdfTextLine line : pdf.getTextLines()) {
-      for (PdfWord word : line.getWords()) {
-        String text = PdfWordUtils.normalize(word);
+    PdfFontFace pdfFontFace = pdf.getCharacterStatistics()
+        .getMostCommonFontFace();
+    for (PdfParagraph paragraph : pdf.getParagraphs()) {
+      for (PdfTextBlock textBlock : paragraph.getTextBlocks()) {
+        for (PdfTextLine line : textBlock.getTextLines()) {
+          for (PdfWord word : line.getWords()) {
+            String text = PdfWordUtils.normalize(word);
 
-        // Find all indexes of hyphens.
-        List<Integer> hyphenIndexes = StringUtils.indexesOf(text, HYPHENS);
+            // Find all indexes of hyphens.
+            List<Integer> hyphenIndexes = StringUtils.indexesOf(text, HYPHENS);
 
-        // If there are no hyphens, the word is a non-hyphenated words.
-        if (hyphenIndexes.isEmpty()) {
-          // Consider only words with most common font. Formula element "(cIR"
-          // affects "cir-cumstance".
-          PdfFontFace fontFace = word.getCharacters().getMostCommonFontFace();
-          if (fontFace == pdfFontFace) {
-            this.noHyphenWords.add(text);
-          }
-        } else {
-          // There are hyphens. Get the prefixes.
-          for (int indexOfHyphen : hyphenIndexes) {
-            // Only consider "middle" hyphens.
-            if (indexOfHyphen > 0 && indexOfHyphen < text.length() - 1) {
-              // Add the prefix, e.g. for the word "sugar-free", add "sugar".
-              this.hyphenPrefixes.add(text.substring(0, indexOfHyphen));
+            // If there are no hyphens, the word is a non-hyphenated words.
+            if (hyphenIndexes.isEmpty()) {
+              // Consider only words with most common font. Formula element
+              // "(cIR" affects "cir-cumstance".
+              PdfCharacterStatistics charStats = word.getCharacterStatistics();
+              PdfFontFace fontFace = charStats.getMostCommonFontFace();
+              if (fontFace == pdfFontFace) {
+                this.noHyphenWords.add(text);
+              }
+            } else {
+              // There are hyphens. Get the prefixes.
+              for (int indexOfHyphen : hyphenIndexes) {
+                // Only consider "middle" hyphens.
+                if (indexOfHyphen > 0 && indexOfHyphen < text.length() - 1) {
+                  // Add the prefix, e.g. for word "sugar-free", add "sugar".
+                  this.hyphenPrefixes.add(text.substring(0, indexOfHyphen));
+                }
+              }
             }
           }
         }
@@ -96,7 +105,7 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
   @Override
   public PdfWord dehyphenate(PdfWord word1, PdfWord word2) {
     boolean isHyphenMandatory = isHyphenMandatory(word1, word2);
-    
+
     PdfWord dehyphenated = this.wordFactory.create();
     if (isHyphenMandatory) {
       dehyphenated.addCharacters(word1.getCharacters());
@@ -107,12 +116,12 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
         dehyphenated.addCharacter(word1.getCharacters().get(i));
       }
       dehyphenated.addCharacters(word2.getCharacters());
-      dehyphenated.setText(word1.getText().substring(0, 
+      dehyphenated.setText(word1.getText().substring(0,
           word1.getText().length() - 1) + word2.getText());
     }
 
     dehyphenated.setIsDehyphenated(true);
-    
+
     return dehyphenated;
   }
 
@@ -129,13 +138,13 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
    */
   protected boolean isHyphenMandatory(PdfWord word1, PdfWord word2) {
     String prefix = PdfWordUtils.normalize(word1);
-    
+
     String textWithoutHyphen = prefix + PdfWordUtils.normalize(word2);
 
     if (prefix.isEmpty() || textWithoutHyphen.isEmpty()) {
       return false;
     }
-    
+
     int numPrefixes = this.hyphenPrefixes.get(prefix);
     int numWithoutHyphen = this.noHyphenWords.get(textWithoutHyphen);
 

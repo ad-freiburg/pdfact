@@ -7,13 +7,30 @@ import java.util.List;
  *
  * @author Claudius Korzen
  */
-public interface HasTextBlocks {
+public interface HasTextBlocks extends HasTextLineStatistics,
+    HasCharacterStatistics {
   /**
    * Returns the text blocks.
    * 
    * @return The text blocks.
    */
   List<PdfTextBlock> getTextBlocks();
+
+  /**
+   * Returns the first text block.
+   * 
+   * @return the first text block.
+   */
+  PdfTextBlock getFirstTextBlock();
+
+  /**
+   * Returns the last text block.
+   * 
+   * @return the last text block.
+   */
+  PdfTextBlock getLastTextBlock();
+
+  // ==========================================================================
 
   /**
    * Sets the given text blocks.

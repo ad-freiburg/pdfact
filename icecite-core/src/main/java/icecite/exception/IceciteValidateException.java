@@ -10,7 +10,7 @@ public class IceciteValidateException extends IceciteException {
    * The serial id.
    */
   protected static final long serialVersionUID = -2555647293109903637L;
-  
+
   /**
    * The default status code of this exception.
    */
@@ -25,7 +25,7 @@ public class IceciteValidateException extends IceciteException {
   public IceciteValidateException(String message) {
     super(STATUS_CODE, message);
   }
-  
+
   /**
    * The default constructor.
    * 

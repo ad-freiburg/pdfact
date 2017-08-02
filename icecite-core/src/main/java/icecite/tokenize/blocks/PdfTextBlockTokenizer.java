@@ -7,19 +7,19 @@ import icecite.models.PdfPage;
 import icecite.models.PdfTextBlock;
 
 /**
- * A tokenizer that tokenizes text lines into paragraphs.
+ * Identifies text blocks in PDF pages.
  * 
  * @author Claudius Korzen
  */
 public interface PdfTextBlockTokenizer {
   /**
-   * Tokenizes the given page into text blocks.
+   * Tokenizes the given PDF page into text blocks.
    * 
    * @param pdf
-   *        The PDF document to process.
+   *        The PDF document to which the page belongs to.
    * @param page
-   *        The page to process.
-   *
+   *        The PDF page to process.
+   * 
    * @return The list of identified text blocks.
    */
   List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page);

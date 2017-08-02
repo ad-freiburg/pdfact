@@ -145,13 +145,13 @@ public class StrokePath extends OperatorProcessor {
 
           Point ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
-          
+
           // Round the values.
           ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
           ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
           ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
-          
+
           PdfPosition position = this.positionFactory.create(pdfPage, ll, ur);
 
           PdfShape shape = this.shapeFactory.create();
@@ -166,13 +166,13 @@ public class StrokePath extends OperatorProcessor {
 
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
-          
+
           // Round the values.
           ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
           ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
           ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
-          
+
           position = this.positionFactory.create(pdfPage, ll, ur);
 
           shape = this.shapeFactory.create();
@@ -192,13 +192,13 @@ public class StrokePath extends OperatorProcessor {
 
           ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
           ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
-          
+
           // Round the values.
           ll.setX(MathUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
           ll.setY(MathUtils.round(ll.getY(), FLOATING_NUMBER_PRECISION));
           ur.setX(MathUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(MathUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
-          
+
           position = this.positionFactory.create(pdfPage, ll, ur);
 
           shape = this.shapeFactory.create();

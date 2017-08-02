@@ -17,7 +17,7 @@ public interface PdfTextTokenizer {
    *        The PDF document to process.
    */
   void tokenize(PdfDocument pdf);
-  
+
   /**
    * The factory to create instance of {@link PdfTextTokenizer}.
    * 

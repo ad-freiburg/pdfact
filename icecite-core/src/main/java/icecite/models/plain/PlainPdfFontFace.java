@@ -55,7 +55,7 @@ public class PlainPdfFontFace implements PdfFontFace {
   }
 
   // ==========================================================================
-  
+
   @Override
   public float getFontSize() {
     return this.fontSize;
@@ -65,7 +65,7 @@ public class PlainPdfFontFace implements PdfFontFace {
   public void setFontSize(float fontSize) {
     this.fontSize = fontSize;
   }
-  
+
   // ==========================================================================
 
   @Override

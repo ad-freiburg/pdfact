@@ -70,7 +70,7 @@ public class OperatorProcessorModule extends AbstractModule {
     bind(PDFontFaceConverter.class).in(Singleton.class);
     bind(PDFontConverter.class).in(Singleton.class);
     bind(PDColorConverter.class).in(Singleton.class);
-    
+
     Multibinder<OperatorProcessor> binder = Multibinder.newSetBinder(binder(),
         OperatorProcessor.class);
 

@@ -18,23 +18,23 @@ public class AppendixModule implements PdfTextSemanticizerModule {
    * of the appendix or not.
    */
   protected boolean isAppendix = false;
-  
+
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
       return;
     }
-    
+
     List<PdfPage> pages = pdf.getPages();
     if (pages == null) {
       return;
     }
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
       }
-      
+
       for (PdfTextBlock block : page.getTextBlocks()) {
         if (block == null) {
           continue;
@@ -48,7 +48,7 @@ public class AppendixModule implements PdfTextSemanticizerModule {
         if (this.isAppendix && role == PdfRole.HEADING) {
           this.isAppendix = false;
         }
-        
+
         if (this.isAppendix) {
           block.setRole(PdfRole.APPENDIX);
         }

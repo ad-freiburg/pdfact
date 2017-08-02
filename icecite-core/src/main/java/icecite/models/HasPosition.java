@@ -8,7 +8,7 @@ import icecite.utils.geometric.HasRectangle;
  *
  * @author Claudius Korzen
  */
-public interface HasPosition extends HasRectangle, HasPage {
+public interface HasPosition extends HasRectangle {
   /**
    * Returns the position.
    * 

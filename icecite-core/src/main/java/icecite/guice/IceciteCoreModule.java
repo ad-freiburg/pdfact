@@ -8,6 +8,9 @@ import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
+import icecite.models.PdfCharacterStatistician;
+import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistics.PdfCharacterStatisticsFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfDocument;
@@ -32,12 +35,17 @@ import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
+import icecite.models.PdfTextLineStatistician;
+import icecite.models.PdfTextLineStatistics;
+import icecite.models.PdfTextLineStatistics.PdfTextLineStatisticsFactory;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.PdfWordList;
 import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.models.plain.PlainPdfCharacter;
 import icecite.models.plain.PlainPdfCharacterList;
+import icecite.models.plain.PlainPdfCharacterStatistician;
+import icecite.models.plain.PlainPdfCharacterStatistics;
 import icecite.models.plain.PlainPdfColor;
 import icecite.models.plain.PlainPdfDocument;
 import icecite.models.plain.PlainPdfFigure;
@@ -50,6 +58,8 @@ import icecite.models.plain.PlainPdfShape;
 import icecite.models.plain.PlainPdfTextBlock;
 import icecite.models.plain.PlainPdfTextLine;
 import icecite.models.plain.PlainPdfTextLineList;
+import icecite.models.plain.PlainPdfTextLineStatistician;
+import icecite.models.plain.PlainPdfTextLineStatistics;
 import icecite.models.plain.PlainPdfWord;
 import icecite.models.plain.PlainPdfWordList;
 import icecite.parse.PdfParser;
@@ -82,20 +92,24 @@ import icecite.serialize.XmlPdfSerializer;
 import icecite.tokenize.PdfTextTokenizer;
 import icecite.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import icecite.tokenize.PlainPdfTextTokenizer;
-import icecite.tokenize.areas.PdfTextAreaTokenizer;
-import icecite.tokenize.areas.XYCutPdfTextAreaTokenizer;
+import icecite.tokenize.areas.PdfTextAreaSegmenter;
+import icecite.tokenize.areas.XYCutPdfTextAreaSegmenter;
 import icecite.tokenize.blocks.PdfTextBlockTokenizer;
 import icecite.tokenize.blocks.PlainPdfTextBlockTokenizer;
+import icecite.tokenize.lines.PdfTextLineSegmenter;
 import icecite.tokenize.lines.PdfTextLineTokenizer;
-import icecite.tokenize.lines.XYCutPdfTextLineTokenizer;
+import icecite.tokenize.lines.PlainPdfTextLineTokenizer;
+import icecite.tokenize.lines.XYCutPdfTextLineSegmenter;
 import icecite.tokenize.paragraphs.PdfParagraphTokenizer;
 import icecite.tokenize.paragraphs.PdfParagraphTokenizer.PdfParagraphTokenizerFactory;
 import icecite.tokenize.paragraphs.PlainPdfParagraphTokenizer;
 import icecite.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator;
 import icecite.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator.PdfWordDehyphenatorFactory;
 import icecite.tokenize.paragraphs.dehyphenate.PlainPdfWordDehyphenator;
+import icecite.tokenize.words.PdfWordSegmenter;
 import icecite.tokenize.words.PdfWordTokenizer;
-import icecite.tokenize.words.XYCutPdfWordTokenizer;
+import icecite.tokenize.words.PlainPdfWordTokenizer;
+import icecite.tokenize.words.XYCutPdfWordSegmenter;
 import icecite.utils.geometric.Line;
 import icecite.utils.geometric.Line.LineFactory;
 import icecite.utils.geometric.Point;
@@ -130,18 +144,24 @@ public class IceciteCoreModule extends com.google.inject.AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class,
-        PlainPdfTextTokenizer.class);
-    bind(PdfTextAreaTokenizer.class).to(XYCutPdfTextAreaTokenizer.class);
-    bind(PdfTextLineTokenizer.class).to(XYCutPdfTextLineTokenizer.class);
-    bind(PdfWordTokenizer.class).to(XYCutPdfWordTokenizer.class);
+    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class, PlainPdfTextTokenizer.class);
+    bind(PdfTextAreaSegmenter.class).to(XYCutPdfTextAreaSegmenter.class);
+    bind(PdfTextLineSegmenter.class).to(XYCutPdfTextLineSegmenter.class);
+    bind(PdfTextLineTokenizer.class).to(PlainPdfTextLineTokenizer.class);
+    bind(PdfWordSegmenter.class).to(XYCutPdfWordSegmenter.class);
+    bind(PdfWordTokenizer.class).to(PlainPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
     
-    fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class, 
+    fc(PdfCharacterStatistics.class, PdfCharacterStatisticsFactory.class,
+        PlainPdfCharacterStatistics.class);
+    fc(PdfTextLineStatistics.class, PdfTextLineStatisticsFactory.class,
+        PlainPdfTextLineStatistics.class);
+
+    fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class,
         PlainPdfParagraphTokenizer.class);
-    fc(PdfWordDehyphenator.class, PdfWordDehyphenatorFactory.class, 
+    fc(PdfWordDehyphenator.class, PdfWordDehyphenatorFactory.class,
         PlainPdfWordDehyphenator.class);
-    
+
     // Bind the semanticizer.
     fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
         PlainPdfTextSemanticizer.class);
@@ -170,6 +190,10 @@ public class IceciteCoreModule extends com.google.inject.AbstractModule {
         PlainPdfTextLineList.class);
 
     fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
+
+    bind(PdfCharacterStatistician.class)
+        .to(PlainPdfCharacterStatistician.class);
+    bind(PdfTextLineStatistician.class).to(PlainPdfTextLineStatistician.class);
 
     // Bind the geometric model factories.
     fc(PdfPosition.class, PdfPositionFactory.class, PlainPdfPosition.class);

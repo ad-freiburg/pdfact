@@ -94,7 +94,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (page == null) {
       return;
     }
-    
+
     // Visualize the text elements.
     for (PdfTextBlock block : page.getTextBlocks()) {
       if (isVisualizePdfElement(block, features, roles)) {
@@ -199,10 +199,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
     // Check if the role of the given element was registered to be serialized.
     // TODO
-//    boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
-//    if (isRoleGiven && !roles.contains(element.getRole())) {
-//      return false;
-//    }
+    // boolean isRoleGiven = !CollectionUtils.isNullOrEmpty(roles);
+    // if (isRoleGiven && !roles.contains(element.getRole())) {
+    // return false;
+    // }
     return true;
   }
 }

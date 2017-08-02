@@ -59,7 +59,7 @@ public class PdfCharacterUtils {
    * The hyphens.
    */
   static final TCharSet HYPHENS = new TCharHashSet();
-  
+
   static {
     BASELINE_PUNCTUATION_MARKS.add('.');
     BASELINE_PUNCTUATION_MARKS.add('?');
@@ -370,7 +370,7 @@ public class PdfCharacterUtils {
     MATH_OPERATORS.add("gcd");
     MATH_OPERATORS.add("det");
     MATH_OPERATORS.add("Pr");
-    
+
     HYPHENS.add('-');
     HYPHENS.add('–');
   }
@@ -566,7 +566,7 @@ public class PdfCharacterUtils {
     String ch = character.getText();
     return MATH_SYMBOLS.contains(ch) || MATH_OPERATORS.contains(ch);
   }
-  
+
   /**
    * Returns true if the given character is a hyphen.
    * 

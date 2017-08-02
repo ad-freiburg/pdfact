@@ -5,7 +5,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
-import icecite.utils.geometric.Rectangle.RectangleFactory;
 
 /**
  * A plain implementation of {@link PdfWordList}.
@@ -21,27 +20,21 @@ public class PlainPdfWordList extends PlainPdfElementList<PdfWord>
 
   /**
    * Creates a new PlainPdfWordList.
-   * 
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
    */
   @AssistedInject
-  public PlainPdfWordList(RectangleFactory rectangleFactory) {
-    super(rectangleFactory);
+  public PlainPdfWordList() {
+    super();
   }
 
   /**
    * Creates a new PlainPdfWordList.
    * 
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
    * @param initialCapacity
    *        The initial capacity.
    */
   @AssistedInject
-  public PlainPdfWordList(RectangleFactory rectangleFactory,
-      @Assisted int initialCapacity) {
-    super(rectangleFactory, initialCapacity);
+  public PlainPdfWordList(@Assisted int initialCapacity) {
+    super(initialCapacity);
   }
 
   // ==========================================================================

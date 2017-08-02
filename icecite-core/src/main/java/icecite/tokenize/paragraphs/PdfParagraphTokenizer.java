@@ -21,7 +21,7 @@ public interface PdfParagraphTokenizer {
    * @return The list of identified paragraphs.
    */
   List<PdfParagraph> tokenize(PdfDocument pdf);
-  
+
   /**
    * The factory to create instances of PdfTextParagraphTokenizer.
    * 

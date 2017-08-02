@@ -60,7 +60,7 @@ public interface PdfParser {
   void setIsTranslateLigatures(boolean translateLigatures);
 
   // ==========================================================================
-  
+
   /**
    * Returns true, if diacritics should be translated; False otherwise.
    * 
@@ -77,7 +77,7 @@ public interface PdfParser {
    *        not.
    */
   void setIsTranslateDiacritics(boolean translateDiacritics);
-  
+
   // ==========================================================================
 
   /**

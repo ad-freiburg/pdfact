@@ -1,14 +1,12 @@
 package icecite.models;
 
-// MAYBE: Add Interface HasWords?
-
 /**
  * A page in a PDF document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfPage
-    extends HasCharacters, HasFigures, HasShapes, HasTextLines, HasTextBlocks {
+public interface PdfPage extends HasCharacters, HasFigures, HasShapes,
+    HasTextBlocks {
   /**
    * Returns the number of this page in the PDF document.
    * 

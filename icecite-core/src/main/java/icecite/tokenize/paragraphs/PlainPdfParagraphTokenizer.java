@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
+import icecite.models.PdfCharacter;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
@@ -64,7 +65,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
     List<PdfParagraph> paragraphs = identifyParagraphs(pdf);
     composeTexts(pdf, paragraphs);
-    
+
     return paragraphs;
   }
 
@@ -96,10 +97,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
       // Create a new paragraph.
       PdfParagraph paragraph = this.paragraphFactory.create();
-   // TODO: Change base of text block to words.
-      for (PdfTextLine line : block.getTextLines()) {
-        paragraph.addWords(line.getWords());
-      }
+      paragraph.addTextBlock(block);
       block.setParentPdfParagraph(paragraph);
 
       // If the role of the block is "body text", check if there is another
@@ -114,10 +112,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
             break;
           }
           // Add the block to the existing paragraph.
-          // TODO: Change base of text block to words.
-          for (PdfTextLine line : otherBlock.getTextLines()) {
-            paragraph.addWords(line.getWords());
-          }
+          paragraph.addTextBlock(otherBlock);
           otherBlock.setParentPdfParagraph(paragraph);
         }
       }
@@ -143,13 +138,16 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
     // The block belongs to the paragraph, if the paragraph doesn't end with
     // a punctuation mark.
-    if (!PdfCharacterUtils.isPunctuationMark(para.getLastCharacter())) {
+    PdfWord word = para.getLastTextBlock().getLastTextLine().getLastWord();
+    PdfCharacter lastChar = word != null ? word.getLastCharacter() : null;
+    if (!PdfCharacterUtils.isPunctuationMark(lastChar)) {
       return true;
     }
 
     // The block belongs to the paragraph, if the block starts with an
     // lowercased letter.
-    if (PdfCharacterUtils.isLowercase(block.getFirstCharacter())) {
+    PdfWord firstWord = block.getFirstTextLine().getFirstWord();
+    if (PdfCharacterUtils.isLowercase(firstWord.getFirstCharacter())) {
       return true;
     }
 
@@ -169,8 +167,15 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   protected void composeTexts(PdfDocument pdf, List<PdfParagraph> paragraphs) {
     PdfWordDehyphenator deyphenator = this.dehyphenatorFactory.create(pdf);
 
-    for (PdfParagraph paragraph : paragraphs) {
-      List<PdfWord> words = paragraph.getWords();
+    for (PdfParagraph paragraph : pdf.getParagraphs()) {
+      // Put all words to a single list to be able to iterate them in one go.
+      List<PdfWord> words = new ArrayList<>();
+      for (PdfTextBlock block : paragraph.getTextBlocks()) {
+        for (PdfTextLine line : block.getTextLines()) {
+          words.addAll(line.getWords());
+        }
+      }
+
       List<PdfWord> newWords = new ArrayList<>();
       for (int i = 0; i < words.size() - 1; i++) {
         PdfWord word = words.get(i);

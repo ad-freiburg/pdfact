@@ -3,7 +3,7 @@ package icecite.semanticize.plain.modules;
 import java.util.List;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterList;
+import icecite.models.PdfCharacterStatistics;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -52,29 +52,25 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
         if (textLines == null || textLines.isEmpty()) {
           continue;
         }
-        PdfTextLine firstTextLine = textLines.get(0);
-        if (firstTextLine == null) {
+        PdfTextLine firstLine = textLines.get(0);
+        if (firstLine == null) {
           continue;
         }
-        
-        Line firstBaseLine = firstTextLine.getBaseline();
-        PdfCharacterList firstTextLineChars = firstTextLine.getCharacters();
-        PdfFontFace fontFace = firstTextLineChars.getMostCommonFontFace();
-        PdfCharacterList firstLineCharacters = firstTextLine.getCharacters();
-        if (firstLineCharacters == null || firstLineCharacters.isEmpty()) {
-          continue;
-        }
-        PdfCharacter firstChar = firstLineCharacters.get(0);
+
+        Line firstBaseLine = firstLine.getBaseline();
+        PdfCharacter firstChar = firstLine.getFirstWord().getFirstCharacter();
         Rectangle firstCharBox = firstChar.getPosition().getRectangle();
         float firstCharMinY = firstCharBox.getMinY();
         float lineBaseLineY = firstBaseLine.getStartY();
-        
+
         // The block is *not* a footnote, if the first char is not raised.
         // TODO
         if (MathUtils.isSmallerOrEqual(firstCharMinY, lineBaseLineY, 1)) {
           continue;
         }
 
+        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         // The text block is *not* a footnote, if the font face of the 1st char
         // is equal to the most common font face in the text line.
         if (firstChar.getFontFace() == fontFace) {

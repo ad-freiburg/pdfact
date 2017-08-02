@@ -15,7 +15,7 @@ import icecite.models.PdfFontFace;
  */
 public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   /**
-   * The sequence number of this characters in the extraction order.
+   * The sequence number of this character in the extraction order.
    */
   protected int sequenceNumber;
 
@@ -28,7 +28,7 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
    * The color of this character.
    */
   protected PdfColor color;
-  
+
   /**
    * The text of this character.
    */
@@ -109,7 +109,6 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
       builder.append(getFeature(), otherCharacter.getFeature());
       builder.append(getPosition(), otherCharacter.getPosition());
       builder.append(getText(), otherCharacter.getText());
-
       return builder.isEquals();
     }
     return false;

@@ -7,13 +7,30 @@ import java.util.List;
  *
  * @author Claudius Korzen
  */
-public interface HasParagraphs {
+public interface HasParagraphs
+    extends HasTextLineStatistics, HasCharacterStatistics {
   /**
    * Returns the paragraphs.
    * 
    * @return The paragraphs.
    */
   List<PdfParagraph> getParagraphs();
+
+  /**
+   * Returns the first paragraph.
+   * 
+   * @return The first paragraph.
+   */
+  PdfParagraph getFirstParagraph();
+
+  /**
+   * Returns the last paragraph.
+   * 
+   * @return the last paragraph.
+   */
+  PdfParagraph getLastParagraph();
+
+  // ==========================================================================
 
   /**
    * Sets the given paragraphs.

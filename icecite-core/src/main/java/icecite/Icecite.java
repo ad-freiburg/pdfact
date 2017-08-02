@@ -41,7 +41,7 @@ public class Icecite {
    * The logger.
    */
   protected static final Logger LOG = Logger.getLogger(Icecite.class);
-  
+
   /**
    * The factory to create instances of PdfParser.
    */
@@ -71,7 +71,7 @@ public class Icecite {
    * The factory to create instances of PdfVisualizer.
    */
   protected PdfVisualizerFactory visualizerFactory;
-  
+
   // ==========================================================================
   // The input arguments defined by the user.
 
@@ -165,23 +165,23 @@ public class Icecite {
     LOG.info("--------------------------------------------------------------");
     LOG.info("Progress:");
     LOG.info("--------------------------------------------------------------");
-    
+
     // Parse the PDF "as it is".
     PdfDocument pdf = parse();
     // Tokenize the PDF into words, lines and text blocks.
     tokenize(pdf);
-    // Identify the semantics of text blocks.
-    semanticize(pdf);
-    // Join the text blocks to paragraphs.
-    paragraphify(pdf);
-    // Serialize the PDF document to file.
-    serialize(pdf);
-    // Visualize the PDF document.
-    visualize(pdf);
-    
+    // // Identify the semantics of text blocks.
+    // semanticize(pdf);
+    // // Join the text blocks to paragraphs.
+    // paragraphify(pdf);
+    // // Serialize the PDF document to file.
+    // serialize(pdf);
+    // // Visualize the PDF document.
+    // visualize(pdf);
+
     long end = System.currentTimeMillis();
     LOG.info("Finished in " + (end - start) + " ms.");
-    
+
     return pdf;
   }
 
@@ -197,57 +197,60 @@ public class Icecite {
    */
   protected PdfDocument parse() throws IceciteException {
     LOG.info("Parsing the PDF...");
-    
+
     // Check if a (validated) input path is given.
     if (this.inputFile == null) {
       throw new IceciteValidateException("No input file given.");
     }
-    
+
     return this.parserFactory.create().parsePdf(this.inputFile);
   }
 
   /**
    * Tokenizes the given PDF document into words, lines and text blocks.
    * 
-   * @param pdf The PDF document to process.
+   * @param pdf
+   *        The PDF document to process.
    * 
    * @throws IceciteException
    *         If something went wrong on tokenizing the PDF.
    */
   protected void tokenize(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying words, text lines and text blocks...");
-    
+
     this.tokenizerFactory.create().tokenize(pdf);
   }
-  
+
   /**
    * Identifies the semantic of text blocks in the given PDF document.
    * 
-   * @param pdf The PDF document to process.
+   * @param pdf
+   *        The PDF document to process.
    * 
    * @throws IceciteException
    *         If something went wrong on identifying the semantics.
    */
   protected void semanticize(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying the semantics of the text blocks...");
-    
+
     this.semanticizerFactory.create(pdf).semanticize();
   }
-  
+
   /**
    * Identifies the paragraphs in the given PDF document.
    * 
-   * @param pdf The PDF document to process.
+   * @param pdf
+   *        The PDF document to process.
    * 
    * @throws IceciteException
    *         If something went wrong on identifying the paragraphs.
    */
   protected void paragraphify(PdfDocument pdf) throws IceciteException {
     LOG.info("Identifying the text paragraphs...");
-    
+
     this.paragraphTokenizerFactory.create().tokenize(pdf);
   }
-  
+
   /**
    * Serializes the given PDF document to the given target file.
    * 
@@ -279,7 +282,7 @@ public class Icecite {
           "Couldn't find a serializer for the format '" + format + "'.");
     }
 
-    // Serialize the PDF document.    
+    // Serialize the PDF document.
     try (OutputStream os = Files.newOutputStream(file)) {
       serializerProvider.get().serialize(pdf, os, this.features, this.roles);
     } catch (IOException e) {
@@ -304,9 +307,9 @@ public class Icecite {
       // Don't throw an exception, because visualization is optional.
       return;
     }
-    
+
     LOG.info("Visualizing...");
-    
+
     // Create the visualizer and visualize the PDF document.
     PdfVisualizer visualizer = this.visualizerFactory.create();
     try (OutputStream os = Files.newOutputStream(file)) {
@@ -537,7 +540,7 @@ public class Icecite {
   public Set<String> getSerializationFormatChoices() {
     return this.serializers.keySet();
   }
-  
+
   /**
    * Returns the output file for the visualization.
    * 
@@ -564,7 +567,7 @@ public class Icecite {
   public Set<String> getFeatureNameChoices() {
     return PdfFeature.getNames();
   }
-  
+
   /**
    * Returns the roles to consider.
    * 
@@ -573,7 +576,7 @@ public class Icecite {
   public Set<PdfRole> getRoles() {
     return this.roles;
   }
-  
+
   /**
    * Returns the names of the supported semantic roles.
    * 

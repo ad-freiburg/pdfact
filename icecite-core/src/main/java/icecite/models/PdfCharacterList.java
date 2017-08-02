@@ -1,88 +1,13 @@
 package icecite.models;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * A list of PDF characters.
  * 
  * @author Claudius Korzen
  */
-public interface PdfCharacterList
-    extends PdfElementList<PdfCharacter>, HasCharacters {
-  /**
-   * Returns the most common font face of the characters in this list.
-   * 
-   * @return The most common font face of the characters in this list.
-   */
-  PdfFontFace getMostCommonFontFace();
-
-  /**
-   * Returns all characters with the most common font face.
-   * 
-   * @return All characters with the most common font face.
-   */
-  Set<PdfCharacter> getCharactersWithMostCommonFontFace();
-  
-  // ==========================================================================
-  
-  /**
-   * Returns the most common font of the characters in this list.
-   * 
-   * @return The most common font of the characters in this list.
-   */
-  PdfFont getMostCommonFont();
-
-  /**
-   * Returns all characters with the most common font.
-   * 
-   * @return All characters with the most common font.
-   */
-  Set<PdfCharacter> getCharactersWithMostCommonFont();
-
-  // ==========================================================================
-
-  /**
-   * Returns the most common color of the characters in this list.
-   * 
-   * @return The most common color of the characters in this list.
-   */
-  PdfColor getMostCommonColor();
-
-  /**
-   * Returns all characters with the most common color.
-   * 
-   * @return All characters with the most common color.
-   */
-  Set<PdfCharacter> getCharactersWithMostCommonColor();
-
-  // ==========================================================================
-
-  /**
-   * Returns the most common font size of the characters in this list.
-   * 
-   * @return The most common font size of the characters in this list.
-   */
-  float getMostCommonFontsize();
-
-  /**
-   * Returns all characters with the most common font size.
-   * 
-   * @return All characters with the most common font size.
-   */
-  Set<PdfCharacter> getCharactersWithMostCommonFontsize();
-
-  // ==========================================================================
-  
-  /**
-   * Returns the average font size of the characters in this list.
-   * 
-   * @return The average font size of the characters in this list.
-   */
-  float getAverageFontsize();
-
-  // ==========================================================================
-
+public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
   /**
    * Splits this list at the given index into two halves. Both halves are views
    * of the related portion of the list, that is (1) the portion between index

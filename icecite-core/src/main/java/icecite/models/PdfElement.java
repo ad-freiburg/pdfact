@@ -1,8 +1,8 @@
 package icecite.models;
 
 /**
- * Any (visual) element in a PDF document, for example a character, a image, 
- * a shape, a word, a text line, a text block, a paragraph, etc).
+ * Any (visual) element in a PDF document, for example a character, a image, a
+ * shape, a word, a text line, a text block, a paragraph, etc).
  * 
  * @author Claudius Korzen
  */
