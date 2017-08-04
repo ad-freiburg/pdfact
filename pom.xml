@@ -2,15 +2,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>icecite</groupId>
-  <artifactId>icecite-parent</artifactId>
+  <groupId>pdfact</groupId>
+  <artifactId>pdfact-parent</artifactId>
   <name>${project.artifactId}</name>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>icecite-core</module>
-    <module>icecite-service</module>
+    <module>pdfact-core</module>
+    <module>pdfact-service</module>
   </modules>
 
   <properties>
