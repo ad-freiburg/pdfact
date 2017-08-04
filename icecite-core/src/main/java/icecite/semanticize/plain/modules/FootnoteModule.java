@@ -3,7 +3,7 @@ package icecite.semanticize.plain.modules;
 import java.util.List;
 
 import icecite.models.PdfCharacter;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -69,7 +69,7 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
           continue;
         }
 
-        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
         PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         // The text block is *not* a footnote, if the font face of the 1st char
         // is equal to the most common font face in the text line.

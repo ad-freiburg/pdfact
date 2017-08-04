@@ -1,20 +1,20 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has text.
+ * An interface that is implemented by PDF elements that contain text.
  *
  * @author Claudius Korzen
  */
 public interface HasText {
   /**
-   * Returns the text.
+   * Returns the text of the element.
    * 
    * @return The text.
    */
   String getText();
 
   /**
-   * Sets the given text.
+   * Sets the text of the element.
    * 
    * @param text
    *        The text.

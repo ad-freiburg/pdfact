@@ -3,55 +3,56 @@ package icecite.models;
 import java.util.List;
 
 /**
- * An interface that declares that the implementing object has shapes.
+ * An interface that is implemented by PDF elements that consist of shapes 
+ * (lines, curves, paths, etc.).
  *
  * @author Claudius Korzen
  */
 public interface HasShapes {
   /**
-   * Returns the shapes.
+   * Returns the shapes of the element.
    * 
    * @return The shapes.
    */
   List<PdfShape> getShapes();
 
   /**
-   * Returns the first shape.
+   * Returns the first shape of the element.
    * 
-   * @return the first shape.
+   * @return The first shape.
    */
   PdfShape getFirstShape();
 
   /**
-   * Returns the last character.
+   * Returns the last shape of the element.
    * 
-   * @return the last character.
+   * @return The last shape.
    */
   PdfShape getLastShape();
 
   // ==========================================================================
 
   /**
-   * Sets the given shapes.
+   * Sets the shapes of the element.
    * 
    * @param shapes
-   *        The shapes.
+   *        The shapes to set.
    */
   void setShapes(List<PdfShape> shapes);
 
   /**
-   * Adds the given shapes.
+   * Adds shapes to the element.
    * 
    * @param shapes
-   *        The shapes.
+   *        The shapes to add.
    */
   void addShapes(List<PdfShape> shapes);
 
   /**
-   * Adds the given shape.
+   * Adds the given shape to the element.
    * 
    * @param shape
-   *        The shape.
+   *        The shape to add.
    */
   void addShape(PdfShape shape);
 }

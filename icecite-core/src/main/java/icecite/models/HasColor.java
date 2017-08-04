@@ -1,20 +1,20 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has a color.
+ * An interface that is implemented by PDF elements that have a color.
  *
  * @author Claudius Korzen
  */
 public interface HasColor {
   /**
-   * Returns the color.
+   * Returns the color of the element.
    * 
    * @return The color.
    */
   PdfColor getColor();
 
   /**
-   * Sets the given color.
+   * Sets the color of the element.
    * 
    * @param color
    *        The color.

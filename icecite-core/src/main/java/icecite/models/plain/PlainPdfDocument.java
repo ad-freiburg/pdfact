@@ -11,11 +11,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfParagraph;
-import icecite.models.PdfTextLineStatistics;
+import icecite.models.PdfTextLineStatistic;
 
 /**
  * A plain implementation of {@link PdfDocument}.
@@ -24,7 +24,7 @@ import icecite.models.PdfTextLineStatistics;
  */
 public class PlainPdfDocument implements PdfDocument {
   /**
-   * The file on which this PDF document is based on.
+   * The path to the underlying PDF file.
    */
   protected Path path;
 
@@ -39,14 +39,14 @@ public class PlainPdfDocument implements PdfDocument {
   protected List<PdfParagraph> paragraphs;
 
   /**
-   * The statistics about characters.
+   * The statistics about all characters in this PDF document.
    */
-  protected PdfCharacterStatistics characterStatistics;
+  protected PdfCharacterStatistic characterStatistic;
 
   /**
-   * The statistics about text lines.
+   * The statistics about all text lines in this PDF document.
    */
-  protected PdfTextLineStatistics textLineStatistics;
+  protected PdfTextLineStatistic textLineStatistic;
 
   // ==========================================================================
   // Constructors.
@@ -55,7 +55,7 @@ public class PlainPdfDocument implements PdfDocument {
    * Creates a new PDF document.
    * 
    * @param pdf
-   *        The PDF file given as a File object.
+   *        The path to the underlying PDF file.
    */
   @AssistedInject
   public PlainPdfDocument(@Assisted File pdf) {
@@ -66,7 +66,7 @@ public class PlainPdfDocument implements PdfDocument {
    * Creates a new PDF document.
    *
    * @param pdf
-   *        The PDF file given as a File object.
+   *        The path to the underlying PDF file.
    */
   @AssistedInject
   public PlainPdfDocument(@Assisted Path pdf) {
@@ -103,6 +103,8 @@ public class PlainPdfDocument implements PdfDocument {
   public void setFile(File file) {
     this.path = file != null ? file.toPath() : null;
   }
+  
+  // ==========================================================================
 
   @Override
   public Path getPath() {
@@ -157,25 +159,25 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistics getCharacterStatistics() {
-    return this.characterStatistics;
+  public PdfCharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
   }
 
   @Override
-  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
-    this.characterStatistics = statistics;
+  public void setCharacterStatistic(PdfCharacterStatistic statistic) {
+    this.characterStatistic = statistic;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfTextLineStatistics getTextLineStatistics() {
-    return this.textLineStatistics;
+  public PdfTextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
   }
 
   @Override
-  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
-    this.textLineStatistics = statistics;
+  public void setTextLineStatistic(PdfTextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
   }
 
   // ==========================================================================
@@ -184,6 +186,8 @@ public class PlainPdfDocument implements PdfDocument {
   public String toString() {
     return "PlainPdfDocument(" + this.path + ")";
   }
+  
+  // ==========================================================================
 
   @Override
   public boolean equals(Object other) {
@@ -192,7 +196,6 @@ public class PlainPdfDocument implements PdfDocument {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPath(), otherDocument.getPath());
-
       return builder.isEquals();
     }
     return false;

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfFeature;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfWord;
@@ -35,9 +35,9 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   protected Line baseLine;
 
   /**
-   * The statistics about the characters in this line.
+   * The statistics about the characters in this text line.
    */
-  protected PdfCharacterStatistics characterStatistics;
+  protected PdfCharacterStatistic characterStatistic;
 
   // ==========================================================================
 
@@ -51,6 +51,13 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   public PlainPdfTextLine(PdfWordListFactory wordListFactory) {
     this.words = wordListFactory.create();
   }
+  
+  // ==========================================================================
+
+  @Override
+  public PdfFeature getFeature() {
+    return PdfFeature.TEXT_LINE;
+  }
 
   // ==========================================================================
 
@@ -61,18 +68,18 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
 
   @Override
   public PdfWord getFirstWord() {
-    if (this.words != null && !this.words.isEmpty()) {
-      return this.words.get(0);
+    if (this.words == null || this.words.isEmpty()) {
+      return null;
     }
-    return null;
+    return this.words.get(0);
   }
 
   @Override
   public PdfWord getLastWord() {
-    if (this.words != null && !this.words.isEmpty()) {
-      return this.words.get(this.words.size() - 1);
+    if (this.words == null || this.words.isEmpty()) {
+      return null;
     }
-    return null;
+    return this.words.get(this.words.size() - 1);
   }
 
   @Override
@@ -82,9 +89,7 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
 
   @Override
   public void addWords(PdfWordList words) {
-    for (PdfWord word : words) {
-      addWord(word);
-    }
+    this.words.addAll(words);
   }
 
   @Override
@@ -119,20 +124,13 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistics getCharacterStatistics() {
-    return this.characterStatistics;
+  public PdfCharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
   }
 
   @Override
-  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
-    this.characterStatistics = statistics;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.TEXT_LINE;
+  public void setCharacterStatistic(PdfCharacterStatistic statistic) {
+    this.characterStatistic = statistic;
   }
 
   // ==========================================================================
@@ -142,13 +140,14 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
     return "PlainPdfTextLine(" + this.text + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfTextLine) {
       PdfTextLine otherTextLine = (PdfTextLine) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getWords(), otherTextLine.getWords());
       builder.append(getText(), otherTextLine.getText());
       builder.append(getPosition(), otherTextLine.getPosition());
 
@@ -160,7 +159,6 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getWords());
     builder.append(getText());
     builder.append(getPosition());
     return builder.hashCode();

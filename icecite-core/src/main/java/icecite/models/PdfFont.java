@@ -82,26 +82,26 @@ public interface PdfFont extends PdfResource {
   // ==========================================================================
 
   /**
-   * Returns true, if this font is a bold font.
+   * Returns true, if this font is bold.
    * 
-   * @return True, if this font is a bold font, false otherwise.
+   * @return True, if this font is bold, false otherwise.
    */
   boolean isBold();
 
   /**
-   * Sets the boolean flag that indicates whether this font is a bold font.
+   * Sets the boolean flag that indicates whether this font is bold.
    * 
    * @param isBold
-   *        The boolean flag that indicates whether this font is a bold font.
+   *        The boolean flag that indicates whether this font is bold.
    */
   void setIsBold(boolean isBold);
 
   // ==========================================================================
 
   /**
-   * Returns true, if this font is an italic font.
+   * Returns true, if this font is italic.
    * 
-   * @return True, if this font is an italic font, false otherwise.
+   * @return True, if this font is italic, false otherwise.
    */
   boolean isItalic();
 
@@ -123,7 +123,7 @@ public interface PdfFont extends PdfResource {
    */
   public interface PdfFontFactory {
     /**
-     * Creates a new PdfFont.
+     * Creates a new instance of PdfFont.
      * 
      * @return An instance of {@link PdfFont}.
      */

@@ -12,34 +12,34 @@ import icecite.utils.geometric.Rectangle;
  */
 public interface PdfPosition {
   /**
-   * Returns the rectangle of this position.
+   * Returns the bounding box.
    * 
-   * @return The rectangle of this position.
+   * @return The bounding box.
    */
   Rectangle getRectangle();
 
   /**
-   * Sets the rectangle of this position.
+   * Sets the bounding box.
    * 
    * @param rectangle
-   *        The rectangle of this position.
+   *        The bounding box.
    */
   void setRectangle(Rectangle rectangle);
 
   // ==========================================================================
 
   /**
-   * Returns the page of this position.
+   * Returns the page.
    * 
-   * @return The page of this position.
+   * @return The page.
    */
   PdfPage getPage();
 
   /**
-   * Sets the page of this position.
+   * Sets the page.
    * 
    * @param page
-   *        The page of this position.
+   *        The page.
    */
   void setPage(PdfPage page);
 
@@ -52,19 +52,19 @@ public interface PdfPosition {
    */
   public interface PdfPositionFactory {
     /**
-     * Creates a new PdfPosition.
+     * Creates a new instance of PdfPosition.
      * 
      * @param page
      *        The page.
      * @param rectangle
-     *        The rectangle.
+     *        The bounding box.
      * 
-     * @return An instance of {@link PdfPosition}.
+     * @return A new instance of {@link PdfPosition}.
      */
     PdfPosition create(PdfPage page, Rectangle rectangle);
 
     /**
-     * Creates a new PdfPosition.
+     * Creates a new instance of PdfPosition.
      * 
      * @param page
      *        The page.
@@ -77,23 +77,23 @@ public interface PdfPosition {
      * @param maxY
      *        The maxY value of the bounding box.
      * 
-     * @return An instance of {@link PdfPosition}.
+     * @return A new instance of {@link PdfPosition}.
      */
     PdfPosition create(@Assisted("page") PdfPage page,
         @Assisted("minX") float minX, @Assisted("minY") float minY,
         @Assisted("maxX") float maxX, @Assisted("maxY") float maxY);
 
     /**
-     * Creates a new PdfPosition.
+     * Creates a new instance of PdfPosition.
      * 
      * @param page
      *        The page.
      * @param point1
-     *        The lower left vertex.
+     *        The lower left vertex of the bounding box.
      * @param point2
-     *        The upper right vertex.
+     *        The upper right vertex of the bounding box.
      * 
-     * @return An instance of {@link PdfPosition}.
+     * @return A new instance of {@link PdfPosition}.
      */
     PdfPosition create(@Assisted("page") PdfPage page,
         @Assisted("point1") Point point1,

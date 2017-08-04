@@ -14,6 +14,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 
+// TODO: Implement hashCode() and equals().
+
 /**
  * A plain implementation of {@link PdfCharacterList}.
  * 
@@ -30,7 +32,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   // Constructors.
 
   /**
-   * Creates a new PdfCharacterList.
+   * Creates a new, empty list of characters.
    */
   @AssistedInject
   public PlainPdfCharacterList() {
@@ -38,7 +40,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   }
 
   /**
-   * Creates a new PdfCharacterList.
+   * Creates a new, empty list of characters.
    * 
    * @param initialCapacity
    *        The initial capacity of this list.
@@ -64,6 +66,8 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     return super.toString();
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     return super.equals(other);
@@ -81,7 +85,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
    * 
    * @author Claudius Korzen
    */
-  class PdfCharacterView extends PlainPdfCharacterList
+  class PdfCharacterView extends PlainPdfCharacterList 
       implements PdfCharacterList {
     /**
      * The serial id.

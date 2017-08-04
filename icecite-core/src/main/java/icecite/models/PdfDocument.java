@@ -21,7 +21,7 @@ public interface PdfDocument extends HasParagraphs {
    * Sets the pages of this PDF document.
    * 
    * @param pages
-   *        The list of pages to set.
+   *        The pages to set.
    */
   void setPages(List<PdfPage> pages);
 
@@ -36,34 +36,34 @@ public interface PdfDocument extends HasParagraphs {
   // ==========================================================================
 
   /**
-   * Returns the file as a File object on which the PDF document is based on.
+   * Returns the path to the underlying PDF file as a File object.
    * 
-   * @return The file as a File object on which the PDF document is based on.
+   * @return The path to the underlying PDF file as a File object.
    */
   File getFile();
 
   /**
-   * Sets the file on which the PDF document is based on.
+   * Sets the path to the underlying PDF file.
    * 
    * @param file
-   *        The file on which the PDF document is based on.
+   *        The path to the underlying PDF file.
    */
   void setFile(File file);
 
   // ==========================================================================
 
   /**
-   * Returns the file as Path object on which the PDF document is based on.
+   * Returns the path to the underlying PDF file as a Path object.
    * 
-   * @return The file as Path object on which the PDF document is based on.
+   * @return The path to the underlying PDF file as a Path object.
    */
   Path getPath();
 
   /**
-   * Returns the file on which the PDF document is based on.
+   * Sets the path to the underlying PDF file.
    * 
    * @param path
-   *        The file on which the PDF document is based on.
+   *        The path to the underlying PDF file.
    */
   void setPath(Path path);
 
@@ -76,22 +76,22 @@ public interface PdfDocument extends HasParagraphs {
    */
   public interface PdfDocumentFactory {
     /**
-     * Creates a PdfDocument.
+     * Creates a new instance of PdfDocument.
      * 
      * @param pdf
-     *        The file on which the PDF document is based on.
+     *        The path to the underlying PDF file.
      * 
-     * @return An instance of {@link PdfDocument}.
+     * @return A new instance of {@link PdfDocument}.
      */
     PdfDocument create(File pdf);
 
     /**
-     * Creates a PdfDocument.
+     * Creates a new instance of PdfDocument.
      * 
      * @param pdf
-     *        The file on which the PDF document is based on.
+     *        The path to the underlying PDF file.
      * 
-     * @return An instance of {@link PdfDocument}.
+     * @return A new instance of {@link PdfDocument}.
      */
     PdfDocument create(Path pdf);
   }

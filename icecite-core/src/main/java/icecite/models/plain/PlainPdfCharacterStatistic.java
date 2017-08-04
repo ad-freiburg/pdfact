@@ -1,17 +1,19 @@
 package icecite.models.plain;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfColor;
 import icecite.models.PdfFontFace;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 
+// TODO: Implement hashCode() and equals().
+
 /**
- * A plain implementation of {@link PdfCharacterStatistics}.
+ * A plain implementation of {@link PdfCharacterStatistic}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfCharacterStatistics implements PdfCharacterStatistics {
+public class PlainPdfCharacterStatistic implements PdfCharacterStatistic {
   /**
    * The height frequencies.
    */
@@ -23,39 +25,39 @@ public class PlainPdfCharacterStatistics implements PdfCharacterStatistics {
   protected FloatCounter widthFrequencies;
 
   /**
-   * The smallest minX.
-   */
-  protected float smallestMinX = Float.MAX_VALUE;
-
-  /**
-   * The smallest minY.
-   */
-  protected float smallestMinY = Float.MAX_VALUE;
-
-  /**
-   * The largest maxX.
-   */
-  protected float largestMaxX = -Float.MAX_VALUE;
-
-  /**
-   * The largest maxY.
-   */
-  protected float largestMaxY = -Float.MAX_VALUE;
-
-  /**
-   * The frequencies of the colors.
+   * The color frequencies.
    */
   protected ObjectCounter<PdfColor> colorFrequencies;
 
   /**
-   * The frequencies of the font faces.
+   * The font face frequencies.
    */
   protected ObjectCounter<PdfFontFace> fontFaceFrequencies;
 
   /**
-   * The frequencies of the font sizes.
+   * The font size frequencies.
    */
   protected FloatCounter fontsizeFrequencies;
+
+  /**
+   * The smallest minX value.
+   */
+  protected float smallestMinX = Float.MAX_VALUE;
+
+  /**
+   * The smallest minY value.
+   */
+  protected float smallestMinY = Float.MAX_VALUE;
+
+  /**
+   * The largest maxX value.
+   */
+  protected float largestMaxX = -Float.MAX_VALUE;
+
+  /**
+   * The largest maxY value.
+   */
+  protected float largestMaxY = -Float.MAX_VALUE;
 
   // ==========================================================================
 
@@ -115,54 +117,6 @@ public class PlainPdfCharacterStatistics implements PdfCharacterStatistics {
       return Float.NaN;
     }
     return this.widthFrequencies.getAverageFloat();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public float getSmallestMinX() {
-    return this.smallestMinX;
-  }
-
-  @Override
-  public void setSmallestMinX(float minX) {
-    this.smallestMinX = minX;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public float getSmallestMinY() {
-    return this.smallestMinY;
-  }
-
-  @Override
-  public void setSmallestMinY(float minY) {
-    this.smallestMinY = minY;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public float getLargestMaxX() {
-    return this.largestMaxX;
-  }
-
-  @Override
-  public void setLargestMaxX(float maxX) {
-    this.largestMaxX = maxX;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public float getLargestMaxY() {
-    return this.largestMaxY;
-  }
-
-  @Override
-  public void setLargestMaxY(float maxY) {
-    this.largestMaxY = maxY;
   }
 
   // ==========================================================================
@@ -229,5 +183,53 @@ public class PlainPdfCharacterStatistics implements PdfCharacterStatistics {
       return null;
     }
     return this.colorFrequencies.getMostCommonObject();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getSmallestMinX() {
+    return this.smallestMinX;
+  }
+
+  @Override
+  public void setSmallestMinX(float minX) {
+    this.smallestMinX = minX;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getSmallestMinY() {
+    return this.smallestMinY;
+  }
+
+  @Override
+  public void setSmallestMinY(float minY) {
+    this.smallestMinY = minY;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getLargestMaxX() {
+    return this.largestMaxX;
+  }
+
+  @Override
+  public void setLargestMaxX(float maxX) {
+    this.largestMaxX = maxX;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getLargestMaxY() {
+    return this.largestMaxY;
+  }
+
+  @Override
+  public void setLargestMaxY(float maxY) {
+    this.largestMaxY = maxY;
   }
 }

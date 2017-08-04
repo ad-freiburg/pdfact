@@ -37,13 +37,20 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public PdfColor getColor() {
-    return this.color;
+  public PdfFeature getFeature() {
+    return PdfFeature.CHARACTER;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public int getSequenceNumber() {
+    return this.sequenceNumber;
   }
 
   @Override
-  public void setColor(PdfColor color) {
-    this.color = color;
+  public void setSequenceNumber(int num) {
+    this.sequenceNumber = num;
   }
 
   // ==========================================================================
@@ -61,32 +68,25 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public void setText(String text) {
-    this.text = text;
+  public PdfColor getColor() {
+    return this.color;
   }
+
+  @Override
+  public void setColor(PdfColor color) {
+    this.color = color;
+  }
+
+  // ==========================================================================
 
   @Override
   public String getText() {
     return this.text;
   }
 
-  // ==========================================================================
-
   @Override
-  public void setSequenceNumber(int pos) {
-    this.sequenceNumber = pos;
-  }
-
-  @Override
-  public int getSequenceNumber() {
-    return this.sequenceNumber;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.CHARACTER;
+  public void setText(String text) {
+    this.text = text;
   }
 
   // ==========================================================================
@@ -96,19 +96,19 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
     return "PlainPdfCharacter(" + getText() + ", " + getPosition() + ")";
   }
 
+  // ==========================================================================
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfCharacter) {
       PdfCharacter otherCharacter = (PdfCharacter) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getColor(), otherCharacter.getColor());
-      builder.append(getFontFace(), otherCharacter.getFontFace());
-      builder.append(getText(), otherCharacter.getText());
       builder.append(getSequenceNumber(), otherCharacter.getSequenceNumber());
-      builder.append(getFeature(), otherCharacter.getFeature());
-      builder.append(getPosition(), otherCharacter.getPosition());
+      builder.append(getFontFace(), otherCharacter.getFontFace());
+      builder.append(getColor(), otherCharacter.getColor());
       builder.append(getText(), otherCharacter.getText());
+      builder.append(getPosition(), otherCharacter.getPosition());
       return builder.isEquals();
     }
     return false;
@@ -117,13 +117,11 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getColor());
-    builder.append(getFontFace());
-    builder.append(getText());
     builder.append(getSequenceNumber());
-    builder.append(getFeature());
-    builder.append(getPosition());
+    builder.append(getFontFace());
+    builder.append(getColor());
     builder.append(getText());
+    builder.append(getPosition());
     return builder.hashCode();
   }
 }

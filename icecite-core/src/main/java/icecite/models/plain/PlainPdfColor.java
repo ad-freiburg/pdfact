@@ -10,8 +10,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import icecite.models.PdfColor;
 
-// TODO: Allow various color systems, not only RGB.
-
 /**
  * A plain implementation of {@link PdfColor}.
  * 
@@ -43,7 +41,8 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
    * Creates a new color.
    * 
    * @param rgb
-   *        The RGB value, given by three floats in range [0,255].
+   *        The RGB value of this color given as an array of three float values
+   *        in range [0,1].
    */
   @AssistedInject
   public PlainPdfColor(@Assisted float[] rgb) {
@@ -65,6 +64,11 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   // ==========================================================================
 
   @Override
+  public float[] getRGB() {
+    return this.rgb;
+  }
+  
+  @Override
   public void setRGB(final float[] rgb) {
     this.rgb = rgb;
   }
@@ -76,11 +80,6 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
     this.rgb[2] = b;
   }
 
-  @Override
-  public float[] getRGB() {
-    return this.rgb;
-  }
-
   // ==========================================================================
 
   @Override
@@ -88,6 +87,8 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
     return "PlainPdfColor(" + Arrays.toString(this.rgb) + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfColor) {
@@ -95,7 +96,6 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getRGB(), otherColor.getRGB());
-
       return builder.isEquals();
     }
     return false;

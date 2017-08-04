@@ -2,7 +2,7 @@ package icecite.models;
 
 import java.util.List;
 
-// TODO: In PdfElementList, accelerate cut method.
+// TODO: Accelerate the cut method in PdfElementList.
 
 /**
  * A list of PDF elements.
@@ -41,25 +41,25 @@ public interface PdfElementList<T extends PdfElement> extends List<T> {
    * The factory to create instances of {@link PdfElementList}.
    * 
    * @param <T>
-   *        The concrete type of the PDF elements in the list to create.
+   *        The type of the PDF elements in this list.
    * 
    * @author Claudius Korzen
    */
   public interface PdfElementListFactory<T extends PdfElement> {
     /**
-     * Creates a new PdfElementList.
+     * Creates a new instance of PdfElementList.
      * 
-     * @return An instance of {@link PdfElementList}.
+     * @return A new instance of {@link PdfElementList}.
      */
     PdfElementList<T> create();
 
     /**
-     * Creates a PdfElementList.
+     * Creates a new instance of PdfElementList.
      * 
      * @param initialCapacity
      *        The initial capacity of this list.
      * 
-     * @return An instance of {@link PdfElementList}.
+     * @return A new instance of {@link PdfElementList}.
      */
     PdfElementList<T> create(int initialCapacity);
   }

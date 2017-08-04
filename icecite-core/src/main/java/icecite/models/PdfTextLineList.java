@@ -1,7 +1,7 @@
 package icecite.models;
 
 /**
- * A list of PDF text lines.
+ * A list of text lines in a PDF document.
  * 
  * @author Claudius Korzen
  */
@@ -13,19 +13,19 @@ public interface PdfTextLineList extends PdfElementList<PdfTextLine> {
    */
   public interface PdfTextLineListFactory {
     /**
-     * Creates a PdfTextLineList.
+     * Creates a new instance of PdfTextLineList.
      * 
-     * @return An instance of {@link PdfTextLineList}.
+     * @return A new instance of {@link PdfTextLineList}.
      */
     PdfTextLineList create();
 
     /**
-     * Creates a PdfTextLineList.
+     * Creates a new instance of PdfTextLineList.
      * 
      * @param initialCapacity
      *        The initial capacity of this list.
      * 
-     * @return An instance of {@link PdfTextLineList}.
+     * @return A new instance of {@link PdfTextLineList}.
      */
     PdfTextLineList create(int initialCapacity);
   }

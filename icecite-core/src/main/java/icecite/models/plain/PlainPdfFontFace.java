@@ -29,7 +29,7 @@ public class PlainPdfFontFace implements PdfFontFace {
   // The constructors.
 
   /**
-   * Creates a new PlainPdfFontFace.
+   * Creates a new font face.
    * 
    * @param font
    *        The font.
@@ -72,6 +72,8 @@ public class PlainPdfFontFace implements PdfFontFace {
   public String toString() {
     return "PlainPdfFontFace(" + this.font + ", " + this.fontSize + ")";
   }
+  
+  // ==========================================================================
 
   @Override
   public boolean equals(Object other) {
@@ -81,7 +83,6 @@ public class PlainPdfFontFace implements PdfFontFace {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getFont(), otherCharacter.getFont());
       builder.append(getFontSize(), otherCharacter.getFontSize());
-
       return builder.isEquals();
     }
     return false;

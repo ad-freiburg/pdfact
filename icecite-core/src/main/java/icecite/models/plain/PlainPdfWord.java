@@ -9,7 +9,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfFeature;
 import icecite.models.PdfWord;
 
@@ -42,7 +42,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   /**
    * The statistics about the characters in this word.
    */
-  protected PdfCharacterStatistics characterStatistics;
+  protected PdfCharacterStatistic characterStatistic;
 
   // ==========================================================================
 
@@ -71,6 +71,13 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
+  public PdfFeature getFeature() {
+    return PdfFeature.WORD;
+  }
+
+  // ==========================================================================
+
+  @Override
   public String getText() {
     return this.text;
   }
@@ -94,9 +101,7 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
 
   @Override
   public void addCharacters(PdfCharacterList characters) {
-    for (PdfCharacter character : characters) {
-      addCharacter(character);
-    }
+    this.characters.addAll(characters);
   }
 
   @Override
@@ -149,20 +154,13 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistics getCharacterStatistics() {
-    return this.characterStatistics;
+  public PdfCharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
   }
 
   @Override
-  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
-    this.characterStatistics = statistics;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.WORD;
+  public void setCharacterStatistic(PdfCharacterStatistic statistics) {
+    this.characterStatistic = statistics;
   }
 
   // ==========================================================================
@@ -172,14 +170,14 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
     return "PlainPdfWord(" + this.text + ")";
   }
 
+  // ==========================================================================
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfWord) {
       PdfWord otherWord = (PdfWord) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getCharacters(), otherWord.getCharacters());
-      builder.append(getFeature(), otherWord.getFeature());
       builder.append(getPosition(), otherWord.getPosition());
       builder.append(getText(), otherWord.getText());
 
@@ -191,8 +189,6 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getCharacters());
-    builder.append(getFeature());
     builder.append(getPosition());
     builder.append(getText());
     return builder.hashCode();

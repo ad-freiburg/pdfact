@@ -3,28 +3,28 @@ package icecite.models;
 import java.util.List;
 
 /**
- * An interface that declares that the implementing object has text blocks.
+ * An interface that is implemented by PDF elements that consist of text blocks.
  *
  * @author Claudius Korzen
  */
-public interface HasTextBlocks extends HasTextLineStatistics,
-    HasCharacterStatistics {
+public interface HasTextBlocks extends HasTextLineStatistic,
+    HasCharacterStatistic {
   /**
-   * Returns the text blocks.
+   * Returns the text blocks of the element.
    * 
    * @return The text blocks.
    */
   List<PdfTextBlock> getTextBlocks();
 
   /**
-   * Returns the first text block.
+   * Returns the first text block of the element.
    * 
    * @return the first text block.
    */
   PdfTextBlock getFirstTextBlock();
 
   /**
-   * Returns the last text block.
+   * Returns the last text block of the element.
    * 
    * @return the last text block.
    */
@@ -33,26 +33,26 @@ public interface HasTextBlocks extends HasTextLineStatistics,
   // ==========================================================================
 
   /**
-   * Sets the given text blocks.
+   * Sets the text blocks of the element.
    * 
    * @param blocks
-   *        The text blocks.
+   *        The text blocks to set.
    */
   void setTextBlocks(List<PdfTextBlock> blocks);
 
   /**
-   * Adds the given text blocks.
+   * Adds text blocks to the element.
    * 
    * @param blocks
-   *        The text blocks.
+   *        The text blocks to add.
    */
   void addTextBlocks(List<PdfTextBlock> blocks);
 
   /**
-   * Adds the given text block.
+   * Adds a text block to the element.
    * 
    * @param block
-   *        The text block.
+   *        The text block to add.
    */
   void addTextBlock(PdfTextBlock block);
 }

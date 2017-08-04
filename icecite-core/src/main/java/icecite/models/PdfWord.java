@@ -7,7 +7,7 @@ package icecite.models;
  */
 public interface PdfWord extends HasCharacters, HasText, PdfElement {
   /**
-   * Returns true, if this word is hyphenated.
+   * Returns the boolean flag that indicates whether this word is hyphenated.
    * 
    * @return True, if this word is hyphenated, false otherwise.
    */
@@ -17,7 +17,7 @@ public interface PdfWord extends HasCharacters, HasText, PdfElement {
    * Sets the boolean flag that indicates whether this word is hyphenated.
    * 
    * @param isHyphenated
-   *        The boolean flag.
+   *        True, if this word is hyphenated, false otherwise.
    */
   void setIsHyphenated(boolean isHyphenated);
 
@@ -34,7 +34,7 @@ public interface PdfWord extends HasCharacters, HasText, PdfElement {
    * Sets the boolean flag that indicates whether this word was dehyphenated.
    * 
    * @param isDehyphenated
-   *        The boolean flag.
+   *        True, if this word was dehyphenated, false otherwise.
    */
   void setIsDehyphenated(boolean isDehyphenated);
 
@@ -47,19 +47,19 @@ public interface PdfWord extends HasCharacters, HasText, PdfElement {
    */
   public interface PdfWordFactory {
     /**
-     * Creates a PdfWord.
+     * Creates a new instance of PdfWord.
      * 
-     * @return An instance of {@link PdfWord}.
+     * @return A new instance of {@link PdfWord}.
      */
     PdfWord create();
 
     /**
-     * Creates a PdfWord.
+     * Creates a new instance of PdfWord.
      * 
      * @param characters
-     *        The characters of the word to create.
+     *        The characters of the word.
      * 
-     * @return An instance of {@link PdfWord}.
+     * @return A new instance of {@link PdfWord}.
      */
     PdfWord create(PdfCharacterList characters);
   }

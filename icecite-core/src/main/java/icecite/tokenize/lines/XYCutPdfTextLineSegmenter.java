@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.tokenize.xycut.XYCut;
@@ -81,11 +81,11 @@ public class XYCutPdfTextLineSegmenter extends XYCut
   public float assessHorizontalCut(PdfDocument pdf, PdfPage page,
       List<PdfCharacterList> halves) {
     PdfCharacterList upper = halves.get(0);
-    PdfCharacterStatistics upperStats = this.charStatistician.compute(upper);
+    PdfCharacterStatistic upperStats = this.charStatistician.compute(upper);
     float upperMinY = upperStats.getSmallestMinY();
 
     PdfCharacterList lower = halves.get(1);
-    PdfCharacterStatistics lowerStats = this.charStatistician.compute(lower);
+    PdfCharacterStatistic lowerStats = this.charStatistician.compute(lower);
     float lowerMaxY = lowerStats.getLargestMaxY();
 
     return upperMinY - lowerMaxY;

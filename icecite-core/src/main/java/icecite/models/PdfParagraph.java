@@ -14,9 +14,9 @@ public interface PdfParagraph extends HasTextBlocks, HasRole, HasText,
    */
   public interface PdfParagraphFactory {
     /**
-     * Creates an empty PdfParagraph.
+     * Creates a new instance of PdfParagraph.
      * 
-     * @return An instance of {@link PdfParagraph}.
+     * @return A new instance of {@link PdfParagraph}.
      */
     PdfParagraph create();
   }

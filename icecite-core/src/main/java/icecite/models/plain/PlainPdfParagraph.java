@@ -8,12 +8,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfFeature;
 import icecite.models.PdfParagraph;
 import icecite.models.PdfRole;
 import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextLineStatistics;
+import icecite.models.PdfTextLineStatistic;
 
 /**
  * A plain implementation of {@link PdfParagraph}.
@@ -42,14 +42,14 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   protected PdfRole secondaryRole;
 
   /**
-   * The statistics about the characters.
+   * The statistics about the characters in this paragraph.
    */
-  protected PdfCharacterStatistics characterStatistics;
+  protected PdfCharacterStatistic characterStatistic;
 
   /**
-   * The statistics about the text lines.
+   * The statistics about the text lines in this paragraph.
    */
-  protected PdfTextLineStatistics textLineStatistics;
+  protected PdfTextLineStatistic textLineStatistic;
 
   // ==========================================================================
   // Constructors.
@@ -60,6 +60,13 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   @AssistedInject
   public PlainPdfParagraph() {
     this.textBlocks = new ArrayList<>();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfFeature getFeature() {
+    return PdfFeature.PARAGRAPH;
   }
 
   // ==========================================================================
@@ -141,32 +148,25 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   // ==========================================================================
 
   @Override
-  public PdfTextLineStatistics getTextLineStatistics() {
-    return this.textLineStatistics;
+  public PdfTextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
   }
 
   @Override
-  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
-    this.textLineStatistics = statistics;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfCharacterStatistics getCharacterStatistics() {
-    return this.characterStatistics;
-  }
-
-  @Override
-  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
-    this.characterStatistics = statistics;
+  public void setTextLineStatistic(PdfTextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.PARAGRAPH;
+  public PdfCharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
+  }
+
+  @Override
+  public void setCharacterStatistic(PdfCharacterStatistic statistic) {
+    this.characterStatistic = statistic;
   }
 
   // ==========================================================================
@@ -176,6 +176,8 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
     return "PlainPdfParagraph(" + this.getText() + ")";
   }
 
+  // ==========================================================================
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfParagraph) {
@@ -183,9 +185,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getText(), otherParagraph.getText());
-      builder.append(getFeature(), otherParagraph.getFeature());
       builder.append(getPosition(), otherParagraph.getPosition());
-
       return builder.isEquals();
     }
     return false;
@@ -195,7 +195,6 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getText());
-    builder.append(getFeature());
     builder.append(getPosition());
     return builder.hashCode();
   }

@@ -12,12 +12,12 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfFigure;
 import icecite.models.PdfPage;
 import icecite.models.PdfShape;
 import icecite.models.PdfTextBlock;
-import icecite.models.PdfTextLineStatistics;
+import icecite.models.PdfTextLineStatistic;
 
 /**
  * A plain implementation of {@link PdfPage}.
@@ -51,14 +51,14 @@ public class PlainPdfPage implements PdfPage {
   protected List<PdfTextBlock> textBlocks;
 
   /**
-   * The statistics about the characters.
+   * The statistics about the characters in this page.
    */
-  protected PdfCharacterStatistics characterStatistics;
+  protected PdfCharacterStatistic characterStatistic;
 
   /**
-   * The statistics about text lines.
+   * The statistics about the text lines in this page.
    */
-  protected PdfTextLineStatistics textLineStatistics;
+  protected PdfTextLineStatistic textLineStatistic;
 
   // ==========================================================================
   // Constructors.
@@ -71,24 +71,24 @@ public class PlainPdfPage implements PdfPage {
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory) {
-    this.characters = characterListFactory.create();
-    this.figures = new ArrayList<>();
-    this.shapes = new ArrayList<>();
-    this.textBlocks = new ArrayList<>();
+    this(characterListFactory, 0);
   }
 
   /**
    * Creates a new PDF page.
    * 
    * @param characterListFactory
-   *        The factory to create instances of PdfCharacterList.
+   *        The factory to create instances of {@link PdfCharacterList}.
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
   public PlainPdfPage(PdfCharacterListFactory characterListFactory,
       @Assisted int pageNumber) {
-    this(characterListFactory);
+    this.characters = characterListFactory.create();
+    this.figures = new ArrayList<>();
+    this.shapes = new ArrayList<>();
+    this.textBlocks = new ArrayList<>();
     this.pageNumber = pageNumber;
   }
 
@@ -122,9 +122,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public void addCharacters(PdfCharacterList characters) {
-    for (PdfCharacter character : characters) {
-      addCharacter(character);
-    }
+    this.characters.addAll(characters);
   }
 
   @Override
@@ -141,7 +139,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfFigure getFirstFigure() {
-    if (this.figures == null) {
+    if (this.figures == null || this.figures.isEmpty()) {
       return null;
     }
     return this.figures.get(0);
@@ -149,7 +147,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfFigure getLastFigure() {
-    if (this.figures == null) {
+    if (this.figures == null || this.figures.isEmpty()) {
       return null;
     }
     return this.figures.get(this.figures.size() - 1);
@@ -162,9 +160,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public void addFigures(List<PdfFigure> figures) {
-    for (PdfFigure figure : figures) {
-      addFigure(figure);
-    }
+    this.figures.addAll(figures);
   }
 
   @Override
@@ -181,7 +177,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfShape getFirstShape() {
-    if (this.shapes == null) {
+    if (this.shapes == null || this.shapes.isEmpty()) {
       return null;
     }
     return this.shapes.get(0);
@@ -189,7 +185,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfShape getLastShape() {
-    if (this.shapes == null) {
+    if (this.shapes == null || this.shapes.isEmpty()) {
       return null;
     }
     return this.shapes.get(this.shapes.size() - 1);
@@ -202,9 +198,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public void addShapes(List<PdfShape> shapes) {
-    for (PdfShape shape : shapes) {
-      addShape(shape);
-    }
+    this.shapes.addAll(shapes);
   }
 
   @Override
@@ -221,7 +215,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfTextBlock getFirstTextBlock() {
-    if (this.textBlocks == null) {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
       return null;
     }
     return this.textBlocks.get(0);
@@ -229,7 +223,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public PdfTextBlock getLastTextBlock() {
-    if (this.textBlocks == null) {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
       return null;
     }
     return this.textBlocks.get(this.textBlocks.size() - 1);
@@ -242,9 +236,7 @@ public class PlainPdfPage implements PdfPage {
 
   @Override
   public void addTextBlocks(List<PdfTextBlock> blocks) {
-    for (PdfTextBlock block : blocks) {
-      addTextBlock(block);
-    }
+    this.textBlocks.addAll(blocks);
   }
 
   @Override
@@ -255,23 +247,25 @@ public class PlainPdfPage implements PdfPage {
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistics getCharacterStatistics() {
-    return this.characterStatistics;
+  public PdfCharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
   }
 
   @Override
-  public void setCharacterStatistics(PdfCharacterStatistics statistics) {
-    this.characterStatistics = statistics;
+  public void setCharacterStatistic(PdfCharacterStatistic statistic) {
+    this.characterStatistic = statistic;
+  }
+
+  // ==========================================================================
+  
+  @Override
+  public PdfTextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
   }
 
   @Override
-  public PdfTextLineStatistics getTextLineStatistics() {
-    return this.textLineStatistics;
-  }
-
-  @Override
-  public void setPdfTextLineStatistics(PdfTextLineStatistics statistics) {
-    this.textLineStatistics = statistics;
+  public void setTextLineStatistic(PdfTextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
   }
 
   // ==========================================================================
@@ -293,6 +287,8 @@ public class PlainPdfPage implements PdfPage {
     return "PlainPdfPage(" + this.pageNumber + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfPage) {
@@ -300,7 +296,10 @@ public class PlainPdfPage implements PdfPage {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPageNumber(), otherPage.getPageNumber());
-
+      builder.append(getCharacters(), otherPage.getCharacters());
+      builder.append(getFigures(), otherPage.getShapes());
+      builder.append(getShapes(), otherPage.getShapes());
+      builder.append(getTextBlocks(), otherPage.getTextBlocks());
       return builder.isEquals();
     }
     return false;
@@ -310,6 +309,10 @@ public class PlainPdfPage implements PdfPage {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPageNumber());
+    builder.append(getCharacters());
+    builder.append(getFigures());
+    builder.append(getShapes());
+    builder.append(getTextBlocks());
     return builder.hashCode();
   }
 }

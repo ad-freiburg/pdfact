@@ -9,9 +9,8 @@ import icecite.utils.geometric.Line;
  */
 public interface PdfTextLine extends HasWords, HasText, PdfElement {
   /**
-   * Returns the baseline of this text line. See
-   * https://en.wikipedia.org/wiki/Baseline_(typography) for more details about
-   * baselines.
+   * Returns the baseline of this text line. For more details about baselines,
+   * see https://en.wikipedia.org/wiki/Baseline_(typography).
    * 
    * @return The base line of this text line.
    */
@@ -21,7 +20,7 @@ public interface PdfTextLine extends HasWords, HasText, PdfElement {
    * Sets the baseline of this text line.
    * 
    * @param baseLine
-   *        The base line of this text line.
+   *        The base line.
    */
   void setBaseline(Line baseLine);
 
@@ -34,9 +33,9 @@ public interface PdfTextLine extends HasWords, HasText, PdfElement {
    */
   public interface PdfTextLineFactory {
     /**
-     * Creates a PdfTextLine.
+     * Creates a new instance of PdfTextLine.
      * 
-     * @return An instance of {@link PdfTextLine}.
+     * @return A new instance of {@link PdfTextLine}.
      */
     PdfTextLine create();
   }

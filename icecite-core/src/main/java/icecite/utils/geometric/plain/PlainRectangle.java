@@ -22,22 +22,22 @@ public class PlainRectangle extends Rectangle {
   /**
    * The x value of the lower left.
    */
-  protected float minX;
+  protected float minX = Float.MAX_VALUE;
 
   /**
    * The y value of the lower left.
    */
-  protected float minY;
+  protected float minY = Float.MAX_VALUE;
 
   /**
    * The x value of the upper right.
    */
-  protected float maxX;
+  protected float maxX = -Float.MAX_VALUE;
 
   /**
    * The y value of the upper right.
    */
-  protected float maxY;
+  protected float maxY = -Float.MAX_VALUE;
 
   /**
    * Creates a new rectangle that is spanned by the points (0, 0) and (0, 0).
@@ -126,6 +126,37 @@ public class PlainRectangle extends Rectangle {
     setMaxX(maxX);
     setMaxY(maxY);
   }
+
+  /**
+   * Creates a new rectangle that represents the bounding box around the given
+   * objects.
+   * 
+   * @param objects
+   *        The objects to process.
+   */
+  @AssistedInject
+  public PlainRectangle(@Assisted Iterable<? extends HasRectangle> objects) {
+    for (HasRectangle object : objects) {
+      Rectangle rectangle = object.getRectangle();
+      if (rectangle.getMinX() < getMinX()) {
+        setMinX(rectangle.getMinX());
+      }
+
+      if (rectangle.getMinY() < getMinY()) {
+        setMinY(rectangle.getMinY());
+      }
+
+      if (rectangle.getMaxX() > getMaxX()) {
+        setMaxX(rectangle.getMaxX());
+      }
+
+      if (rectangle.getMaxY() > getMaxY()) {
+        setMaxY(rectangle.getMaxY());
+      }
+    }
+  }
+
+  // ==========================================================================
 
   /**
    * Creates a new rectangle from the 2 given vertices. The vertices need not

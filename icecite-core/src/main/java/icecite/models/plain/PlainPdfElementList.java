@@ -16,13 +16,13 @@ import icecite.models.PdfElement;
 import icecite.models.PdfElementList;
 import icecite.utils.sort.Quicksort;
 
-// TODO: Accelerate cut method.
+// TODO: Implement hashCode() and equals().
 
 /**
  * A plain implementation of {@link PdfElementList}.
  * 
  * @param <T>
- *        The concrete type of the elements in this list.
+ *        The type of the PDF elements in this list.
  * 
  * @author Claudius Korzen
  */
@@ -42,7 +42,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   // Constructors.
 
   /**
-   * Creates a new list.
+   * Creates a new, empty list.
    */
   @AssistedInject
   public PlainPdfElementList() {
@@ -50,10 +50,10 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
   }
 
   /**
-   * Creates a new list.
+   * Creates a new, empty list.
    * 
    * @param initialCapacity
-   *        The initial capacity.
+   *        The initial capacity of this list.
    */
   @AssistedInject
   public PlainPdfElementList(int initialCapacity) {
@@ -88,6 +88,8 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
     return super.toString();
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     return super.equals(other);
@@ -106,7 +108,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
    * @author Claudius Korzen
    *
    * @param <S>
-   *        The concrete type of the elements in this list.
+   *        The type of the PDF elements in this list.
    */
   class PdfElementView<S extends PdfElement> extends PlainPdfElementList<S>
       implements PdfElementList<S> {
@@ -288,6 +290,8 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
       return super.toString();
     }
 
+    // ========================================================================
+    
     @Override
     public boolean equals(Object other) {
       return super.equals(other);

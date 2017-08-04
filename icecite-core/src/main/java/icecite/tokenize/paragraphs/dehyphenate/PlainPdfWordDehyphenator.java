@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfParagraph;
@@ -66,7 +66,7 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
    *        The pdf document to process.
    */
   protected void preprocess(PdfDocument pdf) {
-    PdfFontFace pdfFontFace = pdf.getCharacterStatistics()
+    PdfFontFace pdfFontFace = pdf.getCharacterStatistic()
         .getMostCommonFontFace();
     for (PdfParagraph paragraph : pdf.getParagraphs()) {
       for (PdfTextBlock textBlock : paragraph.getTextBlocks()) {
@@ -81,7 +81,7 @@ public class PlainPdfWordDehyphenator implements PdfWordDehyphenator {
             if (hyphenIndexes.isEmpty()) {
               // Consider only words with most common font. Formula element
               // "(cIR" affects "cir-cumstance".
-              PdfCharacterStatistics charStats = word.getCharacterStatistics();
+              PdfCharacterStatistic charStats = word.getCharacterStatistic();
               PdfFontFace fontFace = charStats.getMostCommonFontFace();
               if (fontFace == pdfFontFace) {
                 this.noHyphenWords.add(text);

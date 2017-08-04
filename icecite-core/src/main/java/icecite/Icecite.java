@@ -583,6 +583,6 @@ public class Icecite {
    * @return The names of the supported semantic roles.
    */
   public Set<String> getRoleNameChoices() {
-    return PdfRole.getNames();
+    return PdfRole.getIdentifiers();
   }
 }

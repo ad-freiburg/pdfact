@@ -1,15 +1,15 @@
 package icecite.models;
 
 /**
- * A character in a PDF document.
+ * A single character in a PDF document.
  * 
  * @author Claudius Korzen
  */
 public interface PdfCharacter extends PdfElement, HasColor, HasFontFace,
     HasText {
   /**
-   * Returns the sequence number of this character, that is the rank in the
-   * extraction order of characters.
+   * Returns the sequence number of this character - that is the rank in the
+   * extraction order of PDF elements.
    *
    * @return The sequence number.
    */
@@ -32,7 +32,7 @@ public interface PdfCharacter extends PdfElement, HasColor, HasFontFace,
    */
   public interface PdfCharacterFactory {
     /**
-     * Creates a PdfCharacter.
+     * Creates a new PdfCharacter.
      * 
      * @return An instance of {@link PdfCharacter}.
      */

@@ -3,7 +3,7 @@ package icecite.models;
 import java.util.List;
 
 /**
- * A list of PDF characters.
+ * A list of characters in a PDF document.
  * 
  * @author Claudius Korzen
  */
@@ -29,19 +29,19 @@ public interface PdfCharacterList extends PdfElementList<PdfCharacter> {
    */
   public interface PdfCharacterListFactory {
     /**
-     * Creates a PdfCharacterList.
+     * Creates a new instance of PdfCharacterList.
      * 
-     * @return An instance of {@link PdfCharacterList}.
+     * @return A new instance of {@link PdfCharacterList}.
      */
     PdfCharacterList create();
 
     /**
-     * Creates a PdfCharacterList.
+     * Creates a new instance of PdfCharacterList.
      * 
      * @param initialCapacity
      *        The initial capacity of this list.
      * 
-     * @return An instance of {@link PdfCharacterList}.
+     * @return A new instance of {@link PdfCharacterList}.
      */
     PdfCharacterList create(int initialCapacity);
   }

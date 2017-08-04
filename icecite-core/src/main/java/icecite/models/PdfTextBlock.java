@@ -7,10 +7,10 @@ package icecite.models;
  */
 public interface PdfTextBlock extends HasTextLines, HasRole, HasText,
     PdfElement {
-
   /**
-   * Returns the parent paragraph, which this block is a member of (needed to
-   * decide whether this text block was already matched to a paragraph).
+   * Returns the parent paragraph, which this block is a member of (used on the
+   * identification of the paragraphs, to decide whether this text block was
+   * already matched to a paragraph).
    * 
    * @return The parent paragraph.
    */
@@ -33,9 +33,9 @@ public interface PdfTextBlock extends HasTextLines, HasRole, HasText,
    */
   public interface PdfTextBlockFactory {
     /**
-     * Creates a PdfTextBlock.
+     * Creates a new instance of PdfTextBlock.
      * 
-     * @return An instance of {@link PdfTextBlock}.
+     * @return A new instance of {@link PdfTextBlock}.
      */
     PdfTextBlock create();
   }

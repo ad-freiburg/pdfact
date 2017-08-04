@@ -2,7 +2,7 @@ package icecite.semanticize.plain.modules;
 
 import java.util.List;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -46,7 +46,7 @@ public class TitleModule implements PdfTextSemanticizerModule {
         continue;
       }
 
-      PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+      PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
       PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
       if (fontFace.getFontSize() > largestFontsize) {
         largestFontsize = fontFace.getFontSize();

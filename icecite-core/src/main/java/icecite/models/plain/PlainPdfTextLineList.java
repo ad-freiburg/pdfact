@@ -6,6 +6,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfTextLine;
 import icecite.models.PdfTextLineList;
 
+// TODO: Implement hashCode() and equals().
+
 /**
  * A plain implementation of {@link PdfTextLineList}.
  * 
@@ -21,7 +23,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   // ==========================================================================
 
   /**
-   * Creates a new PlainPdfTextLineList.
+   * Creates a new text line list.
    */
   @AssistedInject
   public PlainPdfTextLineList() {
@@ -29,7 +31,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   }
 
   /**
-   * Creates a new PlainPdfTextLineList.
+   * Creates a new text line list.
    * 
    * @param initialCapacity
    *        The initial capacity of this list.
@@ -45,6 +47,8 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
   public String toString() {
     return super.toString();
   }
+  
+  // ==========================================================================
 
   @Override
   public boolean equals(Object other) {

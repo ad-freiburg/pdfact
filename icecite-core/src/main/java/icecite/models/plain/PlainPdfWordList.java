@@ -6,6 +6,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import icecite.models.PdfWord;
 import icecite.models.PdfWordList;
 
+//TODO: Implement hashCode() and equals().
+
 /**
  * A plain implementation of {@link PdfWordList}.
  * 

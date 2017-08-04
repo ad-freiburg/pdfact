@@ -32,7 +32,7 @@ public class PlainPdfPosition implements PdfPosition {
   // The constructor.
 
   /**
-   * Creates a new PlainPdfPosition.
+   * Creates a new position.
    * 
    * @param page
    *        The page.
@@ -46,7 +46,7 @@ public class PlainPdfPosition implements PdfPosition {
   }
 
   /**
-   * Creates a new PlainPdfPosition.
+   * Creates a new position.
    * 
    * @param rectangleFactory
    *        The factory to create instances of {@link Rectangle}.
@@ -74,16 +74,16 @@ public class PlainPdfPosition implements PdfPosition {
   }
 
   /**
-   * Creates a new PlainPdfPosition.
+   * Creates a new position.
    * 
    * @param rectangleFactory
    *        The factory to create instances of {@link Rectangle}.
    * @param page
    *        The page.
    * @param point1
-   *        The lower left vertex.
+   *        The lower left vertex of the bounding box.
    * @param point2
-   *        The upper right vertex.
+   *        The upper right vertex of the bounding box.
    * 
    */
   @AssistedInject
@@ -127,6 +127,8 @@ public class PlainPdfPosition implements PdfPosition {
         + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfPosition) {
@@ -135,7 +137,6 @@ public class PlainPdfPosition implements PdfPosition {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPage(), otherPosition.getPage());
       builder.append(getRectangle(), otherPosition.getRectangle());
-
       return builder.isEquals();
     }
     return false;

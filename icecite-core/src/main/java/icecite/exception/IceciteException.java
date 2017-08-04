@@ -12,45 +12,45 @@ public class IceciteException extends Exception {
   protected static final long serialVersionUID = -7396761485778372279L;
 
   /**
-   * The status code of this exception.
+   * The exit code to return of this exception.
    */
-  protected int statusCode;
+  protected int exitCode;
 
   /**
-   * The default constructor.
+   * Creates a new exception.
    * 
-   * @param statusCode
-   *        The status code of this exception.
+   * @param exitCode
+   *        The exit code of this exception.
    * @param message
    *        The message of this exception.
    */
-  public IceciteException(int statusCode, String message) {
-    this(statusCode, message, null);
+  public IceciteException(int exitCode, String message) {
+    this(exitCode, message, null);
   }
 
   /**
-   * The default constructor.
+   * Creates a new exception.
    * 
-   * @param statusCode
-   *        The status code of this exception.
+   * @param exitCode
+   *        The exit code of this exception.
    * @param message
    *        The message of this exception.
    * @param cause
    *        The cause of this exception.
    */
-  public IceciteException(int statusCode, String message, Throwable cause) {
+  public IceciteException(int exitCode, String message, Throwable cause) {
     super(message, cause);
-    this.statusCode = statusCode;
+    this.exitCode = exitCode;
   }
 
   // ===========================================================================
 
   /**
-   * Returns the status code of this exception.
+   * Returns the exit code of this exception.
    * 
-   * @return The status code of this exception.
+   * @return The exit code of this exception.
    */
-  public int getStatusCode() {
-    return this.statusCode;
+  public int getExitCode() {
+    return this.exitCode;
   }
 }

@@ -1,43 +1,43 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has a semantic role.
+ * An interface that is implemented by PDF elements that have a semantic role.
  *
  * @author Claudius Korzen
  */
 public interface HasRole {
   /**
-   * Returns the role of this object.
+   * Returns the semantic role of the element.
    * 
-   * @return The role of this object.
+   * @return The semantic role.
    */
   PdfRole getRole();
 
   /**
-   * Sets the role of this object.
+   * Sets the semantic role of the element.
    * 
    * @param role
-   *        The role of this object.
+   *        The semantic role.
    */
   void setRole(PdfRole role);
 
   // ==========================================================================
 
   /**
-   * Returns the secondary role of this object. A secondary role is a role, to
-   * which the primary role relates. For example, the role "section heading"
-   * can relate to the role "abstract", indicating to be the section heading
-   * for the abstract.
+   * Returns the *secondary* role of this element. A secondary role could be
+   * any supplementary role, e.g. a role that relates to the primary role. For
+   * example, the primary role "section heading" could have a secondary role
+   * that gives the role of the belonging section, e.g. "abstract".
    * 
-   * @return The secondary role of this PDF element.
+   * @return The secondary role of the element.
    */
   PdfRole getSecondaryRole();
 
   /**
-   * Sets the secondary role of this PDF element.
+   * Sets the secondary role of the element.
    * 
    * @param role
-   *        The secondary role of this PDF element.
+   *        The secondary role of the element.
    */
   void setSecondaryRole(PdfRole role);
 }

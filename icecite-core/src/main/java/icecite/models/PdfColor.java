@@ -1,5 +1,7 @@
 package icecite.models;
 
+// TODO: Implement the support of other color schemes (CMYK, etc.)
+
 /**
  * A color in a PDF document.
  * 
@@ -27,7 +29,8 @@ public interface PdfColor extends PdfResource {
    * Sets the RGB value of this color.
    * 
    * @param rgb
-   *        The RGB value given as an array of three float values in [0,1].
+   *        The RGB value given as an array of three float values in range
+   *        [0,1].
    */
   void setRGB(float[] rgb);
 
@@ -35,18 +38,19 @@ public interface PdfColor extends PdfResource {
    * Sets the RGB value of this color.
    * 
    * @param r
-   *        The R value of this color.
+   *        The R value.
    * @param g
-   *        The G value of this color.
+   *        The G value.
    * @param b
-   *        The B value of this color.
+   *        The B value.
    */
   void setRGB(float r, float g, float b);
 
   /**
    * Returns the RGB value of this color.
    * 
-   * @return The RGB value given as array of three float values in [0,1].
+   * @return The RGB value given as an array of three float values in range
+   *         [0,1].
    */
   float[] getRGB();
 
@@ -59,19 +63,19 @@ public interface PdfColor extends PdfResource {
    */
   public interface PdfColorFactory {
     /**
-     * Creates a PdfColor.
+     * Creates a new instance of PdfColor.
      * 
-     * @return An instance of {@link PdfColor}.
+     * @return A new instance of {@link PdfColor}.
      */
     PdfColor create();
 
     /**
-     * Creates a PdfColor.
+     * Creates a new instance of PdfColor.
      * 
      * @param rgb
-     *        The RGB value of this color.
+     *        The RGB value of the color.
      * 
-     * @return An instance of {@link PdfColor}.
+     * @return A new instance of {@link PdfColor}.
      */
     PdfColor create(float[] rgb);
   }

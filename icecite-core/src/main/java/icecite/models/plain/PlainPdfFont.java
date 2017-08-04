@@ -44,18 +44,6 @@ public class PlainPdfFont extends PlainPdfResource implements PdfFont {
   // ==========================================================================
 
   @Override
-  public String getId() {
-    return this.id;
-  }
-
-  @Override
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  // ==========================================================================
-
-  @Override
   public String getNormalizedName() {
     return this.normalizedName;
   }
@@ -135,6 +123,8 @@ public class PlainPdfFont extends PlainPdfResource implements PdfFont {
         + this.isItalic() + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfFont) {
@@ -142,7 +132,6 @@ public class PlainPdfFont extends PlainPdfResource implements PdfFont {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getNormalizedName(), otherFont.getNormalizedName());
-
       return builder.isEquals();
     }
     return false;

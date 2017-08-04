@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfPosition.PdfPositionFactory;
@@ -85,11 +85,11 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
   public float assessVerticalCut(PdfDocument pdf, PdfPage page,
       List<PdfCharacterList> halves) {
     PdfCharacterList left = halves.get(0);
-    PdfCharacterStatistics leftStats = this.charStatistician.compute(left);
+    PdfCharacterStatistic leftStats = this.charStatistician.compute(left);
     float leftMaxX = leftStats.getLargestMaxX();
     
     PdfCharacterList right = halves.get(1);
-    PdfCharacterStatistics rightStats = this.charStatistician.compute(right);
+    PdfCharacterStatistic rightStats = this.charStatistician.compute(right);
     float rightMinX = rightStats.getSmallestMinX();
     
     float width = rightMinX - leftMaxX;

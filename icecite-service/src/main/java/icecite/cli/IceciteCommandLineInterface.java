@@ -36,7 +36,7 @@ public class IceciteCommandLineInterface {
     try {
       new IceciteCommandLineInterface().process(args);
     } catch (IceciteException e) {
-      statusCode = e.getStatusCode();
+      statusCode = e.getExitCode();
       errorMessage = e.getMessage();
       errorCause = e.getCause();
     }

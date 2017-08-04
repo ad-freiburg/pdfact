@@ -3,38 +3,28 @@ package icecite.models;
 import java.util.List;
 
 /**
- * A class that computes statistics about characters.
+ * A class that computes character statistics.
  * 
  * @author Claudius Korzen
  */
 public interface PdfCharacterStatistician {
   /**
-   * Computes statistics about characters.
+   * Computes the character statistic for the given characters.
    * 
    * @param characters
    *        The characters to process.
    * 
+   * @return The computed character statistics.
+   */
+  PdfCharacterStatistic compute(PdfCharacterList characters);
+  
+  /**
+   * Combines the given list of character statistics to a single statistic.
+   * 
+   * @param stats
+   *        The statistics to combine.
+   * 
    * @return The computed statistics.
    */
-  PdfCharacterStatistics compute(PdfCharacterList characters);
-
-  /**
-   * Aggregates the given characters statistics.
-   * 
-   * @param statistics
-   *        The statistics to aggregate.
-   * 
-   * @return The aggregated statistics.
-   */
-  PdfCharacterStatistics aggregate(PdfCharacterStatistics... statistics);
-
-  /**
-   * Aggregates the given characters statistics.
-   * 
-   * @param statistics
-   *        The statistics to aggregate.
-   * 
-   * @return The aggregated statistics.
-   */
-  PdfCharacterStatistics aggregate(List<PdfCharacterStatistics> statistics);
+  PdfCharacterStatistic combine(List<? extends HasCharacterStatistic> stats);
 }

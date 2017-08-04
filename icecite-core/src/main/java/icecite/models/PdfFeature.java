@@ -104,7 +104,7 @@ public enum PdfFeature {
    * Returns the features that are associated with the given names.
    * 
    * @param names
-   *        The names of features to fetch.
+   *        The names of the features to fetch.
    *
    * @return A set of the fetched features.
    */

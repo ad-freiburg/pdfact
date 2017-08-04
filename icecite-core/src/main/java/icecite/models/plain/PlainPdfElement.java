@@ -20,6 +20,13 @@ public class PlainPdfElement implements PdfElement {
   protected PdfPosition position;
 
   // ==========================================================================
+  
+  @Override
+  public PdfFeature getFeature() {
+    return null;
+  }
+  
+  // ==========================================================================
 
   @Override
   public PdfPosition getPosition() {
@@ -48,17 +55,12 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return null;
-  }
-
-  // ==========================================================================
-
-  @Override
   public String toString() {
     return "PlainPdfElement(pos: " + getPosition() + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfElement) {
@@ -66,8 +68,6 @@ public class PlainPdfElement implements PdfElement {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherElement.getPosition());
-      builder.append(getFeature(), otherElement.getFeature());
-
       return builder.isEquals();
     }
     return false;
@@ -77,7 +77,6 @@ public class PlainPdfElement implements PdfElement {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
-    builder.append(getFeature());
     return builder.hashCode();
   }
 }

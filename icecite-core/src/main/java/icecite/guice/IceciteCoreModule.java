@@ -9,8 +9,8 @@ import icecite.models.PdfCharacter.PdfCharacterFactory;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
-import icecite.models.PdfCharacterStatistics.PdfCharacterStatisticsFactory;
+import icecite.models.PdfCharacterStatistic;
+import icecite.models.PdfCharacterStatistic.PdfCharacterStatisticFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 import icecite.models.PdfDocument;
@@ -36,8 +36,8 @@ import icecite.models.PdfTextLine.PdfTextLineFactory;
 import icecite.models.PdfTextLineList;
 import icecite.models.PdfTextLineList.PdfTextLineListFactory;
 import icecite.models.PdfTextLineStatistician;
-import icecite.models.PdfTextLineStatistics;
-import icecite.models.PdfTextLineStatistics.PdfTextLineStatisticsFactory;
+import icecite.models.PdfTextLineStatistic;
+import icecite.models.PdfTextLineStatistic.PdfTextLineStatisticFactory;
 import icecite.models.PdfWord;
 import icecite.models.PdfWord.PdfWordFactory;
 import icecite.models.PdfWordList;
@@ -45,7 +45,7 @@ import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.models.plain.PlainPdfCharacter;
 import icecite.models.plain.PlainPdfCharacterList;
 import icecite.models.plain.PlainPdfCharacterStatistician;
-import icecite.models.plain.PlainPdfCharacterStatistics;
+import icecite.models.plain.PlainPdfCharacterStatistic;
 import icecite.models.plain.PlainPdfColor;
 import icecite.models.plain.PlainPdfDocument;
 import icecite.models.plain.PlainPdfFigure;
@@ -129,6 +129,8 @@ import icecite.visualize.pdfbox.PdfBoxDrawer;
 // TODO: Find out how to dynamically update bindings (needed for the parser,
 // where PdfBox needs extra bindings.
 
+// TODO: Clean up the Guice module.
+
 /**
  * A module that defines the basic Guice bindings for Icecite.
  * 
@@ -144,17 +146,18 @@ public class IceciteCoreModule extends com.google.inject.AbstractModule {
         PdfBoxPdfStreamParser.class);
 
     // Bind the tokenizers.
-    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class, PlainPdfTextTokenizer.class);
+    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class,
+        PlainPdfTextTokenizer.class);
     bind(PdfTextAreaSegmenter.class).to(XYCutPdfTextAreaSegmenter.class);
     bind(PdfTextLineSegmenter.class).to(XYCutPdfTextLineSegmenter.class);
     bind(PdfTextLineTokenizer.class).to(PlainPdfTextLineTokenizer.class);
     bind(PdfWordSegmenter.class).to(XYCutPdfWordSegmenter.class);
     bind(PdfWordTokenizer.class).to(PlainPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
-    
-    fc(PdfCharacterStatistics.class, PdfCharacterStatisticsFactory.class,
-        PlainPdfCharacterStatistics.class);
-    fc(PdfTextLineStatistics.class, PdfTextLineStatisticsFactory.class,
+
+    fc(PdfCharacterStatistic.class, PdfCharacterStatisticFactory.class,
+        PlainPdfCharacterStatistic.class);
+    fc(PdfTextLineStatistic.class, PdfTextLineStatisticFactory.class,
         PlainPdfTextLineStatistics.class);
 
     fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class,

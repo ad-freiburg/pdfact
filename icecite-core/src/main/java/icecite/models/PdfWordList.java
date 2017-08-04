@@ -1,7 +1,7 @@
 package icecite.models;
 
 /**
- * A list of words.
+ * A list of words in a PDF document.
  * 
  * @author Claudius Korzen
  */
@@ -13,19 +13,19 @@ public interface PdfWordList extends PdfElementList<PdfWord> {
    */
   public interface PdfWordListFactory {
     /**
-     * Creates a PdfWordList.
+     * Creates a new instance of PdfWordList.
      * 
-     * @return An instance of {@link PdfWordList}.
+     * @return A new instance of {@link PdfWordList}.
      */
     PdfWordList create();
 
     /**
-     * Creates a PdfWordList.
+     * Creates a new instance of PdfWordList.
      * 
      * @param initialCapacity
      *        The initial capacity of this list.
      * 
-     * @return An instance of {@link PdfWordList}.
+     * @return A new instance of {@link PdfWordList}.
      */
     PdfWordList create(int initialCapacity);
   }

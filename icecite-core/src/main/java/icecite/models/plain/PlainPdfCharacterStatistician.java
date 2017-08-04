@@ -1,20 +1,22 @@
 package icecite.models.plain;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.inject.Inject;
 
+import icecite.models.HasCharacterStatistic;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
-import icecite.models.PdfCharacterStatistics.PdfCharacterStatisticsFactory;
+import icecite.models.PdfCharacterStatistic;
+import icecite.models.PdfCharacterStatistic.PdfCharacterStatisticFactory;
 import icecite.models.PdfColor;
 import icecite.models.PdfFontFace;
 import icecite.utils.counter.FloatCounter;
 import icecite.utils.counter.ObjectCounter;
 import icecite.utils.geometric.Rectangle;
+
+// TODO: Implement hashCode() and equals().
 
 /**
  * A plain implementation of {@link PdfCharacterStatistician}.
@@ -23,27 +25,27 @@ import icecite.utils.geometric.Rectangle;
  */
 public class PlainPdfCharacterStatistician implements PdfCharacterStatistician {
   /**
-   * The factory to create instances of {@link PdfCharacterStatistics}.
+   * The factory to create instances of {@link PdfCharacterStatistic}.
    */
-  protected PdfCharacterStatisticsFactory statisticsFactory;
+  protected PdfCharacterStatisticFactory statisticFactory;
 
   /**
-   * The default constructor.
+   * Creates a new statistician to compute statistics about characters.
    * 
-   * @param statisticsFactory
-   *        The factory to create instances of {@link PdfCharacterStatistics}.
+   * @param factory
+   *        The factory to create instances of {@link PdfCharacterStatistic}.
    */
   @Inject
-  public PlainPdfCharacterStatistician(
-      PdfCharacterStatisticsFactory statisticsFactory) {
-    this.statisticsFactory = statisticsFactory;
+  public PlainPdfCharacterStatistician(PdfCharacterStatisticFactory factory) {
+    this.statisticFactory = factory;
   }
 
   @Override
-  public PdfCharacterStatistics compute(PdfCharacterList characters) {
-    PdfCharacterStatistics statistics = this.statisticsFactory.create();
+  public PdfCharacterStatistic compute(PdfCharacterList characters) {
+    // Create new statistic object.
+    PdfCharacterStatistic statistic = this.statisticFactory.create();
 
-    // Count the heights, widths and font sizes of the characters.
+    // Count the heights, widths and font sizes.
     FloatCounter heightsFrequencies = new FloatCounter();
     FloatCounter widthsFrequencies = new FloatCounter();
     FloatCounter fontsizeFrequencies = new FloatCounter();
@@ -66,49 +68,46 @@ public class PlainPdfCharacterStatistician implements PdfCharacterStatistician {
       // Register the color.
       colorFrequencies.add(character.getColor());
 
-      // Register the smallest minX value.
-      if (rectangle.getMinX() < statistics.getSmallestMinX()) {
-        statistics.setSmallestMinX(rectangle.getMinX());
+      // Register the minX value.
+      if (rectangle.getMinX() < statistic.getSmallestMinX()) {
+        statistic.setSmallestMinX(rectangle.getMinX());
       }
 
-      // Register the smallest minY value.
-      if (rectangle.getMinY() < statistics.getSmallestMinY()) {
-        statistics.setSmallestMinY(rectangle.getMinY());
+      // Register the minY value.
+      if (rectangle.getMinY() < statistic.getSmallestMinY()) {
+        statistic.setSmallestMinY(rectangle.getMinY());
       }
 
-      // Register the largest maxX value.
-      if (rectangle.getMaxX() > statistics.getLargestMaxX()) {
-        statistics.setLargestMaxX(rectangle.getMaxX());
+      // Register the maxX value.
+      if (rectangle.getMaxX() > statistic.getLargestMaxX()) {
+        statistic.setLargestMaxX(rectangle.getMaxX());
       }
 
-      // Register the largest maxY value.
-      if (rectangle.getMaxY() > statistics.getLargestMaxY()) {
-        statistics.setLargestMaxY(rectangle.getMaxY());
+      // Register the maxY value.
+      if (rectangle.getMaxY() > statistic.getLargestMaxY()) {
+        statistic.setLargestMaxY(rectangle.getMaxY());
       }
     }
 
-    // Fill the statistics.
-    statistics.setHeightFrequencies(heightsFrequencies);
-    statistics.setWidthFrequencies(widthsFrequencies);
-    statistics.setFontSizeFrequencies(fontsizeFrequencies);
-    statistics.setColorFrequencies(colorFrequencies);
-    statistics.setFontFaceFrequencies(fontFaceFrequencies);
+    // Fill the statistic object.
+    statistic.setHeightFrequencies(heightsFrequencies);
+    statistic.setWidthFrequencies(widthsFrequencies);
+    statistic.setFontSizeFrequencies(fontsizeFrequencies);
+    statistic.setColorFrequencies(colorFrequencies);
+    statistic.setFontFaceFrequencies(fontFaceFrequencies);
 
-    return statistics;
+    return statistic;
   }
 
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistics aggregate(PdfCharacterStatistics... stats) {
-    return aggregate(Arrays.asList(stats));
-  }
+  public PdfCharacterStatistic combine(
+      List<? extends HasCharacterStatistic> stats) {
+    // Create new statistic object.
+    PdfCharacterStatistic statistic = this.statisticFactory.create();
 
-  @Override
-  public PdfCharacterStatistics aggregate(List<PdfCharacterStatistics> stats) {
-    PdfCharacterStatistics statistics = this.statisticsFactory.create();
-
-    // Count the heights, widths and font sizes of the characters.
+    // Count the heights, widths and font sizes.
     FloatCounter heightsFrequencies = new FloatCounter();
     FloatCounter widthsFrequencies = new FloatCounter();
     FloatCounter fontsizeFrequencies = new FloatCounter();
@@ -117,46 +116,48 @@ public class PlainPdfCharacterStatistician implements PdfCharacterStatistician {
     ObjectCounter<PdfColor> colorFrequencies = new ObjectCounter<>();
     ObjectCounter<PdfFontFace> fontFaceFrequencies = new ObjectCounter<>();
 
-    for (PdfCharacterStatistics stat : stats) {
-      // Register the height.
+    for (HasCharacterStatistic s : stats) {
+      PdfCharacterStatistic stat = s.getCharacterStatistic();
+
+      // Register the full height frequencies.
       heightsFrequencies.add(stat.getHeightFrequencies());
-      // Register the width.
+      // Register the full width frequencies.
       widthsFrequencies.add(stat.getWidthFrequencies());
-      // Register the font face.
+      // Register the full font face frequencies.
       fontFaceFrequencies.add(stat.getFontFaceFrequencies());
-      // Register the font size.
+      // Register the full font size frequencies.
       fontsizeFrequencies.add(stat.getFontSizeFrequencies());
-      // Register the color.
+      // Register the full color frequencies.
       colorFrequencies.add(stat.getColorFrequencies());
 
-      // Register the smallest minX value.
-      if (stat.getSmallestMinX() < statistics.getSmallestMinX()) {
-        statistics.setSmallestMinX(stat.getSmallestMinX());
+      // Register the minX value.
+      if (stat.getSmallestMinX() < statistic.getSmallestMinX()) {
+        statistic.setSmallestMinX(stat.getSmallestMinX());
       }
 
-      // Register the smallest minY value.
-      if (stat.getSmallestMinY() < statistics.getSmallestMinY()) {
-        statistics.setSmallestMinY(stat.getSmallestMinY());
+      // Register the minY value.
+      if (stat.getSmallestMinY() < statistic.getSmallestMinY()) {
+        statistic.setSmallestMinY(stat.getSmallestMinY());
       }
 
-      // Register the largest maxX value.
-      if (stat.getLargestMaxX() > statistics.getLargestMaxX()) {
-        statistics.setLargestMaxX(stat.getLargestMaxX());
+      // Register the maxX value.
+      if (stat.getLargestMaxX() > statistic.getLargestMaxX()) {
+        statistic.setLargestMaxX(stat.getLargestMaxX());
       }
 
-      // Register the largest maxY value.
-      if (stat.getLargestMaxY() > statistics.getLargestMaxY()) {
-        statistics.setLargestMaxY(stat.getLargestMaxY());
+      // Register the maxY value.
+      if (stat.getLargestMaxY() > statistic.getLargestMaxY()) {
+        statistic.setLargestMaxY(stat.getLargestMaxY());
       }
     }
 
-    // Fill the statistics.
-    statistics.setHeightFrequencies(heightsFrequencies);
-    statistics.setWidthFrequencies(widthsFrequencies);
-    statistics.setFontSizeFrequencies(fontsizeFrequencies);
-    statistics.setColorFrequencies(colorFrequencies);
-    statistics.setFontFaceFrequencies(fontFaceFrequencies);
+    // Fill the statistic object.
+    statistic.setHeightFrequencies(heightsFrequencies);
+    statistic.setWidthFrequencies(widthsFrequencies);
+    statistic.setFontSizeFrequencies(fontsizeFrequencies);
+    statistic.setColorFrequencies(colorFrequencies);
+    statistic.setFontFaceFrequencies(fontFaceFrequencies);
 
-    return statistics;
+    return statistic;
   }
 }

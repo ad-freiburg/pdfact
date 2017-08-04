@@ -3,27 +3,27 @@ package icecite.models;
 import java.util.List;
 
 /**
- * An interface that declares that the implementing object has figures.
+ * An interface that is implemented by PDF elements that consist of figures.
  *
  * @author Claudius Korzen
  */
 public interface HasFigures {
   /**
-   * Returns the figures.
+   * Returns the figures of the element.
    * 
    * @return The figures.
    */
   List<PdfFigure> getFigures();
 
   /**
-   * Returns the first figure.
+   * Returns the first figure of the element.
    * 
    * @return The first figure.
    */
   PdfFigure getFirstFigure();
 
   /**
-   * Returns the last figure.
+   * Returns the last figure of the element.
    * 
    * @return The last figure.
    */
@@ -32,26 +32,26 @@ public interface HasFigures {
   // ==========================================================================
 
   /**
-   * Sets the given figures.
+   * Sets the figures of the element.
    * 
    * @param figures
-   *        The figures.
+   *        The figures to set.
    */
   void setFigures(List<PdfFigure> figures);
 
   /**
-   * Adds the given figures.
+   * Adds figures to the element.
    * 
    * @param figures
-   *        The figures.
+   *        The figures to add.
    */
   void addFigures(List<PdfFigure> figures);
 
   /**
-   * Adds the given figure.
+   * Adds the given figure to the element.
    * 
    * @param figure
-   *        The figure.
+   *        The figure to add.
    */
   void addFigure(PdfFigure figure);
 }

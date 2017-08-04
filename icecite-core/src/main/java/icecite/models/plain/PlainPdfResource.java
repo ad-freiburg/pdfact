@@ -2,6 +2,8 @@ package icecite.models.plain;
 
 import icecite.models.PdfResource;
 
+// TODO: Implement hashCode() and equals().
+
 /**
  * A plain implementation of {@link PdfResource}.
  * 
@@ -13,6 +15,8 @@ public class PlainPdfResource implements PdfResource {
    */
   protected String id;
 
+  // ==========================================================================
+  
   @Override
   public String getId() {
     return this.id;
@@ -30,6 +34,8 @@ public class PlainPdfResource implements PdfResource {
     return "PlainPdfResource()";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     return super.equals(other);

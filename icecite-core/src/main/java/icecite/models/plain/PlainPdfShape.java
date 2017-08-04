@@ -14,15 +14,17 @@ import icecite.models.PdfShape;
  */
 public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   /**
-   * The sequence number of this shape in the extraction order of PDF elements.
-   */
-  protected int sequenceNumber;
-
-  /**
    * The color of this shape.
    */
   protected PdfColor color;
 
+  // ==========================================================================
+
+  @Override
+  public PdfFeature getFeature() {
+    return PdfFeature.SHAPE;
+  }
+  
   // ==========================================================================
 
   @Override
@@ -38,18 +40,13 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.SHAPE;
-  }
-
-  // ==========================================================================
-
-  @Override
   public String toString() {
     return "PlainPdfShape(pos: " + getPosition() + ", color: " + this.color
         + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfShape) {
@@ -58,7 +55,6 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherShape.getPosition());
       builder.append(getColor(), otherShape.getColor());
-      builder.append(getFeature(), otherShape.getFeature());
 
       return builder.isEquals();
     }
@@ -70,7 +66,6 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
     builder.append(getColor());
-    builder.append(getFeature());
     return builder.hashCode();
   }
 }

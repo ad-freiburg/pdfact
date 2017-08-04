@@ -1,47 +1,47 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has words.
+ * An interface that is implemented by PDF elements that consist of words.
  *
  * @author Claudius Korzen
  */
-public interface HasWords extends HasCharacterStatistics {
+public interface HasWords extends HasCharacterStatistic {
   /**
-   * Returns the words.
+   * Returns the words of the element.
    * 
    * @return The words.
    */
   PdfWordList getWords();
 
   /**
-   * Returns the first word.
+   * Returns the first word of the element.
    * 
-   * @return The first word or null if there are no words.
+   * @return The first word.
    */
   PdfWord getFirstWord();
 
   /**
-   * Returns the last word.
+   * Returns the last word of the element.
    * 
-   * @return The last word or null if there are no words.
+   * @return The last word.
    */
   PdfWord getLastWord();
 
   // ==========================================================================
 
   /**
-   * Sets the given words.
+   * Sets the words of the element.
    * 
    * @param words
-   *        The words.
+   *        The words to set.
    */
   void setWords(PdfWordList words);
 
   /**
-   * Adds the given words.
+   * Adds words to the element.
    * 
    * @param words
-   *        The words.
+   *        The words to add.
    */
   void addWords(PdfWordList words);
 
@@ -49,7 +49,7 @@ public interface HasWords extends HasCharacterStatistics {
    * Adds the given word.
    * 
    * @param word
-   *        The word.
+   *        The word to add.
    */
   void addWord(PdfWord word);
 }

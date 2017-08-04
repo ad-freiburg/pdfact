@@ -12,22 +12,22 @@ public class IceciteSerializeException extends IceciteException {
   protected static final long serialVersionUID = -2555647293109903637L;
 
   /**
-   * The default status code of this exception.
+   * The default exit code of this exception.
    */
-  protected static final int STATUS_CODE = 30;
+  protected static final int EXIT_CODE = 30;
 
   /**
-   * The default constructor.
+   * Creates a new exception.
    * 
    * @param message
    *        The message of this exception.
    */
   public IceciteSerializeException(String message) {
-    super(STATUS_CODE, message);
+    super(EXIT_CODE, message);
   }
 
   /**
-   * The default constructor.
+   * Creates a new Exception.
    * 
    * @param message
    *        The message of this exception.
@@ -35,6 +35,6 @@ public class IceciteSerializeException extends IceciteException {
    *        The cause of this exception.
    */
   public IceciteSerializeException(String message, Throwable cause) {
-    super(STATUS_CODE, message, cause);
+    super(EXIT_CODE, message, cause);
   }
 }

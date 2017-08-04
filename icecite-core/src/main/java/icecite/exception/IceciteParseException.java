@@ -12,22 +12,22 @@ public class IceciteParseException extends IceciteException {
   protected static final long serialVersionUID = 3552957003556580621L;
 
   /**
-   * The default status code of this exception.
+   * The default exit code of this exception.
    */
-  protected static final int STATUS_CODE = 20;
+  protected static final int EXIT_CODE = 20;
 
   /**
-   * The default constructor.
+   * Creates a new exception.
    * 
    * @param message
    *        The message of this exception.
    */
   public IceciteParseException(String message) {
-    super(STATUS_CODE, message);
+    super(EXIT_CODE, message);
   }
 
   /**
-   * The default constructor.
+   * Creates a new exception.
    * 
    * @param message
    *        The message of this exception.
@@ -35,6 +35,6 @@ public class IceciteParseException extends IceciteException {
    *        The cause of this exception.
    */
   public IceciteParseException(String message, Throwable cause) {
-    super(STATUS_CODE, message, cause);
+    super(EXIT_CODE, message, cause);
   }
 }

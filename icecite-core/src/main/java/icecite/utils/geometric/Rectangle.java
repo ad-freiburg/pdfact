@@ -258,5 +258,16 @@ public abstract class Rectangle extends Geometric {
      */
     Rectangle create(@Assisted("minX") float minX, @Assisted("minY") float minY,
         @Assisted("maxX") float maxX, @Assisted("maxY") float maxY);
+
+    /**
+     * Computes the bounding boxes around the given objects.
+     * 
+     * @param objects
+     *        The objects to process.
+     * 
+     * @return An instance of Rectangle.
+     */
+    Rectangle computeBoundingBox(
+        @Assisted Iterable<? extends HasRectangle> objects);
   }
 }

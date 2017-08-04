@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterList.PdfCharacterListFactory;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -145,7 +145,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
           continue;
         }
 
-        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
         PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         String text = toNormalizedText(block);
 
@@ -180,7 +180,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
       return null;
     }
 
-    PdfCharacterStatistics pdfCharStats = pdf.getCharacterStatistics();
+    PdfCharacterStatistic pdfCharStats = pdf.getCharacterStatistic();
     PdfFontFace pdfFontFace = pdfCharStats.getMostCommonFontFace();
     if (pdfFontFace == null) {
       return null;
@@ -195,7 +195,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
           continue;
         }
 
-        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
         PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         if (fontFace == null) {
           continue;
@@ -213,7 +213,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
       }
     }
 
-    PdfCharacterStatistics stats = this.charStatistician.compute(headingChars);
+    PdfCharacterStatistic stats = this.charStatistician.compute(headingChars);
     return stats.getMostCommonFontFace();
   }
 

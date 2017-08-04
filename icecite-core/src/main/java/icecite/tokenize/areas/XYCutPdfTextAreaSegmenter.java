@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import icecite.models.PdfCharacter;
 import icecite.models.PdfCharacterList;
 import icecite.models.PdfCharacterStatistician;
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.tokenize.xycut.XYCut;
@@ -51,19 +51,19 @@ public class XYCutPdfTextAreaSegmenter extends XYCut
       List<PdfCharacterList> halves) {
     // Compute the statistics for the characters in the left half.
     PdfCharacterList left = halves.get(0);
-    PdfCharacterStatistics leftStats = this.charStatistician.compute(left);
+    PdfCharacterStatistic leftStats = this.charStatistician.compute(left);
 
     // Compute the statistics for the characters in the right half.
     PdfCharacterList right = halves.get(1);
-    PdfCharacterStatistics rightStats = this.charStatistician.compute(right);
+    PdfCharacterStatistic rightStats = this.charStatistician.compute(right);
 
     // Compute the (fictive) lane between the left and right half.
     float laneMinX = leftStats.getLargestMaxX();
     float laneMaxX = rightStats.getSmallestMinX();
     float laneWidth = laneMaxX - laneMinX;
 
-    PdfCharacterStatistics pdfCharStats = pdf.getCharacterStatistics();
-    PdfCharacterStatistics pageCharStats = page.getCharacterStatistics();
+    PdfCharacterStatistic pdfCharStats = pdf.getCharacterStatistic();
+    PdfCharacterStatistic pageCharStats = page.getCharacterStatistic();
     float pdfCharWidth = pdfCharStats.getMostCommonWidth();
     float pageCharWidth = pageCharStats.getMostCommonWidth();
 
@@ -87,11 +87,11 @@ public class XYCutPdfTextAreaSegmenter extends XYCut
       List<PdfCharacterList> halves) {
     // Compute the statistics for the characters in the upper half.
     PdfCharacterList upper = halves.get(0);
-    PdfCharacterStatistics upperStats = this.charStatistician.compute(upper);
+    PdfCharacterStatistic upperStats = this.charStatistician.compute(upper);
 
     // Compute the statistics for the characters in the lower half.
     PdfCharacterList lower = halves.get(1);
-    PdfCharacterStatistics lowerStats = this.charStatistician.compute(lower);
+    PdfCharacterStatistic lowerStats = this.charStatistician.compute(lower);
 
     // Compute the (fictive) lane between the lower and upper half.
     float laneMinY = lowerStats.getLargestMaxY();
@@ -103,8 +103,8 @@ public class XYCutPdfTextAreaSegmenter extends XYCut
       return -1;
     }
 
-    float pdfCharHeight = pdf.getCharacterStatistics().getMostCommonHeight();
-    float pageCharHeight = page.getCharacterStatistics().getMostCommonHeight();
+    float pdfCharHeight = pdf.getCharacterStatistic().getMostCommonHeight();
+    float pageCharHeight = page.getCharacterStatistic().getMostCommonHeight();
 
     // Don't allow the lane, if it is too shallow.
     if (laneHeight < Math.min(pdfCharHeight, pageCharHeight)) {
@@ -134,8 +134,8 @@ public class XYCutPdfTextAreaSegmenter extends XYCut
    * @return True if there is such a character pair, false otherwise.
    */
   protected boolean separatesConsecutiveCharacters(PdfCharacterList left,
-      PdfCharacterStatistics leftStats, PdfCharacterList right,
-      PdfCharacterStatistics rightStats) {
+      PdfCharacterStatistic leftStats, PdfCharacterList right,
+      PdfCharacterStatistic rightStats) {
     float largestMaxX = leftStats.getLargestMaxX();
     Set<PdfCharacter> leftChars = new HashSet<>();
     for (PdfCharacter character : left) {

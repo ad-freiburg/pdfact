@@ -2,7 +2,7 @@ package icecite.semanticize.plain.modules;
 
 import java.util.List;
 
-import icecite.models.PdfCharacterStatistics;
+import icecite.models.PdfCharacterStatistic;
 import icecite.models.PdfDocument;
 import icecite.models.PdfFontFace;
 import icecite.models.PdfPage;
@@ -27,7 +27,7 @@ public class BodyTextModule implements PdfTextSemanticizerModule {
     }
 
     // Compute the most common font face in the PDF document.
-    PdfCharacterStatistics pdfCharStats = pdf.getCharacterStatistics();
+    PdfCharacterStatistic pdfCharStats = pdf.getCharacterStatistic();
     PdfFontFace pdfFontFace = pdfCharStats.getMostCommonFontFace();
 
     for (PdfPage page : pages) {
@@ -46,7 +46,7 @@ public class BodyTextModule implements PdfTextSemanticizerModule {
 
         // The text block is a member of the body text if its font face is
         // equal to the most common font face.
-        PdfCharacterStatistics blockCharStats = block.getCharacterStatistics();
+        PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
         PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
         if (fontFace == pdfFontFace) {
           block.setRole(PdfRole.BODY_TEXT);

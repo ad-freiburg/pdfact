@@ -1,7 +1,8 @@
 package icecite.models;
 
 /**
- * A font face, that is a pair of font and font size.
+ * A font face in a PDF document - that is a pair consisting of a font and a
+ * font size.
  * 
  * @author Claudius Korzen
  */
@@ -47,14 +48,14 @@ public interface PdfFontFace {
    */
   public interface PdfFontFaceFactory {
     /**
-     * Creates a new PdfFontFace.
+     * Creates a new instance of PdfFontFace.
      * 
      * @param font
      *        The font.
      * @param fontSize
      *        The font size.
      * 
-     * @return An instance of {@link PdfFontFace}.
+     * @return A new instance of {@link PdfFontFace}.
      */
     PdfFontFace create(PdfFont font, float fontSize);
   }

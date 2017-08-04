@@ -9,7 +9,7 @@ import icecite.utils.counter.FloatCounter;
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextLineStatistics {
+public interface PdfTextLineStatistic {
   /**
    * Returns the frequencies of line pitches.
    * 
@@ -71,12 +71,12 @@ public interface PdfTextLineStatistics {
   /**
    * A factory to create instances of PdfTextLineStats.
    */
-  public interface PdfTextLineStatisticsFactory {
+  public interface PdfTextLineStatisticFactory {
     /**
      * Creates a PdfTextLineStats.
      * 
-     * @return An instance of {@link PdfTextLineStatistics}.
+     * @return An instance of {@link PdfTextLineStatistic}.
      */
-    PdfTextLineStatistics create();
+    PdfTextLineStatistic create();
   }
 }

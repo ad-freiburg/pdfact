@@ -1,36 +1,36 @@
 package icecite.models;
 
 /**
- * An interface that declares that the implementing object has characters.
+ * An interface that is implemented by PDF elements that consist of characters.
  *
  * @author Claudius Korzen
  */
-public interface HasCharacters extends HasCharacterStatistics {
+public interface HasCharacters extends HasCharacterStatistic {
   /**
-   * Returns the list of characters.
+   * Returns the characters.
    * 
-   * @return The list of characters.
+   * @return The characters.
    */
   PdfCharacterList getCharacters();
 
   /**
    * Returns the first character.
    * 
-   * @return the first character.
+   * @return The first character.
    */
   PdfCharacter getFirstCharacter();
 
   /**
    * Returns the last character.
    * 
-   * @return the last character.
+   * @return The last character.
    */
   PdfCharacter getLastCharacter();
 
   // ==========================================================================
 
   /**
-   * Sets the given characters.
+   * Sets the characters of the element.
    * 
    * @param characters
    *        The characters to set.
@@ -38,7 +38,7 @@ public interface HasCharacters extends HasCharacterStatistics {
   void setCharacters(PdfCharacterList characters);
 
   /**
-   * Adds the given characters.
+   * Adds characters to the element.
    * 
    * @param characters
    *        The characters to add.
@@ -46,7 +46,7 @@ public interface HasCharacters extends HasCharacterStatistics {
   void addCharacters(PdfCharacterList characters);
 
   /**
-   * Adds the given character.
+   * Adds the given character to the element.
    * 
    * @param character
    *        The character to add.

@@ -3,15 +3,17 @@ package icecite.models.plain;
 import java.util.Map;
 
 import icecite.models.PdfFontFace;
-import icecite.models.PdfTextLineStatistics;
+import icecite.models.PdfTextLineStatistic;
 import icecite.utils.counter.FloatCounter;
 
+// TODO: Implement hashCode() and equals().
+
 /**
- * A plain implementation of {@link PdfTextLineStatistics}.
+ * A plain implementation of {@link PdfTextLineStatistic}.
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfTextLineStatistics implements PdfTextLineStatistics {
+public class PlainPdfTextLineStatistics implements PdfTextLineStatistic {
   /**
    * The most common line pitches per font faces.
    */

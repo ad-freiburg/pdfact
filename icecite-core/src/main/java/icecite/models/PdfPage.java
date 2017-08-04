@@ -8,14 +8,14 @@ package icecite.models;
 public interface PdfPage extends HasCharacters, HasFigures, HasShapes,
     HasTextBlocks {
   /**
-   * Returns the number of this page in the PDF document.
+   * Returns the page number.
    * 
    * @return The page number.
    */
   int getPageNumber();
 
   /**
-   * Sets the number of this page in the PDF document.
+   * Sets the page number.
    * 
    * @param pageNumber
    *        The page number.
@@ -31,19 +31,19 @@ public interface PdfPage extends HasCharacters, HasFigures, HasShapes,
    */
   public interface PdfPageFactory {
     /**
-     * Creates a new PDF page.
+     * Creates a new instance of PdfPage.
      * 
-     * @return An instance of {@link PdfPage}.
+     * @return A new instance of {@link PdfPage}.
      */
     PdfPage create();
 
     /**
-     * Creates a new PDF page.
+     * Creates a new instance of PdfPage.
      * 
      * @param pageNum
-     *        The number of the page in the PDF document.
+     *        The page number.
      * 
-     * @return An instance of {@link PdfPage}.
+     * @return A new instance of {@link PdfPage}.
      */
     PdfPage create(int pageNum);
   }

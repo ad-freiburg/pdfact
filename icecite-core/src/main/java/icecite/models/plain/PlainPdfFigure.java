@@ -12,6 +12,9 @@ import icecite.models.PdfFigure;
  * @author Claudius Korzen
  */
 public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
+  
+  // ==========================================================================
+
   @Override
   public PdfFeature getFeature() {
     return PdfFeature.FIGURE;
@@ -24,6 +27,8 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
     return "PlainPdfFigure(pos: " + getPosition() + ")";
   }
 
+  // ==========================================================================
+  
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfFigure) {
@@ -31,8 +36,6 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherFigure.getPosition());
-      builder.append(getFeature(), otherFigure.getFeature());
-
       return builder.isEquals();
     }
     return false;
@@ -42,7 +45,6 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPosition());
-    builder.append(getFeature());
     return builder.hashCode();
   }
 }

@@ -1,6 +1,6 @@
 package icecite.models;
 
-// TODO: Add some more properties for a figure.
+// TODO: Add some more properties to a figure.
 
 /**
  * A figure in a PDF document.
@@ -15,9 +15,9 @@ public interface PdfFigure extends PdfElement {
    */
   public interface PdfFigureFactory {
     /**
-     * Creates a new PdfFigure.
+     * Creates a new instance of PdfFigure.
      * 
-     * @return An instance of {@link PdfFigure}.
+     * @return A new instance of {@link PdfFigure}.
      */
     PdfFigure create();
   }

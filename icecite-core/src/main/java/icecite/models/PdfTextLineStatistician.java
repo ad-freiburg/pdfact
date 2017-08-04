@@ -3,38 +3,28 @@ package icecite.models;
 import java.util.List;
 
 /**
- * A class that computes statistics about text lines.
+ * A class that computes text line statistics.
  * 
  * @author Claudius Korzen
  */
 public interface PdfTextLineStatistician {
   /**
-   * Computes statistics about text lines.
+   * Computes the text line statistic for the given text lines.
    * 
    * @param textLines
    *        The text lines to process.
    * 
+   * @return The computed text line statistics.
+   */
+  PdfTextLineStatistic compute(PdfTextLineList textLines);
+
+  /**
+   * Combines the given list of text line statistics to a single statistic.
+   * 
+   * @param stats
+   *        The statistics to combine.
+   * 
    * @return The computed statistics.
    */
-  PdfTextLineStatistics compute(PdfTextLineList textLines);
-
-  /**
-   * Aggregates the given text line statistics.
-   * 
-   * @param statistics
-   *        The statistics to aggregate.
-   * 
-   * @return The aggregated statistics.
-   */
-  PdfTextLineStatistics aggregate(PdfTextLineStatistics... statistics);
-
-  /**
-   * Aggregates the given text line statistics.
-   * 
-   * @param statistics
-   *        The statistics to aggregate.
-   * 
-   * @return The aggregated statistics.
-   */
-  PdfTextLineStatistics aggregate(List<PdfTextLineStatistics> statistics);
+  PdfTextLineStatistic combine(List<? extends HasTextLineStatistic> stats);
 }
