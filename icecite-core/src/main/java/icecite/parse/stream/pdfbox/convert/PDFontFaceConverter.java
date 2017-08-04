@@ -10,7 +10,8 @@ import icecite.models.PdfFontFace;
 import icecite.models.PdfFontFace.PdfFontFaceFactory;
 
 /**
- * A converter that converts PDFont objects into PdfFont objects.
+ * A converter that converts PDFont objects and font size to PdfFontFace
+ * objects.
  * 
  * @author Claudius Korzen
  */

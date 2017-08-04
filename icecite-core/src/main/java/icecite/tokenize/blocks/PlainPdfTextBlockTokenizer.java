@@ -104,7 +104,8 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   }
 
   @Override
-  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page, PdfTextLineList lines) {
+  public List<PdfTextBlock> tokenize(PdfDocument pdf, PdfPage page,
+      PdfTextLineList lines) {
     // Then, identify the text blocks from the text lines.
     return identifyTextBlocks(pdf, page, lines);
   }

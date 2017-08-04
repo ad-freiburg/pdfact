@@ -147,7 +147,6 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   }
 
   // ==========================================================================
-  // Getter methods.
 
   @Override
   public boolean isTranslateLigatures() {
@@ -155,16 +154,15 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   }
 
   @Override
-  public boolean isTranslateDiacritics() {
-    return this.translateDiacritics;
+  public void setIsTranslateLigatures(boolean translateLigatures) {
+    this.translateLigatures = translateLigatures;
   }
 
   // ==========================================================================
-  // Setter methods.
 
   @Override
-  public void setIsTranslateLigatures(boolean translateLigatures) {
-    this.translateLigatures = translateLigatures;
+  public boolean isTranslateDiacritics() {
+    return this.translateDiacritics;
   }
 
   @Override

@@ -4,20 +4,19 @@ import icecite.models.PdfCharacter;
 import icecite.parse.translate.DiacriticsTranslator;
 
 /**
- * A class with methods to decide whether to filter PDF characters while
- * parsing PDF files.
+ * A class to filter out certain PDF characters while parsing PDF files.
  * 
  * @author Claudius Korzen
  */
 public class PdfCharacterFilter {
   /**
-   * Returns true if the given PDF character should be filtered on parsing a
-   * PDF document.
+   * Checks if the given characters should be filtered out.
    * 
    * @param character
-   *        The character to process.
-   * @return true if the given PDF character should be ignored while parsing a
-   *         PDF document; false otherwise.
+   *        The character to check.
+   * 
+   * @return True if the given PDF character should be filtered out; False
+   *         otherwise.
    */
   public static boolean filterPdfCharacter(PdfCharacter character) {
     // Ignore the character, if it is null.

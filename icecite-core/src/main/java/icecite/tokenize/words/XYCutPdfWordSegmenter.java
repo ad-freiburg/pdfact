@@ -6,15 +6,11 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import icecite.models.PdfCharacterList;
-import icecite.models.PdfCharacterStatistician;
 import icecite.models.PdfCharacterStatistic;
+import icecite.models.PdfCharacterStatistician;
 import icecite.models.PdfDocument;
 import icecite.models.PdfPage;
 import icecite.models.PdfPosition.PdfPositionFactory;
-import icecite.models.PdfWord;
-import icecite.models.PdfWord.PdfWordFactory;
-import icecite.models.PdfWordList;
-import icecite.models.PdfWordList.PdfWordListFactory;
 import icecite.tokenize.xycut.XYCut;
 
 /**
@@ -23,16 +19,6 @@ import icecite.tokenize.xycut.XYCut;
  * @author Claudius Korzen
  */
 public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
-  /**
-   * The factory to create instances of {@link PdfWordList}.
-   */
-  protected PdfWordListFactory wordListFactory;
-  
-  /**
-   * The factory to create instances of {@link PdfWord}.
-   */
-  protected PdfWordFactory wordFactory;
-  
   /**
    * The factory to create instances of {@link PdfPositionFactory}.
    */
@@ -53,20 +39,13 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
    *        The statistician to compute statistics about characters.
    * @param positionFactory
    *        The factory to create instance of PdfPosition.
-   * @param wordListFactory
-   *        The factory to create instance of {@link PdfWordList}.
-   * @param wordFactory
-   *        The factory to create instance of {@link PdfWord}.
    */
   @Inject
   public XYCutPdfWordSegmenter(PdfCharacterStatistician characterStatistician,
-      PdfPositionFactory positionFactory, PdfWordListFactory wordListFactory,
-      PdfWordFactory wordFactory) {
+      PdfPositionFactory positionFactory) {
     super();
     this.charStatistician = characterStatistician;
     this.positionFactory = positionFactory;
-    this.wordListFactory = wordListFactory;
-    this.wordFactory = wordFactory;
   }
 
   // ==========================================================================

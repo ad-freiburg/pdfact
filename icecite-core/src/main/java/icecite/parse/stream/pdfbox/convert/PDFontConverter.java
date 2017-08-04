@@ -16,18 +16,18 @@ import icecite.models.PdfFont;
 import icecite.models.PdfFont.PdfFontFactory;
 
 /**
- * A converter that converts PDFont objects into PdfFont objects.
+ * A converter that converts PDFont objects to PdfFont objects.
  * 
  * @author Claudius Korzen
  */
 public class PDFontConverter {
   /**
-   * The factory to create instances of PdfFont.
+   * The factory to create instances of {@link PdfFont}.
    */
   protected PdfFontFactory fontFactory;
 
   /**
-   * The already known PdfFont objects per name.
+   * The already known fonts per name.
    */
   protected Map<String, PdfFont> knownFonts;
 
@@ -38,7 +38,7 @@ public class PDFontConverter {
    * Creates a new PDFontConverter.
    * 
    * @param fontFactory
-   *        The factory to create instances of PdfFont.
+   *        The factory to create instances of {@link PdfFont}.
    */
   @Inject
   public PDFontConverter(PdfFontFactory fontFactory) {

@@ -13,18 +13,18 @@ import icecite.models.PdfColor;
 import icecite.models.PdfColor.PdfColorFactory;
 
 /**
- * A converter that converts PDColor objects into PdfColor objects.
+ * A converter that converts PDColor objects to PdfColor objects.
  * 
  * @author Claudius Korzen
  */
 public class PDColorConverter {
   /**
-   * The factory to create instances of PdfColor.
+   * The factory to create instances of {@link PdfColor}.
    */
   protected PdfColorFactory colorFactory;
 
   /**
-   * The already known PdfColor objects per name.
+   * The already known colors per name.
    */
   protected Map<String, PdfColor> knownColors;
 
@@ -35,7 +35,7 @@ public class PDColorConverter {
    * Creates a new PDColorConverter.
    * 
    * @param colorFactory
-   *        The factory to create instances of PdfColor.
+   *        The factory to create instances of {@link PdfColor}.
    */
   @Inject
   public PDColorConverter(PdfColorFactory colorFactory) {
@@ -46,7 +46,7 @@ public class PDColorConverter {
   // ==========================================================================
 
   /**
-   * Converts the given PDColor object to a related PdfColor object.
+   * Converts the given PDColor object to a PdfColor object.
    * 
    * @param color
    *        The color to convert.
@@ -144,6 +144,7 @@ public class PDColorConverter {
     try {
       return colorSpace.toRGB(color.getComponents());
     } catch (Exception e) {
+      // TODO: Handle the exception.
       return null;
     }
   }

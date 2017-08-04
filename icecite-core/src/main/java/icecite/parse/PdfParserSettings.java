@@ -1,5 +1,7 @@
 package icecite.parse;
 
+// TODO: Use this settings more extensive.
+
 /**
  * Some settings for the PDF parser.
  * 

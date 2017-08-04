@@ -148,6 +148,6 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   protected void computeTextLineStatistics(PdfDocument pdf) {
     List<PdfPage> pages = pdf.getPages();
     // Compute the text line statistics for the whole PDF document.
-    pdf.setTextLineStatistic(this.textLineStatistician.aggregate(pages));
+    pdf.setTextLineStatistic(this.textLineStatistician.combine(pages));
   }
 }

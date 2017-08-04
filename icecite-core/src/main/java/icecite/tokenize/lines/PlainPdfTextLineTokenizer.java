@@ -41,7 +41,7 @@ public class PlainPdfTextLineTokenizer implements PdfTextLineTokenizer {
   protected PdfTextAreaSegmenter textAreaSegmenter;
 
   /**
-   * The text line classifier;
+   * The text line classifier.
    */
   protected PdfTextLineSegmenter lineSegmenter;
 
