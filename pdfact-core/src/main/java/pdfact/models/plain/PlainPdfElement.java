@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.models.PdfElement;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfPosition;
 import pdfact.utils.geometric.Rectangle;
 
@@ -22,7 +22,7 @@ public class PlainPdfElement implements PdfElement {
   // ==========================================================================
   
   @Override
-  public PdfFeature getFeature() {
+  public PdfTextUnit getTextUnit() {
     return null;
   }
   

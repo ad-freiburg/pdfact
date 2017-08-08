@@ -309,10 +309,6 @@ public class PlainPdfPage implements PdfPage {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getPageNumber());
-    builder.append(getCharacters());
-    builder.append(getFigures());
-    builder.append(getShapes());
-    builder.append(getTextBlocks());
     return builder.hashCode();
   }
 }

@@ -2,7 +2,7 @@ package pdfact.parse.stream;
 
 import java.io.File;
 
-import pdfact.exception.IceciteException;
+import pdfact.exception.PdfActException;
 
 /**
  * A PDF stream parser.
@@ -15,10 +15,10 @@ public interface PdfStreamParser {
    *
    * @param pdf
    *        The PDF file to parse.
-   * @throws IceciteException
+   * @throws PdfActException
    *         If something went wrong while parsing the PDF:
    */
-  void parsePdf(File pdf) throws IceciteException;
+  void parsePdf(File pdf) throws PdfActException;
 
   // ==========================================================================
 

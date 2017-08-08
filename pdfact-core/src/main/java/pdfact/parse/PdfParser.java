@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.exception.IceciteException;
+import pdfact.exception.PdfActException;
 import pdfact.models.PdfDocument;
 
 // TODO: Add a feature to read "invisible" tokens -> Needed for "synctex"
@@ -23,10 +23,10 @@ public interface PdfParser {
    *        The PDF file to parse, given as Path object.
    * @return An instance of PdfDocument that contains the characters, figures
    *         and shapes per pages.
-   * @throws IceciteException
+   * @throws PdfActException
    *         If something went wrong while parsing the PDF file.
    */
-  PdfDocument parsePdf(Path pdf) throws IceciteException;
+  PdfDocument parsePdf(Path pdf) throws PdfActException;
 
   /**
    * Parses the given PDF file.
@@ -35,10 +35,10 @@ public interface PdfParser {
    *        The PDF file to parse, given as File object.
    * @return An instance of PdfDocument that contains the characters, figures
    *         and shapes per pages.
-   * @throws IceciteException
+   * @throws PdfActException
    *         If something went wrong while parsing the PDF file.
    */
-  PdfDocument parsePdf(File pdf) throws IceciteException;
+  PdfDocument parsePdf(File pdf) throws PdfActException;
 
   // ==========================================================================
 

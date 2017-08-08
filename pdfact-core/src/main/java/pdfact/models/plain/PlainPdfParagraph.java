@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfParagraph;
 import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
@@ -65,8 +65,8 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.PARAGRAPH;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.PARAGRAPH;
   }
 
   // ==========================================================================

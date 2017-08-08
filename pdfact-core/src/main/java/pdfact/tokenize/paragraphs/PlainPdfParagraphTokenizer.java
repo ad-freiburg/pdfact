@@ -64,6 +64,9 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     }
 
     List<PdfParagraph> paragraphs = identifyParagraphs(pdf);
+    // TODO
+    pdf.setParagraphs(paragraphs);
+    
     composeTexts(pdf, paragraphs);
 
     return paragraphs;
@@ -85,11 +88,11 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
     for (PdfPage page : pdf.getPages()) {
       textBlocks.addAll(page.getTextBlocks());
     }
-
+    
     // Identify the paragraphs from the text blocks.
     for (int i = 0; i < textBlocks.size(); i++) {
       PdfTextBlock block = textBlocks.get(i);
-
+      
       if (block.getParentPdfParagraph() != null) {
         // The block was already added to a paragraph. Ignore it.
         continue;
@@ -97,6 +100,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
       // Create a new paragraph.
       PdfParagraph paragraph = this.paragraphFactory.create();
+      paragraph.setRole(block.getRole());
       paragraph.addTextBlock(block);
       block.setParentPdfParagraph(paragraph);
 
@@ -113,11 +117,13 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
           }
           // Add the block to the existing paragraph.
           paragraph.addTextBlock(otherBlock);
+          paragraph.setRole(block.getRole());
           otherBlock.setParentPdfParagraph(paragraph);
         }
       }
       paragraphs.add(paragraph);
     }
+    
     return paragraphs;
   }
 

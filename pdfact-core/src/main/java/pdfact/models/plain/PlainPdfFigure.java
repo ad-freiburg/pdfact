@@ -3,7 +3,7 @@ package pdfact.models.plain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfFigure;
 
 /**
@@ -16,8 +16,8 @@ public class PlainPdfFigure extends PlainPdfElement implements PdfFigure {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.FIGURE;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.FIGURE;
   }
 
   // ==========================================================================

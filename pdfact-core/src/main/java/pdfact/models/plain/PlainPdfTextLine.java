@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfWord;
 import pdfact.models.PdfWordList;
@@ -55,8 +55,8 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.TEXT_LINE;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.TEXT_LINE;
   }
 
   // ==========================================================================

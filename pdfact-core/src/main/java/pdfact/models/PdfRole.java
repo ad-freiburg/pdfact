@@ -99,33 +99,33 @@ public enum PdfRole {
   // ==========================================================================
 
   /**
-   * The identifier of this role.
+   * The name of this role.
    */
-  protected String identifier;
+  protected String name;
 
   /**
    * Creates a new PDF role.
    * 
-   * @param identifier
-   *        The identifier of the role.
+   * @param name
+   *        The name of the role.
    */
-  PdfRole(String identifier) {
-    this.identifier = identifier;
+  PdfRole(String name) {
+    this.name = name;
   }
 
   /**
-   * Returns the identifier of this role.
+   * Returns the name of this role.
    * 
-   * @return The identifier of this role.
+   * @return The name of this role.
    */
-  public String getIdentifier() {
-    return this.identifier;
+  public String getName() {
+    return this.name;
   }
 
   // ==========================================================================
 
   /**
-   * The roles by identifier.
+   * The roles by names.
    */
   protected static Map<String, PdfRole> roles;
 
@@ -134,45 +134,45 @@ public enum PdfRole {
 
     // Fill the map of roles per name.
     for (PdfRole role : values()) {
-      roles.put(role.getIdentifier(), role);
+      roles.put(role.getName(), role);
     }
   }
 
   /**
-   * Returns a set of the identifiers of all roles.
+   * Returns a set of the names of all roles.
    * 
-   * @return A set of the identifiers of all roles.
+   * @return A set of the names of all roles.
    */
-  public static Set<String> getIdentifiers() {
+  public static Set<String> getNames() {
     return roles.keySet();
   }
 
   /**
-   * Checks if the given identifier is a valid identifier of an existing role.
+   * Checks if the given name is a valid name of an existing role.
    * 
-   * @param identifier
-   *        The identifier to check.
+   * @param name
+   *        The name to check.
    *
-   * @return True, if the given identifier is a valid name of an existing role.
+   * @return True, if the given name is a valid name of an existing role.
    */
-  public static boolean isValidRole(String identifier) {
-    return roles.containsKey(identifier.toLowerCase());
+  public static boolean isValidRole(String name) {
+    return roles.containsKey(name.toLowerCase());
   }
 
   /**
-   * Returns the roles that are associated with the given identifierss.
+   * Returns the roles that are associated with the given names.
    * 
-   * @param identifiers
-   *        The identifiers of the roles to fetch.
+   * @param names
+   *        The names of the roles to fetch.
    * @return A set of the fetched roles.
    */
-  public static Set<PdfRole> getRoles(String... identifiers) {
-    if (identifiers == null || identifiers.length == 0) {
+  public static Set<PdfRole> getRoles(String... names) {
+    if (names == null || names.length == 0) {
       return null;
     }
 
     Set<PdfRole> roles = new HashSet<>();
-    for (String name : identifiers) {
+    for (String name : names) {
       PdfRole role = getRole(name);
       if (role != null) {
         roles.add(role);
@@ -182,16 +182,16 @@ public enum PdfRole {
   }
 
   /**
-   * Returns the role that is associated with the given identifier.
+   * Returns the role that is associated with the given name.
    * 
-   * @param identifier
-   *        The identifier of the role to fetch.
-   * @return The role that is associated with the given identifier.
+   * @param name
+   *        The name of the role to fetch.
+   * @return The role that is associated with the given name.
    */
-  public static PdfRole getRole(String identifier) {
-    if (!isValidRole(identifier)) {
-      throw new IllegalArgumentException(identifier + " isn't a valid role.");
+  public static PdfRole getRole(String name) {
+    if (!isValidRole(name)) {
+      throw new IllegalArgumentException(name + " isn't a valid role.");
     }
-    return roles.get(identifier.toLowerCase());
+    return roles.get(name.toLowerCase());
   }
 }

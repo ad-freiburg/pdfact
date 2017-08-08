@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.models.PdfColor;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfShape;
 
 /**
@@ -21,8 +21,8 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.SHAPE;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.SHAPE;
   }
   
   // ==========================================================================

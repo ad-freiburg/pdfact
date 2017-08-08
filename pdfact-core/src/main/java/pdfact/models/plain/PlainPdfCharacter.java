@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfColor;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfFontFace;
 
 /**
@@ -37,8 +37,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.CHARACTER;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.CHARACTER;
   }
 
   // ==========================================================================

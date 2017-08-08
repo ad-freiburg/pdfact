@@ -27,8 +27,8 @@ import org.apache.pdfbox.util.Matrix;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.exception.IceciteException;
-import pdfact.exception.IceciteParseException;
+import pdfact.exception.PdfActException;
+import pdfact.exception.PdfActParseException;
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfFigure;
 import pdfact.models.PdfPage;
@@ -166,10 +166,10 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
    * 
    * @param pdf
    *        The PDF file to process.
-   * @throws IceciteException
+   * @throws PdfActException
    *         if something went wrong on processing the PDF file.
    */
-  public void parsePdf(File pdf) throws IceciteException {
+  public void parsePdf(File pdf) throws PdfActException {
     try (PDDocument doc = PDDocument.load(pdf)) {
       handlePdfFileStart(pdf);
       for (int i = 0; i < doc.getPages().getCount(); i++) {
@@ -177,7 +177,7 @@ public class PdfBoxPdfStreamParser implements PdfStreamParser {
       }
       handlePdfFileEnd(pdf);
     } catch (IOException e) {
-      throw new IceciteParseException("Couldn't parse the PDF.", e);
+      throw new PdfActParseException("Couldn't parse the PDF.", e);
     }
   }
 

@@ -12,5 +12,5 @@ public interface PdfElement extends HasPosition {
    * 
    * @return The feature of this PDF element.
    */
-  PdfFeature getFeature();
+  PdfTextUnit getTextUnit();
 }

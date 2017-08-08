@@ -9,7 +9,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfCharacterList;
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfFeature;
+import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfWord;
 import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
 
@@ -71,8 +71,8 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public PdfFeature getFeature() {
-    return PdfFeature.WORD;
+  public PdfTextUnit getTextUnit() {
+    return PdfTextUnit.WORD;
   }
 
   // ==========================================================================

@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.exception.IceciteException;
+import pdfact.exception.PdfActException;
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfDocument;
 import pdfact.models.PdfFigure;
@@ -131,12 +131,12 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   // Parse methods.
 
   @Override
-  public PdfDocument parsePdf(Path pdf) throws IceciteException {
+  public PdfDocument parsePdf(Path pdf) throws PdfActException {
     return parsePdf(pdf != null ? pdf.toFile() : null);
   }
 
   @Override
-  public PdfDocument parsePdf(File pdf) throws IceciteException {
+  public PdfDocument parsePdf(File pdf) throws PdfActException {
     PdfStreamParser streamParser = this.streamParserFactory.create(this);
 
     // Parse the PDF file.
