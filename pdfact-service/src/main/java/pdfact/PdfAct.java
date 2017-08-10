@@ -1,6 +1,8 @@
 package pdfact;
 
-import static pdfact.PdfActSettings.*;
+import static pdfact.PdfActSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+import static pdfact.PdfActSettings.DEFAULT_SERIALIZATION_FORMAT;
+import static pdfact.PdfActSettings.DEFAULT_TEXT_UNITS_TO_INCLUDE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,19 +15,19 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import pdfact.exception.PdfActException;
 import pdfact.exception.PdfActSerializeException;
 import pdfact.exception.PdfActValidateException;
 import pdfact.exception.PdfActVisualizeException;
+import pdfact.model.PdfSerializationFormat;
 import pdfact.models.PdfDocument;
 import pdfact.models.PdfRole;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.parse.PdfParser.PdfParserFactory;
 import pdfact.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
-import pdfact.serialize.PdfActSerializationFormat;
 import pdfact.serialize.PdfSerializer;
+import pdfact.serialize.PdfSerializer.PdfSerializerFactory;
 import pdfact.tokenize.PdfTextTokenizer.PdfTextTokenizerFactory;
 import pdfact.tokenize.paragraphs.PdfParagraphTokenizer.PdfParagraphTokenizerFactory;
 import pdfact.visualize.PdfVisualizer;
@@ -40,7 +42,7 @@ public class PdfAct extends PdfActCore {
   /**
    * The available serializers, per serialization formats.
    */
-  protected Map<PdfActSerializationFormat, Provider<PdfSerializer>> serializers;
+  protected Map<PdfSerializationFormat, PdfSerializerFactory> serializerFactories;
 
   /**
    * The factory to create instances of {@link PdfVisualizer}.
@@ -51,7 +53,7 @@ public class PdfAct extends PdfActCore {
    * The boolean flag to indicate if the PDF document should be serialized.
    */
   protected boolean isSerializationScheduled;
-  
+
   /**
    * The serialization target, given as a file.
    */
@@ -65,13 +67,13 @@ public class PdfAct extends PdfActCore {
   /**
    * The serialization format.
    */
-  protected PdfActSerializationFormat serializationFormat;
+  protected PdfSerializationFormat serializationFormat;
 
   /**
    * The boolean flag to indicate if the PDF document should be visualized.
    */
   protected boolean isVisualizationScheduled;
-  
+
   /**
    * The visualization target, given as a file.
    */
@@ -85,12 +87,12 @@ public class PdfAct extends PdfActCore {
   /**
    * The text units to be included in serialization and visualization.
    */
-  protected Set<PdfTextUnit> textUnitFilters;
+  protected Set<PdfElementType> units;
 
   /**
    * The roles of text units to be included in serialization and visualization.
    */
-  protected Set<PdfRole> roleFilters;
+  protected Set<PdfRole> roles;
 
   // ==========================================================================
 
@@ -105,8 +107,8 @@ public class PdfAct extends PdfActCore {
    *        The factory to create instances of PdfTextSemanticizer.
    * @param paragraphTokenizerFactory
    *        The factory to create instances of PdfParagraphTokenizer.
-   * @param serializers
-   *        The available serializers, per serialization formats.
+   * @param serializerFactories
+   *        The factories to create instances of PdfSerializer, by formats.
    * @param visualizerFactory
    *        The factory to create instances of {@link PdfVisualizer}.
    */
@@ -116,15 +118,15 @@ public class PdfAct extends PdfActCore {
       PdfTextTokenizerFactory tokenizerFactory,
       PdfTextSemanticizerFactory semanticizerFactory,
       PdfParagraphTokenizerFactory paragraphTokenizerFactory,
-      Map<PdfActSerializationFormat, Provider<PdfSerializer>> serializers,
+      Map<PdfSerializationFormat, PdfSerializerFactory> serializerFactories,
       PdfVisualizerFactory visualizerFactory) {
     super(parserFactory, tokenizerFactory, semanticizerFactory,
         paragraphTokenizerFactory);
-    this.serializers = serializers;
+    this.serializerFactories = serializerFactories;
     this.visualizerFactory = visualizerFactory;
     this.serializationFormat = DEFAULT_SERIALIZATION_FORMAT;
-    this.textUnitFilters = DEFAULT_TEXT_UNITS_TO_INCLUDE;
-    this.roleFilters = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+    this.units = DEFAULT_TEXT_UNITS_TO_INCLUDE;
+    this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
 
   @Override
@@ -134,7 +136,7 @@ public class PdfAct extends PdfActCore {
     if (isSerializationScheduled()) {
       serialize(pdf);
     }
-    
+
     if (isVisualizationScheduled()) {
       visualize(pdf);
     }
@@ -143,7 +145,7 @@ public class PdfAct extends PdfActCore {
   }
 
   // ==========================================================================
-  
+
   /**
    * Serializes the given PDF document to the given target file.
    * 
@@ -162,24 +164,24 @@ public class PdfAct extends PdfActCore {
     }
 
     // Check if a (validated) serialization format is given.
-    PdfActSerializationFormat format = this.serializationFormat;
+    PdfSerializationFormat format = this.serializationFormat;
     if (format == null) {
       throw new PdfActValidateException("No serialization format given.");
     }
 
-    // Obtain the serializer to use.
-    Provider<PdfSerializer> serializerProvider = this.serializers.get(format);
-    if (serializerProvider == null) {
+    // Obtain the serializer factory to use.
+    PdfSerializerFactory factory = this.serializerFactories.get(format);
+    if (factory == null) {
       throw new PdfActSerializeException(
           "Couldn't find a serializer for the format '" + format + "'.");
     }
 
-    PdfSerializer serializer = serializerProvider.get();
-    serializer.setTextUnits(this.textUnitFilters);
-    serializer.setRoles(this.roleFilters);
+    // Create the serializer.
+    PdfSerializer serializer = factory.create(this.units, this.roles);
+    // Serialize the PDF document.
     byte[] serialization = serializer.serialize(pdf);
 
-    // If the serialization target is given as a stream, write to it.
+    // If the target is given as a stream, write the serialization it.
     if (this.serializationStream != null) {
       try {
         this.serializationStream.write(serialization);
@@ -189,7 +191,7 @@ public class PdfAct extends PdfActCore {
       }
     }
 
-    // If the serialization target is given as a file, open and write to it.
+    // If the target is given as a file, open it and write the serialization.
     if (this.serializationFile != null) {
       try (OutputStream os = Files.newOutputStream(this.serializationFile)) {
         os.write(serialization);
@@ -217,33 +219,40 @@ public class PdfAct extends PdfActCore {
       throw new PdfActVisualizeException("No visualization target given.");
     }
 
-    // Create the visualizer and visualize the PDF document.
-    PdfVisualizer visualizer = this.visualizerFactory.create();
+    // Obtain the visualizer factory to use.
+    PdfVisualizerFactory factory = this.visualizerFactory;
+    if (factory == null) {
+      throw new PdfActVisualizeException("There is no visualizer given.");
+    }
 
-    // If the visualization target is given as a stream, write to it.
+    // Create the visualizer.
+    PdfVisualizer visualizer = factory.create(this.units, this.roles);
+    // Visualize the PDF document.
+    byte[] visualization = visualizer.visualize(pdf);
+
+    // If the target is given as a stream, write to it.
     if (this.visualizationStream != null) {
       try {
-        visualizer.visualize(pdf, this.visualizationStream, this.textUnitFilters,
-            this.roleFilters);
+        this.visualizationStream.write(visualization);
       } catch (IOException e) {
         throw new PdfActVisualizeException(
             "Couldn't write to visualization target stream.", e);
       }
     }
 
-    // If the visualization target is given as a file, open and write to it.
+    // If the target is given as a file, open it and write the visualization.
     if (this.visualizationFile != null) {
       try (OutputStream os = Files.newOutputStream(this.visualizationFile)) {
-        visualizer.visualize(pdf, os, this.textUnitFilters, this.roleFilters);
+        os.write(visualization);
       } catch (IOException e) {
-        throw new PdfActSerializeException(
+        throw new PdfActVisualizeException(
             "Couldn't open file '" + this.visualizationFile + "'.", e);
       }
     }
   }
 
   // ==========================================================================
-  
+
   /**
    * Checks if the PDF document should be serialized.
    * 
@@ -252,7 +261,7 @@ public class PdfAct extends PdfActCore {
   protected boolean isSerializationScheduled() {
     return this.isSerializationScheduled;
   }
-  
+
   /**
    * Returns the target file for the serialization.
    * 
@@ -329,7 +338,7 @@ public class PdfAct extends PdfActCore {
    * 
    * @return The format to use on the serialization.
    */
-  public PdfActSerializationFormat getSerializationFormat() {
+  public PdfSerializationFormat getSerializationFormat() {
     return this.serializationFormat;
   }
 
@@ -349,11 +358,11 @@ public class PdfAct extends PdfActCore {
     }
 
     // Check if the given format is valid.
-    if (!this.serializers.containsKey(this.serializationFormat)) {
+    if (!this.serializerFactories.containsKey(this.serializationFormat)) {
       throw new PdfActValidateException(
           "The serialization format '" + format + "' is not valid.");
     }
-    this.serializationFormat = PdfActSerializationFormat
+    this.serializationFormat = PdfSerializationFormat
         .getSerializationFormat(format);
   }
 
@@ -367,7 +376,7 @@ public class PdfAct extends PdfActCore {
   protected boolean isVisualizationScheduled() {
     return this.isVisualizationScheduled;
   }
-  
+
   /**
    * Returns the target file for the visualization.
    * 
@@ -444,8 +453,8 @@ public class PdfAct extends PdfActCore {
    * 
    * @return The list of features to extract.
    */
-  public Set<PdfTextUnit> getFeatures() {
-    return this.textUnitFilters;
+  public Set<PdfElementType> getFeatures() {
+    return this.units;
   }
 
   /**
@@ -464,15 +473,15 @@ public class PdfAct extends PdfActCore {
     }
 
     // Check if all given features are valid.
-    Set<PdfTextUnit> featureSet = new HashSet<>();
+    Set<PdfElementType> featureSet = new HashSet<>();
     for (String feature : features) {
-      if (!PdfTextUnit.isValidFeature(feature)) {
+      if (!PdfElementType.isValidType(feature)) {
         throw new PdfActValidateException(
             "The feature '" + feature + "' is not valid.");
       }
-      featureSet.add(PdfTextUnit.getFeature(feature));
+      featureSet.add(PdfElementType.getType(feature));
     }
-    this.textUnitFilters = featureSet;
+    this.units = featureSet;
   }
 
   // ==========================================================================
@@ -483,7 +492,7 @@ public class PdfAct extends PdfActCore {
    * @return The list of roles to consider.
    */
   public Set<PdfRole> getRoles() {
-    return this.roleFilters;
+    return this.roles;
   }
 
   /**
@@ -509,6 +518,6 @@ public class PdfAct extends PdfActCore {
       }
       roleSet.add(PdfRole.getRole(r));
     }
-    this.roleFilters = roleSet;
+    this.roles = roleSet;
   }
 }

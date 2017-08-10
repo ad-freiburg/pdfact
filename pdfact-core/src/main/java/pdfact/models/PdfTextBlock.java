@@ -5,8 +5,8 @@ package pdfact.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextBlock extends HasTextLines, HasRole, HasText,
-    PdfElement {
+public interface PdfTextBlock extends PdfSinglePositionElement, HasTextLines, 
+    HasRole, HasText {
   /**
    * Returns the parent paragraph, which this block is a member of (used on the
    * identification of the paragraphs, to decide whether this text block was

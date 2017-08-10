@@ -2,9 +2,10 @@ package pdfact.serialize;
 
 import java.util.Set;
 
+import pdfact.exception.PdfActException;
 import pdfact.models.PdfDocument;
 import pdfact.models.PdfRole;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 
 /**
  * A serializer to serialize a PDF document in a specific format.
@@ -17,9 +18,11 @@ public interface PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to serialize.
-   * @return The serialized PDF document.
+   * @return The serialization.
+   * @throws PdfActException
+   *         If the serilization failed.
    */
-  byte[] serialize(PdfDocument pdf);
+  byte[] serialize(PdfDocument pdf) throws PdfActException;
 
   // ==========================================================================
 
@@ -28,7 +31,7 @@ public interface PdfSerializer {
    * 
    * @return The text units to include on serialization.
    */
-  Set<PdfTextUnit> getTextUnits();
+  Set<PdfElementType> getElementTypeFilters();
 
   /**
    * Sets the text units to include on serialization.
@@ -36,7 +39,7 @@ public interface PdfSerializer {
    * @param units
    *        The text units to include on serialization.
    */
-  void setTextUnits(Set<PdfTextUnit> units);
+  void setElementTypeFilters(Set<PdfElementType> units);
 
   // ==========================================================================
 
@@ -45,7 +48,7 @@ public interface PdfSerializer {
    * 
    * @return The semantic roles of text units to include on serialization.
    */
-  Set<PdfRole> getRoles();
+  Set<PdfRole> getElementRoleFilters();
 
   /**
    * Sets the semantic roles of text units to include on serialization.
@@ -53,7 +56,7 @@ public interface PdfSerializer {
    * @param roles
    *        The semantic roles of text units to include on serialization.
    */
-  void setRoles(Set<PdfRole> roles);
+  void setElementRoleFilters(Set<PdfRole> roles);
 
   // ==========================================================================
 
@@ -80,6 +83,6 @@ public interface PdfSerializer {
      * 
      * @return An instance of PdfSerializer.
      */
-    PdfSerializer create(Set<PdfTextUnit> units, Set<PdfRole> roles);
+    PdfSerializer create(Set<PdfElementType> units, Set<PdfRole> roles);
   }
 }

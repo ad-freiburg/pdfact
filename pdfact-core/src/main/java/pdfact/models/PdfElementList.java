@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfElementList<T extends PdfElement> extends List<T> {
+public interface PdfElementList<T extends PdfSinglePositionElement> extends List<T> {
   /**
    * Swaps the elements at index i and j.
    * 
@@ -45,7 +45,7 @@ public interface PdfElementList<T extends PdfElement> extends List<T> {
    * 
    * @author Claudius Korzen
    */
-  public interface PdfElementListFactory<T extends PdfElement> {
+  public interface PdfElementListFactory<T extends PdfSinglePositionElement> {
     /**
      * Creates a new instance of PdfElementList.
      * 

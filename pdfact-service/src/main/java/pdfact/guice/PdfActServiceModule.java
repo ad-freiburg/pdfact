@@ -5,13 +5,19 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 
 import pdfact.PdfActCore;
-import pdfact.serialize.JsonPdfSerializer;
-import pdfact.serialize.PdfActSerializationFormat;
-import pdfact.serialize.PdfSerializer;
-import pdfact.serialize.TxtPdfSerializer;
-import pdfact.serialize.XmlPdfSerializer;
+import pdfact.model.PdfSerializationFormat;
+import pdfact.serialize.PdfJsonSerializer;
+import pdfact.serialize.PdfJsonSerializer.PdfJsonSerializerFactory;
+import pdfact.serialize.PdfSerializer.PdfSerializerFactory;
+import pdfact.serialize.PdfTxtSerializer;
+import pdfact.serialize.PdfTxtSerializer.PdfTxtSerializerFactory;
+import pdfact.serialize.PdfXmlSerializer;
+import pdfact.serialize.PdfXmlSerializer.PdfXmlSerializerFactory;
+import pdfact.serialize.plain.PlainPdfJsonSerializer;
+import pdfact.serialize.plain.PlainPdfTxtSerializer;
+import pdfact.serialize.plain.PlainPdfXmlSerializer;
 import pdfact.visualize.PdfDrawer;
-import pdfact.visualize.PdfDrawerFactory;
+import pdfact.visualize.PdfDrawer.PdfDrawerFactory;
 import pdfact.visualize.PdfVisualizer;
 import pdfact.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.visualize.PlainPdfVisualizer;
@@ -27,22 +33,41 @@ public class PdfActServiceModule extends AbstractModule {
   protected void configure() {
     bind(PdfActCore.class);
 
-    MapBinder<PdfActSerializationFormat, PdfSerializer> serializerBinder = MapBinder
-        .newMapBinder(binder(), PdfActSerializationFormat.class,
-            PdfSerializer.class);
+    // Install the serializer factories.
+    install(new FactoryModuleBuilder()
+        .implement(PdfTxtSerializer.class, PlainPdfTxtSerializer.class)
+        .build(PdfTxtSerializerFactory.class));
 
-    // Bind the serializers.
-    serializerBinder.addBinding(TxtPdfSerializer.getSerializationFormat())
-        .to(TxtPdfSerializer.class);
-    serializerBinder.addBinding(XmlPdfSerializer.getSerializationFormat())
-        .to(XmlPdfSerializer.class);
-    serializerBinder.addBinding(JsonPdfSerializer.getSerializationFormat())
-        .to(JsonPdfSerializer.class);
+    install(new FactoryModuleBuilder()
+        .implement(PdfXmlSerializer.class, PlainPdfXmlSerializer.class)
+        .build(PdfXmlSerializerFactory.class));
 
-    // Bind the visualizer.
-    fc(PdfDrawer.class, PdfDrawerFactory.class, PdfBoxDrawer.class);
-    fc(PdfVisualizer.class, PdfVisualizerFactory.class,
-        PlainPdfVisualizer.class);
+    install(new FactoryModuleBuilder()
+        .implement(PdfJsonSerializer.class, PlainPdfJsonSerializer.class)
+        .build(PdfJsonSerializerFactory.class));
+
+    MapBinder<PdfSerializationFormat, PdfSerializerFactory> serializerBinder 
+      = MapBinder.newMapBinder(
+          binder(), PdfSerializationFormat.class, PdfSerializerFactory.class);
+
+    serializerBinder
+        .addBinding(PdfSerializationFormat.TXT)
+        .to(PdfTxtSerializerFactory.class);
+    serializerBinder
+        .addBinding(PdfSerializationFormat.XML)
+        .to(PdfXmlSerializerFactory.class);
+    serializerBinder
+        .addBinding(PdfSerializationFormat.JSON)
+        .to(PdfJsonSerializerFactory.class);
+
+    // Bind the visualizers.
+    install(new FactoryModuleBuilder()
+        .implement(PdfDrawer.class, PdfBoxDrawer.class)
+        .build(PdfDrawerFactory.class));
+    
+    install(new FactoryModuleBuilder()
+        .implement(PdfVisualizer.class, PlainPdfVisualizer.class)
+        .build(PdfVisualizerFactory.class));
   }
 
   /**

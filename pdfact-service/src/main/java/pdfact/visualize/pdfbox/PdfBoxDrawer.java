@@ -1,9 +1,9 @@
 package pdfact.visualize.pdfbox;
 
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +23,10 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.utils.geometric.HasRectangle;
 import pdfact.utils.geometric.Line;
-import pdfact.utils.geometric.Point;
-import pdfact.utils.geometric.Rectangle;
 import pdfact.utils.geometric.Line.LineFactory;
+import pdfact.utils.geometric.Point;
 import pdfact.utils.geometric.Point.PointFactory;
+import pdfact.utils.geometric.Rectangle;
 import pdfact.utils.geometric.Rectangle.RectangleFactory;
 import pdfact.visualize.PdfDrawer;
 
@@ -239,10 +239,24 @@ public class PdfBoxDrawer implements PdfDrawer {
     Line adapted = adaptLine(line, pageNum, relativeToUpperLeft,
         originInUpperLeft);
 
+    float minX = adapted.getStartX();
+    float minY = adapted.getStartY();
+    float maxX = adapted.getEndX();
+    float maxY = adapted.getEndY();
+
+    // If width and/or height is 0, the lines are not visible. Set minimum
+    // values for both values.
+    if (minX == maxX) {
+      maxX += thickness;
+    }
+    if (minY == maxY) {
+      maxY += thickness;
+    }
+    
     stream.setStrokingColor(color);
     stream.setLineWidth(thickness);
-    stream.moveTo(adapted.getStartX(), adapted.getStartY());
-    stream.lineTo(adapted.getEndX(), adapted.getEndY());
+    stream.moveTo(minX, minY);
+    stream.lineTo(maxX, maxY);
     stream.stroke();
   }
 
@@ -300,6 +314,11 @@ public class PdfBoxDrawer implements PdfDrawer {
     float width = adapted.getWidth();
     float height = adapted.getHeight();
 
+    // If width and/or height is 0, the lines are not visible. Set minimum
+    // values for both values.
+    width = Math.max(thickness, width);
+    height = Math.max(thickness, height);
+    
     stream.setStrokingColor(strokingColor);
     stream.setLineWidth(thickness);
     stream.addRect(minX, minY, width, height);
@@ -430,7 +449,8 @@ public class PdfBoxDrawer implements PdfDrawer {
   }
 
   @Override
-  public void writeTo(OutputStream os) throws IOException {
+  public byte[] toByteArray() throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       // Close all the open PDPageContentStream objects. Start at 1 because of
       // the dummy at the start.
@@ -442,7 +462,7 @@ public class PdfBoxDrawer implements PdfDrawer {
         }
       }
       // Try to save the pdf document to the given file.
-      this.pdDocument.save(os);
+      this.pdDocument.save(baos);
     } catch (Exception e) {
       e.printStackTrace();
       throw new IOException("Error on visualization: " + e.getMessage());
@@ -454,6 +474,7 @@ public class PdfBoxDrawer implements PdfDrawer {
         throw new IOException("Error on closing the pdf: " + e.getMessage());
       }
     }
+    return baos.toByteArray();
   }
 
   /**

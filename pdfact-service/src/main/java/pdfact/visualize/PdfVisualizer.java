@@ -1,12 +1,11 @@
 package pdfact.visualize;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Set;
 
+import pdfact.exception.PdfActVisualizeException;
 import pdfact.models.PdfDocument;
-import pdfact.models.PdfTextUnit;
 import pdfact.models.PdfRole;
+import pdfact.models.PdfElementType;
 
 /**
  * The interface for all concrete implementations to visualize the features of
@@ -20,29 +19,45 @@ public interface PdfVisualizer {
    * 
    * @param pdf
    *        The PDF document to process.
-   * @param stream
-   *        The stream to write to.
-   * @throws IOException
+   * @return the visualization.
+   * @throws PdfActVisualizeException
    *         If something went wrong while visualizing.
    */
-  void visualize(PdfDocument pdf, OutputStream stream) throws IOException;
+  byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException;
+
+  // ==========================================================================
 
   /**
-   * Visualizes all features of the given document to the given stream.
+   * Returns the text units to include on serialization.
    * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param stream
-   *        The stream to write to.
-   * @param features
-   *        The features to visualize.
-   * @param roles
-   *        The roles to consider on visualization.
-   * @throws IOException
-   *         If something went wrong while visualizing.
+   * @return The text units to include on serialization.
    */
-  void visualize(PdfDocument pdf, OutputStream stream, Set<PdfTextUnit> features,
-      Set<PdfRole> roles) throws IOException;
+  Set<PdfElementType> getElementTypeFilters();
+
+  /**
+   * Sets the text units to include on serialization.
+   * 
+   * @param units
+   *        The text units to include on serialization.
+   */
+  void setElementTypeFilters(Set<PdfElementType> units);
+
+  // ==========================================================================
+
+  /**
+   * Returns the semantic roles of text units to include on serialization.
+   * 
+   * @return The semantic roles of text units to include on serialization.
+   */
+  Set<PdfRole> getElementRoleFilters();
+
+  /**
+   * Sets the semantic roles of text units to include on serialization.
+   * 
+   * @param roles
+   *        The semantic roles of text units to include on serialization.
+   */
+  void setElementRoleFilters(Set<PdfRole> roles);
 
   // ==========================================================================
 
@@ -58,5 +73,17 @@ public interface PdfVisualizer {
      * @return An instance of PdfVisualizer.
      */
     PdfVisualizer create();
+
+    /**
+     * Creates a new PdfVisualizer.
+     * 
+     * @param units
+     *        The text units to include.
+     * @param roles
+     *        The semantic roles of text units to include.
+     * 
+     * @return An instance of PdfVisualizer.
+     */
+    PdfVisualizer create(Set<PdfElementType> units, Set<PdfRole> roles);
   }
 }

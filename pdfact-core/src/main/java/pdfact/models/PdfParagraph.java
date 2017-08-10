@@ -6,7 +6,7 @@ package pdfact.models;
  * @author Claudius Korzen
  */
 public interface PdfParagraph extends HasTextBlocks, HasRole, HasText,
-    PdfElement {
+    PdfMultiPositionElement {
   /**
    * The factory to create instances of {@link PdfParagraph}.
    * 

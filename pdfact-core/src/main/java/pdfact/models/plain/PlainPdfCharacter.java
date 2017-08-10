@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfColor;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfFontFace;
 
 /**
@@ -13,7 +13,7 @@ import pdfact.models.PdfFontFace;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
+public class PlainPdfCharacter extends PlainPdfSinglePositionElement implements PdfCharacter {
   /**
    * The sequence number of this character in the extraction order.
    */
@@ -37,8 +37,8 @@ public class PlainPdfCharacter extends PlainPdfElement implements PdfCharacter {
   // ==========================================================================
 
   @Override
-  public PdfTextUnit getTextUnit() {
-    return PdfTextUnit.CHARACTER;
+  public PdfElementType getType() {
+    return PdfElementType.CHARACTER;
   }
 
   // ==========================================================================

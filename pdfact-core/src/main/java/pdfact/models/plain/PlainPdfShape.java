@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.models.PdfColor;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfShape;
 
 /**
@@ -12,7 +12,7 @@ import pdfact.models.PdfShape;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfShape extends PlainPdfElement implements PdfShape {
+public class PlainPdfShape extends PlainPdfSinglePositionElement implements PdfShape {
   /**
    * The color of this shape.
    */
@@ -21,8 +21,8 @@ public class PlainPdfShape extends PlainPdfElement implements PdfShape {
   // ==========================================================================
 
   @Override
-  public PdfTextUnit getTextUnit() {
-    return PdfTextUnit.SHAPE;
+  public PdfElementType getType() {
+    return PdfElementType.SHAPE;
   }
   
   // ==========================================================================

@@ -5,7 +5,8 @@ package pdfact.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfWord extends HasCharacters, HasText, PdfElement {
+public interface PdfWord extends PdfSinglePositionElement, HasCharacters,
+    HasText {
   /**
    * Returns the boolean flag that indicates whether this word is hyphenated.
    * 

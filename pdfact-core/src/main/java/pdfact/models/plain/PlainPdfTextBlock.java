@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfParagraph;
 import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
@@ -19,7 +20,8 @@ import pdfact.models.PdfTextLineList.PdfTextLineListFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
+public class PlainPdfTextBlock extends PlainPdfSinglePositionElement
+    implements PdfTextBlock {
   /**
    * The text lines of this text block.
    */
@@ -66,6 +68,13 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   @AssistedInject
   public PlainPdfTextBlock(PdfTextLineListFactory textLineListFactory) {
     this.textLines = textLineListFactory.create();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public PdfElementType getType() {
+    return PdfElementType.TEXT_BLOCK;
   }
 
   // ==========================================================================
@@ -184,7 +193,7 @@ public class PlainPdfTextBlock extends PlainPdfElement implements PdfTextBlock {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfTextBlock) {

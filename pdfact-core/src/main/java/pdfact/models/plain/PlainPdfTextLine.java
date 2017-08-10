@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfWord;
 import pdfact.models.PdfWordList;
@@ -18,7 +18,7 @@ import pdfact.utils.geometric.Line;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
+public class PlainPdfTextLine extends PlainPdfSinglePositionElement implements PdfTextLine {
   /**
    * The words of this text line.
    */
@@ -55,8 +55,8 @@ public class PlainPdfTextLine extends PlainPdfElement implements PdfTextLine {
   // ==========================================================================
 
   @Override
-  public PdfTextUnit getTextUnit() {
-    return PdfTextUnit.TEXT_LINE;
+  public PdfElementType getType() {
+    return PdfElementType.TEXT_LINE;
   }
 
   // ==========================================================================

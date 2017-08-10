@@ -12,7 +12,7 @@ import java.util.Spliterator;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.models.PdfElement;
+import pdfact.models.PdfSinglePositionElement;
 import pdfact.models.PdfElementList;
 import pdfact.utils.sort.Quicksort;
 
@@ -26,7 +26,7 @@ import pdfact.utils.sort.Quicksort;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
+public class PlainPdfElementList<T extends PdfSinglePositionElement> extends ArrayList<T>
     implements PdfElementList<T> {
   /**
    * The serial id.
@@ -110,7 +110,7 @@ public class PlainPdfElementList<T extends PdfElement> extends ArrayList<T>
    * @param <S>
    *        The type of the PDF elements in this list.
    */
-  class PdfElementView<S extends PdfElement> extends PlainPdfElementList<S>
+  class PdfElementView<S extends PdfSinglePositionElement> extends PlainPdfElementList<S>
       implements PdfElementList<S> {
     /**
      * The serial id.

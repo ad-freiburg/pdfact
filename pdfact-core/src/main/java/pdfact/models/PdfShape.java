@@ -7,7 +7,7 @@ package pdfact.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfShape extends PdfElement, HasColor {
+public interface PdfShape extends PdfSinglePositionElement, HasColor {
   /**
    * The factory to create instances of {@link PdfShape}.
    * 

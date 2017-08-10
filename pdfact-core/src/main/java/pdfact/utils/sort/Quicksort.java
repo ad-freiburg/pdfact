@@ -3,7 +3,7 @@ package pdfact.utils.sort;
 import java.util.Comparator;
 import java.util.Random;
 
-import pdfact.models.PdfElement;
+import pdfact.models.PdfSinglePositionElement;
 import pdfact.models.PdfElementList;
 
 /**
@@ -31,7 +31,7 @@ public class Quicksort {
    * @param c
    *        The comparator to use.
    */
-  public static <T extends PdfElement> void sort(PdfElementList<T> list,
+  public static <T extends PdfSinglePositionElement> void sort(PdfElementList<T> list,
       Comparator<? super T> c) {
     // Do nothing, if the array is not set.
     if (list == null) {
@@ -62,7 +62,7 @@ public class Quicksort {
    * @param r
    *        The end index.
    */
-  protected static <T extends PdfElement> void quickSortRecursive(
+  protected static <T extends PdfSinglePositionElement> void quickSortRecursive(
       PdfElementList<T> list, Comparator<? super T> c, int l, int r) {
     // Do nothing, if the range contains no more than 1 element.
     int index = quickSortDivide(list, c, l, r);
@@ -91,7 +91,7 @@ public class Quicksort {
    *        The end index.
    * @return The index of dividing element.
    */
-  protected static <T extends PdfElement> int quickSortDivide(
+  protected static <T extends PdfSinglePositionElement> int quickSortDivide(
       PdfElementList<T> list, Comparator<? super T> c, int l, int r) {
     // Define the two pointers i and j.
     int i = l;

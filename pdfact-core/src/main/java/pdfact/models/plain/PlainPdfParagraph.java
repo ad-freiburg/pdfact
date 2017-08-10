@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfParagraph;
 import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
@@ -20,7 +20,8 @@ import pdfact.models.PdfTextLineStatistic;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
+public class PlainPdfParagraph extends PlainPdfMultiPositionElement
+    implements PdfParagraph {
   /**
    * The text blocks of this paragraph.
    */
@@ -65,8 +66,8 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   // ==========================================================================
 
   @Override
-  public PdfTextUnit getTextUnit() {
-    return PdfTextUnit.PARAGRAPH;
+  public PdfElementType getType() {
+    return PdfElementType.PARAGRAPH;
   }
 
   // ==========================================================================
@@ -185,7 +186,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getText(), otherParagraph.getText());
-      builder.append(getPosition(), otherParagraph.getPosition());
+      builder.append(getPositions(), otherParagraph.getPositions());
       return builder.isEquals();
     }
     return false;
@@ -195,7 +196,7 @@ public class PlainPdfParagraph extends PlainPdfElement implements PdfParagraph {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getText());
-    builder.append(getPosition());
+    builder.append(getPositions());
     return builder.hashCode();
   }
 }

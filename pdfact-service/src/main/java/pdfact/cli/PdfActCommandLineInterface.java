@@ -21,10 +21,10 @@ import pdfact.exception.PdfActParseCommandLineException;
 import pdfact.guice.PdfActCoreModule;
 import pdfact.guice.PdfActServiceModule;
 import pdfact.log.PdfActLogLevel;
+import pdfact.model.PdfSerializationFormat;
 import pdfact.models.PdfRole;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.parse.stream.pdfbox.guice.OperatorProcessorModule;
-import pdfact.serialize.PdfActSerializationFormat;
 
 /**
  * A command line interface for PdfAct.
@@ -265,7 +265,7 @@ public class PdfActCommandLineInterface {
               + "to stdout.");
 
       // Add an argument to define the output format.
-      Set<String> formatChoices = PdfActSerializationFormat.getNames();
+      Set<String> formatChoices = PdfSerializationFormat.getNames();
       this.parser.addArgument("--" + OPTION_OUTPUT_FORMAT)
           .dest(OPTION_OUTPUT_FORMAT)
           .required(false)
@@ -275,7 +275,7 @@ public class PdfActCommandLineInterface {
               + "written. Choose from: " + formatChoices + ".");
 
       // Add an argument to define the text unit(s) to extract.
-      Set<String> textUnitChoices = PdfTextUnit.getNames();
+      Set<String> textUnitChoices = PdfElementType.getGroupNames();
       this.parser.addArgument("--" + OPTION_TEXT_UNIT)
           .dest(OPTION_TEXT_UNIT)
           .nargs("*")

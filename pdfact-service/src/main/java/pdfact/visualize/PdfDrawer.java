@@ -1,8 +1,9 @@
 package pdfact.visualize;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.file.Path;
 
 import pdfact.utils.geometric.HasRectangle;
 import pdfact.utils.geometric.Line;
@@ -535,12 +536,40 @@ public interface PdfDrawer {
   // ==========================================================================
 
   /**
-   * Writes the visualization to the given output stream.
+   * Returns the drawn PDF file as byte array.
    * 
-   * @param stream
-   *        The stream to use.
+   * @return The drawn PDF file as byte array.
    * @throws IOException
-   *         If writing to the stream failed.
+   *         If getting the bytes has failed.
    */
-  void writeTo(OutputStream stream) throws IOException;
+  byte[] toByteArray() throws IOException;
+
+  // ==========================================================================
+
+  /**
+   * The factory to create instances of {@link PdfDrawer}.
+   * 
+   * @author Claudius Korzen
+   */
+  public interface PdfDrawerFactory {
+    /**
+     * Creates a new PdfDrawer.
+     * 
+     * @param pdf
+     *        The PDF file to process.
+     * 
+     * @return A new instance of {@link PdfDrawer}.
+     */
+    PdfDrawer create(File pdf);
+
+    /**
+     * Creates a new PdfDrawer.
+     * 
+     * @param pdf
+     *        The PDF file to process.
+     * 
+     * @return A new instance of {@link PdfDrawer}.
+     */
+    PdfDrawer create(Path pdf);
+  }
 }

@@ -7,7 +7,7 @@ package pdfact.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfFigure extends PdfElement {
+public interface PdfFigure extends PdfSinglePositionElement {
   /**
    * The factory to create instances of {@link PdfFigure}.
    * 

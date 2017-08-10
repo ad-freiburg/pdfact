@@ -9,7 +9,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfCharacterList;
 import pdfact.models.PdfCharacterStatistic;
-import pdfact.models.PdfTextUnit;
+import pdfact.models.PdfElementType;
 import pdfact.models.PdfWord;
 import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
 
@@ -18,7 +18,7 @@ import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfWord extends PlainPdfElement implements PdfWord {
+public class PlainPdfWord extends PlainPdfSinglePositionElement implements PdfWord {
   /**
    * The characters of this word.
    */
@@ -71,8 +71,8 @@ public class PlainPdfWord extends PlainPdfElement implements PdfWord {
   // ==========================================================================
 
   @Override
-  public PdfTextUnit getTextUnit() {
-    return PdfTextUnit.WORD;
+  public PdfElementType getType() {
+    return PdfElementType.WORD;
   }
 
   // ==========================================================================

@@ -3,9 +3,9 @@ package pdfact;
 import java.util.HashSet;
 import java.util.Set;
 
+import pdfact.model.PdfSerializationFormat;
 import pdfact.models.PdfRole;
-import pdfact.models.PdfTextUnit;
-import pdfact.serialize.PdfActSerializationFormat;
+import pdfact.models.PdfElementType;
 
 /**
  * Some global settings to control the behavior of PdfAct.
@@ -19,16 +19,16 @@ public class PdfActSettings {
   /**
    * The default serialization format.
    */
-  public static final PdfActSerializationFormat DEFAULT_SERIALIZATION_FORMAT = 
-      PdfActSerializationFormat.TXT;
+  public static final PdfSerializationFormat DEFAULT_SERIALIZATION_FORMAT = 
+      PdfSerializationFormat.TXT;
 
   /**
    * The default text units to include on serialization and visualization.
    */
-  public static final Set<PdfTextUnit> DEFAULT_TEXT_UNITS_TO_INCLUDE;
+  public static final Set<PdfElementType> DEFAULT_TEXT_UNITS_TO_INCLUDE;
   static {
     DEFAULT_TEXT_UNITS_TO_INCLUDE = new HashSet<>();
-    DEFAULT_TEXT_UNITS_TO_INCLUDE.add(PdfTextUnit.PARAGRAPH);
+    DEFAULT_TEXT_UNITS_TO_INCLUDE.add(PdfElementType.PARAGRAPH);
   }
 
   /**

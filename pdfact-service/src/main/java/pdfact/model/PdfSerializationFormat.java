@@ -1,4 +1,4 @@
-package pdfact.serialize;
+package pdfact.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import java.util.Set;
  * 
  * @author Claudius Korzen
  */
-public enum PdfActSerializationFormat {
+public enum PdfSerializationFormat {
   /**
    * The serialization format xml.
    */
@@ -35,7 +35,7 @@ public enum PdfActSerializationFormat {
    * @param name
    *        The name of the format.
    */
-  PdfActSerializationFormat(String name) {
+  PdfSerializationFormat(String name) {
     this.name = name;
   }
 
@@ -53,13 +53,13 @@ public enum PdfActSerializationFormat {
   /**
    * The formats.
    */
-  protected static final Map<String, PdfActSerializationFormat> FORMATS;
+  protected static final Map<String, PdfSerializationFormat> FORMATS;
 
   static {
     FORMATS = new HashMap<>();
 
     // Fill the map of roles per name.
-    for (PdfActSerializationFormat format : values()) {
+    for (PdfSerializationFormat format : values()) {
       FORMATS.put(format.getName(), format);
     }
   }
@@ -95,15 +95,15 @@ public enum PdfActSerializationFormat {
    *        The identifiers of the serialization formats to fetch.
    * @return A set of the fetched serialization formats.
    */
-  public static Set<PdfActSerializationFormat> getSerializationFormats(
+  public static Set<PdfSerializationFormat> getSerializationFormats(
       String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
-    Set<PdfActSerializationFormat> formats = new HashSet<>();
+    Set<PdfSerializationFormat> formats = new HashSet<>();
     for (String name : names) {
-      PdfActSerializationFormat format = getSerializationFormat(name);
+      PdfSerializationFormat format = getSerializationFormat(name);
       if (format != null) {
         formats.add(format);
       }
@@ -118,7 +118,7 @@ public enum PdfActSerializationFormat {
    *        The name of the serialization format to fetch.
    * @return The serialization format that is associated with the given name.
    */
-  public static PdfActSerializationFormat getSerializationFormat(String name) {
+  public static PdfSerializationFormat getSerializationFormat(String name) {
     if (!isValidSerializationFormat(name)) {
       throw new IllegalArgumentException(
           name + " isn't a valid serialization format.");
