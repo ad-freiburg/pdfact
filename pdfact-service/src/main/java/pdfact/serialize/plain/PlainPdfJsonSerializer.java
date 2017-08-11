@@ -69,12 +69,19 @@ import pdfact.utils.geometric.Rectangle;
  */
 public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   /**
-   * The element types filter.
+   * The indentation length.
+   */
+  protected static final int INDENT_LENGTH = 2;
+  
+  // ==========================================================================
+  
+  /**
+   * The element types to consider on serializing.
    */
   protected Set<PdfElementType> typesFilter;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to consider on serializing.
    */
   protected Set<PdfRole> rolesFilter;
 
@@ -88,10 +95,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    */
   protected Set<PdfColor> usedColors;
 
-  /**
-   * The indentation length.
-   */
-  protected static final int INDENT_LENGTH = 2;
+
 
   // ==========================================================================
   // Constructors.
@@ -114,7 +118,8 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    *        The semantic roles filter.
    */
   @AssistedInject
-  public PlainPdfJsonSerializer(@Assisted Set<PdfElementType> typesFilter,
+  public PlainPdfJsonSerializer(
+      @Assisted Set<PdfElementType> typesFilter,
       @Assisted Set<PdfRole> rolesFilter) {
     this();
     this.typesFilter = typesFilter;
@@ -176,7 +181,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
           continue;
         }
 
-        // Serialize the paragraph if paragraphs match the types filter.
+        // Serialize the paragraph (if types filter includes paragraphs).
         if (hasRelevantElementType(paragraph)) {
           JSONObject paragraphJson = serializeParagraph(paragraph);
           if (paragraphJson != null && paragraphJson.length() > 0) {
@@ -185,7 +190,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
         }
 
         for (PdfTextBlock block : paragraph.getTextBlocks()) {
-          // Serialize the text block if text blocks match the types filter.
+          // Serialize the text block (if types filter includes text blocks).
           if (hasRelevantElementType(block)) {
             JSONObject blockJson = serializeTextBlock(block);
             if (blockJson != null && blockJson.length() > 0) {
@@ -193,7 +198,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
             }
           }
           for (PdfTextLine line : block.getTextLines()) {
-            // Serialize the text line if text lines match the types filter.
+            // Serialize the text line (if types filter includes text lines).
             if (hasRelevantElementType(line)) {
               JSONObject lineJson = serializeTextLine(line);
               if (lineJson != null && lineJson.length() > 0) {
@@ -201,7 +206,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
               }
             }
             for (PdfWord word : line.getWords()) {
-              // Serialize the word if words match the types filter.
+              // Serialize the word (if types filter includes words).
               if (hasRelevantElementType(word)) {
                 JSONObject wordJson = serializeWord(word);
                 if (wordJson != null && wordJson.length() > 0) {
@@ -209,7 +214,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
                 }
               }
               for (PdfCharacter character : word.getCharacters()) {
-                // Serialize the character if characters match the type filter.
+                // Serialize the char (if types filter includes text chars).
                 if (hasRelevantElementType(character)) {
                   JSONObject characterJson = serializeCharacter(character);
                   if (characterJson != null && characterJson.length() > 0) {
@@ -236,9 +241,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON object that represents the serialization.
    */
   protected JSONObject serializeParagraph(PdfParagraph paragraph) {
-    JSONObject paragraphJson = serializePdfElement(paragraph);
     JSONObject result = new JSONObject();
-    // Wrap the JSON object with a JSON object that describes paragraphs.
+    JSONObject paragraphJson = serializePdfElement(paragraph);
+    // Wrap the JSON object with a JSON object that describes a paragraph.
     if (paragraphJson != null && paragraphJson.length() > 0) {
       result.put(PARAGRAPH, paragraphJson);
     }
@@ -254,9 +259,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON object that represents the serialization.
    */
   protected JSONObject serializeTextBlock(PdfTextBlock block) {
-    JSONObject blockJson = serializePdfElement(block);
     JSONObject result = new JSONObject();
-    // Wrap the JSON object with a JSON object that describes text blocks.
+    JSONObject blockJson = serializePdfElement(block);
+    // Wrap the JSON object with a JSON object that describes a text block.
     if (blockJson != null && blockJson.length() > 0) {
       result.put(TEXT_BLOCK, blockJson);
     }
@@ -272,9 +277,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON object that represents the serialization.
    */
   protected JSONObject serializeTextLine(PdfTextLine line) {
-    JSONObject lineJson = serializePdfElement(line);
     JSONObject result = new JSONObject();
-    // Wrap the JSON object with a JSON object that describes text lines.
+    JSONObject lineJson = serializePdfElement(line);
+    // Wrap the JSON object with a JSON object that describes a text line.
     if (lineJson != null && lineJson.length() > 0) {
       result.put(TEXT_LINE, lineJson);
     }
@@ -290,9 +295,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON object that represents the serialization.
    */
   protected JSONObject serializeWord(PdfWord word) {
-    JSONObject wordJson = serializePdfElement(word);
     JSONObject result = new JSONObject();
-    // Wrap the JSON object with a JSON object that describes words.
+    JSONObject wordJson = serializePdfElement(word);
+    // Wrap the JSON object with a JSON object that describes a word.
     if (wordJson != null && wordJson.length() > 0) {
       result.put(WORD, wordJson);
     }
@@ -308,9 +313,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON object that represents the serialization.
    */
   protected JSONObject serializeCharacter(PdfCharacter character) {
-    JSONObject characterJson = serializePdfElement(character);
     JSONObject result = new JSONObject();
-    // Wrap the JSON object with a JSON object that describes characters.
+    JSONObject characterJson = serializePdfElement(character);
+    // Wrap the JSON object with a JSON object that describes a character.
     if (characterJson != null && characterJson.length() > 0) {
       result.put(CHARACTER, characterJson);
     }
@@ -417,7 +422,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   }
 
   /**
-   * Serializes the given PDF positions.
+   * Serializes the given list of PDF positions.
    * 
    * @param positions
    *        The list of positions to serialize.
@@ -447,23 +452,28 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    */
   protected JSONObject serializePosition(PdfPosition position) {
     JSONObject positionJson = new JSONObject();
+    
     if (position != null) {
       PdfPage page = position.getPage();
+      int pageNumber = page.getPageNumber();
       Rectangle rect = position.getRectangle();
-
-      if (page != null && rect != null) {
-        positionJson.put(PAGE, page.getPageNumber());
-        positionJson.put(MIN_X, rect.getMinX());
-        positionJson.put(MIN_Y, rect.getMinY());
-        positionJson.put(MAX_X, rect.getMaxX());
-        positionJson.put(MAX_Y, rect.getMaxY());
+      
+      if (pageNumber > 0 && rect != null) {
+        positionJson.put(PAGE, pageNumber);
+        
+        // If we pass primitive floats here, the values would be casted to
+        // double values (yielding in inaccurate numbers). So transform the 
+        // values to Float objects. 
+        positionJson.put(MIN_X, new Float(rect.getMinX()));
+        positionJson.put(MIN_Y, new Float(rect.getMinY()));
+        positionJson.put(MAX_X, new Float(rect.getMaxX()));
+        positionJson.put(MAX_Y, new Float(rect.getMaxY()));
       }
     }
     return positionJson;
   }
 
   // ==========================================================================
-  // Methods to serialize fonts.
 
   /**
    * Serializes the given fonts.
@@ -556,7 +566,6 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
         }
       }
     }
-    
     return result;
   }
 
@@ -587,25 +596,25 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   // ==========================================================================
 
   @Override
-  public Set<PdfElementType> getElementTypeFilters() {
+  public Set<PdfElementType> getElementTypesFilter() {
     return this.typesFilter;
   }
 
   @Override
-  public void setElementTypeFilters(Set<PdfElementType> types) {
-    this.typesFilter = types;
+  public void setElementTypesFilter(Set<PdfElementType> typesFilter) {
+    this.typesFilter = typesFilter;
   }
 
   // ==========================================================================
 
   @Override
-  public Set<PdfRole> getElementRoleFilters() {
+  public Set<PdfRole> getSemanticRolesFilter() {
     return this.rolesFilter;
   }
 
   @Override
-  public void setElementRoleFilters(Set<PdfRole> roles) {
-    this.rolesFilter = roles;
+  public void setSemanticRolesFilter(Set<PdfRole> rolesFilter) {
+    this.rolesFilter = rolesFilter;
   }
 
   // ==========================================================================
@@ -626,7 +635,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     }
 
     if (this.rolesFilter == null || this.rolesFilter.isEmpty()) {
-      // No filter is given -> The paragraph is relevant.
+      // No filter is given -> The element is relevant.
       return true;
     }
 

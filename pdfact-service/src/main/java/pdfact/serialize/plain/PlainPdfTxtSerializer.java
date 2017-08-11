@@ -33,12 +33,12 @@ import pdfact.utils.collection.CollectionUtils;
  */
 public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   /**
-   * The element types filter.
+   * The element types to consider on serializing.
    */
   protected Set<PdfElementType> typesFilter;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to consider on serializing.
    */
   protected Set<PdfRole> rolesFilter;
 
@@ -62,12 +62,13 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
    * @param typesFilter
-   *        The element types filter.
+   *        The element types to consider on serializing.
    * @param rolesFilter
-   *        The semantic roles filter.
+   *        The semantic roles to consider on serializing.
    */
   @AssistedInject
-  public PlainPdfTxtSerializer(@Assisted Set<PdfElementType> typesFilter,
+  public PlainPdfTxtSerializer(
+      @Assisted Set<PdfElementType> typesFilter,
       @Assisted Set<PdfRole> rolesFilter) {
     this();
     this.typesFilter = typesFilter;
@@ -82,53 +83,77 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     String result = "";
 
     if (pdf != null) {
-      // The serialized elements.
-      List<String> elements = new ArrayList<>();
+      List<String> lines = new ArrayList<>();
 
+      // Create the section that contains all serialized PDF elements.
+      List<String> elementsLines = serializePdfElements(pdf);
+      if (elementsLines != null) {
+        lines.addAll(elementsLines);
+      }
+
+      result = CollectionUtils.join(elementsLines, TYPES_DELIMITER);
+    }
+
+    return result.getBytes(DEFAULT_ENCODING);
+  }
+
+  /**
+   * Serializes the elements of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   *
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializePdfElements(PdfDocument pdf) {
+    // The serialized elements.
+    List<String> result = new ArrayList<>();
+
+    if (pdf != null) {
       for (PdfParagraph paragraph : pdf.getParagraphs()) {
         // Ignore the paragraph if its role doesn't match the roles filter.
         if (!hasRelevantRole(paragraph)) {
           continue;
         }
 
-        // Serialize the paragraph if paragraphs match the types filter.
+        // Serialize the paragraph (if types filter includes paragraphs).
         if (hasRelevantElementType(paragraph)) {
           List<String> paragraphLines = serializeParagraph(paragraph);
           if (paragraphLines != null) {
-            elements.addAll(paragraphLines);
+            result.addAll(paragraphLines);
           }
         }
 
         for (PdfTextBlock block : paragraph.getTextBlocks()) {
-          // Serialize the text block if text blocks match the types filter.
+          // Serialize the text block (if types filter includes text blocks).
           if (hasRelevantElementType(block)) {
             List<String> blockLines = serializeTextBlock(block);
             if (blockLines != null) {
-              elements.addAll(blockLines);
+              result.addAll(blockLines);
             }
           }
           for (PdfTextLine line : block.getTextLines()) {
-            // Serialize the text line if text lines match the types filter.
+            // Serialize the text line (if types filter includes text lines).
             if (hasRelevantElementType(line)) {
               List<String> lineLines = serializeTextLine(line);
               if (lineLines != null) {
-                elements.addAll(lineLines);
+                result.addAll(lineLines);
               }
             }
             for (PdfWord word : line.getWords()) {
-              // Serialize the word if words match the types filter.
+              // Serialize the word (if types filter includes words).
               if (hasRelevantElementType(word)) {
                 List<String> wordLines = serializeWord(word);
                 if (wordLines != null) {
-                  elements.addAll(wordLines);
+                  result.addAll(wordLines);
                 }
               }
               for (PdfCharacter c : word.getCharacters()) {
-                // Serialize the character if characters match the type filter.
+                // Serialize the char (if types filter includes text chars).
                 if (hasRelevantElementType(c)) {
                   List<String> characterLines = serializeCharacter(c);
                   if (characterLines != null) {
-                    elements.addAll(characterLines);
+                    result.addAll(characterLines);
                   }
                 }
               }
@@ -136,12 +161,8 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
           }
         }
       }
-      
-      // Join the units to a single string.
-      result = CollectionUtils.join(elements, TYPES_DELIMITER);
     }
-
-    return result.getBytes(DEFAULT_ENCODING);
+    return result;
   }
 
   // ==========================================================================
@@ -232,25 +253,25 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   // ==========================================================================
 
   @Override
-  public Set<PdfElementType> getElementTypeFilters() {
+  public Set<PdfElementType> getElementTypesFilter() {
     return this.typesFilter;
   }
 
   @Override
-  public void setElementTypeFilters(Set<PdfElementType> types) {
-    this.typesFilter = types;
+  public void setElementTypesFilter(Set<PdfElementType> typesFilter) {
+    this.typesFilter = typesFilter;
   }
 
   // ==========================================================================
 
   @Override
-  public Set<PdfRole> getElementRoleFilters() {
+  public Set<PdfRole> getSemanticRolesFilter() {
     return this.rolesFilter;
   }
 
   @Override
-  public void setElementRoleFilters(Set<PdfRole> roles) {
-    this.rolesFilter = roles;
+  public void setSemanticRolesFilter(Set<PdfRole> rolesFilter) {
+    this.rolesFilter = rolesFilter;
   }
 
   // ==========================================================================
@@ -271,7 +292,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     }
 
     if (this.rolesFilter == null || this.rolesFilter.isEmpty()) {
-      // No filter is given -> The paragraph is relevant.
+      // No filter is given -> The element is relevant.
       return true;
     }
 
@@ -303,11 +324,11 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
       return true;
     }
 
-    PdfElementType textUnit = element.getType();
-    if (textUnit == null) {
+    PdfElementType elementType = element.getType();
+    if (elementType == null) {
       return false;
     }
 
-    return this.typesFilter.contains(textUnit);
+    return this.typesFilter.contains(elementType);
   }
 }

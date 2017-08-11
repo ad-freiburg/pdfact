@@ -74,12 +74,24 @@ import pdfact.utils.text.StringUtils;
  */
 public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   /**
-   * The element types filter.
+   * The indentation length.
+   */
+  protected static final int INDENT_LENGTH = 2;
+
+  /**
+   * The line delimiter to use on joining the individual lines.
+   */
+  protected static String LINE_DELIMITER = System.lineSeparator();
+
+  // ==========================================================================
+
+  /**
+   * The element types to consider on serializing.
    */
   protected Set<PdfElementType> typesFilter;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to consider on serializing.
    */
   protected Set<PdfRole> rolesFilter;
 
@@ -92,16 +104,6 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * The colors of the PDF elements which were in fact serialized.
    */
   protected Set<PdfColor> usedColors;
-
-  /**
-   * The indentation length.
-   */
-  protected static final int INDENT_LENGTH = 2;
-
-  /**
-   * The line delimiter to use on joining the individual lines.
-   */
-  protected static String LINE_DELIMITER = System.lineSeparator();
 
   // ==========================================================================
   // Constructors.
@@ -124,7 +126,8 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    *        The semantic roles filter.
    */
   @AssistedInject
-  public PlainPdfXmlSerializer(@Assisted Set<PdfElementType> typesFilter,
+  public PlainPdfXmlSerializer(
+      @Assisted Set<PdfElementType> typesFilter,
       @Assisted Set<PdfRole> rolesFilter) {
     this();
     this.typesFilter = typesFilter;
@@ -148,10 +151,10 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
       resultLines.add(start(PDF, level++));
 
       // Create the section that contains all serialized PDF elements.
-      List<String> pdfElementsLines = serializePdfElements(level + 1, pdf);
-      if (pdfElementsLines != null && !pdfElementsLines.isEmpty()) {
+      List<String> elementsLines = serializePdfElements(level + 1, pdf);
+      if (elementsLines != null && !elementsLines.isEmpty()) {
         resultLines.add(start(DOCUMENT, level));
-        resultLines.addAll(pdfElementsLines);
+        resultLines.addAll(elementsLines);
         resultLines.add(end(DOCUMENT, level));
       }
 
@@ -191,7 +194,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @param pdf
    *        The PDF document to process.
    *
-   * @return A list of strings that represent the lines of the serialization.
+   * @return A list of strings that represent the serialized elements.
    */
   protected List<String> serializePdfElements(int level, PdfDocument pdf) {
     List<String> result = new ArrayList<>();
@@ -203,7 +206,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
           continue;
         }
 
-        // Serialize the paragraph if paragraphs match the types filter.
+        // Serialize the paragraph (if types filter includes paragraphs).
         if (hasRelevantElementType(paragraph)) {
           List<String> paragraphLines = serializeParagraph(level, paragraph);
           if (paragraphLines != null) {
@@ -212,7 +215,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
         }
 
         for (PdfTextBlock block : paragraph.getTextBlocks()) {
-          // Serialize the text block if text blocks match the types filter.
+          // Serialize the text block (if types filter includes text blocks).
           if (hasRelevantElementType(block)) {
             List<String> blockLines = serializeTextBlock(level, block);
             if (blockLines != null) {
@@ -220,7 +223,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
             }
           }
           for (PdfTextLine line : block.getTextLines()) {
-            // Serialize the text line if text lines match the types filter.
+            // Serialize the text line (if types filter includes text lines).
             if (hasRelevantElementType(line)) {
               List<String> lineLines = serializeTextLine(level, line);
               if (lineLines != null) {
@@ -228,7 +231,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
               }
             }
             for (PdfWord word : line.getWords()) {
-              // Serialize the word if words match the types filter.
+              // Serialize the word (if types filter includes words).
               if (hasRelevantElementType(word)) {
                 List<String> wordLines = serializeWord(level, word);
                 if (wordLines != null) {
@@ -236,7 +239,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
                 }
               }
               for (PdfCharacter c : word.getCharacters()) {
-                // Serialize the character if characters match the type filter.
+                // Serialize the character (if types filter includes chars).
                 if (hasRelevantElementType(c)) {
                   List<String> characterLines = serializeCharacter(level, c);
                   if (characterLines != null) {
@@ -263,12 +266,12 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeParagraph(int level, PdfParagraph paragraph) {
-    List<String> serialized = serializePdfElement(level + 1, paragraph);
     List<String> result = new ArrayList<>();
-    // Wrap the serialized lines with a tag that describes paragraphs.
-    if (serialized != null && !serialized.isEmpty()) {
+    List<String> paragraphLines = serializePdfElement(level + 1, paragraph);
+    // Wrap the serialized lines with a tag that describes a paragraph.
+    if (paragraphLines != null && !paragraphLines.isEmpty()) {
       result.add(start(PARAGRAPH, level));
-      result.addAll(serialized);
+      result.addAll(paragraphLines);
       result.add(end(PARAGRAPH, level));
     }
     return result;
@@ -285,12 +288,12 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeTextBlock(int level, PdfTextBlock block) {
-    List<String> serialized = serializePdfElement(level + 1, block);
     List<String> result = new ArrayList<>();
-    // Wrap the serialized lines with a tag that describes text blocks.
-    if (serialized != null && !serialized.isEmpty()) {
+    List<String> blockLines = serializePdfElement(level + 1, block);
+    // Wrap the serialized lines with a tag that describe a text block.
+    if (blockLines != null && !blockLines.isEmpty()) {
       result.add(start(TEXT_BLOCK, level));
-      result.addAll(serialized);
+      result.addAll(blockLines);
       result.add(end(TEXT_BLOCK, level));
     }
     return result;
@@ -307,12 +310,12 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeTextLine(int level, PdfTextLine line) {
-    List<String> serialized = serializePdfElement(level + 1, line);
     List<String> result = new ArrayList<>();
-    // Wrap the serialized lines with a tag that describes text lines.
-    if (serialized != null && !serialized.isEmpty()) {
+    List<String> lineLines = serializePdfElement(level + 1, line);
+    // Wrap the serialized lines with a tag that describes a text line.
+    if (lineLines != null && !lineLines.isEmpty()) {
       result.add(start(TEXT_LINE, level));
-      result.addAll(serialized);
+      result.addAll(lineLines);
       result.add(end(TEXT_LINE, level));
     }
     return result;
@@ -329,12 +332,12 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeWord(int level, PdfWord word) {
-    List<String> serialized = serializePdfElement(level + 1, word);
     List<String> result = new ArrayList<>();
-    // Wrap the serialized lines with a tag that describes words.
-    if (serialized != null && !serialized.isEmpty()) {
+    List<String> wordLines = serializePdfElement(level + 1, word);
+    // Wrap the serialized lines with a tag that describes a word.
+    if (wordLines != null && !wordLines.isEmpty()) {
       result.add(start(WORD, level));
-      result.addAll(serialized);
+      result.addAll(wordLines);
       result.add(end(WORD, level));
     }
     return result;
@@ -351,12 +354,12 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeCharacter(int level, PdfCharacter character) {
-    List<String> serialized = serializePdfElement(level + 1, character);
     List<String> result = new ArrayList<>();
-    // Wrap the serialized lines with a tag that describes characters.
-    if (serialized != null && !serialized.isEmpty()) {
+    List<String> characterLines = serializePdfElement(level + 1, character);
+    // Wrap the serialized lines with a tag that describes a character.
+    if (characterLines != null && !characterLines.isEmpty()) {
       result.add(start(CHARACTER, level));
-      result.addAll(serialized);
+      result.addAll(characterLines);
       result.add(end(CHARACTER, level));
     }
     return result;
@@ -461,7 +464,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @param level
    *        The current indentation level.
    * @param pos
-   *        The list of positions to serialize.
+   *        The positions to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -571,7 +574,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @param level
    *        The current indentation level.
    * @param font
-   *        The font to serialize. 
+   *        The font to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -620,10 +623,15 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    */
   protected List<String> serializeColors(int level, Set<PdfColor> colors) {
     List<String> result = new ArrayList<>();
-    for (PdfColor color : colors) {
-      List<String> colorLines = serializeColor(level, color);
-      if (colorLines != null) {
-        result.addAll(colorLines);
+    
+    if (colors != null) {
+      for (PdfColor color : colors) {
+        if (color != null) {
+          List<String> colorLines = serializeColor(level, color);
+          if (colorLines != null) {
+            result.addAll(colorLines);
+          }
+        }
       }
     }
     return result;
@@ -643,6 +651,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     List<String> result = new ArrayList<>();
     if (color != null) {
       float[] rgb = color.getRGB();
+      
       if (rgb != null && rgb.length == 3) {
         result.add(start(COLOR, level++));
         result.add(start(ID, level) + text(color.getId()) + end(ID));
@@ -747,25 +756,25 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   // ==========================================================================
 
   @Override
-  public Set<PdfElementType> getElementTypeFilters() {
+  public Set<PdfElementType> getElementTypesFilter() {
     return this.typesFilter;
   }
 
   @Override
-  public void setElementTypeFilters(Set<PdfElementType> types) {
-    this.typesFilter = types;
+  public void setElementTypesFilter(Set<PdfElementType> typesFilter) {
+    this.typesFilter = typesFilter;
   }
 
   // ==========================================================================
 
   @Override
-  public Set<PdfRole> getElementRoleFilters() {
+  public Set<PdfRole> getSemanticRolesFilter() {
     return this.rolesFilter;
   }
 
   @Override
-  public void setElementRoleFilters(Set<PdfRole> roles) {
-    this.rolesFilter = roles;
+  public void setSemanticRolesFilter(Set<PdfRole> rolesFilter) {
+    this.rolesFilter = rolesFilter;
   }
 
   // ==========================================================================
@@ -786,7 +795,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     }
 
     if (this.rolesFilter == null || this.rolesFilter.isEmpty()) {
-      // No filter is given -> The paragraph is relevant.
+      // No filter is given -> The element is relevant.
       return true;
     }
 

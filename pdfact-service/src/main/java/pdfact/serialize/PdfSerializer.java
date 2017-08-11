@@ -31,7 +31,7 @@ public interface PdfSerializer {
    * 
    * @return The text units to include on serialization.
    */
-  Set<PdfElementType> getElementTypeFilters();
+  Set<PdfElementType> getElementTypesFilter();
 
   /**
    * Sets the text units to include on serialization.
@@ -39,7 +39,7 @@ public interface PdfSerializer {
    * @param units
    *        The text units to include on serialization.
    */
-  void setElementTypeFilters(Set<PdfElementType> units);
+  void setElementTypesFilter(Set<PdfElementType> units);
 
   // ==========================================================================
 
@@ -48,7 +48,7 @@ public interface PdfSerializer {
    * 
    * @return The semantic roles of text units to include on serialization.
    */
-  Set<PdfRole> getElementRoleFilters();
+  Set<PdfRole> getSemanticRolesFilter();
 
   /**
    * Sets the semantic roles of text units to include on serialization.
@@ -56,7 +56,7 @@ public interface PdfSerializer {
    * @param roles
    *        The semantic roles of text units to include on serialization.
    */
-  void setElementRoleFilters(Set<PdfRole> roles);
+  void setSemanticRolesFilter(Set<PdfRole> roles);
 
   // ==========================================================================
 

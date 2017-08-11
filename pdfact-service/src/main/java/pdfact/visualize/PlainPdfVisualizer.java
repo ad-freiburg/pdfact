@@ -42,12 +42,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected PdfDrawerFactory pdfDrawerFactory;
 
   /**
-   * The element types filter.
+   * The element types to consider on visualizing.
    */
   protected Set<PdfElementType> typesFilter;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to consider on visualizing.
    */
   protected Set<PdfRole> rolesFilter;
 
@@ -98,28 +98,28 @@ public class PlainPdfVisualizer implements PdfVisualizer {
           continue;
         }
 
-        // Serialize the paragraph if paragraphs match the types filter.
+        // Visualize the paragraph (if types filter includes paragraphs).
         if (hasRelevantElementType(paragraph)) {
           visualizeParagraph(paragraph, drawer);
         }
 
         for (PdfTextBlock block : paragraph.getTextBlocks()) {
-          // Serialize the text block if text blocks match the types filter.
+          // Visualize the text block (if types filter includes text blocks).
           if (hasRelevantElementType(block)) {
             visualizeTextBlock(block, drawer);
           }
           for (PdfTextLine line : block.getTextLines()) {
-            // Serialize the text line if text lines match the types filter.
+            // Visualize the text line (if types filter includes text lines).
             if (hasRelevantElementType(line)) {
               visualizeTextLine(line, drawer);
             }
             for (PdfWord word : line.getWords()) {
-              // Serialize the word if words match the types filter.
+              // Visualize the word (if types filter includes words).
               if (hasRelevantElementType(word)) {
                 visualizeWord(word, drawer);
               }
               for (PdfCharacter character : word.getCharacters()) {
-                // Serialize the character if characters match the type filter.
+                // Visualize the character (if types filter includes chars).
                 if (hasRelevantElementType(character)) {
                   visualizeCharacter(character, drawer);
                 }
@@ -132,11 +132,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       // Visualize the graphical elements.
       for (PdfPage page : pdf.getPages()) {
         for (PdfFigure figure : page.getFigures()) {
+          // Visualize the figure (if types filter includes figures).
           if (hasRelevantElementType(figure)) {
             visualizeFigure(figure, drawer);
           }
         }
         for (PdfShape shape : page.getShapes()) {
+          // Visualize the shape (if types filter includes shapes).
           if (hasRelevantElementType(shape)) {
             visualizeShape(shape, drawer);
           }
@@ -269,7 +271,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==========================================================================
 
   /**
-   * Visualizes the given list of rectangles using the given drawer.
+   * Visualizes the given PDF element using the given drawer.
    * 
    * @param element
    *        The element to visualize.
@@ -278,7 +280,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @param color
    *        The color to use.
    * @throws PdfActVisualizeException
-   *         If the drawing failed.
+   *         If something went wrong on visualization.
    */
   protected void visualizePdfElement(PdfElement element, PdfDrawer drawer,
       Color color) throws PdfActVisualizeException {
@@ -342,7 +344,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   }
 
   /**
-   * Visualizes the given position.
+   * Visualizes the given PDF position.
    * 
    * @param position
    *        The position to visualize.
