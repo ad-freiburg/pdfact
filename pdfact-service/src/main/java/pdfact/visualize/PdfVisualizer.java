@@ -28,36 +28,36 @@ public interface PdfVisualizer {
   // ==========================================================================
 
   /**
-   * Returns the text units to include on serialization.
+   * Returns the element types filter.
    * 
-   * @return The text units to include on serialization.
+   * @return The element types filter.
    */
   Set<PdfElementType> getElementTypeFilters();
 
   /**
-   * Sets the text units to include on serialization.
+   * Sets the element types filter.
    * 
    * @param units
-   *        The text units to include on serialization.
+   *        The element types filter.
    */
   void setElementTypeFilters(Set<PdfElementType> units);
 
   // ==========================================================================
 
   /**
-   * Returns the semantic roles of text units to include on serialization.
+   * Returns the semantic roles filter.
    * 
-   * @return The semantic roles of text units to include on serialization.
+   * @return The semantic roles filter.
    */
-  Set<PdfRole> getElementRoleFilters();
+  Set<PdfRole> getSemanticRolesFilter();
 
   /**
-   * Sets the semantic roles of text units to include on serialization.
+   * Sets the semantic roles filter.
    * 
    * @param roles
-   *        The semantic roles of text units to include on serialization.
+   *        The semantic roles filter.
    */
-  void setElementRoleFilters(Set<PdfRole> roles);
+  void setSemanticRolesFilter(Set<PdfRole> roles);
 
   // ==========================================================================
 

@@ -26,5 +26,5 @@ public interface PdfTextLineStatistician {
    * 
    * @return The computed statistics.
    */
-  PdfTextLineStatistic combine(List<? extends HasTextLineStatistic> stats);
+  PdfTextLineStatistic aggregate(List<? extends HasTextLineStatistic> stats);
 }

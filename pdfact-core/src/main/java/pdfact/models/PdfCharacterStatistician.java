@@ -26,5 +26,5 @@ public interface PdfCharacterStatistician {
    * 
    * @return The computed statistics.
    */
-  PdfCharacterStatistic combine(List<? extends HasCharacterStatistic> stats);
+  PdfCharacterStatistic aggregate(List<? extends HasCharacterStatistic> stats);
 }

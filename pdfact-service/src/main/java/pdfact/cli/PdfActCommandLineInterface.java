@@ -91,14 +91,14 @@ public class PdfActCommandLineInterface {
         this.pdfAct.setVisualizationTarget(parser.getVisualizationFilePath());
       }
 
-      // Pass the text unit filters for serialization & visualization.
-      if (parser.hasTextUnitFilters()) {
-        this.pdfAct.setTextUnitFilters(parser.getTextUnitFilters());
+      // Pass the element types filter for serialization & visualization.
+      if (parser.hasElementTypesFilter()) {
+        this.pdfAct.setElementTypesFilter(parser.getElementTypesFilter());
       }
 
-      // Pass the semantic role filters for serialization & visualization.
-      if (parser.hasRoleFilters()) {
-        this.pdfAct.setRoleFilters(parser.getRoleFilters());
+      // Pass the semantic roles filter for serialization & visualization.
+      if (parser.hasSemanticRolesFilter()) {
+        this.pdfAct.setSemanticRolesFilter(parser.getSemanticRolesFilter());
       }
 
       // Run PdfAct.
@@ -201,16 +201,16 @@ public class PdfActCommandLineInterface {
     // ========================================================================
 
     /**
-     * The name of the option to define the text unit(s) to be included in the
+     * The name of the option to define the element types to be included in the
      * output.
      */
-    protected static final String OPTION_TEXT_UNIT = "unit";
+    protected static final String OPTION_ELEMENT_TYPES_FILTER = "type";
 
     /**
-     * The text unit(s) to be included in the output.
+     * The element type(s) to be included in the output.
      */
-    @Arg(dest = OPTION_TEXT_UNIT)
-    protected List<String> units;
+    @Arg(dest = OPTION_ELEMENT_TYPES_FILTER)
+    protected List<String> elementTypesFilter;
 
     // ========================================================================
 
@@ -218,12 +218,12 @@ public class PdfActCommandLineInterface {
      * The name of the option to define the semantic role(s) to consider on
      * generating the output.
      */
-    protected static final String OPTION_ROLE = "role";
+    protected static final String OPTION_SEMANTIC_ROLES_FILTER = "role";
 
     /**
      * The semantic role(s) to consider.
      */
-    @Arg(dest = OPTION_ROLE)
+    @Arg(dest = OPTION_SEMANTIC_ROLES_FILTER)
     protected List<String> roles;
 
     // ========================================================================
@@ -274,33 +274,33 @@ public class PdfActCommandLineInterface {
           .help("Defines the format in which the text output should be "
               + "written. Choose from: " + formatChoices + ".");
 
-      // Add an argument to define the text unit(s) to extract.
-      Set<String> textUnitChoices = PdfElementType.getGroupNames();
-      this.parser.addArgument("--" + OPTION_TEXT_UNIT)
-          .dest(OPTION_TEXT_UNIT)
+      // Add an argument to define the element types filter.
+      Set<String> elementTypesChoices = PdfElementType.getGroupNames();
+      this.parser.addArgument("--" + OPTION_ELEMENT_TYPES_FILTER)
+          .dest(OPTION_ELEMENT_TYPES_FILTER)
           .nargs("*")
-          .choices(textUnitChoices)
+          .choices(elementTypesChoices)
           .required(false)
-          .metavar("<unit>", "<unit>")
-          .help("Defines one or more text units to be included in the text "
+          .metavar("<type>", "<type>")
+          .help("Defines one or more element types to be included in the text "
               + "output (and visualization if the --"
               + OPTION_VISUALIZATION_FILE_PATH + " option is given). "
               + "Choose from:" + formatChoices + ".");
 
       // Add an argument to define the semantic role(s) to extract.
       Set<String> roleChoices = PdfRole.getNames();
-      this.parser.addArgument("--" + OPTION_ROLE)
-          .dest(OPTION_ROLE)
+      this.parser.addArgument("--" + OPTION_SEMANTIC_ROLES_FILTER)
+          .dest(OPTION_SEMANTIC_ROLES_FILTER)
           .nargs("*")
           .choices(roleChoices)
           .required(false)
           .metavar("<role>", "<role>")
           .help("Defines one or more semantic role(s) in order to filter the "
-              + "chosen text units to be included in the text output (and "
+              + "chosen element types to be included in the text output (and "
               + "visualization if the --" + OPTION_VISUALIZATION_FILE_PATH + " "
-              + "option is given) by those roles. If not specified, all text "
-              + "units will be included, regardless of their semantic roles. "
-              + "Choose from: " + roleChoices);
+              + "option is given) by those roles. If not specified, all "
+              + "element types will be included, regardless of their semantic "
+              + "roles. Choose from: " + roleChoices);
 
       // Add an argument to define the path to the visualization file.
       this.parser.addArgument("--" + OPTION_VISUALIZATION_FILE_PATH)
@@ -309,7 +309,7 @@ public class PdfActCommandLineInterface {
           .metavar("<visualization-file>")
           .help("Defines a path to a file where pdfact should write a "
               + "visualization of the text output (that is a PDF file where "
-              + "the chosen text units are surrounded by bounding boxes). If "
+              + "the chosen elements are surrounded by bounding boxes). If "
               + "not specified, no visualization will be created.");
 
       // Add an argument to define the log level.
@@ -453,12 +453,13 @@ public class PdfActCommandLineInterface {
     // ========================================================================
 
     /**
-     * Returns true, if there is at least one text unit given.
+     * Returns true, if there is at least one element type is given.
      * 
-     * @return True, if there is at least one text unit given; False otherwise.
+     * @return True, if there is at least one element type is given; False
+     *         otherwise.
      */
-    public boolean hasTextUnitFilters() {
-      return this.units != null;
+    public boolean hasElementTypesFilter() {
+      return this.elementTypesFilter != null;
     }
 
     /**
@@ -466,8 +467,8 @@ public class PdfActCommandLineInterface {
      * 
      * @return The feature(s) to extract.
      */
-    public List<String> getTextUnitFilters() {
-      return this.units;
+    public List<String> getElementTypesFilter() {
+      return this.elementTypesFilter;
     }
 
     // ========================================================================
@@ -477,7 +478,7 @@ public class PdfActCommandLineInterface {
      * 
      * @return True, if there is at least one role given; False otherwise.
      */
-    public boolean hasRoleFilters() {
+    public boolean hasSemanticRolesFilter() {
       return this.roles != null;
     }
 
@@ -486,7 +487,7 @@ public class PdfActCommandLineInterface {
      * 
      * @return The role(s) to consider.
      */
-    public List<String> getRoleFilters() {
+    public List<String> getSemanticRolesFilter() {
       return this.roles;
     }
 

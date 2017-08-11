@@ -98,7 +98,7 @@ public class PlainPdfTextLineStatistician implements PdfTextLineStatistician {
   }
 
   @Override
-  public PdfTextLineStatistic combine(
+  public PdfTextLineStatistic aggregate(
       List<? extends HasTextLineStatistic> hasStats) {
     // Create new statistic object.
     PdfTextLineStatistic statistic = this.statisticFactory.create();

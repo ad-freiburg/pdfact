@@ -466,7 +466,7 @@ public class PdfAct extends PdfActCore {
    * @throws PdfActException
    *         If at least one of the given features is not valid.
    */
-  public void setTextUnitFilters(List<String> features) throws PdfActException {
+  public void setElementTypesFilter(List<String> features) throws PdfActException {
     // Check if at least one feature is given.
     if (features == null || features.size() == 0) {
       throw new PdfActValidateException("No features given.");
@@ -504,7 +504,7 @@ public class PdfAct extends PdfActCore {
    * @throws PdfActException
    *         If at least one of the given roles is not valid.
    */
-  public void setRoleFilters(List<String> roles) throws PdfActException {
+  public void setSemanticRolesFilter(List<String> roles) throws PdfActException {
     // Check if at least one role is given.
     if (roles == null || roles.size() == 0) {
       throw new PdfActValidateException("No roles given.");

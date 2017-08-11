@@ -102,7 +102,7 @@ public class PlainPdfCharacterStatistician implements PdfCharacterStatistician {
   // ==========================================================================
 
   @Override
-  public PdfCharacterStatistic combine(
+  public PdfCharacterStatistic aggregate(
       List<? extends HasCharacterStatistic> stats) {
     // Create new statistic object.
     PdfCharacterStatistic statistic = this.statisticFactory.create();

@@ -29,14 +29,14 @@ public interface PdfXmlSerializer extends PdfSerializer {
     /**
      * Creates a new PdfXmlSerializer.
      * 
-     * @param units
-     *        The text units to extract.
+     * @param types
+     *        The element types filter.
      * @param roles
-     *        The semantic roles of text units to extract.
+     *        The semantic roles filter.
      * 
      * @return An instance of PdfXmlSerializer.
      */
-    PdfXmlSerializer create(@Assisted Set<PdfElementType> units,
+    PdfXmlSerializer create(@Assisted Set<PdfElementType> types,
         @Assisted Set<PdfRole> roles);
   }
 }

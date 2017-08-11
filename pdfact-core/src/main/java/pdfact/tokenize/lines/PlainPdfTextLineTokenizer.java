@@ -164,7 +164,7 @@ public class PlainPdfTextLineTokenizer implements PdfTextLineTokenizer {
    * @return The character statistics for the given text line.
    */
   protected PdfCharacterStatistic computeCharStatistics(PdfTextLine line) {
-    return this.charStatistician.combine(line.getWords());
+    return this.charStatistician.aggregate(line.getWords());
   }
 
   /**

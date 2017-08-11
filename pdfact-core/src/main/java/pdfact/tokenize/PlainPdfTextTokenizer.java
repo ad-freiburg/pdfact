@@ -97,7 +97,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
     }
 
     pdf.setTextLineStatistic(
-        this.textLineStatistician.combine(pdf.getPages()));
+        this.textLineStatistician.aggregate(pdf.getPages()));
 
     return linesMap;
   }
@@ -136,7 +136,7 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
       page.setCharacterStatistic(stats);
     }
     // Compute the character statistics for the whole PDF document.
-    pdf.setCharacterStatistic(this.characterStatistician.combine(pages));
+    pdf.setCharacterStatistic(this.characterStatistician.aggregate(pages));
   }
 
   /**
@@ -148,6 +148,6 @@ public class PlainPdfTextTokenizer implements PdfTextTokenizer {
   protected void computeTextLineStatistics(PdfDocument pdf) {
     List<PdfPage> pages = pdf.getPages();
     // Compute the text line statistics for the whole PDF document.
-    pdf.setTextLineStatistic(this.textLineStatistician.combine(pages));
+    pdf.setTextLineStatistic(this.textLineStatistician.aggregate(pages));
   }
 }

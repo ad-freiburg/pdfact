@@ -22,6 +22,7 @@ import static pdfact.serialize.plain.PlainPdfSerializerConstants.PDF;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.POSITION;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.POSITIONS;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.R;
+import static pdfact.serialize.plain.PlainPdfSerializerConstants.ROLE;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT_LINE;
@@ -402,6 +403,16 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
           result.add(start(POSITIONS, level));
           result.addAll(serialized);
           result.add(end(POSITIONS, level));
+        }
+      }
+
+      // Serialize the role of the element, if there is any.
+      if (element instanceof HasRole) {
+        HasRole hasRole = (HasRole) element;
+        PdfRole role = hasRole.getRole();
+
+        if (role != null) {
+          result.add(start(ROLE, level) + text(role.getName()) + end(ROLE));
         }
       }
 

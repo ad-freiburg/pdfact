@@ -488,7 +488,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @return The character statistics for the given text block.
    */
   protected PdfCharacterStatistic computeCharStatistics(PdfTextBlock block) {
-    return this.charStatistician.combine(block.getTextLines());
+    return this.charStatistician.aggregate(block.getTextLines());
   }
 
   /**

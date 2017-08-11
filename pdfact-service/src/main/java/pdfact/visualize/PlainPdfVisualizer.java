@@ -186,6 +186,14 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected void visualizeTextBlock(PdfTextBlock block, PdfDrawer drawer)
       throws PdfActVisualizeException {
     visualizePdfElement(block, drawer, Color.BLUE);
+    try {
+      String roleStr = block.getRole() != null ? block.getRole().getName() : "";
+      drawer.drawText(roleStr, 
+          block.getPosition().getPage().getPageNumber(), 
+          block.getPosition().getRectangle().getUpperLeft(), Color.BLACK, 9f);
+    } catch (IOException e) {
+      
+    }
   }
 
   /**
@@ -364,7 +372,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       if (page != null && rect != null) {
         int pageNum = page.getPageNumber();
         try {
-          drawer.drawBoundingBox(rect, pageNum, color, color, 1f);
+          drawer.drawBoundingBox(rect, pageNum, color, null, 1f);
         } catch (IOException e) {
           throw new PdfActVisualizeException(
               "Couldn't visualize the PDF document", e);
@@ -388,12 +396,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==========================================================================
 
   @Override
-  public Set<PdfRole> getElementRoleFilters() {
+  public Set<PdfRole> getSemanticRolesFilter() {
     return this.rolesFilter;
   }
 
   @Override
-  public void setElementRoleFilters(Set<PdfRole> roles) {
+  public void setSemanticRolesFilter(Set<PdfRole> roles) {
     this.rolesFilter = roles;
   }
 

@@ -8,15 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.Spliterator;
 
+import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.models.PdfSinglePositionElement;
 import pdfact.models.PdfElementList;
+import pdfact.models.PdfSinglePositionElement;
 import pdfact.utils.sort.Quicksort;
-
-// TODO: Implement hashCode() and equals().
 
 /**
  * A plain implementation of {@link PdfElementList}.
@@ -26,47 +24,173 @@ import pdfact.utils.sort.Quicksort;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfElementList<T extends PdfSinglePositionElement> extends ArrayList<T>
+public class PlainPdfElementList<T extends PdfSinglePositionElement>
     implements PdfElementList<T> {
   /**
-   * The serial id.
+   * The underlying list.
    */
-  protected static final long serialVersionUID = 2032345121881710427L;
-
-  /**
-   * The default initial capacity of this list.
-   */
-  protected static final int DEFAULT_INITIAL_CAPACITY = 16;
+  protected ArrayList<T> list;
 
   // ==========================================================================
-  // Constructors.
 
   /**
-   * Creates a new, empty list.
+   * Creates an empty list.
    */
   @AssistedInject
   public PlainPdfElementList() {
-    this(DEFAULT_INITIAL_CAPACITY);
+    this.list = new ArrayList<>();
   }
 
   /**
-   * Creates a new, empty list.
-   * 
+   * Creates an empty list with the given initial capacity.
+   *
    * @param initialCapacity
-   *        The initial capacity of this list.
+   *        The initial capacity of the list
    */
   @AssistedInject
-  public PlainPdfElementList(int initialCapacity) {
-    super(initialCapacity);
+  public PlainPdfElementList(@Assisted int initialCapacity) {
+    this.list = new ArrayList<>(initialCapacity);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public T get(int index) {
+    return this.list.get(index);
+  }
+
+  @Override
+  public T set(int index, T element) {
+    return this.list.set(index, element);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean contains(Object o) {
+    return this.list.contains(o);
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> c) {
+    return this.list.containsAll(c);
+  }
+
+  @Override
+  public int indexOf(Object o) {
+    return this.list.indexOf(o);
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
+    return this.list.lastIndexOf(o);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean add(T e) {
+    return this.list.add(e);
+  }
+
+  @Override
+  public void add(int index, T element) {
+    this.list.add(index, element);
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends T> c) {
+    return this.list.addAll(c);
+  }
+
+  @Override
+  public boolean addAll(int index, Collection<? extends T> c) {
+    return this.list.addAll(index, c);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean remove(Object o) {
+    return this.list.remove(o);
+  }
+
+  @Override
+  public T remove(int index) {
+    return this.list.remove(index);
+  }
+
+  @Override
+  public boolean removeAll(Collection<?> c) {
+    return this.list.removeAll(c);
+  }
+
+  @Override
+  public boolean retainAll(Collection<?> c) {
+    return this.list.retainAll(c);
+  }
+
+  @Override
+  public void clear() {
+    this.list.clear();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public int size() {
+    return this.list.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return this.list.isEmpty();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Object[] toArray() {
+    return this.list.toArray();
+  }
+
+  @Override
+  public <X> X[] toArray(X[] a) {
+    return this.list.toArray(a);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Iterator<T> iterator() {
+    return this.list.iterator();
+  }
+
+  @Override
+  public ListIterator<T> listIterator() {
+    return this.list.listIterator();
+  }
+
+  @Override
+  public ListIterator<T> listIterator(int index) {
+    return this.list.listIterator(index);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<T> subList(int fromIndex, int toIndex) {
+    return this.list.subList(fromIndex, toIndex);
   }
 
   // ==========================================================================
 
   @Override
   public void swap(int i, int j) {
-    T tmp = get(i);
-    super.set(i, get(j));
-    super.set(j, tmp);
+    T first = this.list.get(i);
+    T second = this.list.get(j);
+    this.list.set(i, second);
+    this.list.set(j, first);
   }
 
   @Override
@@ -83,25 +207,6 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
 
   // ==========================================================================
 
-  @Override
-  public String toString() {
-    return super.toString();
-  }
-
-  // ==========================================================================
-  
-  @Override
-  public boolean equals(Object other) {
-    return super.equals(other);
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  // ==========================================================================
-
   /**
    * A view of a PdfElementList.
    * 
@@ -110,7 +215,7 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
    * @param <S>
    *        The type of the PDF elements in this list.
    */
-  class PdfElementView<S extends PdfSinglePositionElement> extends PlainPdfElementList<S>
+  class PdfElementView<S extends PdfSinglePositionElement>
       implements PdfElementList<S> {
     /**
      * The serial id.
@@ -123,10 +228,15 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
     protected final PdfElementList<S> parent;
 
     /**
-     * The offset of this view in the parent list.
+     * The left boundary of this view in the parent list.
      */
-    protected final int offset;
+    protected final int from;
 
+    /**
+     * The right boundary of this view in the parent list.
+     */
+    protected final int to;
+    
     /**
      * The size of this list (the number of elements).
      */
@@ -148,35 +258,144 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
     PdfElementView(PdfElementList<S> parent, int fromIndex, int toIndex) {
       super();
       this.parent = parent;
-      this.offset = fromIndex;
+      this.from = fromIndex;
+      this.to = toIndex;
       this.size = toIndex - fromIndex;
     }
 
     // ========================================================================
-    // Don't allow to add elements to views.
 
     @Override
-    public boolean add(S s) {
+    public S get(int index) {
+      return this.parent.get(this.from + index);
+    }
+
+    @Override
+    public S set(int index, S element) {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    // ========================================================================
+
+    @Override
+    public boolean contains(Object o) {
+      return indexOf(o) >= 0;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+      for (Object o : c) {
+        if (!contains(o)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+      for (int i = this.from; i < this.size; i++) {
+        if (o.equals(get(i))) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+      for (int i = this.size - 1; i >= this.from; i--) {
+        if (o.equals(get(i))) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    // ========================================================================
+
+    @Override
+    public boolean add(S e) {
+      // Don't allow to change the content of the list.
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public void add(int index, S s) {
+    public void add(int index, S element) {
+      // Don't allow to change the content of the list.
       throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean addAll(Collection<? extends S> c) {
+      // Don't allow to change the content of the list.
       throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends S> c) {
+      // Don't allow to change the content of the list.
       throw new UnsupportedOperationException();
     }
 
     // ========================================================================
-    // Iterators.
+
+    @Override
+    public boolean remove(Object o) {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public S remove(int index) {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+      // Don't allow to change the content of the list.
+      throw new UnsupportedOperationException();
+    }
+
+    // ========================================================================
+
+    @Override
+    public int size() {
+      return this.size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return this.size == 0;
+    }
+
+    // ========================================================================
+
+    @Override
+    public Object[] toArray() {
+      return Arrays.copyOfRange(this.parent.toArray(), this.from, this.to);
+    }
+
+    @Override
+    public <X> X[] toArray(X[] a) {
+      throw new UnsupportedOperationException();
+    }
+
+    // ========================================================================
 
     @Override
     public Iterator<S> iterator() {
@@ -184,7 +403,12 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
     }
 
     @Override
-    public ListIterator<S> listIterator(final int index) {
+    public ListIterator<S> listIterator() {
+      return listIterator(0);
+    }
+
+    @Override
+    public ListIterator<S> listIterator(int index) {
       return new ListIterator<S>() {
         int cursor = index;
 
@@ -241,65 +465,34 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement> extends Arr
       };
     }
 
-    @Override
-    public Spliterator<S> spliterator() {
-      throw new UnsupportedOperationException();
-    }
-
     // ========================================================================
-    // Getters.
 
     @Override
-    public S get(int index) {
-      return this.parent.get(this.offset + index);
-    }
-
-    @Override
-    public int size() {
-      return this.size;
-    }
-
-    public boolean isEmpty() {
-      return this.size == 0;
+    public List<S> subList(int from, int to) {
+      return this.parent.subList(this.from + from, this.from + to);
     }
 
     // ========================================================================
 
     @Override
     public void swap(int i, int j) {
-      this.parent.swap(this.offset + i, this.offset + j);
+      this.parent.swap(this.from + i, this.from + j);
     }
 
-    // ========================================================================
+    @Override
+    public void sort(Comparator<? super S> c) {
+      Quicksort.sort(this, c);
+    }
 
     @Override
-    public List<? extends PdfElementList<S>> cut(int i) {
+    public List<? extends PdfElementList<S>> cut(int index) {
       // Create new views.
-      int left = this.offset;
-      int cut = this.offset + i;
-      int right = this.offset + size();
+      int left = this.from;
+      int cut = this.from + index;
+      int right = this.from + size();
       PdfElementView<S> v1 = new PdfElementView<S>(this.parent, left, cut);
       PdfElementView<S> v2 = new PdfElementView<S>(this.parent, cut, right);
       return Arrays.asList(v1, v2);
-    }
-
-    // ========================================================================
-
-    @Override
-    public String toString() {
-      return super.toString();
-    }
-
-    // ========================================================================
-    
-    @Override
-    public boolean equals(Object other) {
-      return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-      return super.hashCode();
     }
   }
 }

@@ -11,10 +11,10 @@ import pdfact.models.PdfCharacterStatistician;
 import pdfact.models.PdfDocument;
 import pdfact.models.PdfPage;
 import pdfact.models.PdfPosition;
-import pdfact.models.PdfWord;
-import pdfact.models.PdfWordList;
 import pdfact.models.PdfPosition.PdfPositionFactory;
+import pdfact.models.PdfWord;
 import pdfact.models.PdfWord.PdfWordFactory;
+import pdfact.models.PdfWordList;
 import pdfact.models.PdfWordList.PdfWordListFactory;
 import pdfact.utils.character.PdfCharacterUtils;
 import pdfact.utils.collection.CollectionUtils;
@@ -39,7 +39,7 @@ public class PlainPdfWordTokenizer implements PdfWordTokenizer {
   protected PdfWordFactory wordFactory;
 
   /**
-   * The word classifier.
+   * The word segmenter.
    */
   protected PdfWordSegmenter segmenter;
 
@@ -96,10 +96,10 @@ public class PlainPdfWordTokenizer implements PdfWordTokenizer {
     PdfWordList words = this.wordListFactory.create();
 
     // Segment the given characters of a line into word segments.
-    List<PdfCharacterList> segments = this.segmenter.segment(pdf, page, line);
+    List<PdfCharacterList> segments = segmentIntoWords(pdf, page, line);
 
-    PdfWord word = null;
     // Create the PdfWord objects.
+    PdfWord word = null;
     for (PdfCharacterList segment : segments) {
       word = this.wordFactory.create();
       word.setCharacters(segment);
@@ -115,6 +115,25 @@ public class PlainPdfWordTokenizer implements PdfWordTokenizer {
     }
 
     return words;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Segments the given text line into words.
+   * 
+   * @param pdf
+   *        The related PDF document.
+   * @param page
+   *        The related PDF page.
+   * @param line
+   *        The characters of the text line to segment.
+   * 
+   * @return The list of words.
+   */
+  protected List<PdfCharacterList> segmentIntoWords(PdfDocument pdf,
+      PdfPage page, PdfCharacterList line) {
+    return this.segmenter.segment(pdf, page, line);
   }
 
   // ==========================================================================

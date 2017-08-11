@@ -51,6 +51,8 @@ public class PlainPdfSerializerConstants {
   static final String POSITIONS = "positions";
   /** The constant 'R' (the red part of an RGB color). */
   static final String R = "r";
+  /** The constant 'ROLE'. */
+  static final String ROLE = "role";
   /** The constant 'TEXT'. */
   static final String TEXT = "text";
   /** The constant 'TEXT_BLOCK'. */

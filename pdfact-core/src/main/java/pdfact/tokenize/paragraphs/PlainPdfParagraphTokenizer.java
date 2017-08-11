@@ -5,18 +5,18 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
-import pdfact.models.PdfCharacter;
+import pdfact.models.PdfCharacterStatistic;
+import pdfact.models.PdfCharacterStatistician;
 import pdfact.models.PdfDocument;
-import pdfact.models.PdfPage;
 import pdfact.models.PdfParagraph;
+import pdfact.models.PdfParagraph.PdfParagraphFactory;
+import pdfact.models.PdfPosition;
 import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
-import pdfact.models.PdfTextLine;
-import pdfact.models.PdfWord;
-import pdfact.models.PdfParagraph.PdfParagraphFactory;
+import pdfact.models.PdfTextLineStatistic;
+import pdfact.models.PdfTextLineStatistician;
 import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator;
 import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator.PdfWordDehyphenatorFactory;
-import pdfact.utils.character.PdfCharacterUtils;
 import pdfact.utils.collection.CollectionUtils;
 
 /**
@@ -26,9 +26,24 @@ import pdfact.utils.collection.CollectionUtils;
  */
 public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   /**
+   * The paragraph segmenter.
+   */
+  protected PdfParagraphSegmenter paragraphSegmenter;
+
+  /**
    * The factory to create instances of {@link PdfParagraph}.
    */
   protected PdfParagraphFactory paragraphFactory;
+
+  /**
+   * The character statistician.
+   */
+  protected PdfCharacterStatistician characterStatistician;
+
+  /**
+   * The text line statistician.
+   */
+  protected PdfTextLineStatistician textLineStatistician;
 
   /**
    * The factory to create instances of {@link PdfWordDehyphenator}.
@@ -40,15 +55,28 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
   /**
    * Creates a new {@link PlainPdfParagraphTokenizer}.
    * 
+   * @param paragraphSegmenter
+   *        The paragraph segmenter.
    * @param paragraphFactory
    *        The factory to create instances of {@link PdfParagraph}.
+   * @param characterStatistician
+   *        The character statistician.
+   * @param textLineStatistician
+   *        The text line statistician.
    * @param dehyphenatorFactory
    *        The factory to create instances of {@link PdfWordDehyphenator}.
    */
   @Inject
-  public PlainPdfParagraphTokenizer(PdfParagraphFactory paragraphFactory,
+  public PlainPdfParagraphTokenizer(
+      PdfParagraphSegmenter paragraphSegmenter,
+      PdfParagraphFactory paragraphFactory,
+      PdfCharacterStatistician characterStatistician,
+      PdfTextLineStatistician textLineStatistician,
       PdfWordDehyphenatorFactory dehyphenatorFactory) {
+    this.paragraphSegmenter = paragraphSegmenter;
     this.paragraphFactory = paragraphFactory;
+    this.characterStatistician = characterStatistician;
+    this.textLineStatistician = textLineStatistician;
     this.dehyphenatorFactory = dehyphenatorFactory;
   }
 
@@ -59,146 +87,152 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
   @Override
   public List<PdfParagraph> tokenize(PdfDocument pdf) {
-    if (pdf == null) {
-      return null;
+    List<PdfParagraph> paragraphs = new ArrayList<>();
+
+    // Segment the PDF document into paragraphs.
+    List<List<PdfTextBlock>> segments = segmentIntoParagraphs(pdf);
+
+    // Create the PdfParagraph objects.
+    for (List<PdfTextBlock> segment : segments) {
+      PdfParagraph paragraph = this.paragraphFactory.create();
+      paragraph.setTextBlocks(segment);
+      paragraph.setText(computeText(paragraph));
+      paragraph.setPositions(computePositions(paragraph));
+      paragraph.setRole(computeRole(paragraph));
+      paragraph.setCharacterStatistic(computeCharacterStatistics(paragraph));
+      paragraph.setTextLineStatistic(computeTextLineStatistics(paragraph));
+      paragraphs.add(paragraph);
     }
 
-    List<PdfParagraph> paragraphs = identifyParagraphs(pdf);
     // TODO
     pdf.setParagraphs(paragraphs);
     
-    composeTexts(pdf, paragraphs);
-
     return paragraphs;
-  }
-
-  /**
-   * Identifies the paragraphs in the given PDF document.
-   * 
-   * @param pdf
-   *        The PDF document.
-   * 
-   * @return The list of identified paragraphs.
-   */
-  protected List<PdfParagraph> identifyParagraphs(PdfDocument pdf) {
-    List<PdfParagraph> paragraphs = new ArrayList<>();
-
-    // Put all blocks to a single list to be able to iterate them in one go.
-    List<PdfTextBlock> textBlocks = new ArrayList<>();
-    for (PdfPage page : pdf.getPages()) {
-      textBlocks.addAll(page.getTextBlocks());
-    }
-    
-    // Identify the paragraphs from the text blocks.
-    for (int i = 0; i < textBlocks.size(); i++) {
-      PdfTextBlock block = textBlocks.get(i);
-      
-      if (block.getParentPdfParagraph() != null) {
-        // The block was already added to a paragraph. Ignore it.
-        continue;
-      }
-
-      // Create a new paragraph.
-      PdfParagraph paragraph = this.paragraphFactory.create();
-      paragraph.setRole(block.getRole());
-      paragraph.addTextBlock(block);
-      block.setParentPdfParagraph(paragraph);
-
-      // If the role of the block is "body text", check if there is another
-      // block in the remaining blocks that belongs to the same paragraph.
-      if (block.getRole() == PdfRole.BODY_TEXT) {
-        for (int j = i + 1; j < textBlocks.size(); j++) {
-          PdfTextBlock otherBlock = textBlocks.get(j);
-          if (otherBlock.getRole() != PdfRole.BODY_TEXT) {
-            continue;
-          }
-          if (!belongsToParagraph(otherBlock, paragraph)) {
-            break;
-          }
-          // Add the block to the existing paragraph.
-          paragraph.addTextBlock(otherBlock);
-          paragraph.setRole(block.getRole());
-          otherBlock.setParentPdfParagraph(paragraph);
-        }
-      }
-      paragraphs.add(paragraph);
-    }
-    
-    return paragraphs;
-  }
-
-  /**
-   * Checks, if the given text block belongs to the given paragraph.
-   * 
-   * @param block
-   *        The text block to process.
-   * @param para
-   *        The paragraph to process.
-   * 
-   * @return True, if the given text block should be added to the paragraph.
-   */
-  protected boolean belongsToParagraph(PdfTextBlock block, PdfParagraph para) {
-    if (block == null || para == null) {
-      return false;
-    }
-
-    // The block belongs to the paragraph, if the paragraph doesn't end with
-    // a punctuation mark.
-    PdfWord word = para.getLastTextBlock().getLastTextLine().getLastWord();
-    PdfCharacter lastChar = word != null ? word.getLastCharacter() : null;
-    if (!PdfCharacterUtils.isPunctuationMark(lastChar)) {
-      return true;
-    }
-
-    // The block belongs to the paragraph, if the block starts with an
-    // lowercased letter.
-    PdfWord firstWord = block.getFirstTextLine().getFirstWord();
-    if (PdfCharacterUtils.isLowercase(firstWord.getFirstCharacter())) {
-      return true;
-    }
-
-    return false;
   }
 
   // ==========================================================================
 
   /**
-   * Compose the texts for the paragraphs.
+   * Segments the given PDF document into paragraphs.
    * 
    * @param pdf
-   *        The PDF document.
-   * @param paragraphs
-   *        The paragraphs to process.
+   *        The PDF document to process.
+   * 
+   * @return The list of list of text blocks of a paragraph.
    */
-  protected void composeTexts(PdfDocument pdf, List<PdfParagraph> paragraphs) {
-    PdfWordDehyphenator deyphenator = this.dehyphenatorFactory.create(pdf);
-
-    for (PdfParagraph paragraph : pdf.getParagraphs()) {
-      // Put all words to a single list to be able to iterate them in one go.
-      List<PdfWord> words = new ArrayList<>();
-      for (PdfTextBlock block : paragraph.getTextBlocks()) {
-        for (PdfTextLine line : block.getTextLines()) {
-          words.addAll(line.getWords());
-        }
-      }
-
-      List<PdfWord> newWords = new ArrayList<>();
-      for (int i = 0; i < words.size() - 1; i++) {
-        PdfWord word = words.get(i);
-        PdfWord nextWord = words.get(i + 1);
-
-        if (word.isHyphenated()) {
-          PdfWord dehyphenated = deyphenator.dehyphenate(word, nextWord);
-          newWords.add(dehyphenated);
-          i++;
-        } else {
-          newWords.add(word);
-        }
-      }
-      // TODO: Don't forget the last word.
-      newWords.add(words.get(words.size() - 1));
-      paragraph.setText(CollectionUtils.join(newWords, " "));
-    }
+  protected List<List<PdfTextBlock>> segmentIntoParagraphs(PdfDocument pdf) {
+    return this.paragraphSegmenter.segment(pdf);
   }
 
+  // ==========================================================================
+
+  /**
+   * Computes the text for the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * @return The text for the given paragraph.
+   */
+  protected String computeText(PdfParagraph p) {
+    // TODO: Dehyphenate
+    return CollectionUtils.join(p.getTextBlocks(), " ");
+  }
+
+  /**
+   * Computes the positions for the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * 
+   * @return The text for the given paragraph.
+   */
+  protected List<PdfPosition> computePositions(PdfParagraph p) {
+    List<PdfPosition> positions = new ArrayList<>();
+    for (PdfTextBlock block : p.getTextBlocks()) {
+      positions.add(block.getPosition());
+    }
+    return positions;
+  }
+
+  /**
+   * Computes the role for the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * 
+   * @return The role for the given paragraph.
+   */
+  protected PdfRole computeRole(PdfParagraph p) {
+    List<PdfTextBlock> textBlocks = p.getTextBlocks();
+    if (textBlocks == null || textBlocks.isEmpty()) {
+      return null;
+    }
+    // Return the role of the first text block.
+    return textBlocks.get(0).getRole();
+  }
+
+  /**
+   * Computes the statistics about the characters in the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * 
+   * @return The text for the given paragraph.
+   */
+  protected PdfCharacterStatistic computeCharacterStatistics(PdfParagraph p) {
+    return this.characterStatistician.aggregate(p.getTextBlocks());
+  }
+
+  /**
+   * Computes the statistics about the text lines in the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * 
+   * @return The text for the given paragraph.
+   */
+  protected PdfTextLineStatistic computeTextLineStatistics(PdfParagraph p) {
+    return this.textLineStatistician.aggregate(p.getTextBlocks());
+  }
+
+  // ==========================================================================
+
+//  /**
+//   * Compose the texts for the paragraphs.
+//   * 
+//   * @param pdf
+//   *        The PDF document.
+//   * @param paragraphs
+//   *        The paragraphs to process.
+//   */
+//  protected void composeTexts(PdfDocument pdf, List<PdfParagraph> paragraphs) {
+//    PdfWordDehyphenator deyphenator = this.dehyphenatorFactory.create(pdf);
+//
+//    for (PdfParagraph paragraph : pdf.getParagraphs()) {
+//      // Put all words to a single list to be able to iterate them in one go.
+//      List<PdfWord> words = new ArrayList<>();
+//      for (PdfTextBlock block : paragraph.getTextBlocks()) {
+//        for (PdfTextLine line : block.getTextLines()) {
+//          words.addAll(line.getWords());
+//        }
+//      }
+//
+//      List<PdfWord> newWords = new ArrayList<>();
+//      for (int i = 0; i < words.size() - 1; i++) {
+//        PdfWord word = words.get(i);
+//        PdfWord nextWord = words.get(i + 1);
+//
+//        if (word.isHyphenated()) {
+//          PdfWord dehyphenated = deyphenator.dehyphenate(word, nextWord);
+//          newWords.add(dehyphenated);
+//          i++;
+//        } else {
+//          newWords.add(word);
+//        }
+//      }
+//      // TODO: Don't forget the last word.
+//      newWords.add(words.get(words.size() - 1));
+//      paragraph.setText(CollectionUtils.join(newWords, " "));
+//    }
+//  }
 }

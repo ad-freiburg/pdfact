@@ -7,13 +7,12 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacterStatistic;
 import pdfact.models.PdfElementType;
-import pdfact.models.PdfParagraph;
 import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfTextLineList;
-import pdfact.models.PdfTextLineStatistic;
 import pdfact.models.PdfTextLineList.PdfTextLineListFactory;
+import pdfact.models.PdfTextLineStatistic;
 
 /**
  * A plain implementation of {@link PdfTextBlock}.
@@ -31,11 +30,6 @@ public class PlainPdfTextBlock extends PlainPdfSinglePositionElement
    * The text of this text block.
    */
   protected String text;
-
-  /**
-   * The parent paragraph of this text block.
-   */
-  protected PdfParagraph parentParagraph;
 
   /**
    * The role of this text block of this text block.
@@ -113,18 +107,6 @@ public class PlainPdfTextBlock extends PlainPdfSinglePositionElement
   @Override
   public void addTextLine(PdfTextLine line) {
     this.textLines.add(line);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public PdfParagraph getParentPdfParagraph() {
-    return this.parentParagraph;
-  }
-
-  @Override
-  public void setParentPdfParagraph(PdfParagraph paragraph) {
-    this.parentParagraph = paragraph;
   }
 
   // ==========================================================================

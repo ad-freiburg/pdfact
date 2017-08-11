@@ -20,6 +20,7 @@ import static pdfact.serialize.plain.PlainPdfSerializerConstants.PAGE;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.PARAGRAPH;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.POSITIONS;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.R;
+import static pdfact.serialize.plain.PlainPdfSerializerConstants.ROLE;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.serialize.plain.PlainPdfSerializerConstants.TEXT_LINE;
@@ -72,9 +73,9 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * The indentation length.
    */
   protected static final int INDENT_LENGTH = 2;
-  
+
   // ==========================================================================
-  
+
   /**
    * The element types to consider on serializing.
    */
@@ -94,8 +95,6 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * The colors of the PDF elements which were in fact serialized.
    */
   protected Set<PdfColor> usedColors;
-
-
 
   // ==========================================================================
   // Constructors.
@@ -356,6 +355,16 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
         }
       }
 
+      // Serialize the role of the element, if there is any.
+      if (element instanceof HasRole) {
+        HasRole hasRole = (HasRole) element;
+        PdfRole role = hasRole.getRole();
+
+        if (role != null) {
+          result.put(ROLE, role.getName());
+        }
+      }
+
       // Serialize the font face of the element, if there is any.
       if (element instanceof HasFontFace) {
         HasFontFace hasFontFace = (HasFontFace) element;
@@ -452,18 +461,18 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    */
   protected JSONObject serializePosition(PdfPosition position) {
     JSONObject positionJson = new JSONObject();
-    
+
     if (position != null) {
       PdfPage page = position.getPage();
       int pageNumber = page.getPageNumber();
       Rectangle rect = position.getRectangle();
-      
+
       if (pageNumber > 0 && rect != null) {
         positionJson.put(PAGE, pageNumber);
-        
+
         // If we pass primitive floats here, the values would be casted to
-        // double values (yielding in inaccurate numbers). So transform the 
-        // values to Float objects. 
+        // double values (yielding in inaccurate numbers). So transform the
+        // values to Float objects.
         positionJson.put(MIN_X, new Float(rect.getMinX()));
         positionJson.put(MIN_Y, new Float(rect.getMinY()));
         positionJson.put(MAX_X, new Float(rect.getMaxX()));

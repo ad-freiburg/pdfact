@@ -95,8 +95,10 @@ import pdfact.tokenize.lines.PdfTextLineSegmenter;
 import pdfact.tokenize.lines.PdfTextLineTokenizer;
 import pdfact.tokenize.lines.PlainPdfTextLineTokenizer;
 import pdfact.tokenize.lines.XYCutPdfTextLineSegmenter;
+import pdfact.tokenize.paragraphs.PdfParagraphSegmenter;
 import pdfact.tokenize.paragraphs.PdfParagraphTokenizer;
 import pdfact.tokenize.paragraphs.PdfParagraphTokenizer.PdfParagraphTokenizerFactory;
+import pdfact.tokenize.paragraphs.PlainPdfParagraphSegmenter;
 import pdfact.tokenize.paragraphs.PlainPdfParagraphTokenizer;
 import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator;
 import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator.PdfWordDehyphenatorFactory;
@@ -149,6 +151,7 @@ public class PdfActCoreModule extends com.google.inject.AbstractModule {
     fc(PdfTextLineStatistic.class, PdfTextLineStatisticFactory.class,
         PlainPdfTextLineStatistics.class);
 
+    bind(PdfParagraphSegmenter.class).to(PlainPdfParagraphSegmenter.class);
     fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class,
         PlainPdfParagraphTokenizer.class);
     fc(PdfWordDehyphenator.class, PdfWordDehyphenatorFactory.class,

@@ -1,18 +1,14 @@
 package pdfact.models.plain;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import java.util.Spliterator;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.models.PdfCharacter;
 import pdfact.models.PdfCharacterList;
+import pdfact.models.PdfElementList;
 
 // TODO: Implement hashCode() and equals().
 
@@ -32,18 +28,18 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
   // Constructors.
 
   /**
-   * Creates a new, empty list of characters.
+   * Creates an empty list.
    */
   @AssistedInject
   public PlainPdfCharacterList() {
-    this(DEFAULT_INITIAL_CAPACITY);
+    super();
   }
 
   /**
-   * Creates a new, empty list of characters.
-   * 
+   * Creates an empty list with the given initial capacity.
+   *
    * @param initialCapacity
-   *        The initial capacity of this list.
+   *        The initial capacity of the list
    */
   @AssistedInject
   public PlainPdfCharacterList(@Assisted int initialCapacity) {
@@ -61,51 +57,18 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
 
   // ==========================================================================
 
-  @Override
-  public String toString() {
-    return super.toString();
-  }
-
-  // ==========================================================================
-  
-  @Override
-  public boolean equals(Object other) {
-    return super.equals(other);
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  // ==========================================================================
-
   /**
    * A view of a PdfCharacterList.
    * 
    * @author Claudius Korzen
    */
-  class PdfCharacterView extends PlainPdfCharacterList 
+  class PdfCharacterView extends PdfElementView<PdfCharacter>
       implements PdfCharacterList {
+
     /**
      * The serial id.
      */
     protected static final long serialVersionUID = 884367879377788123L;
-
-    /**
-     * The parent list.
-     */
-    protected final PdfCharacterList parent;
-
-    /**
-     * The offset of this view in the parent list.
-     */
-    protected final int offset;
-
-    /**
-     * The size of this list (the number of elements in the list).
-     */
-    protected int size;
 
     // ========================================================================
     // Constructors.
@@ -113,166 +76,28 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
     /**
      * Creates a new view based on the given parent list.
      * 
-     * @param parent
+     * @param l
      *        The parent list.
-     * @param fromIndex
+     * @param from
      *        The start index in the parent list.
-     * @param toIndex
+     * @param to
      *        The end index in the parent list.
      */
-    PdfCharacterView(PdfCharacterList parent, int fromIndex, int toIndex) {
-      super();
-      this.parent = parent;
-      this.offset = fromIndex;
-      this.size = toIndex - fromIndex;
-    }
-
-    // ========================================================================
-    // Don't allow to add elements to views.
-
-    @Override
-    public boolean add(PdfCharacter c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void add(int index, PdfCharacter c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends PdfCharacter> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends PdfCharacter> c) {
-      throw new UnsupportedOperationException();
-    }
-
-    // ========================================================================
-    // Iterators.
-
-    @Override
-    public Iterator<PdfCharacter> iterator() {
-      return listIterator(0);
-    }
-
-    @Override
-    public ListIterator<PdfCharacter> listIterator(final int index) {
-      return new ListIterator<PdfCharacter>() {
-        int cursor = index;
-
-        @Override
-        public boolean hasNext() {
-          return this.cursor != PdfCharacterView.this.size;
-        }
-
-        @Override
-        public PdfCharacter next() {
-          if (this.cursor >= PdfCharacterView.this.size) {
-            throw new NoSuchElementException();
-          }
-          return PdfCharacterView.this.get(this.cursor++);
-        }
-
-        @Override
-        public boolean hasPrevious() {
-          return this.cursor != 0;
-        }
-
-        @Override
-        public PdfCharacter previous() {
-          if (this.cursor - 1 < 0) {
-            throw new NoSuchElementException();
-          }
-          return PdfCharacterView.this.get(this.cursor--);
-        }
-
-        @Override
-        public int nextIndex() {
-          return this.cursor;
-        }
-
-        @Override
-        public int previousIndex() {
-          return this.cursor - 1;
-        }
-
-        @Override
-        public void remove() {
-          throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void set(PdfCharacter c) {
-          throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void add(PdfCharacter c) {
-          throw new UnsupportedOperationException();
-        }
-      };
-    }
-
-    @Override
-    public Spliterator<PdfCharacter> spliterator() {
-      throw new UnsupportedOperationException();
-    }
-
-    // ========================================================================
-    // Getters.
-
-    @Override
-    public PdfCharacter get(int index) {
-      return this.parent.get(this.offset + index);
-    }
-
-    @Override
-    public int size() {
-      return this.size;
-    }
-
-    public boolean isEmpty() {
-      return this.size == 0;
+    public PdfCharacterView(PdfElementList<PdfCharacter> l, int from, int to) {
+      super(l, from, to);
     }
 
     // ========================================================================
 
     @Override
-    public void swap(int i, int j) {
-      this.parent.swap(this.offset + i, this.offset + j);
-    }
-
-    // ========================================================================
-
-    @Override
-    public List<PdfCharacterList> cut(int i) {
+    public List<PdfCharacterList> cut(int index) {
       // Create new views.
-      int left = this.offset;
-      int cut = this.offset + i;
-      int right = this.offset + size();
+      int left = this.from;
+      int cut = this.from + index;
+      int right = this.from + size();
       PdfCharacterView v1 = new PdfCharacterView(this.parent, left, cut);
       PdfCharacterView v2 = new PdfCharacterView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
-    }
-
-    // ========================================================================
-
-    @Override
-    public String toString() {
-      return super.toString();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      return super.equals(other);
-    }
-
-    @Override
-    public int hashCode() {
-      return super.hashCode();
     }
   }
 }

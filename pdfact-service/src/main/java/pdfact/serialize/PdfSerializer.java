@@ -27,34 +27,34 @@ public interface PdfSerializer {
   // ==========================================================================
 
   /**
-   * Returns the text units to include on serialization.
+   * Returns the element types filter.
    * 
-   * @return The text units to include on serialization.
+   * @return The element types filter.
    */
   Set<PdfElementType> getElementTypesFilter();
 
   /**
-   * Sets the text units to include on serialization.
+   * Sets the element types filter to include on serialization.
    * 
-   * @param units
-   *        The text units to include on serialization.
+   * @param types
+   *        The element types filter to include on serialization.
    */
-  void setElementTypesFilter(Set<PdfElementType> units);
+  void setElementTypesFilter(Set<PdfElementType> types);
 
   // ==========================================================================
 
   /**
-   * Returns the semantic roles of text units to include on serialization.
+   * Returns the semantic roles filter.
    * 
-   * @return The semantic roles of text units to include on serialization.
+   * @return The semantic roles filter.
    */
   Set<PdfRole> getSemanticRolesFilter();
 
   /**
-   * Sets the semantic roles of text units to include on serialization.
+   * Sets the semantic roles filter.
    * 
    * @param roles
-   *        The semantic roles of text units to include on serialization.
+   *        The semantic roles filter.
    */
   void setSemanticRolesFilter(Set<PdfRole> roles);
 
@@ -76,13 +76,13 @@ public interface PdfSerializer {
     /**
      * Creates a new PdfSerializer.
      * 
-     * @param units
-     *        The text units to extract.
+     * @param types
+     *        The element types filter.
      * @param roles
-     *        The semantic roles of text units to extract.
+     *        The semantic roles filter.
      * 
      * @return An instance of PdfSerializer.
      */
-    PdfSerializer create(Set<PdfElementType> units, Set<PdfRole> roles);
+    PdfSerializer create(Set<PdfElementType> types, Set<PdfRole> roles);
   }
 }
