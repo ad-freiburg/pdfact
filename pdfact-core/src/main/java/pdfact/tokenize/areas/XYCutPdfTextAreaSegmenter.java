@@ -14,6 +14,7 @@ import pdfact.models.PdfDocument;
 import pdfact.models.PdfPage;
 import pdfact.tokenize.xycut.XYCut;
 import pdfact.utils.geometric.Rectangle;
+import pdfact.utils.math.MathUtils;
 
 /**
  * A plain implementation of {@link PdfTextAreaSegmenter}, based on XYCut.
@@ -138,17 +139,19 @@ public class XYCutPdfTextAreaSegmenter extends XYCut
       PdfCharacterStatistic rightStats) {
     float largestMaxX = leftStats.getLargestMaxX();
     Set<PdfCharacter> leftChars = new HashSet<>();
-    for (PdfCharacter character : left) {
-      if (character.getRectangle().getMaxX() == largestMaxX) {
-        leftChars.add(character);
+    for (PdfCharacter c : left) {
+      // TODO: Allow a certain threshold value.
+      if (MathUtils.isEqual(c.getRectangle().getMaxX(), largestMaxX, 1f)) {
+        leftChars.add(c);
       }
     }
 
     float smallestMinX = rightStats.getSmallestMinX();
     Set<PdfCharacter> rightChars = new HashSet<>();
-    for (PdfCharacter character : right) {
-      if (character.getRectangle().getMinX() == smallestMinX) {
-        rightChars.add(character);
+    for (PdfCharacter c : right) {
+      // TODO: Allow a certain threshold value.
+      if (MathUtils.isEqual(c.getRectangle().getMinX(), smallestMinX, 1f)) {
+        rightChars.add(c);
       }
     }
 

@@ -285,7 +285,7 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
     }
 
     // Obtain the expected and actual line pitch for the given line.
-    PdfCharacterStatistic characterStats = pdf.getCharacterStatistic();
+    PdfCharacterStatistic characterStats = line.getCharacterStatistic();
     PdfTextLineStatistic textLineStats = pdf.getTextLineStatistic();
 
     PdfFontFace fontFace = characterStats.getMostCommonFontFace();
