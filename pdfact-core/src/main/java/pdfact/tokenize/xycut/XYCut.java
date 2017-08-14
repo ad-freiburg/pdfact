@@ -123,14 +123,16 @@ public abstract class XYCut {
             }
           halves = chars.cut(++index);
         }
-        if (bestCutIndex > -1) {
-          // A cut was found. Return the resulting halves.
-          return chars.cut(bestCutIndex);
-        }
       }
       currentPos = character.getRectangle().getMaxX();
     }
-    return Arrays.asList(chars);
+    
+    if (bestCutIndex > -1) {
+      // A cut was found. Return the resulting halves.
+      return chars.cut(bestCutIndex);
+    } else {
+      return Arrays.asList(chars);
+    }
   }
 
   /**
@@ -181,14 +183,16 @@ public abstract class XYCut {
             }
           halves = chars.cut(++index);
         }
-        if (bestCutIndex > -1) {
-          // A cut was found. Return the resulting halves.
-          return chars.cut(bestCutIndex);
-        }
       }
       currentPos = character.getRectangle().getMinY();
     }
-    return Arrays.asList(chars);
+    
+    if (bestCutIndex > -1) {
+      // A cut was found. Return the resulting halves.
+      return chars.cut(bestCutIndex);
+    } else {
+      return Arrays.asList(chars);
+    }
   }
 
   // ==========================================================================
