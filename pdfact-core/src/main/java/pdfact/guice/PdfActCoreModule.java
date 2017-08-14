@@ -131,75 +131,65 @@ public class PdfActCoreModule extends com.google.inject.AbstractModule {
 
   @Override
   protected void configure() {
-    // Bind the parsers.
-    fc(PdfParser.class, PdfParserFactory.class, PlainPdfParser.class);
-    fc(PdfStreamParser.class, PdfStreamParserFactory.class,
-        PdfBoxPdfStreamParser.class);
+    // Install the factory of the PDF parser.
+    install(new FactoryModuleBuilder()
+        .implement(PdfParser.class, PlainPdfParser.class)
+        .build(PdfParserFactory.class));
 
-    // Bind the tokenizers.
-    fc(PdfTextTokenizer.class, PdfTextTokenizerFactory.class,
-        PlainPdfTextTokenizer.class);
+    // Install the factory of the PDF stream parser.
+    install(new FactoryModuleBuilder()
+        .implement(PdfStreamParser.class, PdfBoxPdfStreamParser.class)
+        .build(PdfStreamParserFactory.class));
+
+    // Install the factory of the text tokenizer.
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextTokenizer.class, PlainPdfTextTokenizer.class)
+        .build(PdfTextTokenizerFactory.class));
+
+    // Bind the segmenters.
     bind(PdfTextAreaSegmenter.class).to(XYCutPdfTextAreaSegmenter.class);
     bind(PdfTextLineSegmenter.class).to(XYCutPdfTextLineSegmenter.class);
-    bind(PdfTextLineTokenizer.class).to(PlainPdfTextLineTokenizer.class);
     bind(PdfWordSegmenter.class).to(XYCutPdfWordSegmenter.class);
+    bind(PdfParagraphSegmenter.class).to(PlainPdfParagraphSegmenter.class);
+
+    // Bind the tokenizers.
+    bind(PdfTextLineTokenizer.class).to(PlainPdfTextLineTokenizer.class);
     bind(PdfWordTokenizer.class).to(PlainPdfWordTokenizer.class);
     bind(PdfTextBlockTokenizer.class).to(PlainPdfTextBlockTokenizer.class);
 
-    fc(PdfCharacterStatistic.class, PdfCharacterStatisticFactory.class,
-        PlainPdfCharacterStatistic.class);
-    fc(PdfTextLineStatistic.class, PdfTextLineStatisticFactory.class,
-        PlainPdfTextLineStatistics.class);
+    // Install the factories of the statistics.
+    install(new FactoryModuleBuilder()
+        .implement(PdfCharacterStatistic.class,
+            PlainPdfCharacterStatistic.class)
+        .build(PdfCharacterStatisticFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextLineStatistic.class, PlainPdfTextLineStatistics.class)
+        .build(PdfTextLineStatisticFactory.class));
 
-    bind(PdfParagraphSegmenter.class).to(PlainPdfParagraphSegmenter.class);
-    fc(PdfParagraphTokenizer.class, PdfParagraphTokenizerFactory.class,
-        PlainPdfParagraphTokenizer.class);
-    fc(PdfWordDehyphenator.class, PdfWordDehyphenatorFactory.class,
-        PlainPdfWordDehyphenator.class);
-
-    // Bind the semanticizer.
-    fc(PdfTextSemanticizer.class, PdfTextSemanticizerFactory.class,
-        PlainPdfTextSemanticizer.class);
-
-    // Bind the PDF model factories.
-    fc(PdfDocument.class, PdfDocumentFactory.class, PlainPdfDocument.class);
-    fc(PdfPage.class, PdfPageFactory.class, PlainPdfPage.class);
-
-    fc(PdfCharacter.class, PdfCharacterFactory.class, PlainPdfCharacter.class);
-    fc(PdfCharacterList.class, PdfCharacterListFactory.class,
-        PlainPdfCharacterList.class);
-
-    fc(PdfFigure.class, PdfFigureFactory.class, PlainPdfFigure.class);
-    fc(PdfShape.class, PdfShapeFactory.class, PlainPdfShape.class);
-    fc(PdfFont.class, PdfFontFactory.class, PlainPdfFont.class);
-    fc(PdfFontFace.class, PdfFontFaceFactory.class, PlainPdfFontFace.class);
-    fc(PdfColor.class, PdfColorFactory.class, PlainPdfColor.class);
-
-    fc(PdfTextBlock.class, PdfTextBlockFactory.class, PlainPdfTextBlock.class);
-
-    fc(PdfWord.class, PdfWordFactory.class, PlainPdfWord.class);
-    fc(PdfWordList.class, PdfWordListFactory.class, PlainPdfWordList.class);
-
-    fc(PdfTextLine.class, PdfTextLineFactory.class, PlainPdfTextLine.class);
-    fc(PdfTextLineList.class, PdfTextLineListFactory.class,
-        PlainPdfTextLineList.class);
-
-    fc(PdfParagraph.class, PdfParagraphFactory.class, PlainPdfParagraph.class);
-
+    // Bind the statistician.
     bind(PdfCharacterStatistician.class)
         .to(PlainPdfCharacterStatistician.class);
     bind(PdfTextLineStatistician.class).to(PlainPdfTextLineStatistician.class);
 
-    // Bind the geometric model factories.
-    fc(PdfPosition.class, PdfPositionFactory.class, PlainPdfPosition.class);
-    fc(Rectangle.class, RectangleFactory.class, PlainRectangle.class);
-    fc(Line.class, LineFactory.class, PlainLine.class);
-    fc(Point.class, PointFactory.class, PlainPoint.class);
+    // Install the factory of the paragraph tokenizer.
+    install(new FactoryModuleBuilder()
+        .implement(PdfParagraphTokenizer.class,
+            PlainPdfParagraphTokenizer.class)
+        .build(PdfParagraphTokenizerFactory.class));
 
+    // Install the factory of the word dehyphenator.
+    install(new FactoryModuleBuilder()
+        .implement(PdfWordDehyphenator.class, PlainPdfWordDehyphenator.class)
+        .build(PdfWordDehyphenatorFactory.class));
+
+    // Install the factory of the semanticizer.
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextSemanticizer.class, PlainPdfTextSemanticizer.class)
+        .build(PdfTextSemanticizerFactory.class));
+
+    // Bind the modules of the semanticizer.
     Multibinder<PdfTextSemanticizerModule> binder = Multibinder
         .newSetBinder(binder(), PdfTextSemanticizerModule.class);
-
-    // Bind semantic role testers.
     binder.addBinding().to(TitleModule.class);
     binder.addBinding().to(HeadingModule.class);
     binder.addBinding().to(AbstractModule.class);
@@ -213,20 +203,67 @@ public class PdfActCoreModule extends com.google.inject.AbstractModule {
     binder.addBinding().to(ItemizeItemModule.class);
     binder.addBinding().to(TableModule.class);
     binder.addBinding().to(BodyTextModule.class);
-  }
 
-  /**
-   * Binds the given interface and the given factory to the given
-   * implementation.
-   * 
-   * @param c
-   *        The interface to process.
-   * @param f
-   *        The factory to process.
-   * @param i
-   *        The implementation to process.
-   */
-  protected <T, F> void fc(Class<T> c, Class<F> f, Class<? extends T> i) {
-    install(new FactoryModuleBuilder().implement(c, i).build(f));
+    // Install the factories of the base models.
+    install(new FactoryModuleBuilder()
+        .implement(PdfDocument.class, PlainPdfDocument.class)
+        .build(PdfDocumentFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfPage.class, PlainPdfPage.class)
+        .build(PdfPageFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfCharacter.class, PlainPdfCharacter.class)
+        .build(PdfCharacterFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfCharacterList.class, PlainPdfCharacterList.class)
+        .build(PdfCharacterListFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfFigure.class, PlainPdfFigure.class)
+        .build(PdfFigureFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfShape.class, PlainPdfShape.class)
+        .build(PdfShapeFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfFont.class, PlainPdfFont.class)
+        .build(PdfFontFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfFontFace.class, PlainPdfFontFace.class)
+        .build(PdfFontFaceFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfColor.class, PlainPdfColor.class)
+        .build(PdfColorFactory.class));
+
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextBlock.class, PlainPdfTextBlock.class)
+        .build(PdfTextBlockFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfWord.class, PlainPdfWord.class)
+        .build(PdfWordFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfWordList.class, PlainPdfWordList.class)
+        .build(PdfWordListFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextLine.class, PlainPdfTextLine.class)
+        .build(PdfTextLineFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfTextLineList.class, PlainPdfTextLineList.class)
+        .build(PdfTextLineListFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(PdfParagraph.class, PlainPdfParagraph.class)
+        .build(PdfParagraphFactory.class));
+
+    // Install the factories of the geometric models.
+    install(new FactoryModuleBuilder()
+        .implement(PdfPosition.class, PlainPdfPosition.class)
+        .build(PdfPositionFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(Rectangle.class, PlainRectangle.class)
+        .build(RectangleFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(Line.class, PlainLine.class)
+        .build(LineFactory.class));
+    install(new FactoryModuleBuilder()
+        .implement(Point.class, PlainPoint.class)
+        .build(PointFactory.class));
   }
 }
