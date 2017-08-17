@@ -10,11 +10,11 @@ import org.apache.pdfbox.cos.COSBase;
 import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
- * ": Move to the next line and show a text string, using aw as the word
- * spacing and ac as the character spacing (setting the corresponding
- * parameters in the text state). aw and ac shall be numbers expressed in
- * unscaled text space units. This operator shall have the same effect as this
- * code: aw Tw ac Tc string '
+ * ": Move to the next line and show a text string, using aw as the word spacing
+ * and ac as the character spacing (setting the corresponding parameters in the
+ * text state). aw and ac shall be numbers expressed in unscaled text space
+ * units. This operator shall have the same effect as this code: aw Tw ac Tc
+ * string '
  * 
  * @author Claudius Korzen
  */

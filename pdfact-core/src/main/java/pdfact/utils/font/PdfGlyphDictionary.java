@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A dictionary that maps glyph names to its unicode string. This dictionary
- * was introduced because in case of embedded fonts, there could be glyphs
- * (codes) that were redefined with a custom shape. For example, in paper
+ * A dictionary that maps glyph names to its unicode string. This dictionary was
+ * introduced because in case of embedded fonts, there could be glyphs (codes)
+ * that were redefined with a custom shape. For example, in paper
  * "cond-mat0001220", the glyph "ǫ" is redefined by "ϵ". But we actually know
  * the path to draw the "ϵ", but we don't now its semantic meaning.
  * Nevertheless, in most of the cases we have a name for the glyph, given from
- * font descriptor, from which we may derive the glyph to show (with the help
- * of this dictionary).
+ * font descriptor, from which we may derive the glyph to show (with the help of
+ * this dictionary).
  * 
  * @author Claudius Korzen
  *
@@ -78,8 +78,8 @@ public class PdfGlyphDictionary {
    * 
    * @param name
    *        The name of the glyph.
-   * @return True, if this dictionary contains a glyph for the given name,
-   *         false otherwise.
+   * @return True, if this dictionary contains a glyph for the given name, false
+   *         otherwise.
    */
   public static boolean hasGlyphForName(String name) {
     return getGlyphForName(name) != null;
@@ -91,8 +91,8 @@ public class PdfGlyphDictionary {
    * 
    * @param name
    *        The name of the glyph.
-   * @return True, if this dictionary contains a glyph for the given name,
-   *         false otherwise.
+   * @return True, if this dictionary contains a glyph for the given name, false
+   *         otherwise.
    */
   public static String getGlyphForName(String name) {
     if (DICT.containsKey(name)) {

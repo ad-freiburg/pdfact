@@ -32,7 +32,7 @@ public class PlainPdfParagraphSegmenter implements PdfParagraphSegmenter {
     }
 
     TIntSet indexesOfAlreadyProcessedBlocks = new TIntHashSet();
-    
+
     // Identify the paragraphs from the text blocks.
     for (int i = 0; i < allTextBlocks.size(); i++) {
       PdfTextBlock block = allTextBlocks.get(i);
@@ -46,7 +46,7 @@ public class PlainPdfParagraphSegmenter implements PdfParagraphSegmenter {
       List<PdfTextBlock> paragraphBlocks = new ArrayList<>();
       paragraphBlocks.add(block);
       indexesOfAlreadyProcessedBlocks.add(i);
-      
+
       // If the role of the block is "body text", check if there is another
       // block in the remaining blocks that belongs to the same paragraph.
       if (block.getRole() == PdfRole.BODY_TEXT) {
@@ -87,9 +87,9 @@ public class PlainPdfParagraphSegmenter implements PdfParagraphSegmenter {
     if (paraBlocks.isEmpty()) {
       return false;
     }
-    
+
     PdfTextBlock lastParaBlock = paraBlocks.get(paraBlocks.size() - 1);
-    
+
     // The block belongs to the paragraph, if the paragraph doesn't end with
     // a punctuation mark.
     PdfWord word = lastParaBlock.getLastTextLine().getLastWord();

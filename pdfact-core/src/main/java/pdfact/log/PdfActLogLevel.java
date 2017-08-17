@@ -131,7 +131,7 @@ public enum PdfActLogLevel {
   public static Collection<PdfActLogLevel> getLogLevels() {
     return LOG_LEVELS.values();
   }
-  
+
   /**
    * Checks if there is a log level for the given int level.
    * 

@@ -18,7 +18,8 @@ import pdfact.utils.geometric.Line;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfTextLine extends PlainPdfSinglePositionElement implements PdfTextLine {
+public class PlainPdfTextLine extends PlainPdfSinglePositionElement
+    implements PdfTextLine {
   /**
    * The words of this text line.
    */
@@ -51,7 +52,7 @@ public class PlainPdfTextLine extends PlainPdfSinglePositionElement implements P
   public PlainPdfTextLine(PdfWordListFactory wordListFactory) {
     this.words = wordListFactory.create();
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -141,7 +142,7 @@ public class PlainPdfTextLine extends PlainPdfSinglePositionElement implements P
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfTextLine) {

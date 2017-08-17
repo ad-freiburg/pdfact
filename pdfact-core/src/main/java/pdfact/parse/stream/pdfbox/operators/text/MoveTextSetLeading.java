@@ -15,8 +15,8 @@ import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 /**
  * TD: Move to the start of the next line, offset from the start of the current
  * line by (tx, ty). As a side effect, this operator shall set the leading
- * parameter in the text state. This operator shall have the same effect as
- * this code: -ty TL tx ty Td
+ * parameter in the text state. This operator shall have the same effect as this
+ * code: -ty TL tx ty Td
  * 
  * @author Claudius Korzen
  */

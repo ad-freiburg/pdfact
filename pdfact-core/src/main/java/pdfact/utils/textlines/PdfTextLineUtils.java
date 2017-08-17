@@ -18,8 +18,8 @@ public class PdfTextLineUtils {
    *        The first text line.
    * @param secondLine
    *        The second text line.
-   * @return The line pitch between the given lines or Float.NaN if the lines
-   *         do not share the same page.
+   * @return The line pitch between the given lines or Float.NaN if the lines do
+   *         not share the same page.
    */
   public static float computeLinePitch(PdfTextLine firstLine,
       PdfTextLine secondLine) {
@@ -42,16 +42,15 @@ public class PdfTextLineUtils {
   }
 
   /**
-   * Checks if the given line is indented, compared to the given reference
-   * line.
+   * Checks if the given line is indented, compared to the given reference line.
    * 
    * @param line
    *        The text line to process.
    * @param refLine
    *        The reference text line.
    * 
-   * @return True, if the given line is indented compared to the given
-   *         reference line.
+   * @return True, if the given line is indented compared to the given reference
+   *         line.
    */
   public static boolean isIndented(PdfTextLine line, PdfTextLine refLine) {
     if (line == null || refLine == null) {

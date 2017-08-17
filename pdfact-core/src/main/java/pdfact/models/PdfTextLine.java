@@ -7,7 +7,7 @@ import pdfact.utils.geometric.Line;
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextLine extends PdfSinglePositionElement, HasWords, 
+public interface PdfTextLine extends PdfSinglePositionElement, HasWords,
     HasText {
   /**
    * Returns the baseline of this text line. For more details about baselines,

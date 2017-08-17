@@ -27,10 +27,10 @@ public interface PdfFont extends PdfResource {
   // ==========================================================================
 
   /**
-   * Returns the basename of this font, that is the normalized name of this
-   * font without the substring behind the "-" sign, without any digits and
-   * without any other special characters. For example, if the normalized name
-   * of the font is "nimbusromno9l-medi", the base name is "nimbusromnol".
+   * Returns the basename of this font, that is the normalized name of this font
+   * without the substring behind the "-" sign, without any digits and without
+   * any other special characters. For example, if the normalized name of the
+   * font is "nimbusromno9l-medi", the base name is "nimbusromnol".
    * 
    * @return The basename of this font.
    */
@@ -109,8 +109,7 @@ public interface PdfFont extends PdfResource {
    * Sets the boolean flag that indicates whether this font is an italic font.
    * 
    * @param isItalic
-   *        The boolean flag that indicates whether this font is an italic
-   *        font.
+   *        The boolean flag that indicates whether this font is an italic font.
    */
   void setIsItalic(boolean isItalic);
 

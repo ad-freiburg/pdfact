@@ -18,7 +18,7 @@ public interface PdfWordTokenizer {
    *        The PDF document to which the page belongs to.
    * @param page
    *        The PDF page to process.
-   * @param line 
+   * @param line
    *        The characters of a text line to process.
    * 
    * @return The list of identified words.

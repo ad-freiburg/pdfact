@@ -72,7 +72,7 @@ public class PlainPdfFontFace implements PdfFontFace {
   public String toString() {
     return "PlainPdfFontFace(" + this.font + ", " + this.fontSize + ")";
   }
-  
+
   // ==========================================================================
 
   @Override

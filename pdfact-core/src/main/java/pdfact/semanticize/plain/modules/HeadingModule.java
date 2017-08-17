@@ -129,7 +129,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
 
     // Compute the expected font face of section headings.
     PdfFontFace headingFontFace = findSectionHeadingFontFace(pdf);
-    
+
     for (PdfPage page : pages) {
       if (page == null) {
         continue;
@@ -182,7 +182,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
 
     PdfCharacterStatistic pdfCharStats = pdf.getCharacterStatistic();
     PdfFontFace pdfFontFace = pdfCharStats.getMostCommonFontFace();
-    
+
     if (pdfFontFace == null) {
       return null;
     }
@@ -198,14 +198,14 @@ public class HeadingModule implements PdfTextSemanticizerModule {
 
         PdfCharacterStatistic blockCharStats = block.getCharacterStatistic();
         PdfFontFace fontFace = blockCharStats.getMostCommonFontFace();
-        
+
         if (fontFace == null) {
           continue;
         }
 
         // TODO: Find a reliable criteria to distinguish headings from the
         // rest.
-        
+
         if (fontFace.getFontSize() - pdfFontFace.getFontSize() > 1) {
           for (PdfTextLine line : block.getTextLines()) {
             for (PdfWord word : line.getWords()) {
@@ -215,7 +215,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
         }
       }
     }
-    
+
     PdfCharacterStatistic stats = this.charStatistician.compute(headingChars);
     return stats.getMostCommonFontFace();
   }

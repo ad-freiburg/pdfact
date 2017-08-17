@@ -124,8 +124,8 @@ public abstract class Geometric implements HasRectangle {
   }
 
   /**
-   * Returns true, if there is an vertical overlap between this geometric
-   * object and the other given geometric object.
+   * Returns true, if there is an vertical overlap between this geometric object
+   * and the other given geometric object.
    * 
    * @param g
    *        The other geometric object.
@@ -160,8 +160,8 @@ public abstract class Geometric implements HasRectangle {
   }
 
   /**
-   * Computes the size of the overlap area between this geometric object and
-   * the other geometric object.
+   * Computes the size of the overlap area between this geometric object and the
+   * other geometric object.
    * 
    * @param g
    *        The other geometric object.
@@ -194,8 +194,8 @@ public abstract class Geometric implements HasRectangle {
   }
 
   /**
-   * Computes the length of the horizontal overlap between this geometric
-   * object and the other geometric object.
+   * Computes the length of the horizontal overlap between this geometric object
+   * and the other geometric object.
    * 
    * @param g
    *        The other geometric object.

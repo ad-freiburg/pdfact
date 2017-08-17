@@ -58,6 +58,10 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
         }
 
         Line firstBaseLine = firstLine.getBaseline();
+        if (firstBaseLine == null) {
+          continue;
+        }
+
         PdfCharacter firstChar = firstLine.getFirstWord().getFirstCharacter();
         Rectangle firstCharBox = firstChar.getPosition().getRectangle();
         float firstCharMinY = firstCharBox.getMinY();

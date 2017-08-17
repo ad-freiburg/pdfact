@@ -18,7 +18,8 @@ import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfWord extends PlainPdfSinglePositionElement implements PdfWord {
+public class PlainPdfWord extends PlainPdfSinglePositionElement
+    implements PdfWord {
   /**
    * The characters of this word.
    */

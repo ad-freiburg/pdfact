@@ -220,8 +220,7 @@ public class PathUtils {
    *        The directory to process.
    * @param extensions
    *        The file extensions to consider.
-   * @return A list of files in the directory that matches the given
-   *         extensions.
+   * @return A list of files in the directory that matches the given extensions.
    * @throws IOException
    *         If reading the directory failed.
    */
@@ -454,8 +453,7 @@ public class PathUtils {
    * 
    * @param path
    *        The path to the directory to read.
-   * @return A map with the names and the streams of all files in this
-   *         directory
+   * @return A map with the names and the streams of all files in this directory
    * @throws IOException
    *         If reading the directory failed.
    */

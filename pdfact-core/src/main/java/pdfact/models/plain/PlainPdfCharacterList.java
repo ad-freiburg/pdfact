@@ -83,7 +83,7 @@ public class PlainPdfCharacterList extends PlainPdfElementList<PdfCharacter>
      * @param to
      *        The end index in the parent list.
      */
-    public PdfCharacterView(PdfElementList<PdfCharacter> l, int from, int to) {
+    PdfCharacterView(PdfElementList<PdfCharacter> l, int from, int to) {
       super(l, from, to);
     }
 

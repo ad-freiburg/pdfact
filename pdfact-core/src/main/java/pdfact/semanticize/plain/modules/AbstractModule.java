@@ -14,8 +14,8 @@ import pdfact.models.PdfTextBlock;
  */
 public class AbstractModule implements PdfTextSemanticizerModule {
   /**
-   * A boolean flag that indicates whether the current text block is a member
-   * of the abstract or not.
+   * A boolean flag that indicates whether the current text block is a member of
+   * the abstract or not.
    */
   protected boolean isAbstract = false;
 

@@ -8,8 +8,8 @@ import pdfact.models.PdfPage;
 import pdfact.models.PdfShape;
 
 /**
- * An interface that defines callback methods to be called by PdfStreamParser
- * on parsing the streams of a PDF file.
+ * An interface that defines callback methods to be called by PdfStreamParser on
+ * parsing the streams of a PDF file.
  * 
  * @author Claudius Korzen
  */

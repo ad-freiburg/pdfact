@@ -12,7 +12,8 @@ import pdfact.models.PdfShape;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfShape extends PlainPdfSinglePositionElement implements PdfShape {
+public class PlainPdfShape extends PlainPdfSinglePositionElement
+    implements PdfShape {
   /**
    * The color of this shape.
    */
@@ -24,7 +25,7 @@ public class PlainPdfShape extends PlainPdfSinglePositionElement implements PdfS
   public PdfElementType getType() {
     return PdfElementType.SHAPE;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -46,7 +47,7 @@ public class PlainPdfShape extends PlainPdfSinglePositionElement implements PdfS
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfShape) {

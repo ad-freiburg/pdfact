@@ -236,7 +236,7 @@ public class PlainPdfElementList<T extends PdfSinglePositionElement>
      * The right boundary of this view in the parent list.
      */
     protected final int to;
-    
+
     /**
      * The size of this list (the number of elements).
      */

@@ -7,8 +7,8 @@ package pdfact.utils.math;
  */
 public class MathUtils {
   /**
-   * Rounds the given number and returns a floating number with the given
-   * number of decimal places.
+   * Rounds the given number and returns a floating number with the given number
+   * of decimal places.
    * 
    * @param number
    *        The number to round.
@@ -43,8 +43,8 @@ public class MathUtils {
   }
 
   /**
-   * Floors the given number and returns a floating number with the given
-   * number of decimal places.
+   * Floors the given number and returns a floating number with the given number
+   * of decimal places.
    * 
    * @param number
    *        The number to floor.
@@ -90,8 +90,8 @@ public class MathUtils {
   }
 
   /**
-   * Returns true, if the first given float is larger (with respect to the
-   * given tolerance) than the second given float.
+   * Returns true, if the first given float is larger (with respect to the given
+   * tolerance) than the second given float.
    * 
    * @param f1
    *        The first float to compare.

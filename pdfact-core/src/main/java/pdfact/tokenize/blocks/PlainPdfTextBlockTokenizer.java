@@ -246,8 +246,8 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    *        The text block to process.
    * @param line
    *        The line to process.
-   * @return True, if the given line overlaps the given text block
-   *         horizontally, false otherwise.
+   * @return True, if the given line overlaps the given text block horizontally,
+   *         false otherwise.
    */
   protected boolean overlapsHorizontally(PdfTextBlock block, PdfTextLine line) {
     if (block == null || line == null) {
@@ -265,9 +265,9 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
   }
 
   /**
-   * Checks if the line pitch between the given line and the given previous
-   * line is larger than expected (larger than the most common line pitch for
-   * the font / font size pair of the given line).
+   * Checks if the line pitch between the given line and the given previous line
+   * is larger than expected (larger than the most common line pitch for the
+   * font / font size pair of the given line).
    * 
    * @param pdf
    *        The PDF document.
@@ -330,9 +330,8 @@ public class PlainPdfTextBlockTokenizer implements PdfTextBlockTokenizer {
    * @param nextLine
    *        The next line.
    * @return True, if (1) the line pitches between the lines are equal, (2)
-   *         prevLine and nextLine do not start with an reference anchor and
-   *         (3) the line is indented compared to the previous and the next
-   *         line.
+   *         prevLine and nextLine do not start with an reference anchor and (3)
+   *         the line is indented compared to the previous and the next line.
    */
   protected boolean isIndented(PdfTextLine prevLine, PdfTextLine line,
       PdfTextLine nextLine) {

@@ -14,8 +14,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceColorSpace;
 import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
- * sc,scn,SC,SCN: Sets the color to use for stroking or non-stroking
- * operations.
+ * sc,scn,SC,SCN: Sets the color to use for stroking or non-stroking operations.
  * 
  * @author Claudius Korzen
  */

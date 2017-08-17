@@ -1,3 +1,5 @@
 serializers
 serializer
 segmenter
+guice
+injector

@@ -437,8 +437,7 @@ public class PdfCharacterUtils {
    * 
    * @param character
    *        The character to process.
-   * @return True if the given character is a punctuation mark; False
-   *         otherwise.
+   * @return True if the given character is a punctuation mark; False otherwise.
    */
   public static boolean isPunctuationMark(PdfCharacter character) {
     char ch = character.getText().charAt(0);

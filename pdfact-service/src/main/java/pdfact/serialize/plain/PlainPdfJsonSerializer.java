@@ -59,12 +59,11 @@ import pdfact.models.PdfTextBlock;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfWord;
 import pdfact.serialize.PdfJsonSerializer;
-import pdfact.serialize.PdfSerializer;
 import pdfact.utils.geometric.Rectangle;
 
 /**
- * An implementation of {@link PdfSerializer} that serializes a PDF document in
- * JSON format.
+ * An implementation of {@link PdfJsonSerializer } that serializes a PDF
+ * document in JSON format.
  *
  * @author Claudius Korzen
  */
@@ -629,8 +628,8 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   // ==========================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic
-   * roles filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles
+   * filter of this serializer.
    * 
    * @param element
    *        The element to check.
@@ -657,14 +656,14 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   }
 
   /**
-   * Checks if the type of the given PDF element matches the element type
-   * filter of this serializer.
+   * Checks if the type of the given PDF element matches the element type filter
+   * of this serializer.
    * 
    * @param element
    *        The PDF element to check.
    *
-   * @return True, if the type of the given PDF element matches the element
-   *         type filter of this serializer, false otherwise.
+   * @return True, if the type of the given PDF element matches the element type
+   *         filter of this serializer, false otherwise.
    */
   protected boolean hasRelevantElementType(HasElementType element) {
     if (element == null) {

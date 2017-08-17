@@ -124,7 +124,7 @@ public class PlainPdfFont extends PlainPdfResource implements PdfFont {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfFont) {

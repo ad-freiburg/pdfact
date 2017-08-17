@@ -14,6 +14,10 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <project.dirs.root>${project.parent.basedir}</project.dirs.root>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
@@ -34,11 +38,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.5</version>
-    </dependency>
-        <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20160810</version>
     </dependency>
   </dependencies>
 </project>

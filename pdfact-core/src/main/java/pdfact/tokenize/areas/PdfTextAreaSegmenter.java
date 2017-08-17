@@ -7,9 +7,9 @@ import pdfact.models.PdfDocument;
 import pdfact.models.PdfPage;
 
 /**
- * A class to segment the characters of a PDF page into text area segments, 
- * where a text area has no special definition and is merely used to
- * distinguish characters from different columns of a page.
+ * A class to segment the characters of a PDF page into text area segments,
+ * where a text area has no special definition and is merely used to distinguish
+ * characters from different columns of a page.
  * 
  * @author Claudius Korzen
  */

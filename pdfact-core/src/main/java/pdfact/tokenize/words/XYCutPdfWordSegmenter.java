@@ -23,7 +23,7 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
    * The factory to create instances of {@link PdfPositionFactory}.
    */
   protected PdfPositionFactory positionFactory;
-  
+
   /**
    * The statistician to compute statistics about characters.
    */
@@ -35,7 +35,7 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
   /**
    * Creates a new word tokenizer.
    * 
-   * @param characterStatistician 
+   * @param characterStatistician
    *        The statistician to compute statistics about characters.
    * @param positionFactory
    *        The factory to create instance of PdfPosition.
@@ -66,11 +66,11 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
     PdfCharacterList left = halves.get(0);
     PdfCharacterStatistic leftStats = this.charStatistician.compute(left);
     float leftMaxX = leftStats.getLargestMaxX();
-    
+
     PdfCharacterList right = halves.get(1);
     PdfCharacterStatistic rightStats = this.charStatistician.compute(right);
     float rightMinX = rightStats.getSmallestMinX();
-    
+
     float width = rightMinX - leftMaxX;
     if (width < 1f) {
       return -1;
@@ -88,23 +88,23 @@ public class XYCutPdfWordSegmenter extends XYCut implements PdfWordSegmenter {
 
   // ==========================================================================
 
-//   @Override
-//   public PdfWordList buildWords(List<PdfCharacterList> wordCharacters) {
-//     PdfWordList words = this.wordListFactory.create();
-//     
-//     for (PdfCharacterList characters : wordCharacters) {
-//       PdfWord word = this.wordFactory.create();
-//       word.setCharacters(characters);
-//       word.setCharacterStatistics(statistics);
-//       word.setIsHyphenated(isHyphenated);
-//       word.setPosition(position);
-//       word.setRectangle(rectangle);
-//       word.setText(text);
-//       words.add(word);
-//     }
-//     
-//     return words;
-//   }
+  // @Override
+  // public PdfWordList buildWords(List<PdfCharacterList> wordCharacters) {
+  // PdfWordList words = this.wordListFactory.create();
+  //
+  // for (PdfCharacterList characters : wordCharacters) {
+  // PdfWord word = this.wordFactory.create();
+  // word.setCharacters(characters);
+  // word.setCharacterStatistics(statistics);
+  // word.setIsHyphenated(isHyphenated);
+  // word.setPosition(position);
+  // word.setRectangle(rectangle);
+  // word.setText(text);
+  // words.add(word);
+  // }
+  //
+  // return words;
+  // }
 
   // ==========================================================================
 

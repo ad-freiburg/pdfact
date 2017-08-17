@@ -17,8 +17,8 @@ import pdfact.utils.geometric.Rectangle;
 public class DiacriticsTranslator {
   /**
    * Checks if the given character is a diacritic, chooses the belonging base
-   * character (either the given character to the left or the given character
-   * to the right of the diacritic) and merges the diacritic with this base
+   * character (either the given character to the left or the given character to
+   * the right of the diacritic) and merges the diacritic with this base
    * character.
    * 
    * @param diacritic
@@ -125,11 +125,11 @@ public class DiacriticsTranslator {
 
   /**
    * Adds non-decomposing diacritics to the hash with their related combining
-   * character. These are values that the unicode spec claims are equivalent
-   * but are not mapped in the form NFKC normalization method. Determined by
-   * going through the Combining Diacritical Marks section of the Unicode spec
-   * and identifying which characters are not mapped to by the normalization.
-   * For example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
+   * character. These are values that the unicode spec claims are equivalent but
+   * are not mapped in the form NFKC normalization method. Determined by going
+   * through the Combining Diacritical Marks section of the Unicode spec and
+   * identifying which characters are not mapped to by the normalization. For
+   * example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
    */
   static final Map<Integer, String> DIACRITICS;
 

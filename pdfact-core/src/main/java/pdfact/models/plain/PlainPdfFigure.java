@@ -11,8 +11,9 @@ import pdfact.models.PdfFigure;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfFigure extends PlainPdfSinglePositionElement implements PdfFigure {
-  
+public class PlainPdfFigure extends PlainPdfSinglePositionElement
+    implements PdfFigure {
+
   // ==========================================================================
 
   @Override
@@ -28,7 +29,7 @@ public class PlainPdfFigure extends PlainPdfSinglePositionElement implements Pdf
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfFigure) {

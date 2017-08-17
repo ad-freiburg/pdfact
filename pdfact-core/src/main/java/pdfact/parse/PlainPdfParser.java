@@ -8,12 +8,12 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.exception.PdfActException;
 import pdfact.models.PdfCharacter;
+import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
 import pdfact.models.PdfDocument;
+import pdfact.models.PdfDocument.PdfDocumentFactory;
 import pdfact.models.PdfFigure;
 import pdfact.models.PdfPage;
 import pdfact.models.PdfShape;
-import pdfact.models.PdfCharacterList.PdfCharacterListFactory;
-import pdfact.models.PdfDocument.PdfDocumentFactory;
 import pdfact.parse.filter.PdfCharacterFilter;
 import pdfact.parse.filter.PdfFigureFilter;
 import pdfact.parse.filter.PdfShapeFilter;
@@ -67,8 +67,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
   protected PdfCharacter prevPrevChar;
 
   /**
-   * The boolean flag to indicate whether ligatures should be translated or
-   * not.
+   * The boolean flag to indicate whether ligatures should be translated or not.
    */
   protected boolean translateLigatures;
 
@@ -239,6 +238,7 @@ public class PlainPdfParser implements PdfParser, HasPdfStreamParserHandlers {
     if (PdfShapeFilter.filterPdfShape(shape)) {
       return;
     }
+
     this.page.addShape(shape);
   }
 }

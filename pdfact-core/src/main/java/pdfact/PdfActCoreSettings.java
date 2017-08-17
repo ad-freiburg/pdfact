@@ -13,16 +13,15 @@ import pdfact.log.PdfActLogLevel;
 public class PdfActCoreSettings {
   // ==========================================================================
   // General settings.
-  
+
   /**
    * The default character encoding.
    */
   public static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
-  
-  
+
   // ==========================================================================
   // Log settings.
-  
+
   /**
    * The default log level.
    */

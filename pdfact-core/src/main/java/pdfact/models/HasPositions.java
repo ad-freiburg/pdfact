@@ -23,7 +23,7 @@ public interface HasPositions {
    *        The list positions.
    */
   void setPositions(List<PdfPosition> positions);
-  
+
   /**
    * Adds the given positions to the element.
    * 
@@ -31,7 +31,7 @@ public interface HasPositions {
    *        The list of positions.
    */
   void addPositions(List<PdfPosition> positions);
-  
+
   /**
    * Adds the given position to the element.
    * 

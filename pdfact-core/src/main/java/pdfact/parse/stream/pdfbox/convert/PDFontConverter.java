@@ -80,9 +80,9 @@ public class PDFontConverter {
   // ==========================================================================
 
   /**
-   * Reads some font specifications from file. This method was introduced to
-   * get meta data about fonts like "cmr9", from which we can't derive from the
-   * font name, if the font is bold (or italic).
+   * Reads some font specifications from file. This method was introduced to get
+   * meta data about fonts like "cmr9", from which we can't derive from the font
+   * name, if the font is bold (or italic).
    * 
    * @return The well-known fonts per name.
    */
@@ -234,8 +234,8 @@ public class PDFontConverter {
    * 
    * @param font
    *        The font to check.
-   * @return True, if the given font represents a font with an italic font
-   *         face, false otherwise.
+   * @return True, if the given font represents a font with an italic font face,
+   *         false otherwise.
    */
   public boolean computeIsItalic(PdfFont font) {
     String fontName = font.getNormalizedName();

@@ -12,7 +12,8 @@ import java.util.List;
  * 
  * @author Claudius Korzen
  */
-public interface PdfElementList<T extends PdfSinglePositionElement> extends List<T> {
+public interface PdfElementList<T extends PdfSinglePositionElement>
+    extends List<T> {
   /**
    * Swaps the elements at index i and j.
    * 

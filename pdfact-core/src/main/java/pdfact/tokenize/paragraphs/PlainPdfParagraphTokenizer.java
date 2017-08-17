@@ -15,8 +15,6 @@ import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
 import pdfact.models.PdfTextLineStatistic;
 import pdfact.models.PdfTextLineStatistician;
-import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator;
-import pdfact.tokenize.paragraphs.dehyphenate.PdfWordDehyphenator.PdfWordDehyphenatorFactory;
 import pdfact.utils.collection.CollectionUtils;
 
 /**
@@ -45,11 +43,6 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
    */
   protected PdfTextLineStatistician textLineStatistician;
 
-  /**
-   * The factory to create instances of {@link PdfWordDehyphenator}.
-   */
-  protected PdfWordDehyphenatorFactory dehyphenatorFactory;
-
   // ==========================================================================
 
   /**
@@ -63,21 +56,17 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
    *        The character statistician.
    * @param textLineStatistician
    *        The text line statistician.
-   * @param dehyphenatorFactory
-   *        The factory to create instances of {@link PdfWordDehyphenator}.
    */
   @Inject
   public PlainPdfParagraphTokenizer(
       PdfParagraphSegmenter paragraphSegmenter,
       PdfParagraphFactory paragraphFactory,
       PdfCharacterStatistician characterStatistician,
-      PdfTextLineStatistician textLineStatistician,
-      PdfWordDehyphenatorFactory dehyphenatorFactory) {
+      PdfTextLineStatistician textLineStatistician) {
     this.paragraphSegmenter = paragraphSegmenter;
     this.paragraphFactory = paragraphFactory;
     this.characterStatistician = characterStatistician;
     this.textLineStatistician = textLineStatistician;
-    this.dehyphenatorFactory = dehyphenatorFactory;
   }
 
   // ==========================================================================
@@ -106,7 +95,7 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
     // TODO
     pdf.setParagraphs(paragraphs);
-    
+
     return paragraphs;
   }
 
@@ -197,42 +186,43 @@ public class PlainPdfParagraphTokenizer implements PdfParagraphTokenizer {
 
   // ==========================================================================
 
-//  /**
-//   * Compose the texts for the paragraphs.
-//   * 
-//   * @param pdf
-//   *        The PDF document.
-//   * @param paragraphs
-//   *        The paragraphs to process.
-//   */
-//  protected void composeTexts(PdfDocument pdf, List<PdfParagraph> paragraphs) {
-//    PdfWordDehyphenator deyphenator = this.dehyphenatorFactory.create(pdf);
-//
-//    for (PdfParagraph paragraph : pdf.getParagraphs()) {
-//      // Put all words to a single list to be able to iterate them in one go.
-//      List<PdfWord> words = new ArrayList<>();
-//      for (PdfTextBlock block : paragraph.getTextBlocks()) {
-//        for (PdfTextLine line : block.getTextLines()) {
-//          words.addAll(line.getWords());
-//        }
-//      }
-//
-//      List<PdfWord> newWords = new ArrayList<>();
-//      for (int i = 0; i < words.size() - 1; i++) {
-//        PdfWord word = words.get(i);
-//        PdfWord nextWord = words.get(i + 1);
-//
-//        if (word.isHyphenated()) {
-//          PdfWord dehyphenated = deyphenator.dehyphenate(word, nextWord);
-//          newWords.add(dehyphenated);
-//          i++;
-//        } else {
-//          newWords.add(word);
-//        }
-//      }
-//      // TODO: Don't forget the last word.
-//      newWords.add(words.get(words.size() - 1));
-//      paragraph.setText(CollectionUtils.join(newWords, " "));
-//    }
-//  }
+  // /**
+  // * Compose the texts for the paragraphs.
+  // *
+  // * @param pdf
+  // * The PDF document.
+  // * @param paragraphs
+  // * The paragraphs to process.
+  // */
+  // protected void composeTexts(PdfDocument pdf, List<PdfParagraph> paragraphs)
+  // {
+  // PdfWordDehyphenator deyphenator = this.dehyphenatorFactory.create(pdf);
+  //
+  // for (PdfParagraph paragraph : pdf.getParagraphs()) {
+  // // Put all words to a single list to be able to iterate them in one go.
+  // List<PdfWord> words = new ArrayList<>();
+  // for (PdfTextBlock block : paragraph.getTextBlocks()) {
+  // for (PdfTextLine line : block.getTextLines()) {
+  // words.addAll(line.getWords());
+  // }
+  // }
+  //
+  // List<PdfWord> newWords = new ArrayList<>();
+  // for (int i = 0; i < words.size() - 1; i++) {
+  // PdfWord word = words.get(i);
+  // PdfWord nextWord = words.get(i + 1);
+  //
+  // if (word.isHyphenated()) {
+  // PdfWord dehyphenated = deyphenator.dehyphenate(word, nextWord);
+  // newWords.add(dehyphenated);
+  // i++;
+  // } else {
+  // newWords.add(word);
+  // }
+  // }
+  // // TODO: Don't forget the last word.
+  // newWords.add(words.get(words.size() - 1));
+  // paragraph.setText(CollectionUtils.join(newWords, " "));
+  // }
+  // }
 }

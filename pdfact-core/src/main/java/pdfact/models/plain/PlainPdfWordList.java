@@ -6,7 +6,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import pdfact.models.PdfWord;
 import pdfact.models.PdfWordList;
 
-//TODO: Implement hashCode() and equals().
+// TODO: Implement hashCode() and equals().
 
 /**
  * A plain implementation of {@link PdfWordList}.

@@ -31,7 +31,8 @@ public class Quicksort {
    * @param c
    *        The comparator to use.
    */
-  public static <T extends PdfSinglePositionElement> void sort(PdfElementList<T> list,
+  public static <T extends PdfSinglePositionElement> void sort(
+      PdfElementList<T> list,
       Comparator<? super T> c) {
     // Do nothing, if the array is not set.
     if (list == null) {
@@ -50,8 +51,8 @@ public class Quicksort {
    * Recursive method for Quicksort. Each call gets the full array plus two
    * variables specifying which range of the array should be sorted, where l is
    * the index of the leftmost element in the range, and r is the index of the
-   * rightmost element in the range. The public method above just calls this
-   * one with l = 0 and r = n - 1, where n is the size of the array.
+   * rightmost element in the range. The public method above just calls this one
+   * with l = 0 and r = n - 1, where n is the size of the array.
    * 
    * @param list
    *        The list to process.

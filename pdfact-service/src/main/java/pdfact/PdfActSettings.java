@@ -19,7 +19,7 @@ public class PdfActSettings {
   /**
    * The default serialization format.
    */
-  public static final PdfSerializationFormat DEFAULT_SERIALIZATION_FORMAT = 
+  public static final PdfSerializationFormat DEFAULT_SERIALIZATION_FORMAT =
       PdfSerializationFormat.TXT;
 
   /**

@@ -12,9 +12,9 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
- * gs: Set the specified parameters in the graphics state. dictName shall be
- * the name of a graphics state parameter dictionary in the ExtGState
- * sub-dictionary of the current resource dictionary.
+ * gs: Set the specified parameters in the graphics state. dictName shall be the
+ * name of a graphics state parameter dictionary in the ExtGState sub-dictionary
+ * of the current resource dictionary.
  * 
  * @author Claudius Korzen
  */

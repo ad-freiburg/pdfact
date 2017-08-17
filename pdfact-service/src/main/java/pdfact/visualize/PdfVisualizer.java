@@ -8,8 +8,8 @@ import pdfact.models.PdfRole;
 import pdfact.models.PdfElementType;
 
 /**
- * The interface for all concrete implementations to visualize the features of
- * a PDF text document.
+ * The interface for all concrete implementations to visualize the features of a
+ * PDF text document.
  *
  * @author Claudius Korzen
  */

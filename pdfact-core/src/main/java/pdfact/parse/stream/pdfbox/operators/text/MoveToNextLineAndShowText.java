@@ -9,8 +9,8 @@ import org.apache.pdfbox.cos.COSBase;
 import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
- * ': Move to the next line and show a text string. This operator shall have
- * the same effect as the code T* string T
+ * ': Move to the next line and show a text string. This operator shall have the
+ * same effect as the code T* string T
  * 
  * @author Claudius Korzen
  */

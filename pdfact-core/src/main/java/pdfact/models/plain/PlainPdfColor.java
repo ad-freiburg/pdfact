@@ -67,7 +67,7 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   public float[] getRGB() {
     return this.rgb;
   }
-  
+
   @Override
   public void setRGB(final float[] rgb) {
     this.rgb = rgb;
@@ -88,7 +88,7 @@ public class PlainPdfColor extends PlainPdfResource implements PdfColor {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfColor) {

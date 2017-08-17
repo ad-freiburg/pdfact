@@ -128,7 +128,7 @@ public class PlainPdfPosition implements PdfPosition {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfPosition) {

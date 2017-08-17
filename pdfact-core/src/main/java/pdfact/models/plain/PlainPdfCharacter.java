@@ -13,7 +13,8 @@ import pdfact.models.PdfFontFace;
  * 
  * @author Claudius Korzen
  */
-public class PlainPdfCharacter extends PlainPdfSinglePositionElement implements PdfCharacter {
+public class PlainPdfCharacter extends PlainPdfSinglePositionElement
+    implements PdfCharacter {
   /**
    * The sequence number of this character in the extraction order.
    */

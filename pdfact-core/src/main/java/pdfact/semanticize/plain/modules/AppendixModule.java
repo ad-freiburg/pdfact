@@ -14,8 +14,8 @@ import pdfact.models.PdfTextBlock;
  */
 public class AppendixModule implements PdfTextSemanticizerModule {
   /**
-   * A boolean flag that indicates whether the current text block is a member
-   * of the appendix or not.
+   * A boolean flag that indicates whether the current text block is a member of
+   * the appendix or not.
    */
   protected boolean isAppendix = false;
 

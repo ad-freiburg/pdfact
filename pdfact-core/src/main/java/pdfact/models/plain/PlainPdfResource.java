@@ -16,7 +16,7 @@ public class PlainPdfResource implements PdfResource {
   protected String id;
 
   // ==========================================================================
-  
+
   @Override
   public String getId() {
     return this.id;
@@ -35,7 +35,7 @@ public class PlainPdfResource implements PdfResource {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     return super.equals(other);

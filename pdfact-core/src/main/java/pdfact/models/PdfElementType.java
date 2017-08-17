@@ -20,7 +20,7 @@ public enum PdfElementType {
    * The type of text blocks.
    */
   TEXT_BLOCK("blocks"),
-  
+
   /**
    * The type of text lines.
    */
@@ -99,13 +99,12 @@ public enum PdfElementType {
    * @param groupName
    *        The group name to check.
    * 
-   * @return True, if the given group name is a group name of an existing
-   *         type.
+   * @return True, if the given group name is a group name of an existing type.
    */
   public static boolean isValidType(String groupName) {
     return index.containsKey(groupName.toLowerCase());
   }
-  
+
   /**
    * Returns the types that are associated with the given group names.
    * 

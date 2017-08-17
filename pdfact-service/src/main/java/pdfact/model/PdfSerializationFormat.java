@@ -14,11 +14,11 @@ public enum PdfSerializationFormat {
   /**
    * The serialization format xml.
    */
-  XML("xml"), 
+  XML("xml"),
   /**
    * The serialization format txt.
    */
-  TXT("txt"), 
+  TXT("txt"),
   /**
    * The serialization format json.
    */
@@ -88,8 +88,7 @@ public enum PdfSerializationFormat {
   }
 
   /**
-   * Returns the serialization formats that are associated with the given
-   * names.
+   * Returns the serialization formats that are associated with the given names.
    * 
    * @param names
    *        The identifiers of the serialization formats to fetch.

@@ -17,7 +17,7 @@ public interface PdfCharacterStatistician {
    * @return The computed character statistics.
    */
   PdfCharacterStatistic compute(PdfCharacterList characters);
-  
+
   /**
    * Combines the given list of character statistics to a single statistic.
    * 

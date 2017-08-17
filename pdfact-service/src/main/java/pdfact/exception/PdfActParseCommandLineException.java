@@ -1,7 +1,5 @@
 package pdfact.exception;
 
-import pdfact.exception.PdfActException;
-
 /**
  * The standard exception to throw on any errors on parsing command line
  * arguments.

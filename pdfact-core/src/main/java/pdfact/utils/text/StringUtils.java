@@ -30,8 +30,8 @@ public class StringUtils {
   }
 
   /**
-   * Parses the given string to float. Returns 'defaultValue' if the input
-   * can't be parsed to float.
+   * Parses the given string to float. Returns 'defaultValue' if the input can't
+   * be parsed to float.
    * 
    * @param input
    *        The string to parse.
@@ -81,8 +81,8 @@ public class StringUtils {
    * @param removeWhitespaces
    *        A boolean flag to indicate whether white spaces should be removed.
    * @param toLowercases
-   *        A boolean flag to indicate whether all letters should be
-   *        transformed to lower cases.
+   *        A boolean flag to indicate whether all letters should be transformed
+   *        to lower cases.
    * @param protects
    *        The characters to protect from removing.
    * @return The normalized text.

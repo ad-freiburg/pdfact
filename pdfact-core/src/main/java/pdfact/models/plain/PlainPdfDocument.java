@@ -103,7 +103,7 @@ public class PlainPdfDocument implements PdfDocument {
   public void setFile(File file) {
     this.path = file != null ? file.toPath() : null;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -186,7 +186,7 @@ public class PlainPdfDocument implements PdfDocument {
   public String toString() {
     return "PlainPdfDocument(" + this.path + ")";
   }
-  
+
   // ==========================================================================
 
   @Override

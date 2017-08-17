@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <baseDir>${project.parent.basedir}</baseDir>
+    <project.dirs.root>${project.parent.basedir}</project.dirs.root>
   </properties>
 
   <dependencies>
@@ -28,10 +28,16 @@
       <artifactId>argparse4j</artifactId>
       <version>0.7.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20160810</version>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- Configure the plugin to create the jar-file -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -52,12 +58,36 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-              <outputDirectory>
-                ${baseDir}/bin/
-              </outputDirectory>
-              <finalName>pdfact</finalName>
+              <outputDirectory>${project.dirs.bin}</outputDirectory>
+              <finalName>${project.basename}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <attach>false</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Configure the antrun plugin to create a start script. -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <!-- Copy the script template. -->
+                <copy file="${project.files.scriptTemplateSource}" 
+                      tofile="${project.files.scriptTemplateTarget}"/>
+                <!-- Insert the path to the JAR file. -->
+                <replace file="${project.files.scriptTemplateTarget}" 
+                         token="{JAR}" 
+                         value="${project.dirs.bin}/${project.basename}.jar"/>
+                <!-- Make the script executable. -->
+                <chmod file="${project.files.scriptTemplateTarget}" perm="755"/>
+              </tasks>
             </configuration>
           </execution>
         </executions>

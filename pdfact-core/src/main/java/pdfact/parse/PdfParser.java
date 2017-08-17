@@ -50,8 +50,7 @@ public interface PdfParser {
   boolean isTranslateLigatures();
 
   /**
-   * Sets the flag that indicates whether ligatures should be translated or
-   * not.
+   * Sets the flag that indicates whether ligatures should be translated or not.
    * 
    * @param translateLigatures
    *        the flag that indicates whether ligatures should be translated or

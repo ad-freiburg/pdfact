@@ -257,7 +257,7 @@ public class PlainPdfPage implements PdfPage {
   }
 
   // ==========================================================================
-  
+
   @Override
   public PdfTextLineStatistic getTextLineStatistic() {
     return this.textLineStatistic;
@@ -288,7 +288,7 @@ public class PlainPdfPage implements PdfPage {
   }
 
   // ==========================================================================
-  
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof PdfPage) {

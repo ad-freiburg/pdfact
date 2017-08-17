@@ -18,13 +18,12 @@ import pdfact.PdfAct;
 import pdfact.PdfActCoreSettings;
 import pdfact.exception.PdfActException;
 import pdfact.exception.PdfActParseCommandLineException;
-import pdfact.guice.PdfActCoreModule;
-import pdfact.guice.PdfActServiceModule;
+import pdfact.guice.PdfActCoreGuiceModule;
+import pdfact.guice.PdfActServiceGuiceModule;
 import pdfact.log.PdfActLogLevel;
 import pdfact.model.PdfSerializationFormat;
-import pdfact.models.PdfRole;
 import pdfact.models.PdfElementType;
-import pdfact.parse.stream.pdfbox.guice.OperatorProcessorModule;
+import pdfact.models.PdfRole;
 
 /**
  * A command line interface for PdfAct.
@@ -33,20 +32,26 @@ import pdfact.parse.stream.pdfbox.guice.OperatorProcessorModule;
  */
 public class PdfActCommandLineInterface {
   /**
+   * The Guice injector.
+   */
+  protected static final Injector INJECTOR;
+
+  /**
    * The main instance of PdfAct.
    */
   protected PdfAct pdfAct;
+
+  static {
+    INJECTOR = Guice.createInjector(
+        new PdfActCoreGuiceModule(),
+        new PdfActServiceGuiceModule());
+  }
 
   /**
    * Creates a new command line interface for PdfAct.
    */
   public PdfActCommandLineInterface() {
-    // TODO: Avoid to inject all needed modules here.
-    Injector injector = Guice.createInjector(
-        new PdfActCoreModule(),
-        new OperatorProcessorModule(),
-        new PdfActServiceModule());
-    this.pdfAct = injector.getInstance(PdfAct.class);
+    this.pdfAct = INJECTOR.getInstance(PdfAct.class);
   }
 
   /**

@@ -17,16 +17,16 @@ import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
  * TJ: Show one or more text strings, allowing individual glyph positioning.
- * Each element of array shall be either a string or a number. If the element
- * is a string, this operator shall show the string. If it is a number, the
+ * Each element of array shall be either a string or a number. If the element is
+ * a string, this operator shall show the string. If it is a number, the
  * operator shall adjust the text position by that amount; that is, it shall
  * translate the text matrix, Tm. The number shall be expressed in thousandths
  * of a unit of text space (see 9.4.4, "Text Space Details"). This amount shall
  * be subtracted from the current horizontal or vertical coordinate, depending
  * on the writing mode. In the default coordinate system, a positive adjustment
- * has the effect of moving the next glyph painted either to the left or down
- * by the given amount. Figure 46 shows an example of the effect of passing
- * offsets to TJ.
+ * has the effect of moving the next glyph painted either to the left or down by
+ * the given amount. Figure 46 shows an example of the effect of passing offsets
+ * to TJ.
  * 
  * @author Claudius Korzen
  */

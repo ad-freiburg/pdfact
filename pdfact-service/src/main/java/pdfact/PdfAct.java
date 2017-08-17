@@ -22,8 +22,8 @@ import pdfact.exception.PdfActValidateException;
 import pdfact.exception.PdfActVisualizeException;
 import pdfact.model.PdfSerializationFormat;
 import pdfact.models.PdfDocument;
-import pdfact.models.PdfRole;
 import pdfact.models.PdfElementType;
+import pdfact.models.PdfRole;
 import pdfact.parse.PdfParser.PdfParserFactory;
 import pdfact.semanticize.PdfTextSemanticizer.PdfTextSemanticizerFactory;
 import pdfact.serialize.PdfSerializer;
@@ -42,7 +42,7 @@ public class PdfAct extends PdfActCore {
   /**
    * The available serializers, per serialization formats.
    */
-  protected Map<PdfSerializationFormat, PdfSerializerFactory> serializerFactories;
+  protected Map<PdfSerializationFormat, PdfSerializerFactory> serializers;
 
   /**
    * The factory to create instances of {@link PdfVisualizer}.
@@ -122,7 +122,7 @@ public class PdfAct extends PdfActCore {
       PdfVisualizerFactory visualizerFactory) {
     super(parserFactory, tokenizerFactory, semanticizerFactory,
         paragraphTokenizerFactory);
-    this.serializerFactories = serializerFactories;
+    this.serializers = serializerFactories;
     this.visualizerFactory = visualizerFactory;
     this.serializationFormat = DEFAULT_SERIALIZATION_FORMAT;
     this.units = DEFAULT_TEXT_UNITS_TO_INCLUDE;
@@ -170,7 +170,7 @@ public class PdfAct extends PdfActCore {
     }
 
     // Obtain the serializer factory to use.
-    PdfSerializerFactory factory = this.serializerFactories.get(format);
+    PdfSerializerFactory factory = this.serializers.get(format);
     if (factory == null) {
       throw new PdfActSerializeException(
           "Couldn't find a serializer for the format '" + format + "'.");
@@ -358,7 +358,7 @@ public class PdfAct extends PdfActCore {
     }
 
     // Check if the given format is valid.
-    if (!this.serializerFactories.containsKey(this.serializationFormat)) {
+    if (!this.serializers.containsKey(this.serializationFormat)) {
       throw new PdfActValidateException(
           "The serialization format '" + format + "' is not valid.");
     }
@@ -466,7 +466,8 @@ public class PdfAct extends PdfActCore {
    * @throws PdfActException
    *         If at least one of the given features is not valid.
    */
-  public void setElementTypesFilter(List<String> features) throws PdfActException {
+  public void setElementTypesFilter(List<String> features)
+      throws PdfActException {
     // Check if at least one feature is given.
     if (features == null || features.size() == 0) {
       throw new PdfActValidateException("No features given.");
@@ -504,7 +505,8 @@ public class PdfAct extends PdfActCore {
    * @throws PdfActException
    *         If at least one of the given roles is not valid.
    */
-  public void setSemanticRolesFilter(List<String> roles) throws PdfActException {
+  public void setSemanticRolesFilter(List<String> roles)
+      throws PdfActException {
     // Check if at least one role is given.
     if (roles == null || roles.size() == 0) {
       throw new PdfActValidateException("No roles given.");

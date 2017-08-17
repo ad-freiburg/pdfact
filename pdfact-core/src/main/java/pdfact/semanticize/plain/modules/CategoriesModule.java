@@ -8,15 +8,14 @@ import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
 
 /**
- * A module that identifies the text blocks with the semantic role
- * "categories".
+ * A module that identifies the text blocks with the semantic role "categories".
  * 
  * @author Claudius Korzen
  */
 public class CategoriesModule implements PdfTextSemanticizerModule {
   /**
-   * A boolean flag that indicates whether the current text block is a member
-   * of the Categories section or not.
+   * A boolean flag that indicates whether the current text block is a member of
+   * the Categories section or not.
    */
   protected boolean isCategories = false;
 

@@ -429,8 +429,8 @@ public class ShowText extends OperatorProcessor {
   }
 
   /**
-   * Computes the bounding box for the given glyph, given in any font,
-   * different from a Type3 font.
+   * Computes the bounding box for the given glyph, given in any font, different
+   * from a Type3 font.
    * 
    * @param code
    *        The internal PDF character code for the glyph
@@ -558,9 +558,9 @@ public class ShowText extends OperatorProcessor {
   }
 
   /**
-   * Computes the bounding box for the given glyph by the method of PdfBox,
-   * that is computing an approximate bounding box, without respecting
-   * ascenders (like "l") or descenders (like "g").
+   * Computes the bounding box for the given glyph by the method of PdfBox, that
+   * is computing an approximate bounding box, without respecting ascenders
+   * (like "l") or descenders (like "g").
    * 
    * @param code
    *        The character

@@ -15,8 +15,8 @@ import pdfact.models.PdfTextBlock;
  */
 public class GeneralTermsModule implements PdfTextSemanticizerModule {
   /**
-   * A boolean flag that indicates whether the current text block is a member
-   * of the "General Terms" section or not.
+   * A boolean flag that indicates whether the current text block is a member of
+   * the "General Terms" section or not.
    */
   protected boolean isGeneralTerms = false;
 

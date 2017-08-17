@@ -159,8 +159,8 @@ public class PlainRectangle extends Rectangle {
   // ==========================================================================
 
   /**
-   * Creates a new rectangle from the 2 given vertices. The vertices need not
-   * be in any special order.
+   * Creates a new rectangle from the 2 given vertices. The vertices need not be
+   * in any special order.
    *
    * @param point1
    *        The first vertex.
@@ -206,8 +206,8 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a new rectangle from the 4 given vertices. The vertices need not
-   * be in any special order.
+   * Creates a new rectangle from the 4 given vertices. The vertices need not be
+   * in any special order.
    *
    * @param point1
    *        The first vertex.

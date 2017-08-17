@@ -14,8 +14,8 @@ import pdfact.models.PdfTextBlock;
  */
 public class ReferenceModule implements PdfTextSemanticizerModule {
   /**
-   * A boolean flag that indicates whether the current text block is a member
-   * of the Reference section or not.
+   * A boolean flag that indicates whether the current text block is a member of
+   * the Reference section or not.
    */
   protected boolean isReferences = false;
 

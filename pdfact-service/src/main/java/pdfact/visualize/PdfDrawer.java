@@ -158,8 +158,8 @@ public interface PdfDrawer {
       Color nonStrokingColor) throws IOException;
 
   /**
-   * Draws the given rectangle with given color and given thickness on the
-   * given page.
+   * Draws the given rectangle with given color and given thickness on the given
+   * page.
    * 
    * @param rect
    *        The rectangle to draw.
@@ -186,8 +186,7 @@ public interface PdfDrawer {
    *        The number of the page in which the rectangle should be drawn.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.
@@ -211,8 +210,7 @@ public interface PdfDrawer {
    *        The color to use on filling the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.
@@ -224,8 +222,8 @@ public interface PdfDrawer {
       boolean originInUpperLeft) throws IOException;
 
   /**
-   * Draws the given rectangle with given color and given thickness on the
-   * given page.
+   * Draws the given rectangle with given color and given thickness on the given
+   * page.
    *
    * @param rect
    *        The rectangle to draw.
@@ -239,8 +237,7 @@ public interface PdfDrawer {
    *        The thickness of the border of the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.
@@ -311,8 +308,7 @@ public interface PdfDrawer {
    *        The number of the page in which the rectangle should be drawn.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.
@@ -336,8 +332,7 @@ public interface PdfDrawer {
    *        The color to use on filling the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.
@@ -364,8 +359,7 @@ public interface PdfDrawer {
    *        The thickness of the border of the rectangle.
    * @param relativeToUpperLeft
    *        A flag to indicate whether the coordinates of the rectangle should
-   *        be considered as relative to the upper left vertex of the
-   *        rectangle.
+   *        be considered as relative to the upper left vertex of the rectangle.
    * @param originInUpperLeft
    *        A flag to indicate whether the origin should be the upper left of
    *        the page.

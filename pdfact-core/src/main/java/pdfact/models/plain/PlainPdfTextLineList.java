@@ -82,7 +82,7 @@ public class PlainPdfTextLineList extends PlainPdfElementList<PdfTextLine>
      * @param to
      *        The end index in the parent list.
      */
-    public PdfTextLineView(PdfElementList<PdfTextLine> l, int from, int to) {
+    PdfTextLineView(PdfElementList<PdfTextLine> l, int from, int to) {
       super(l, from, to);
     }
 

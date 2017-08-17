@@ -77,8 +77,8 @@ public abstract class XYCut {
 
   /**
    * Takes a list of characters and iterates them by sweeping a lane in x
-   * direction in order to find a position to cut the characters vertically
-   * into a left half and a right half.
+   * direction in order to find a position to cut the characters vertically into
+   * a left half and a right half.
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -126,7 +126,7 @@ public abstract class XYCut {
       }
       currentPos = character.getRectangle().getMaxX();
     }
-    
+
     if (bestCutIndex > -1) {
       // A cut was found. Return the resulting halves.
       return chars.cut(bestCutIndex);
@@ -136,10 +136,10 @@ public abstract class XYCut {
   }
 
   /**
-   * Takes a set of characters and sweeps the characters in y direction in
-   * order to find a position to cut the characters vertically into a upper
-   * half and a lower half. For more details about the approach of the sweep
-   * algorithm, see the examples given for xCut().
+   * Takes a set of characters and sweeps the characters in y direction in order
+   * to find a position to cut the characters vertically into a upper half and a
+   * lower half. For more details about the approach of the sweep algorithm, see
+   * the examples given for xCut().
    * 
    * @param pdf
    *        The PDF document to which the characters belong to.
@@ -150,8 +150,8 @@ public abstract class XYCut {
    * @return A list of set of characters. In case of the characters could be
    *         cut, this list consists of two inner sets, containing the
    *         characters of the two halves. In case of the characters could not
-   *         be cut, the list consists only of a single set, representing a
-   *         copy of the original set of characters.
+   *         be cut, the list consists only of a single set, representing a copy
+   *         of the original set of characters.
    */
   protected List<PdfCharacterList> yCut(PdfDocument pdf, PdfPage page,
       PdfCharacterList chars) {
@@ -186,7 +186,7 @@ public abstract class XYCut {
       }
       currentPos = character.getRectangle().getMinY();
     }
-    
+
     if (bestCutIndex > -1) {
       // A cut was found. Return the resulting halves.
       return chars.cut(bestCutIndex);

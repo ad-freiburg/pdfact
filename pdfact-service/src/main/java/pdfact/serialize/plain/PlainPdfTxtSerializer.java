@@ -21,13 +21,12 @@ import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfWord;
-import pdfact.serialize.PdfSerializer;
 import pdfact.serialize.PdfTxtSerializer;
 import pdfact.utils.collection.CollectionUtils;
 
 /**
- * An implementation of {@link PdfSerializer} that serializes a PDF document in
- * TXT format.
+ * An implementation of {@link PdfTxtSerializer} that serializes a PDF document
+ * in TXT format.
  *
  * @author Claudius Korzen
  */
@@ -277,8 +276,8 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   // ==========================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic
-   * roles filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles
+   * filter of this serializer.
    * 
    * @param element
    *        The element to check.
@@ -305,14 +304,14 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   }
 
   /**
-   * Checks if the type of the given PDF element matches the element type
-   * filter of this serializer.
+   * Checks if the type of the given PDF element matches the element type filter
+   * of this serializer.
    * 
    * @param element
    *        The PDF element to check.
    *
-   * @return True, if the type of the given PDF element matches the element
-   *         type filter of this serializer, false otherwise.
+   * @return True, if the type of the given PDF element matches the element type
+   *         filter of this serializer, false otherwise.
    */
   protected boolean hasRelevantElementType(HasElementType element) {
     if (element == null) {

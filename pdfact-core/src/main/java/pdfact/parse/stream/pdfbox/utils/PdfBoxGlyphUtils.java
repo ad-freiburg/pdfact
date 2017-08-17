@@ -8,8 +8,7 @@ import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
 // TODO: Check if this works as suggested.
 
 /**
- * A collection of some utility methods to manage and process additional
- * glyphs.
+ * A collection of some utility methods to manage and process additional glyphs.
  * 
  * @author Claudius Korzen
  */

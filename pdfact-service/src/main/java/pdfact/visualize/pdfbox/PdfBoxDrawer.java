@@ -252,7 +252,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     if (minY == maxY) {
       maxY += thickness;
     }
-    
+
     stream.setStrokingColor(color);
     stream.setLineWidth(thickness);
     stream.moveTo(minX, minY);
@@ -318,7 +318,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     // values for both values.
     width = Math.max(thickness, width);
     height = Math.max(thickness, height);
-    
+
     stream.setStrokingColor(strokingColor);
     stream.setLineWidth(thickness);
     stream.addRect(minX, minY, width, height);
@@ -501,16 +501,16 @@ public class PdfBoxDrawer implements PdfDrawer {
   }
 
   /**
-   * Adapts the given point dependent on whether the coordinates are relative
-   * to upper left and whether the origin is in upper left.
+   * Adapts the given point dependent on whether the coordinates are relative to
+   * upper left and whether the origin is in upper left.
    * 
    * @param point
    *        The point to adapt.
    * @param pageNum
    *        The number of the page in which the point is located.
    * @param isRelativeToUpperLeft
-   *        A flag to indicate whether the coordinates of the point are
-   *        relative to the upper left.
+   *        A flag to indicate whether the coordinates of the point are relative
+   *        to the upper left.
    * @param isOriginInUpperLeft
    *        A flag to indicate whether the origin of the page is in the upper
    *        left.

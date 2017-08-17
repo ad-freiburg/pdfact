@@ -3,7 +3,7 @@ package pdfact.models;
 import java.util.List;
 
 /**
- * An interface that is implemented by PDF elements that consist of shapes 
+ * An interface that is implemented by PDF elements that consist of shapes
  * (lines, curves, paths, etc.).
  *
  * @author Claudius Korzen

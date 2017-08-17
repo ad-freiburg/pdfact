@@ -61,15 +61,14 @@ import pdfact.models.PdfRole;
 import pdfact.models.PdfTextBlock;
 import pdfact.models.PdfTextLine;
 import pdfact.models.PdfWord;
-import pdfact.serialize.PdfSerializer;
 import pdfact.serialize.PdfXmlSerializer;
 import pdfact.utils.collection.CollectionUtils;
 import pdfact.utils.geometric.Rectangle;
 import pdfact.utils.text.StringUtils;
 
 /**
- * An implementation of {@link PdfSerializer} that serializes a PDF document in
- * XML format.
+ * An implementation of {@link PdfXmlSerializer} that serializes a PDF document
+ * in XML format.
  *
  * @author Claudius Korzen
  */
@@ -82,7 +81,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   /**
    * The line delimiter to use on joining the individual lines.
    */
-  protected static String LINE_DELIMITER = System.lineSeparator();
+  protected static final String LINE_DELIMITER = System.lineSeparator();
 
   // ==========================================================================
 
@@ -634,7 +633,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    */
   protected List<String> serializeColors(int level, Set<PdfColor> colors) {
     List<String> result = new ArrayList<>();
-    
+
     if (colors != null) {
       for (PdfColor color : colors) {
         if (color != null) {
@@ -662,7 +661,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     List<String> result = new ArrayList<>();
     if (color != null) {
       float[] rgb = color.getRGB();
-      
+
       if (rgb != null && rgb.length == 3) {
         result.add(start(COLOR, level++));
         result.add(start(ID, level) + text(color.getId()) + end(ID));
@@ -791,8 +790,8 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   // ==========================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic
-   * roles filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles
+   * filter of this serializer.
    * 
    * @param element
    *        The element to check.
@@ -819,14 +818,14 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   }
 
   /**
-   * Checks if the type of the given PDF element matches the element type
-   * filter of this serializer.
+   * Checks if the type of the given PDF element matches the element type filter
+   * of this serializer.
    * 
    * @param element
    *        The PDF element to check.
    *
-   * @return True, if the type of the given PDF element matches the element
-   *         type filter of this serializer, false otherwise.
+   * @return True, if the type of the given PDF element matches the element type
+   *         filter of this serializer, false otherwise.
    */
   protected boolean hasRelevantElementType(HasElementType element) {
     if (element == null) {

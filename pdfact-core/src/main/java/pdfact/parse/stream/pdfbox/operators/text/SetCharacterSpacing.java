@@ -12,8 +12,8 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDTextState;
 import pdfact.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
- * Tc: Set the character spacing to charSpace, which shall be a number
- * expressed in unscaled text space units.
+ * Tc: Set the character spacing to charSpace, which shall be a number expressed
+ * in unscaled text space units.
  * 
  * @author Claudius Korzen
  */

@@ -12,8 +12,8 @@ import pdfact.models.PdfWord;
  */
 public interface PdfWordDehyphenator {
   /**
-   * Returns the word that results from joining the two given subword, either
-   * by keeping the hyphen or by removing the hyphen.
+   * Returns the word that results from joining the two given subword, either by
+   * keeping the hyphen or by removing the hyphen.
    * 
    * @param subword1
    *        The first subword (the subword before the hyphen).

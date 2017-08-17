@@ -188,11 +188,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(block, drawer, Color.BLUE);
     try {
       String roleStr = block.getRole() != null ? block.getRole().getName() : "";
-      drawer.drawText(roleStr, 
-          block.getPosition().getPage().getPageNumber(), 
+      drawer.drawText(roleStr,
+          block.getPosition().getPage().getPageNumber(),
           block.getPosition().getRectangle().getUpperLeft(), Color.BLACK, 9f);
     } catch (IOException e) {
-      
+
     }
   }
 
@@ -408,8 +408,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==========================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic
-   * roles filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles
+   * filter of this serializer.
    * 
    * @param element
    *        The element to check.
@@ -436,14 +436,14 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   }
 
   /**
-   * Checks if the type of the given PDF element matches the element type
-   * filter of this serializer.
+   * Checks if the type of the given PDF element matches the element type filter
+   * of this serializer.
    * 
    * @param element
    *        The PDF element to check.
    *
-   * @return True, if the type of the given PDF element matches the element
-   *         type filter of this serializer, false otherwise.
+   * @return True, if the type of the given PDF element matches the element type
+   *         filter of this serializer, false otherwise.
    */
   protected boolean hasRelevantElementType(HasElementType element) {
     if (element == null) {

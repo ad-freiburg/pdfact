@@ -17,8 +17,8 @@ import pdfact.utils.geometric.Point.PointFactory;
 import pdfact.utils.geometric.Rectangle.RectangleFactory;
 
 /**
- * d1: Set width and bounding box information for the glyph and declare that
- * the glyph description specifies only shape, not color.
+ * d1: Set width and bounding box information for the glyph and declare that the
+ * glyph description specifies only shape, not color.
  * 
  * Arguments: wx wy llx lly urx ur.
  * 

@@ -5,7 +5,7 @@ package pdfact.models;
  * 
  * @author Claudius Korzen
  */
-public interface PdfTextBlock extends PdfSinglePositionElement, HasTextLines, 
+public interface PdfTextBlock extends PdfSinglePositionElement, HasTextLines,
     HasRole, HasText {
   /**
    * The factory to create instances of {@link PdfTextBlock}.
