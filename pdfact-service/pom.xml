@@ -37,7 +37,8 @@
 
   <build>
     <plugins>
-      <!-- Configure the plugin to create the jar-file -->
+      <!-- Configure the assembly plugin to create an executable jar-file with
+      all dependencies -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -67,7 +68,9 @@
         </executions>
       </plugin>
       
-      <!-- Configure the antrun plugin to create a start script. -->
+      <!-- Configure the antrun plugin to create a script in the root directory
+      of the project that can be used to run the CLI of the project (instead
+      of calling "java -jar foo.jar..."). -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -81,7 +84,7 @@
                 <!-- Copy the script template. -->
                 <copy file="${project.files.scriptTemplateSource}" 
                       tofile="${project.files.scriptTemplateTarget}"/>
-                <!-- Insert the path to the JAR file. -->
+                <!-- Insert the JAR file path into the script. -->
                 <replace file="${project.files.scriptTemplateTarget}" 
                          token="{JAR}" 
                          value="${project.dirs.bin}/${project.basename}.jar"/>

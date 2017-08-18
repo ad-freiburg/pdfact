@@ -1,8 +1,0 @@
-#!/bin/sh
-JAR_PATH="./bin/pdfact.jar"
-java="java"
-if test -n "$JAVA_HOME"; then
-    java="$JAVA_HOME/bin/java"
-fi
-exec "$java" -jar $JAR_PATH "$@"
-exit 1 

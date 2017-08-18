@@ -108,9 +108,9 @@
             </goals>
             <configuration>
               <files>
-                <!-- Add the global properties file -->
+                <!-- Add a global properties file -->
                 <file>${project.dirs.root}/pom.properties</file>
-                <!-- Add the submodule-specific properties file -->
+                <!-- Add properties file specific to a submodule -->
                 <file>pom.properties</file>
               </files>
               <quiet>true</quiet>
