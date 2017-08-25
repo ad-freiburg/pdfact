@@ -4,24 +4,35 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 
-import pdfact.PdfActCore;
 import pdfact.model.PdfSerializationFormat;
-import pdfact.serialize.PdfJsonSerializer;
-import pdfact.serialize.PdfJsonSerializer.PdfJsonSerializerFactory;
-import pdfact.serialize.PdfSerializer.PdfSerializerFactory;
-import pdfact.serialize.PdfTxtSerializer;
-import pdfact.serialize.PdfTxtSerializer.PdfTxtSerializerFactory;
-import pdfact.serialize.PdfXmlSerializer;
-import pdfact.serialize.PdfXmlSerializer.PdfXmlSerializerFactory;
-import pdfact.serialize.plain.PlainPdfJsonSerializer;
-import pdfact.serialize.plain.PlainPdfTxtSerializer;
-import pdfact.serialize.plain.PlainPdfXmlSerializer;
-import pdfact.visualize.PdfDrawer;
-import pdfact.visualize.PdfDrawer.PdfDrawerFactory;
-import pdfact.visualize.PdfVisualizer;
-import pdfact.visualize.PdfVisualizer.PdfVisualizerFactory;
-import pdfact.visualize.PlainPdfVisualizer;
-import pdfact.visualize.pdfbox.PdfBoxDrawer;
+import pdfact.pipes.PdfActServicePipe;
+import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
+import pdfact.pipes.PlainPdfActServicePipe;
+import pdfact.pipes.serialize.PdfJsonSerializer;
+import pdfact.pipes.serialize.PdfJsonSerializer.PdfJsonSerializerFactory;
+import pdfact.pipes.serialize.PdfSerializer.PdfSerializerFactory;
+import pdfact.pipes.serialize.PdfTxtSerializer;
+import pdfact.pipes.serialize.PdfTxtSerializer.PdfTxtSerializerFactory;
+import pdfact.pipes.serialize.PdfXmlSerializer;
+import pdfact.pipes.serialize.PdfXmlSerializer.PdfXmlSerializerFactory;
+import pdfact.pipes.serialize.PlainSerializePdfPipe;
+import pdfact.pipes.serialize.SerializePdfPipe;
+import pdfact.pipes.serialize.SerializePdfPipe.SerializePdfPipeFactory;
+import pdfact.pipes.serialize.plain.PlainPdfJsonSerializer;
+import pdfact.pipes.serialize.plain.PlainPdfTxtSerializer;
+import pdfact.pipes.serialize.plain.PlainPdfXmlSerializer;
+import pdfact.pipes.validate.PlainValidatePathToWritePipe;
+import pdfact.pipes.validate.ValidatePathToWritePipe;
+import pdfact.pipes.validate.ValidatePathToWritePipe.ValidatePathToWritePipeFactory;
+import pdfact.pipes.visualize.PdfDrawer;
+import pdfact.pipes.visualize.PdfDrawer.PdfDrawerFactory;
+import pdfact.pipes.visualize.PdfVisualizer;
+import pdfact.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
+import pdfact.pipes.visualize.PlainPdfVisualizer;
+import pdfact.pipes.visualize.PlainVisualizePdfPipe;
+import pdfact.pipes.visualize.VisualizePdfPipe;
+import pdfact.pipes.visualize.VisualizePdfPipe.VisualizePdfPipeFactory;
+import pdfact.pipes.visualize.pdfbox.PdfBoxDrawer;
 
 /**
  * A module that defines the basic Guice bindings for the PdfAct services.
@@ -31,7 +42,28 @@ import pdfact.visualize.pdfbox.PdfBoxDrawer;
 public class PdfActServiceGuiceModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(PdfActCore.class);
+    install(new PdfActCoreGuiceModule());
+
+    // Install the factory of the service pipe.
+    install(new FactoryModuleBuilder()
+        .implement(PdfActServicePipe.class, PlainPdfActServicePipe.class)
+        .build(PdfActServicePipeFactory.class));
+
+    // Install the factory of the pipe to validate paths to write to.
+    install(new FactoryModuleBuilder()
+        .implement(ValidatePathToWritePipe.class,
+            PlainValidatePathToWritePipe.class)
+        .build(ValidatePathToWritePipeFactory.class));
+
+    // Install the factory of the pipe to serialize PDF documents.
+    install(new FactoryModuleBuilder()
+        .implement(SerializePdfPipe.class, PlainSerializePdfPipe.class)
+        .build(SerializePdfPipeFactory.class));
+
+    // Install the factory of the pipe to visualize PDF documents.
+    install(new FactoryModuleBuilder()
+        .implement(VisualizePdfPipe.class, PlainVisualizePdfPipe.class)
+        .build(VisualizePdfPipeFactory.class));
 
     // Install the serializer factories.
     install(new FactoryModuleBuilder()
@@ -65,20 +97,5 @@ public class PdfActServiceGuiceModule extends AbstractModule {
     install(new FactoryModuleBuilder()
         .implement(PdfVisualizer.class, PlainPdfVisualizer.class)
         .build(PdfVisualizerFactory.class));
-  }
-
-  /**
-   * Binds the given interface and the given factory to the given
-   * implementation.
-   * 
-   * @param c
-   *        The interface to process.
-   * @param f
-   *        The factory to process.
-   * @param i
-   *        The implementation to process.
-   */
-  protected <T, F> void fc(Class<T> c, Class<F> f, Class<? extends T> i) {
-    install(new FactoryModuleBuilder().implement(c, i).build(f));
   }
 }

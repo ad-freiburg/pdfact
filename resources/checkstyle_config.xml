@@ -53,6 +53,7 @@
     <module name="ModifierOrder"/>
     <module name="RedundantModifier">
       <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="AvoidNestedBlocks">
       <property name="allowInSwitchCase" value="true"/>
@@ -75,6 +76,10 @@
       <property name="arrayInitIndent" value="2"/>
       <property name="lineWrappingIndentation" value="2"/>
     </module>
+    <module name="JavadocStyle">
+      <property name="checkEmptyJavadoc" value="true"/>
+    </module>
+    <module name="JavadocType"/>
   </module>
   <module name="Translation"/>
   <module name="FileLength"/>

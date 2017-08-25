@@ -94,15 +94,14 @@ public enum PdfSerializationFormat {
    *        The identifiers of the serialization formats to fetch.
    * @return A set of the fetched serialization formats.
    */
-  public static Set<PdfSerializationFormat> getSerializationFormats(
-      String... names) {
+  public static Set<PdfSerializationFormat> fromStrings(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
     Set<PdfSerializationFormat> formats = new HashSet<>();
     for (String name : names) {
-      PdfSerializationFormat format = getSerializationFormat(name);
+      PdfSerializationFormat format = fromString(name);
       if (format != null) {
         formats.add(format);
       }
@@ -117,7 +116,7 @@ public enum PdfSerializationFormat {
    *        The name of the serialization format to fetch.
    * @return The serialization format that is associated with the given name.
    */
-  public static PdfSerializationFormat getSerializationFormat(String name) {
+  public static PdfSerializationFormat fromString(String name) {
     if (!isValidSerializationFormat(name)) {
       throw new IllegalArgumentException(
           name + " isn't a valid serialization format.");

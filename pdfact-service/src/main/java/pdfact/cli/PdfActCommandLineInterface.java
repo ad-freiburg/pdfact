@@ -1,5 +1,6 @@
 package pdfact.cli;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,48 +15,48 @@ import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
-import pdfact.PdfAct;
 import pdfact.PdfActCoreSettings;
-import pdfact.exception.PdfActException;
 import pdfact.exception.PdfActParseCommandLineException;
-import pdfact.guice.PdfActCoreGuiceModule;
 import pdfact.guice.PdfActServiceGuiceModule;
-import pdfact.log.PdfActLogLevel;
+import pdfact.model.PdfDocument;
+import pdfact.model.PdfDocument.PdfDocumentFactory;
+import pdfact.model.ElementType;
+import pdfact.model.LogLevel;
+import pdfact.model.SemanticRole;
 import pdfact.model.PdfSerializationFormat;
-import pdfact.models.PdfElementType;
-import pdfact.models.PdfRole;
+import pdfact.pipes.PdfActServicePipe;
+import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
+import pdfact.util.exception.PdfActException;
 
 /**
- * A command line interface for PdfAct.
+ * The command line interface of PdfAct.
  * 
  * @author Claudius Korzen
  */
 public class PdfActCommandLineInterface {
   /**
-   * The Guice injector.
+   * The factory to create instances of {@link PdfDocument}.
    */
-  protected static final Injector INJECTOR;
+  protected PdfDocumentFactory pdfDocumentFactory;
 
   /**
-   * The main instance of PdfAct.
+   * The factory to create instances of {@link PdfActServicePipe}.
    */
-  protected PdfAct pdfAct;
+  protected PdfActServicePipeFactory serviceFactory;
 
-  static {
-    INJECTOR = Guice.createInjector(
-        new PdfActCoreGuiceModule(),
-        new PdfActServiceGuiceModule());
-  }
+  // ==========================================================================
 
   /**
-   * Creates a new command line interface for PdfAct.
+   * Creates a new command line interface of PdfAct.
    */
   public PdfActCommandLineInterface() {
-    this.pdfAct = INJECTOR.getInstance(PdfAct.class);
+    Injector injector = Guice.createInjector(new PdfActServiceGuiceModule());
+    this.serviceFactory = injector.getInstance(PdfActServicePipeFactory.class);
+    this.pdfDocumentFactory = injector.getInstance(PdfDocumentFactory.class);
   }
 
   /**
-   * Runs the command line interface for PdfAct.
+   * Runs the command line interface of PdfAct.
    * 
    * @param args
    *        The command line arguments.
@@ -68,46 +69,51 @@ public class PdfActCommandLineInterface {
     // Create the command line argument parser.
     PdfActCommandLineParser parser = new PdfActCommandLineParser();
 
+    // Create the service pipe.
+    PdfActServicePipe service = this.serviceFactory.create();
+
     try {
       // Parse the command line arguments.
       parser.parseArgs(args);
 
-      // Pass the arguments to PdfAct.
+      // Create the PDF document from the given path.
+      PdfDocument pdf = this.pdfDocumentFactory.create(parser.getPdfPath());
+
       // Pass the log level.
-      this.pdfAct.setLogLevel(parser.getLogLevel());
-
-      // Pass the path to the input file.
-      this.pdfAct.setInputFilePath(parser.getInputFilePath());
-
-      // Pass the path to the serialization file.
-      if (parser.hasOutputFilePath()) {
-        this.pdfAct.setSerializationTarget(parser.getOutputFilePath());
-      } else {
-        this.pdfAct.setSerializationTarget(System.out);
-      }
+      service.setLogLevel(LogLevel.getLogLevel(parser.getLogLevel()));
 
       // Pass the serialization format if there is any.
-      if (parser.hasOutputFormat()) {
-        this.pdfAct.setSerializationFormat(parser.getOutputFormat());
+      if (parser.hasSerializationFormat()) {
+        String sf = parser.getSerializationFormat();
+        service.setSerializationFormat(PdfSerializationFormat.fromString(sf));
       }
 
-      // Pass the path to the visualization file if there is any.
-      if (parser.hasVisualizationFilePath()) {
-        this.pdfAct.setVisualizationTarget(parser.getVisualizationFilePath());
+      // Pass the target of the serialization.
+      if (parser.hasSerializationPath()) {
+        service.setSerializationPath(Paths.get(parser.getSerializationPath()));
+      } else {
+        service.setSerializationStream(System.out);
+      }
+
+      // Pass the target of the visualization.
+      if (parser.hasVisualizationPath()) {
+        service.setVisualizationPath(Paths.get(parser.getVisualizationPath()));
       }
 
       // Pass the element types filter for serialization & visualization.
-      if (parser.hasElementTypesFilter()) {
-        this.pdfAct.setElementTypesFilter(parser.getElementTypesFilter());
+      if (parser.hasElementTypesFilters()) {
+        List<String> types = parser.getElementTypesFilters();
+        service.setElementTypesFilters(ElementType.fromStrings(types));
       }
 
       // Pass the semantic roles filter for serialization & visualization.
-      if (parser.hasSemanticRolesFilter()) {
-        this.pdfAct.setSemanticRolesFilter(parser.getSemanticRolesFilter());
+      if (parser.hasSemanticRolesFilters()) {
+        List<String> roles = parser.getSemanticRolesFilters();
+        service.setSemanticRolesFilters(SemanticRole.fromStrings(roles));
       }
 
       // Run PdfAct.
-      this.pdfAct.run();
+      service.execute(pdf);
     } catch (PdfActException e) {
       statusCode = e.getExitCode();
       errorMessage = e.getMessage();
@@ -118,7 +124,7 @@ public class PdfActCommandLineInterface {
       // Print the error message (regardless of the log level).
       System.err.println(errorMessage);
       // Print the stack trace if there is any and debugging is enabled.
-      if (errorCause != null && this.pdfAct.hasLogLevel(PdfActLogLevel.DEBUG)) {
+      if (errorCause != null && service.hasLogLevel(LogLevel.DEBUG)) {
         errorCause.printStackTrace();
       }
     }
@@ -142,7 +148,7 @@ public class PdfActCommandLineInterface {
 
   /**
    * A parser that parses the command line arguments in order to run PdfAct.
-   * 
+   *
    * @author Claudius Korzen
    */
   class PdfActCommandLineParser {
@@ -156,92 +162,90 @@ public class PdfActCommandLineInterface {
     /**
      * The name of the option to define the path to the PDF file to process.
      */
-    protected static final String OPTION_PDF_FILE_PATH = "inputFile";
+    protected static final String PDF_PATH = "pdfPath";
 
     /**
      * The path to the PDF file to process.
      */
-    @Arg(dest = OPTION_PDF_FILE_PATH)
-    protected String inputFilePath;
+    @Arg(dest = PDF_PATH)
+    protected String pdfPath;
 
     // ========================================================================
 
     /**
-     * The name of the option to define the path to the output file.
+     * The name of the option to define the target path for the serialization.
      */
-    protected static final String OPTION_OUTPUT_FILE_PATH = "outputFile";
+    protected static final String SERIALIZATION_PATH = "serializationPath";
 
     /**
-     * The path to the output file.
+     * The target path for the serialization.
      */
-    @Arg(dest = OPTION_OUTPUT_FILE_PATH)
-    protected String outputFilePath;
+    @Arg(dest = SERIALIZATION_PATH)
+    protected String serializationPath;
 
     // ========================================================================
 
     /**
-     * The name of the option to define the output format.
+     * The name of the option to define the serialization format.
      */
-    protected static final String OPTION_OUTPUT_FORMAT = "format";
+    protected static final String SERIALIZATION_FORMAT = "format";
 
     /**
-     * The output format.
+     * The serialization format.
      */
-    @Arg(dest = OPTION_OUTPUT_FORMAT)
-    protected String outputFormat;
+    @Arg(dest = SERIALIZATION_FORMAT)
+    protected String serializationFormat;
 
     // ========================================================================
 
     /**
-     * The name of the option to define the path to the visualization file.
+     * The name of the option to define the target path for the visualization.
      */
-    protected static final String OPTION_VISUALIZATION_FILE_PATH = "visualize";
+    protected static final String VISUALIZATION_PATH = "visualize";
 
     /**
-     * The output format.
+     * The target path for the visualization.
      */
-    @Arg(dest = OPTION_VISUALIZATION_FILE_PATH)
-    protected String visualizationFilePath;
+    @Arg(dest = VISUALIZATION_PATH)
+    protected String visualizationPath;
 
     // ========================================================================
 
     /**
-     * The name of the option to define the element types to be included in the
-     * output.
+     * The name of the option to define the element types filters.
      */
-    protected static final String OPTION_ELEMENT_TYPES_FILTER = "type";
+    protected static final String ELEMENT_TYPES_FILTER = "type";
 
     /**
-     * The element type(s) to be included in the output.
+     * The element type(s) filters.
      */
-    @Arg(dest = OPTION_ELEMENT_TYPES_FILTER)
-    protected List<String> elementTypesFilter;
+    @Arg(dest = ELEMENT_TYPES_FILTER)
+    protected List<String> elementTypesFilters;
 
     // ========================================================================
 
     /**
-     * The name of the option to define the semantic role(s) to consider on
-     * generating the output.
+     * The name of the option to define the semantic role(s) filters.
      */
-    protected static final String OPTION_SEMANTIC_ROLES_FILTER = "role";
+    protected static final String SEMANTIC_ROLES_FILTER = "role";
 
     /**
-     * The semantic role(s) to consider.
+     * The semantic role(s) filters.
      */
-    @Arg(dest = OPTION_SEMANTIC_ROLES_FILTER)
-    protected List<String> roles;
+    @Arg(dest = SEMANTIC_ROLES_FILTER)
+    protected List<String> semanticRolesFilters;
 
     // ========================================================================
 
     /**
      * The name of the option to enable log output.
      */
-    protected static final String OPTION_LOG_LEVEL = "debug";
+    protected static final String LOG_LEVEL = "debug";
 
     /**
      * The log level.
      */
-    @Arg(dest = OPTION_LOG_LEVEL)
+    @Arg(dest = LOG_LEVEL)
     protected int logLevel;
 
     // ========================================================================
@@ -254,64 +258,64 @@ public class PdfActCommandLineInterface {
       this.parser.description("pdfact extracts text from PDF files.");
 
       // Add an argument to define the path to the PDF file to process.
-      this.parser.addArgument(OPTION_PDF_FILE_PATH)
-          .dest(OPTION_PDF_FILE_PATH)
+      this.parser.addArgument(PDF_PATH)
+          .dest(PDF_PATH)
           .required(true)
-          .metavar("<pdf-file>")
+          .metavar("<pdf-path>")
           .help("Defines the path to the PDF file to process.");
 
-      // Add an argument to define the path to the output file.
-      this.parser.addArgument(OPTION_OUTPUT_FILE_PATH)
-          .dest(OPTION_OUTPUT_FILE_PATH)
+      // Add an argument to define the target path for the serialization.
+      this.parser.addArgument(SERIALIZATION_PATH)
+          .dest(SERIALIZATION_PATH)
           .nargs("?")
           .metavar("<output-file>")
           .help("Defines the path to the file where pdfact should write the "
               + "text output. If not specified, the output will be written "
               + "to stdout.");
 
-      // Add an argument to define the output format.
+      // Add an argument to define the serialization format.
       Set<String> formatChoices = PdfSerializationFormat.getNames();
-      this.parser.addArgument("--" + OPTION_OUTPUT_FORMAT)
-          .dest(OPTION_OUTPUT_FORMAT)
+      this.parser.addArgument("--" + SERIALIZATION_FORMAT)
+          .dest(SERIALIZATION_FORMAT)
           .required(false)
           .choices(formatChoices)
           .metavar("<format>")
           .help("Defines the format in which the text output should be "
               + "written. Choose from: " + formatChoices + ".");
 
-      // Add an argument to define the element types filter.
-      Set<String> elementTypesChoices = PdfElementType.getGroupNames();
-      this.parser.addArgument("--" + OPTION_ELEMENT_TYPES_FILTER)
-          .dest(OPTION_ELEMENT_TYPES_FILTER)
+      // Add an argument to define the element type(s) filters.
+      Set<String> elementTypesChoices = ElementType.getGroupNames();
+      this.parser.addArgument("--" + ELEMENT_TYPES_FILTER)
+          .dest(ELEMENT_TYPES_FILTER)
           .nargs("*")
           .choices(elementTypesChoices)
           .required(false)
           .metavar("<type>", "<type>")
           .help("Defines one or more element types to be included in the text "
               + "output (and visualization if the --"
-              + OPTION_VISUALIZATION_FILE_PATH + " option is given). "
+              + VISUALIZATION_PATH + " option is given). "
               + "Choose from:" + formatChoices + ".");
 
-      // Add an argument to define the semantic role(s) to extract.
-      Set<String> roleChoices = PdfRole.getNames();
-      this.parser.addArgument("--" + OPTION_SEMANTIC_ROLES_FILTER)
-          .dest(OPTION_SEMANTIC_ROLES_FILTER)
+      // Add an argument to define the semantic role(s) filters.
+      Set<String> semanticRolesChoices = SemanticRole.getNames();
+      this.parser.addArgument("--" + SEMANTIC_ROLES_FILTER)
+          .dest(SEMANTIC_ROLES_FILTER)
           .nargs("*")
-          .choices(roleChoices)
+          .choices(semanticRolesChoices)
           .required(false)
           .metavar("<role>", "<role>")
           .help("Defines one or more semantic role(s) in order to filter the "
               + "chosen element types to be included in the text output (and "
-              + "visualization if the --" + OPTION_VISUALIZATION_FILE_PATH + " "
+              + "visualization if the --" + VISUALIZATION_PATH + " "
               + "option is given) by those roles. If not specified, all "
               + "element types will be included, regardless of their semantic "
-              + "roles. Choose from: " + roleChoices);
+              + "roles. Choose from: " + semanticRolesChoices);
 
-      // Add an argument to define the path to the visualization file.
-      this.parser.addArgument("--" + OPTION_VISUALIZATION_FILE_PATH)
-          .dest(OPTION_VISUALIZATION_FILE_PATH)
+      // Add an argument to define the target path for the visualization.
+      this.parser.addArgument("--" + VISUALIZATION_PATH)
+          .dest(VISUALIZATION_PATH)
           .required(false)
-          .metavar("<visualization-file>")
+          .metavar("<path>")
           .help("Defines a path to a file where pdfact should write a "
               + "visualization of the text output (that is a PDF file where "
               + "the chosen elements are surrounded by bounding boxes). If "
@@ -319,12 +323,12 @@ public class PdfActCommandLineInterface {
 
       // Add an argument to define the log level.
       StringBuilder choiceStr = new StringBuilder();
-      for (PdfActLogLevel level : PdfActLogLevel.getLogLevels()) {
-        choiceStr.append("  " + level.getIntLevel() + " " + level + "\n");
+      for (LogLevel level : LogLevel.getLogLevels()) {
+        choiceStr.append(" " + level.getIntLevel() + " " + level + "\n");
       }
-      PdfActLogLevel debugLevel = PdfActLogLevel.DEBUG;
-      this.parser.addArgument("--" + OPTION_LOG_LEVEL)
-          .dest(OPTION_LOG_LEVEL)
+      LogLevel debugLevel = LogLevel.DEBUG;
+      this.parser.addArgument("--" + LOG_LEVEL)
+          .dest(LOG_LEVEL)
           .nargs("?")
           .metavar("<level>")
           .type(Integer.class)
@@ -337,10 +341,10 @@ public class PdfActCommandLineInterface {
 
     /**
      * Parses the given command line arguments.
-     * 
+     *
      * @param args
      *        The command line arguments to parse.
-     * 
+     *
      * @throws PdfActException
      *         If parsing the command line arguments fails.
      */
@@ -358,7 +362,7 @@ public class PdfActCommandLineInterface {
 
     /**
      * Returns the usage for this command line parser.
-     * 
+     *
      * @return The usage for this command line parser.
      */
     public String getUsage() {
@@ -367,7 +371,7 @@ public class PdfActCommandLineInterface {
 
     /**
      * Returns the help for this command line parser.
-     * 
+     *
      * @return The help for this command line parser.
      */
     public String getHelp() {
@@ -378,129 +382,132 @@ public class PdfActCommandLineInterface {
     // Getters methods.
 
     /**
-     * Returns true, if a path to the input file is given; false otherwise.
-     * 
-     * @return True, if a path to the input file is given; false otherwise.
+     * Returns true, if a path to a PDF file is given; false otherwise.
+     *
+     * @return True, if a path to a PDF file is given; false otherwise.
      */
-    public boolean hasInputFilePath() {
-      return this.inputFilePath != null;
+    public boolean hasPdfPath() {
+      return this.pdfPath != null;
     }
 
     /**
-     * Returns the path to the input file.
-     * 
-     * @return The path to the input file.
+     * Returns the path to the PDF file.
+     *
+     * @return The path to the PDF file.
      */
-    public String getInputFilePath() {
-      return this.inputFilePath;
-    }
-
-    // ========================================================================
-
-    /**
-     * Returns true, if a path to the output file is given; false otherwise.
-     * 
-     * @return True, if a path to the output file is given; false otherwise.
-     */
-    public boolean hasOutputFilePath() {
-      return this.outputFilePath != null;
-    }
-
-    /**
-     * Returns the path to the output file.
-     * 
-     * @return The path to the output file.
-     */
-    public String getOutputFilePath() {
-      return this.outputFilePath;
+    public String getPdfPath() {
+      return this.pdfPath;
     }
 
     // ========================================================================
 
     /**
-     * Returns true, if an output format is given.
-     * 
-     * @return True, if an output format is given.
-     */
-    public boolean hasOutputFormat() {
-      return this.outputFormat != null;
-    }
-
-    /**
-     * Returns the output format.
-     * 
-     * @return The output format.
-     */
-    public String getOutputFormat() {
-      return this.outputFormat;
-    }
-
-    // ========================================================================
-
-    /**
-     * Returns true, if a path to a visualization file is given.
-     * 
-     * @return True, if a path to a visualization file is given.
-     */
-    public boolean hasVisualizationFilePath() {
-      return this.visualizationFilePath != null;
-    }
-
-    /**
-     * Returns the path to the visualization file.
-     * 
-     * @return The path to the visualization file.
-     */
-    public String getVisualizationFilePath() {
-      return this.visualizationFilePath;
-    }
-
-    // ========================================================================
-
-    /**
-     * Returns true, if there is at least one element type is given.
-     * 
-     * @return True, if there is at least one element type is given; False
+     * Returns true, if a target path for the serialization is given; false
+     * otherwise.
+     *
+     * @return True, if a target path for the serialization is given; false
      *         otherwise.
      */
-    public boolean hasElementTypesFilter() {
-      return this.elementTypesFilter != null;
+    public boolean hasSerializationPath() {
+      return this.serializationPath != null;
     }
 
     /**
-     * Returns the feature(s) to extract.
-     * 
-     * @return The feature(s) to extract.
+     * Returns the target path for the serialization.
+     *
+     * @return The target path for the serialization.
      */
-    public List<String> getElementTypesFilter() {
-      return this.elementTypesFilter;
+    public String getSerializationPath() {
+      return this.serializationPath;
     }
 
     // ========================================================================
 
     /**
-     * Returns true, if there is at least one role given.
-     * 
-     * @return True, if there is at least one role given; False otherwise.
+     * Returns true, if an serialization format is given.
+     *
+     * @return True, if an serialization format is given.
      */
-    public boolean hasSemanticRolesFilter() {
-      return this.roles != null;
+    public boolean hasSerializationFormat() {
+      return this.serializationFormat != null;
     }
 
     /**
-     * Returns the role(s) to consider.
-     * 
-     * @return The role(s) to consider.
+     * Returns the serialization format.
+     *
+     * @return The serialization format.
      */
-    public List<String> getSemanticRolesFilter() {
-      return this.roles;
+    public String getSerializationFormat() {
+      return this.serializationFormat;
+    }
+
+    // ========================================================================
+
+    /**
+     * Returns true, if a target path for the visualization is given.
+     *
+     * @return True, if a target path for the visualization is given.
+     */
+    public boolean hasVisualizationPath() {
+      return this.visualizationPath != null;
+    }
+
+    /**
+     * Returns the target path for the visualization.
+     *
+     * @return The target path for the visualization.
+     */
+    public String getVisualizationPath() {
+      return this.visualizationPath;
+    }
+
+    // ========================================================================
+
+    /**
+     * Returns true, if there is at least one element type filter is given.
+     *
+     * @return True, if there is at least one element type filter is given;
+     *         False otherwise.
+     */
+    public boolean hasElementTypesFilters() {
+      return this.elementTypesFilters != null;
+    }
+
+    /**
+     * Returns the element type(s) filters.
+     *
+     * @return The element type(s) filters.
+     */
+    public List<String> getElementTypesFilters() {
+      return this.elementTypesFilters;
+    }
+
+    // ========================================================================
+
+    /**
+     * Returns true, if there is at least one semantic role filter given.
+     *
+     * @return True, if there is at least one semantic role filter given; False
+     *         otherwise.
+     */
+    public boolean hasSemanticRolesFilters() {
+      return this.semanticRolesFilters != null;
+    }
+
+    /**
+     * Returns the semantic role(s) filter(s).
+     *
+     * @return The semantic role(s) filter(s).
+     */
+    public List<String> getSemanticRolesFilters() {
+      return this.semanticRolesFilters;
     }
 
     // ========================================================================
 
     /**
      * Returns the log level.
-     * 
+     *
      * @return The log level.
      */
     public int getLogLevel() {
@@ -520,7 +527,7 @@ public class PdfActCommandLineInterface {
 
     /**
      * Creates a new StoreDefaultArgumentAction.
-     * 
+     *
      * @param defaultValue
      *        The default value to store if the argument value is null.
      */

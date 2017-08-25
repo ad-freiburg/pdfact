@@ -1,5 +1,7 @@
 package pdfact.exception;
 
+import pdfact.util.exception.PdfActException;
+
 /**
  * The standard exception to throw on any serialization error.
  * 
