@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.model.CharacterStatistic;
-import pdfact.model.ElementType;
 import pdfact.model.Position;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
@@ -65,13 +64,6 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   @AssistedInject
   public PlainTextBlock(TextLineListFactory textLineListFactory) {
     this.textLines = textLineListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.TEXT_BLOCK;
   }
 
   // ==========================================================================

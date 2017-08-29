@@ -8,7 +8,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.model.CharacterStatistic;
-import pdfact.model.ElementType;
 import pdfact.model.Paragraph;
 import pdfact.model.Position;
 import pdfact.model.SemanticRole;
@@ -61,13 +60,6 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   @AssistedInject
   public PlainParagraph(WordListFactory wordListFactory) {
     this.words = wordListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.PARAGRAPH;
   }
 
   // ==========================================================================

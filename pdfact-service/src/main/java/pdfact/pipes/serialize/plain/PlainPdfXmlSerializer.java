@@ -43,11 +43,9 @@ import pdfact.exception.PdfActSerializeException;
 import pdfact.model.Character;
 import pdfact.model.Color;
 import pdfact.model.Element;
-import pdfact.model.ElementType;
 import pdfact.model.Font;
 import pdfact.model.FontFace;
 import pdfact.model.HasColor;
-import pdfact.model.HasElementType;
 import pdfact.model.HasFontFace;
 import pdfact.model.HasPosition;
 import pdfact.model.HasPositions;
@@ -61,6 +59,7 @@ import pdfact.model.Rectangle;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
+import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfXmlSerializer;
 import pdfact.util.CollectionUtils;
@@ -85,9 +84,9 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   // ==========================================================================
 
   /**
-   * The element types to consider on serializing.
+   * The text unit.
    */
-  protected Set<ElementType> typesFilter;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles to consider on serializing.
@@ -119,17 +118,17 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in XML format.
    * 
-   * @param typesFilter
-   *        The element types filter.
+   * @param textUnit
+   *        The text unit.
    * @param rolesFilter
    *        The semantic roles filter.
    */
   @AssistedInject
   public PlainPdfXmlSerializer(
-      @Assisted Set<ElementType> typesFilter,
+      @Assisted TextUnit textUnit,
       @Assisted Set<SemanticRole> rolesFilter) {
     this();
-    this.typesFilter = typesFilter;
+    this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
 
@@ -196,6 +195,30 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    * @return A list of strings that represent the serialized elements.
    */
   protected List<String> serializePdfElements(int level, PdfDocument pdf) {
+    switch (this.textUnit) {
+      case CHARACTER:
+        return serializeCharacters(level, pdf);
+      case WORD:
+        return serializeWords(level, pdf);
+      case PARAGRAPH:
+      default:
+        return serializeParagraphs(level, pdf);
+    }
+  }
+
+  // ==========================================================================
+
+  /**
+   * Serializes the paragraphs of the given PDF document.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeParagraphs(int level, PdfDocument pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -205,34 +228,13 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
           continue;
         }
 
-        // Serialize the paragraph (if types filter includes paragraphs).
-        if (hasRelevantElementType(paragraph)) {
-          List<String> paragraphLines = serializeParagraph(level, paragraph);
-          if (paragraphLines != null) {
-            result.addAll(paragraphLines);
-          }
-        }
-
-        for (Word word : paragraph.getWords()) {
-          // Serialize the word (if types filter includes words).
-          if (hasRelevantElementType(word)) {
-            List<String> wordLines = serializeWord(level, word);
-            if (wordLines != null) {
-              result.addAll(wordLines);
-            }
-          }
-          for (Character c : word.getCharacters()) {
-            // Serialize the character (if types filter includes chars).
-            if (hasRelevantElementType(c)) {
-              List<String> characterLines = serializeCharacter(level, c);
-              if (characterLines != null) {
-                result.addAll(characterLines);
-              }
-            }
-          }
+        List<String> paragraphLines = serializeParagraph(level, paragraph);
+        if (paragraphLines != null) {
+          result.addAll(paragraphLines);
         }
       }
     }
+
     return result;
   }
 
@@ -258,47 +260,37 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  /**
-   * Serializes the given text block.
-   * 
-   * @param level
-   *        The current indentation level.
-   * @param block
-   *        The text block to serialize.
-   * 
-   * @return A list of strings that represent the lines of the serialization.
-   */
-  protected List<String> serializeTextBlock(int level, TextBlock block) {
-    List<String> result = new ArrayList<>();
-    List<String> blockLines = serializePdfElement(level + 1, block);
-    // Wrap the serialized lines with a tag that describe a text block.
-    if (blockLines != null && !blockLines.isEmpty()) {
-      result.add(start(TEXT_BLOCK, level));
-      result.addAll(blockLines);
-      result.add(end(TEXT_BLOCK, level));
-    }
-    return result;
-  }
+  // ==========================================================================
 
   /**
-   * Serializes the given text line.
+   * Serializes the words of the given PDF document.
    * 
    * @param level
    *        The current indentation level.
-   * @param line
-   *        The text line to serialize.
+   * @param pdf
+   *        The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeTextLine(int level, TextLine line) {
+  protected List<String> serializeWords(int level, PdfDocument pdf) {
     List<String> result = new ArrayList<>();
-    List<String> lineLines = serializePdfElement(level + 1, line);
-    // Wrap the serialized lines with a tag that describes a text line.
-    if (lineLines != null && !lineLines.isEmpty()) {
-      result.add(start(TEXT_LINE, level));
-      result.addAll(lineLines);
-      result.add(end(TEXT_LINE, level));
+
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
+
+        for (Word word : paragraph.getWords()) {
+          List<String> wordLines = serializeWord(level, word);
+          if (wordLines != null) {
+            result.addAll(wordLines);
+          }
+        }
+      }
     }
+
     return result;
   }
 
@@ -324,6 +316,42 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
+  // ==========================================================================
+
+  /**
+   * Serializes the characters of the given PDF document.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeCharacters(int level, PdfDocument pdf) {
+    List<String> result = new ArrayList<>();
+
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
+
+        for (Word word : paragraph.getWords()) {
+          for (Character character : word.getCharacters()) {
+            List<String> characterLines = serializeCharacter(level, character);
+            if (characterLines != null) {
+              result.addAll(characterLines);
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Serializes the given character.
    * 
@@ -345,6 +373,8 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     }
     return result;
   }
+
+  // ==========================================================================
 
   /**
    * Serializes the given PDF element.
@@ -747,13 +777,13 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilter() {
-    return this.typesFilter;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilter(Set<ElementType> typesFilter) {
-    this.typesFilter = typesFilter;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================
@@ -798,36 +828,8 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return this.rolesFilter.contains(role);
   }
 
-  /**
-   * Checks if the type of the given PDF element matches the element type filter
-   * of this serializer.
-   * 
-   * @param element
-   *        The PDF element to check.
-   *
-   * @return True, if the type of the given PDF element matches the element type
-   *         filter of this serializer, false otherwise.
-   */
-  protected boolean hasRelevantElementType(HasElementType element) {
-    if (element == null) {
-      return false;
-    }
-
-    if (this.typesFilter == null || this.typesFilter.isEmpty()) {
-      // No filter is given -> The element is relevant.
-      return true;
-    }
-
-    ElementType elementType = element.getType();
-    if (elementType == null) {
-      return false;
-    }
-
-    return this.typesFilter.contains(elementType);
-  }
-  
   // ==========================================================================
-  
+
   /**
    * Repeats the given string <repeats>-times.
    * 
@@ -843,5 +845,51 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
       sb.append(string);
     }
     return sb.toString();
+  }
+
+  // ==========================================================================
+
+  /**
+   * Serializes the given text block.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param block
+   *        The text block to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeTextBlock(int level, TextBlock block) {
+    List<String> result = new ArrayList<>();
+    List<String> blockLines = serializePdfElement(level + 1, block);
+    // Wrap the serialized lines with a tag that describe a text block.
+    if (blockLines != null && !blockLines.isEmpty()) {
+      result.add(start(TEXT_BLOCK, level));
+      result.addAll(blockLines);
+      result.add(end(TEXT_BLOCK, level));
+    }
+    return result;
+  }
+
+  /**
+   * Serializes the given text line.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param line
+   *        The text line to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeTextLine(int level, TextLine line) {
+    List<String> result = new ArrayList<>();
+    List<String> lineLines = serializePdfElement(level + 1, line);
+    // Wrap the serialized lines with a tag that describes a text line.
+    if (lineLines != null && !lineLines.isEmpty()) {
+      result.add(start(TEXT_LINE, level));
+      result.addAll(lineLines);
+      result.add(end(TEXT_LINE, level));
+    }
+    return result;
   }
 }

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.model.CharacterStatistic;
-import pdfact.model.ElementType;
 import pdfact.model.Line;
 import pdfact.model.Position;
 import pdfact.model.TextLine;
@@ -56,13 +55,6 @@ public class PlainTextLine extends PlainElement implements TextLine {
   @AssistedInject
   public PlainTextLine(WordListFactory wordListFactory) {
     this.words = wordListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.TEXT_LINE;
   }
 
   // ==========================================================================

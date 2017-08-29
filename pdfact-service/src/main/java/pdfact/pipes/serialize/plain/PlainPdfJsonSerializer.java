@@ -37,33 +37,32 @@ import org.json.JSONObject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import pdfact.model.Character;
+import pdfact.model.Color;
+import pdfact.model.Element;
+import pdfact.model.Font;
+import pdfact.model.FontFace;
 import pdfact.model.HasColor;
-import pdfact.model.HasElementType;
 import pdfact.model.HasFontFace;
 import pdfact.model.HasPosition;
 import pdfact.model.HasPositions;
 import pdfact.model.HasSemanticRole;
 import pdfact.model.HasText;
-import pdfact.model.Character;
-import pdfact.model.Color;
-import pdfact.model.Element;
-import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
-import pdfact.model.Font;
-import pdfact.model.FontFace;
 import pdfact.model.Page;
 import pdfact.model.Paragraph;
+import pdfact.model.PdfDocument;
 import pdfact.model.Position;
 import pdfact.model.Rectangle;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
+import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfJsonSerializer;
 
 /**
- * An implementation of {@link PdfJsonSerializer } that serializes a PDF
- * document in JSON format.
+ * An implementation of {@link PdfJsonSerializer} that serializes a PDF document
+ * in JSON format.
  *
  * @author Claudius Korzen
  */
@@ -78,7 +77,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   /**
    * The element types to consider on serializing.
    */
-  protected Set<ElementType> typesFilter;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles to consider on serializing.
@@ -110,17 +109,17 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in JSON format.
    * 
-   * @param typesFilter
-   *        The element types filter.
+   * @param textUnit
+   *        The text unit.
    * @param rolesFilter
    *        The semantic roles filter.
    */
   @AssistedInject
   public PlainPdfJsonSerializer(
-      @Assisted Set<ElementType> typesFilter,
+      @Assisted TextUnit textUnit,
       @Assisted Set<SemanticRole> rolesFilter) {
     this();
-    this.typesFilter = typesFilter;
+    this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
 
@@ -170,6 +169,28 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    * @return A JSON array that represent the serialized elements.
    */
   protected JSONArray serializePdfElements(PdfDocument pdf) {
+    switch (this.textUnit) {
+      case CHARACTER:
+        return serializeCharacters(pdf);
+      case WORD:
+        return serializeWords(pdf);
+      case PARAGRAPH:
+      default:
+        return serializeParagraphs(pdf);
+    }
+  }
+
+  // ==========================================================================
+
+  /**
+   * Serializes the paragraphs of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A JSON array that represent the serialized elements.
+   */
+  protected JSONArray serializeParagraphs(PdfDocument pdf) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -179,38 +200,15 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
           continue;
         }
 
-        // Serialize the paragraph (if types filter includes paragraphs).
-        if (hasRelevantElementType(paragraph)) {
-          JSONObject paragraphJson = serializeParagraph(paragraph);
-          if (paragraphJson != null && paragraphJson.length() > 0) {
-            result.put(paragraphJson);
-          }
-        }
-
-        for (Word word : paragraph.getWords()) {
-          // Serialize the word (if types filter includes words).
-          if (hasRelevantElementType(word)) {
-            JSONObject wordJson = serializeWord(word);
-            if (wordJson != null && wordJson.length() > 0) {
-              result.put(wordJson);
-            }
-          }
-          for (Character character : word.getCharacters()) {
-            // Serialize the char (if types filter includes text chars).
-            if (hasRelevantElementType(character)) {
-              JSONObject characterJson = serializeCharacter(character);
-              if (characterJson != null && characterJson.length() > 0) {
-                result.put(characterJson);
-              }
-            }
-          }
+        JSONObject paragraphJson = serializeParagraph(paragraph);
+        if (paragraphJson != null) {
+          result.put(paragraphJson);
         }
       }
     }
+
     return result;
   }
-
-  // ==========================================================================
 
   /**
    * Serializes the given paragraph.
@@ -230,39 +228,35 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
-  /**
-   * Serializes the given text block.
-   * 
-   * @param block
-   *        The text block to serialize.
-   * 
-   * @return A JSON object that represents the serialization.
-   */
-  protected JSONObject serializeTextBlock(TextBlock block) {
-    JSONObject result = new JSONObject();
-    JSONObject blockJson = serializePdfElement(block);
-    // Wrap the JSON object with a JSON object that describes a text block.
-    if (blockJson != null && blockJson.length() > 0) {
-      result.put(TEXT_BLOCK, blockJson);
-    }
-    return result;
-  }
+  // ==========================================================================
 
   /**
-   * Serializes the given text line.
+   * Serializes the words of the given PDF document.
    * 
-   * @param line
-   *        The text line to serialize.
+   * @param pdf
+   *        The PDF document to process.
    * 
-   * @return A JSON object that represents the serialization.
+   * @return A JSON array that represent the serialized elements.
    */
-  protected JSONObject serializeTextLine(TextLine line) {
-    JSONObject result = new JSONObject();
-    JSONObject lineJson = serializePdfElement(line);
-    // Wrap the JSON object with a JSON object that describes a text line.
-    if (lineJson != null && lineJson.length() > 0) {
-      result.put(TEXT_LINE, lineJson);
+  protected JSONArray serializeWords(PdfDocument pdf) {
+    JSONArray result = new JSONArray();
+
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
+
+        for (Word word : paragraph.getWords()) {
+          JSONObject wordJson = serializeWord(word);
+          if (wordJson != null) {
+            result.put(wordJson);
+          }
+        }
+      }
     }
+
     return result;
   }
 
@@ -284,6 +278,40 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
+  // ==========================================================================
+
+  /**
+   * Serializes the characters of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A JSON array that represent the serialized elements.
+   */
+  protected JSONArray serializeCharacters(PdfDocument pdf) {
+    JSONArray result = new JSONArray();
+
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
+
+        for (Word word : paragraph.getWords()) {
+          for (Character character : word.getCharacters()) {
+            JSONObject characterJson = serializeCharacter(character);
+            if (characterJson != null) {
+              result.put(characterJson);
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Serializes the given character.
    * 
@@ -301,6 +329,8 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     }
     return result;
   }
+
+  // ==========================================================================
 
   /**
    * Serializes the given PDF element.
@@ -586,13 +616,13 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilter() {
-    return this.typesFilter;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilter(Set<ElementType> typesFilter) {
-    this.typesFilter = typesFilter;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================
@@ -637,31 +667,42 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return this.rolesFilter.contains(role);
   }
 
+  // ==========================================================================
+  // Remaining methods.
+  
   /**
-   * Checks if the type of the given PDF element matches the element type filter
-   * of this serializer.
+   * Serializes the given text block.
    * 
-   * @param element
-   *        The PDF element to check.
-   *
-   * @return True, if the type of the given PDF element matches the element type
-   *         filter of this serializer, false otherwise.
+   * @param block
+   *        The text block to serialize.
+   * 
+   * @return A JSON object that represents the serialization.
    */
-  protected boolean hasRelevantElementType(HasElementType element) {
-    if (element == null) {
-      return false;
+  protected JSONObject serializeTextBlock(TextBlock block) {
+    JSONObject result = new JSONObject();
+    JSONObject blockJson = serializePdfElement(block);
+    // Wrap the JSON object with a JSON object that describes a text block.
+    if (blockJson != null && blockJson.length() > 0) {
+      result.put(TEXT_BLOCK, blockJson);
     }
+    return result;
+  }
 
-    if (this.typesFilter == null || this.typesFilter.isEmpty()) {
-      // No filter is given -> The element is relevant.
-      return true;
+  /**
+   * Serializes the given text line.
+   * 
+   * @param line
+   *        The text line to serialize.
+   * 
+   * @return A JSON object that represents the serialization.
+   */
+  protected JSONObject serializeTextLine(TextLine line) {
+    JSONObject result = new JSONObject();
+    JSONObject lineJson = serializePdfElement(line);
+    // Wrap the JSON object with a JSON object that describes a text line.
+    if (lineJson != null && lineJson.length() > 0) {
+      result.put(TEXT_LINE, lineJson);
     }
-
-    ElementType elementType = element.getType();
-    if (elementType == null) {
-      return false;
-    }
-
-    return this.typesFilter.contains(elementType);
+    return result;
   }
 }

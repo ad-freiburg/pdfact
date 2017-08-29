@@ -4,8 +4,8 @@ import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 
 /**
  * A serializer to serialize a PDF document in XML format.
@@ -29,14 +29,14 @@ public interface PdfXmlSerializer extends PdfSerializer {
     /**
      * Creates a new PdfXmlSerializer.
      * 
-     * @param types
-     *        The element types filter.
+     * @param textUnit
+     *        The text unit.
      * @param roles
      *        The semantic roles filter.
      * 
      * @return An instance of PdfXmlSerializer.
      */
-    PdfXmlSerializer create(@Assisted Set<ElementType> types,
+    PdfXmlSerializer create(@Assisted TextUnit textUnit,
         @Assisted Set<SemanticRole> roles);
   }
 }

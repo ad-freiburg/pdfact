@@ -10,24 +10,22 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.exception.PdfActVisualizeException;
-import pdfact.model.HasElementType;
+import pdfact.model.Character;
+import pdfact.model.Element;
+import pdfact.model.Figure;
 import pdfact.model.HasPosition;
 import pdfact.model.HasPositions;
 import pdfact.model.HasSemanticRole;
-import pdfact.model.PdfDocument;
-import pdfact.model.Point;
-import pdfact.model.Character;
-import pdfact.model.Element;
-import pdfact.model.ElementType;
-import pdfact.model.Figure;
 import pdfact.model.Page;
 import pdfact.model.Paragraph;
+import pdfact.model.PdfDocument;
 import pdfact.model.Position;
 import pdfact.model.Rectangle;
 import pdfact.model.SemanticRole;
 import pdfact.model.Shape;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
+import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.visualize.PdfDrawer.PdfDrawerFactory;
 
@@ -43,9 +41,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected PdfDrawerFactory pdfDrawerFactory;
 
   /**
-   * The element types to consider on visualizing.
+   * The text unit.
    */
-  protected Set<ElementType> typesFilter;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles to consider on visualizing.
@@ -71,17 +69,17 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @param pdfDrawerFactory
    *        The factory to create instances of {@link PdfDrawer}.
-   * @param typesFilter
-   *        The element types filter.
+   * @param textUnit
+   *        The text unit.
    * @param rolesFilter
    *        The semantic roles filter.
    */
   @AssistedInject
   public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory,
-      @Assisted Set<ElementType> typesFilter,
+      @Assisted TextUnit textUnit,
       @Assisted Set<SemanticRole> rolesFilter) {
     this(pdfDrawerFactory);
-    this.typesFilter = typesFilter;
+    this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
 
@@ -92,61 +90,19 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     if (pdf != null) {
       PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
 
-      // Visualize the textual elements.
-      for (Paragraph paragraph : pdf.getParagraphs()) {
-        // Ignore the paragraph if its role doesn't match the roles filter.
-        if (!hasRelevantRole(paragraph)) {
-          continue;
-        }
-
-        // Visualize the paragraph (if types filter includes paragraphs).
-        if (hasRelevantElementType(paragraph)) {
-          visualizeParagraph(paragraph, drawer);
-          try {
-            List<Position> positions = paragraph.getPositions();
-            int i = 0;
-            for (Position position : positions) {
-              int pageNum = position.getPage().getPageNumber();
-              Point point = position.getRectangle().getUpperLeft();
-              drawer.drawText((i++) + " " + paragraph.getSemanticRole(), pageNum, point);
-            }
-            
-          } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-        }
-
-        for (Word word : paragraph.getWords()) {
-          // Visualize the word (if types filter includes words).
-          if (hasRelevantElementType(word)) {
-            visualizeWord(word, drawer);
-          }
-          for (Character character : word.getCharacters()) {
-            // Visualize the character (if types filter includes chars).
-            if (hasRelevantElementType(character)) {
-              visualizeCharacter(character, drawer);
-            }
-          }
-        }
+      switch (this.textUnit) {
+        case CHARACTER:
+          visualizeCharacters(pdf, drawer);
+          break;
+        case WORD:
+          visualizeWords(pdf, drawer);
+          break;
+        case PARAGRAPH:
+        default:
+          visualizeParagraphs(pdf, drawer);
+          break;
       }
-
-      // Visualize the graphical elements.
-      for (Page page : pdf.getPages()) {
-        for (Figure figure : page.getFigures()) {
-          // Visualize the figure (if types filter includes figures).
-          if (hasRelevantElementType(figure)) {
-            visualizeFigure(figure, drawer);
-          }
-        }
-        for (Shape shape : page.getShapes()) {
-          // Visualize the shape (if types filter includes shapes).
-          if (hasRelevantElementType(shape)) {
-            visualizeShape(shape, drawer);
-          }
-        }
-      }
-
+      
       try {
         return drawer.toByteArray();
       } catch (IOException e) {
@@ -157,6 +113,30 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   }
 
   // ==========================================================================
+
+  /**
+   * Visualizes the paragraphs of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * @param drawer
+   *        The drawer to use.
+   * 
+   * @throws PdfActVisualizeException
+   *         If the drawing failed.
+   */
+  protected void visualizeParagraphs(PdfDocument pdf, PdfDrawer drawer)
+      throws PdfActVisualizeException {
+    // Visualize the textual elements.
+    for (Paragraph paragraph : pdf.getParagraphs()) {
+      // Ignore the paragraph if its role doesn't match the roles filter.
+      if (!hasRelevantRole(paragraph)) {
+        continue;
+      }
+
+      visualizeParagraph(paragraph, drawer);
+    }
+  }
 
   /**
    * Visualizes the given paragraph.
@@ -174,44 +154,32 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(paragraph, drawer, Color.RED);
   }
 
+  // ==========================================================================
+
   /**
-   * Visualizes the given text block.
+   * Visualizes the words of the given PDF document.
    * 
-   * @param block
-   *        The text block to visualize.
+   * @param pdf
+   *        The PDF document to process.
    * @param drawer
    *        The drawer to use.
    * 
    * @throws PdfActVisualizeException
    *         If the drawing failed.
    */
-  protected void visualizeTextBlock(TextBlock block, PdfDrawer drawer)
+  protected void visualizeWords(PdfDocument pdf, PdfDrawer drawer)
       throws PdfActVisualizeException {
-    visualizePdfElement(block, drawer, Color.BLUE);
-    try {
-      String roleStr = block.getSemanticRole() != null ? block.getSemanticRole().getName() : "";
-      drawer.drawText(roleStr,
-          block.getPosition().getPage().getPageNumber(),
-          block.getPosition().getRectangle().getUpperLeft(), Color.BLACK, 9f);
-    } catch (IOException e) {
+    // Visualize the textual elements.
+    for (Paragraph paragraph : pdf.getParagraphs()) {
+      // Ignore the paragraph if its role doesn't match the roles filter.
+      if (!hasRelevantRole(paragraph)) {
+        continue;
+      }
 
+      for (Word word : paragraph.getWords()) {
+        visualizeWord(word, drawer);
+      }
     }
-  }
-
-  /**
-   * Visualizes the given text line.
-   * 
-   * @param line
-   *        The text line to visualize.
-   * @param drawer
-   *        The drawer to use.
-   * 
-   * @throws PdfActVisualizeException
-   *         If the drawing failed.
-   */
-  protected void visualizeTextLine(TextLine line, PdfDrawer drawer)
-      throws PdfActVisualizeException {
-    visualizePdfElement(line, drawer, Color.GREEN);
   }
 
   /**
@@ -230,6 +198,40 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(word, drawer, Color.ORANGE);
   }
 
+  // ==========================================================================
+
+  /**
+   * Visualizes the characters of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * @param drawer
+   *        The drawer to use.
+   * 
+   * @throws PdfActVisualizeException
+   *         If the drawing failed.
+   */
+  protected void visualizeCharacters(PdfDocument pdf, PdfDrawer drawer)
+      throws PdfActVisualizeException {
+    // Visualize the textual elements.
+    for (Paragraph paragraph : pdf.getParagraphs()) {
+      // Ignore the paragraph if its role doesn't match the roles filter.
+      if (!hasRelevantRole(paragraph)) {
+        continue;
+      }
+
+      for (Word word : paragraph.getWords()) {
+        if (word == null) {
+          continue;
+        }
+        
+        for (Character character : word.getCharacters()) {
+          visualizeCharacter(character, drawer);
+        }
+      }
+    }
+  }
+
   /**
    * Visualizes the given character.
    * 
@@ -245,6 +247,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       throws PdfActVisualizeException {
     visualizePdfElement(character, drawer, Color.BLACK);
   }
+
+  // ==========================================================================
 
   /**
    * Visualizes the given figure.
@@ -386,13 +390,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypeFilters() {
-    return this.typesFilter;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypeFilters(Set<ElementType> types) {
-    this.typesFilter = types;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================
@@ -436,32 +440,38 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
     return this.rolesFilter.contains(role);
   }
-
+  
+  // ==========================================================================
+  
   /**
-   * Checks if the type of the given PDF element matches the element type filter
-   * of this serializer.
+   * Visualizes the given text block.
    * 
-   * @param element
-   *        The PDF element to check.
-   *
-   * @return True, if the type of the given PDF element matches the element type
-   *         filter of this serializer, false otherwise.
+   * @param block
+   *        The text block to visualize.
+   * @param drawer
+   *        The drawer to use.
+   * 
+   * @throws PdfActVisualizeException
+   *         If the drawing failed.
    */
-  protected boolean hasRelevantElementType(HasElementType element) {
-    if (element == null) {
-      return false;
-    }
-
-    if (this.typesFilter == null || this.typesFilter.isEmpty()) {
-      // No filter is given -> The element is relevant.
-      return true;
-    }
-
-    ElementType elementType = element.getType();
-    if (elementType == null) {
-      return false;
-    }
-
-    return this.typesFilter.contains(elementType);
+  protected void visualizeTextBlock(TextBlock block, PdfDrawer drawer)
+      throws PdfActVisualizeException {
+    visualizePdfElement(block, drawer, Color.BLUE);
+  }
+  
+  /**
+   * Visualizes the given text line.
+   * 
+   * @param line
+   *        The text line to visualize.
+   * @param drawer
+   *        The drawer to use.
+   * 
+   * @throws PdfActVisualizeException
+   *         If the drawing failed.
+   */
+  protected void visualizeTextLine(TextLine line, PdfDrawer drawer)
+      throws PdfActVisualizeException {
+    visualizePdfElement(line, drawer, Color.GREEN);
   }
 }

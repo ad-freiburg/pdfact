@@ -18,12 +18,12 @@ import net.sourceforge.argparse4j.internal.HelpScreenException;
 import pdfact.PdfActCoreSettings;
 import pdfact.exception.PdfActParseCommandLineException;
 import pdfact.guice.PdfActServiceGuiceModule;
+import pdfact.model.LogLevel;
 import pdfact.model.PdfDocument;
 import pdfact.model.PdfDocument.PdfDocumentFactory;
-import pdfact.model.ElementType;
-import pdfact.model.LogLevel;
+import pdfact.model.SerializationFormat;
 import pdfact.model.SemanticRole;
-import pdfact.model.PdfSerializationFormat;
+import pdfact.model.TextUnit;
 import pdfact.pipes.PdfActServicePipe;
 import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.util.exception.PdfActException;
@@ -85,7 +85,7 @@ public class PdfActCommandLineInterface {
       // Pass the serialization format if there is any.
       if (parser.hasSerializationFormat()) {
         String sf = parser.getSerializationFormat();
-        service.setSerializationFormat(PdfSerializationFormat.fromString(sf));
+        service.setSerializationFormat(SerializationFormat.fromString(sf));
       }
 
       // Pass the target of the serialization.
@@ -100,10 +100,9 @@ public class PdfActCommandLineInterface {
         service.setVisualizationPath(Paths.get(parser.getVisualizationPath()));
       }
 
-      // Pass the element types filter for serialization & visualization.
-      if (parser.hasElementTypesFilters()) {
-        List<String> types = parser.getElementTypesFilters();
-        service.setElementTypesFilters(ElementType.fromStrings(types));
+      // Pass the chosen text unit.
+      if (parser.hasTextUnit()) {
+        service.setTextUnit(TextUnit.fromString(parser.getTextUnit()));
       }
 
       // Pass the semantic roles filter for serialization & visualization.
@@ -212,15 +211,15 @@ public class PdfActCommandLineInterface {
     // ========================================================================
 
     /**
-     * The name of the option to define the element types filters.
+     * The name of the option to define the text unit.
      */
-    protected static final String ELEMENT_TYPES_FILTER = "type";
+    protected static final String TEXT_UNIT = "unit";
 
     /**
-     * The element type(s) filters.
+     * The text unit to extract.
      */
-    @Arg(dest = ELEMENT_TYPES_FILTER)
-    protected List<String> elementTypesFilters;
+    @Arg(dest = TEXT_UNIT)
+    protected String textUnit;
 
     // ========================================================================
 
@@ -274,7 +273,7 @@ public class PdfActCommandLineInterface {
               + "to stdout.");
 
       // Add an argument to define the serialization format.
-      Set<String> formatChoices = PdfSerializationFormat.getNames();
+      Set<String> formatChoices = SerializationFormat.getNames();
       this.parser.addArgument("--" + SERIALIZATION_FORMAT)
           .dest(SERIALIZATION_FORMAT)
           .required(false)
@@ -283,17 +282,14 @@ public class PdfActCommandLineInterface {
           .help("Defines the format in which the text output should be "
               + "written. Choose from: " + formatChoices + ".");
 
-      // Add an argument to define the element type(s) filters.
-      Set<String> elementTypesChoices = ElementType.getGroupNames();
-      this.parser.addArgument("--" + ELEMENT_TYPES_FILTER)
-          .dest(ELEMENT_TYPES_FILTER)
-          .nargs("*")
-          .choices(elementTypesChoices)
+      // Add an argument to define the text unit to extract.
+      Set<String> textUnitChoices = TextUnit.getPluralNames();
+      this.parser.addArgument("--" + TEXT_UNIT)
+          .dest(TEXT_UNIT)
+          .choices(textUnitChoices)
           .required(false)
-          .metavar("<type>", "<type>")
-          .help("Defines one or more element types to be included in the text "
-              + "output (and visualization if the --"
-              + VISUALIZATION_PATH + " option is given). "
+          .metavar("<unit>")
+          .help("Defines the text unit to extract. "
               + "Choose from:" + formatChoices + ".");
 
       // Add an argument to define the semantic role(s) filters.
@@ -305,10 +301,10 @@ public class PdfActCommandLineInterface {
           .required(false)
           .metavar("<role>", "<role>")
           .help("Defines one or more semantic role(s) in order to filter the "
-              + "chosen element types to be included in the text output (and "
+              + "chosen text units in the text output (and "
               + "visualization if the --" + VISUALIZATION_PATH + " "
               + "option is given) by those roles. If not specified, all "
-              + "element types will be included, regardless of their semantic "
+              + "text units will be included, regardless of their semantic "
               + "roles. Choose from: " + semanticRolesChoices);
 
       // Add an argument to define the target path for the visualization.
@@ -464,22 +460,22 @@ public class PdfActCommandLineInterface {
     // ========================================================================
 
     /**
-     * Returns true, if there is at least one element type filter is given.
+     * Returns true, if there is a text unit given.
      *
-     * @return True, if there is at least one element type filter is given;
+     * @return True, if there is a text unit given.
      *         False otherwise.
      */
-    public boolean hasElementTypesFilters() {
-      return this.elementTypesFilters != null;
+    public boolean hasTextUnit() {
+      return this.textUnit != null;
     }
 
     /**
-     * Returns the element type(s) filters.
+     * Returns the text unit.
      *
-     * @return The element type(s) filters.
+     * @return The text unit.
      */
-    public List<String> getElementTypesFilters() {
-      return this.elementTypesFilters;
+    public String getTextUnit() {
+      return this.textUnit;
     }
 
     // ========================================================================

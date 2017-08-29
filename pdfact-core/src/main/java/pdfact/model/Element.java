@@ -5,6 +5,6 @@ package pdfact.model;
  * 
  * @author Claudius Korzen
  */
-public interface Element extends HasElementType {
+public interface Element {
 
 }

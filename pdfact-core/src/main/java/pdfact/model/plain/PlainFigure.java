@@ -3,7 +3,6 @@ package pdfact.model.plain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import pdfact.model.ElementType;
 import pdfact.model.Figure;
 import pdfact.model.Position;
 
@@ -17,13 +16,6 @@ public class PlainFigure extends PlainElement implements Figure {
    * The position of this figure.
    */
   protected Position position;
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.FIGURE;
-  }
 
   // ==========================================================================
 

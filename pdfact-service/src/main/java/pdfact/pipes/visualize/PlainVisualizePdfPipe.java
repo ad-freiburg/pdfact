@@ -10,8 +10,8 @@ import com.google.inject.Inject;
 
 import pdfact.exception.PdfActSerializeException;
 import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 import pdfact.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.util.exception.PdfActException;
 
@@ -37,9 +37,9 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   protected OutputStream targetStream;
 
   /**
-   * The element types filter.
+   * The text unit.
    */
-  protected Set<ElementType> types;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles filter.
@@ -62,7 +62,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
     // Create the visualizer.
-    PdfVisualizer visualizer = this.factory.create(this.types, this.roles);
+    PdfVisualizer visualizer = this.factory.create(this.textUnit, this.roles);
 
     // Serialize the PDF document.
     byte[] visualization = visualizer.visualize(pdf);
@@ -123,13 +123,13 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilters() {
-    return this.types;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilters(Set<ElementType> types) {
-    this.types = types;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================

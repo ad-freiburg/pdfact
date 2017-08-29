@@ -4,8 +4,8 @@ import java.util.Set;
 
 import pdfact.exception.PdfActVisualizeException;
 import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 
 /**
  * The interface for all concrete implementations to visualize the features of a
@@ -28,19 +28,19 @@ public interface PdfVisualizer {
   // ==========================================================================
 
   /**
-   * Returns the element types filter.
+   * Returns the text unit.
    * 
-   * @return The element types filter.
+   * @return The text unit.
    */
-  Set<ElementType> getElementTypeFilters();
+  TextUnit getTextUnit();
 
   /**
-   * Sets the element types filter.
+   * Sets the text unit.
    * 
-   * @param units
-   *        The element types filter.
+   * @param unit
+   *        The text unit.
    */
-  void setElementTypeFilters(Set<ElementType> units);
+  void setTextUnit(TextUnit unit);
 
   // ==========================================================================
 
@@ -77,13 +77,13 @@ public interface PdfVisualizer {
     /**
      * Creates a new PdfVisualizer.
      * 
-     * @param units
-     *        The text units to include.
+     * @param unit
+     *        The text unit to include.
      * @param roles
      *        The semantic roles of text units to include.
      * 
      * @return An instance of PdfVisualizer.
      */
-    PdfVisualizer create(Set<ElementType> units, Set<SemanticRole> roles);
+    PdfVisualizer create(TextUnit unit, Set<SemanticRole> roles);
   }
 }

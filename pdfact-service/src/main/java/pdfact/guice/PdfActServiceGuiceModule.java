@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 
-import pdfact.model.PdfSerializationFormat;
+import pdfact.model.SerializationFormat;
 import pdfact.pipes.PdfActServicePipe;
 import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.pipes.PlainPdfActServicePipe;
@@ -78,15 +78,15 @@ public class PdfActServiceGuiceModule extends AbstractModule {
         .implement(PdfJsonSerializer.class, PlainPdfJsonSerializer.class)
         .build(PdfJsonSerializerFactory.class));
 
-    MapBinder<PdfSerializationFormat, PdfSerializerFactory> binder = MapBinder
-        .newMapBinder(binder(), PdfSerializationFormat.class,
+    MapBinder<SerializationFormat, PdfSerializerFactory> binder = MapBinder
+        .newMapBinder(binder(), SerializationFormat.class,
             PdfSerializerFactory.class);
 
-    binder.addBinding(PdfSerializationFormat.TXT)
+    binder.addBinding(SerializationFormat.TXT)
         .to(PdfTxtSerializerFactory.class);
-    binder.addBinding(PdfSerializationFormat.XML)
+    binder.addBinding(SerializationFormat.XML)
         .to(PdfXmlSerializerFactory.class);
-    binder.addBinding(PdfSerializationFormat.JSON)
+    binder.addBinding(SerializationFormat.JSON)
         .to(PdfJsonSerializerFactory.class);
 
     // Bind the visualizers.

@@ -4,8 +4,8 @@ import java.util.Set;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 
 /**
  * A serializer to serialize a PDF document in JSON format.
@@ -29,14 +29,14 @@ public interface PdfJsonSerializer extends PdfSerializer {
     /**
      * Creates a new PdfJsonSerializer.
      * 
-     * @param types
-     *        The element types filter.
+     * @param textUnit
+     *        The text unit.
      * @param roles
      *        The semantic roles filter.
      * 
      * @return An instance of PdfJsonSerializer.
      */
-    PdfJsonSerializer create(@Assisted Set<ElementType> types,
+    PdfJsonSerializer create(@Assisted TextUnit textUnit,
         @Assisted Set<SemanticRole> roles);
   }
 }

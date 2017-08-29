@@ -10,7 +10,7 @@ import java.util.Set;
  * 
  * @author Claudius Korzen
  */
-public enum PdfSerializationFormat {
+public enum SerializationFormat {
   /**
    * The serialization format xml.
    */
@@ -35,7 +35,7 @@ public enum PdfSerializationFormat {
    * @param name
    *        The name of the format.
    */
-  PdfSerializationFormat(String name) {
+  SerializationFormat(String name) {
     this.name = name;
   }
 
@@ -53,13 +53,13 @@ public enum PdfSerializationFormat {
   /**
    * The formats.
    */
-  protected static final Map<String, PdfSerializationFormat> FORMATS;
+  protected static final Map<String, SerializationFormat> FORMATS;
 
   static {
     FORMATS = new HashMap<>();
 
     // Fill the map of roles per name.
-    for (PdfSerializationFormat format : values()) {
+    for (SerializationFormat format : values()) {
       FORMATS.put(format.getName(), format);
     }
   }
@@ -94,14 +94,14 @@ public enum PdfSerializationFormat {
    *        The identifiers of the serialization formats to fetch.
    * @return A set of the fetched serialization formats.
    */
-  public static Set<PdfSerializationFormat> fromStrings(String... names) {
+  public static Set<SerializationFormat> fromStrings(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
-    Set<PdfSerializationFormat> formats = new HashSet<>();
+    Set<SerializationFormat> formats = new HashSet<>();
     for (String name : names) {
-      PdfSerializationFormat format = fromString(name);
+      SerializationFormat format = fromString(name);
       if (format != null) {
         formats.add(format);
       }
@@ -116,7 +116,7 @@ public enum PdfSerializationFormat {
    *        The name of the serialization format to fetch.
    * @return The serialization format that is associated with the given name.
    */
-  public static PdfSerializationFormat fromString(String name) {
+  public static SerializationFormat fromString(String name) {
     if (!isValidSerializationFormat(name)) {
       throw new IllegalArgumentException(
           name + " isn't a valid serialization format.");

@@ -2,7 +2,7 @@ package pdfact.pipes;
 
 import static pdfact.PdfActSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
 import static pdfact.PdfActSettings.DEFAULT_SERIALIZATION_FORMAT;
-import static pdfact.PdfActSettings.DEFAULT_TEXT_UNITS_TO_INCLUDE;
+import static pdfact.PdfActSettings.DEFAULT_TEXT_UNIT;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -14,10 +14,10 @@ import com.google.inject.Inject;
 
 import pdfact.PdfActCoreSettings;
 import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
 import pdfact.model.LogLevel;
 import pdfact.model.SemanticRole;
-import pdfact.model.PdfSerializationFormat;
+import pdfact.model.SerializationFormat;
+import pdfact.model.TextUnit;
 import pdfact.pipes.PdfActCorePipe.PdfActCorePipeFactory;
 import pdfact.pipes.serialize.SerializePdfPipe;
 import pdfact.pipes.serialize.SerializePdfPipe.SerializePdfPipeFactory;
@@ -101,12 +101,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   /**
    * The serialization format.
    */
-  protected PdfSerializationFormat serializationFormat;
+  protected SerializationFormat serializationFormat;
 
   /**
-   * The text units to be included in serialization and visualization.
+   * The text unit to use in serialization and visualization.
    */
-  protected Set<ElementType> types;
+  protected TextUnit textUnit;
 
   /**
    * The roles of text units to be included in serialization and visualization.
@@ -141,7 +141,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.serializePdfPipeFactory = serializePdfPipeFactory;
     this.visualizePdfPipeFactory = visualizePdfPipeFactory;
     this.serializationFormat = DEFAULT_SERIALIZATION_FORMAT;
-    this.types = DEFAULT_TEXT_UNITS_TO_INCLUDE;
+    this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
 
@@ -175,7 +175,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     if (this.serializationStream != null || this.serializationPath != null) {
       SerializePdfPipe serializePipe = this.serializePdfPipeFactory.create();
       serializePipe.setSerializationFormat(this.serializationFormat);
-      serializePipe.setElementTypesFilters(this.types);
+      serializePipe.setTextUnit(this.textUnit);
       serializePipe.setSemanticRolesFilters(this.roles);
       serializePipe.setTargetPath(this.serializationPath);
       serializePipe.setTargetStream(this.serializationStream);
@@ -192,7 +192,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     // Visualize if there is a target given for the visualization.
     if (this.visualizationStream != null || this.visualizationPath != null) {
       VisualizePdfPipe visualizePipe = this.visualizePdfPipeFactory.create();
-      visualizePipe.setElementTypesFilters(this.types);
+      visualizePipe.setTextUnit(this.textUnit);
       visualizePipe.setSemanticRolesFilters(this.roles);
       visualizePipe.setTargetPath(this.visualizationPath);
       visualizePipe.setTargetStream(this.visualizationStream);
@@ -246,12 +246,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==========================================================================
 
   @Override
-  public PdfSerializationFormat getSerializationFormat() {
+  public SerializationFormat getSerializationFormat() {
     return this.serializationFormat;
   }
 
   @Override
-  public void setSerializationFormat(PdfSerializationFormat format) {
+  public void setSerializationFormat(SerializationFormat format) {
     this.serializationFormat = format;
   }
 
@@ -294,12 +294,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilters() {
-    return this.types;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilters(Set<ElementType> filter) {
-    this.types = filter;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 }

@@ -9,17 +9,16 @@ import java.util.Set;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.model.HasElementType;
-import pdfact.model.HasSemanticRole;
-import pdfact.model.HasText;
-import pdfact.model.PdfDocument;
 import pdfact.model.Character;
 import pdfact.model.Element;
-import pdfact.model.ElementType;
+import pdfact.model.HasSemanticRole;
+import pdfact.model.HasText;
 import pdfact.model.Paragraph;
+import pdfact.model.PdfDocument;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
+import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfTxtSerializer;
 import pdfact.util.CollectionUtils;
@@ -32,9 +31,9 @@ import pdfact.util.CollectionUtils;
  */
 public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   /**
-   * The element types to consider on serializing.
+   * The text unit.
    */
-  protected Set<ElementType> typesFilter;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles to consider on serializing.
@@ -60,17 +59,17 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
-   * @param typesFilter
-   *        The element types to consider on serializing.
+   * @param textUnit
+   *        The text unit.
    * @param rolesFilter
    *        The semantic roles to consider on serializing.
    */
   @AssistedInject
   public PlainPdfTxtSerializer(
-      @Assisted Set<ElementType> typesFilter,
+      @Assisted TextUnit textUnit,
       @Assisted Set<SemanticRole> rolesFilter) {
     this();
-    this.typesFilter = typesFilter;
+    this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
 
@@ -105,7 +104,28 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializePdfElements(PdfDocument pdf) {
-    // The serialized elements.
+    switch (this.textUnit) {
+      case CHARACTER:
+        return serializeCharacters(pdf);
+      case WORD:
+        return serializeWords(pdf);
+      case PARAGRAPH:
+      default:
+        return serializeParagraphs(pdf);
+    }
+  }
+
+  // ==========================================================================
+
+  /**
+   * Serializes the paragraphs of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeParagraphs(PdfDocument pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -115,39 +135,16 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
           continue;
         }
 
-        // Serialize the paragraph (if types filter includes paragraphs).
-        if (hasRelevantElementType(paragraph)) {
-          List<String> paragraphLines = serializeParagraph(paragraph);
-          if (paragraphLines != null) {
-            result.addAll(paragraphLines);
-          }
-        }
-
-        for (Word word : paragraph.getWords()) {
-          // Serialize the word (if types filter includes words).
-          if (hasRelevantElementType(word)) {
-            List<String> wordLines = serializeWord(word);
-            if (wordLines != null) {
-              result.addAll(wordLines);
-            }
-          }
-          for (Character c : word.getCharacters()) {
-            // Serialize the char (if types filter includes text chars).
-            if (hasRelevantElementType(c)) {
-              List<String> characterLines = serializeCharacter(c);
-              if (characterLines != null) {
-                result.addAll(characterLines);
-              }
-            }
-          }
+        List<String> paragraphLines = serializeParagraph(paragraph);
+        if (paragraphLines != null) {
+          result.addAll(paragraphLines);
         }
       }
     }
+
     return result;
   }
-
-  // ==========================================================================
-
+  
   /**
    * Serializes the given paragraph.
    * 
@@ -160,30 +157,38 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return serializePdfElement(paragraph);
   }
 
+  // ==========================================================================
+  
   /**
-   * Serializes the given text block.
+   * Serializes the words of the given PDF document.
    * 
-   * @param block
-   *        The text block to serialize.
+   * @param pdf
+   *        The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeTextBlock(TextBlock block) {
-    return serializePdfElement(block);
-  }
+  protected List<String> serializeWords(PdfDocument pdf) {
+    List<String> result = new ArrayList<>();
 
-  /**
-   * Serializes the given text line.
-   * 
-   * @param line
-   *        The text line to serialize.
-   * 
-   * @return A list of strings that represent the lines of the serialization.
-   */
-  protected List<String> serializeTextLine(TextLine line) {
-    return serializePdfElement(line);
-  }
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
 
+        for (Word word : paragraph.getWords()) {
+          List<String> wordLines = serializeWord(word);
+          if (wordLines != null) {
+            result.addAll(wordLines);
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+  
   /**
    * Serializes the given word.
    * 
@@ -196,6 +201,40 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return serializePdfElement(word);
   }
 
+  // ==========================================================================
+  
+  /**
+   * Serializes the characters of the given PDF document.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeCharacters(PdfDocument pdf) {
+    List<String> result = new ArrayList<>();
+
+    if (pdf != null) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        // Ignore the paragraph if its role doesn't match the roles filter.
+        if (!hasRelevantRole(paragraph)) {
+          continue;
+        }
+
+        for (Word word : paragraph.getWords()) {
+          for (Character character : word.getCharacters()) {
+            List<String> characterLines = serializeCharacter(character);
+            if (characterLines != null) {
+              result.addAll(characterLines);
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+  
   /**
    * Serializes the given character.
    * 
@@ -234,13 +273,13 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilter() {
-    return this.typesFilter;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilter(Set<ElementType> typesFilter) {
-    this.typesFilter = typesFilter;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================
@@ -284,32 +323,32 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
 
     return this.rolesFilter.contains(role);
   }
-
+  
+  // ==========================================================================
+  // Remaining methods.
+  
   /**
-   * Checks if the type of the given PDF element matches the element type filter
-   * of this serializer.
+   * Serializes the given text block.
    * 
-   * @param element
-   *        The PDF element to check.
-   *
-   * @return True, if the type of the given PDF element matches the element type
-   *         filter of this serializer, false otherwise.
+   * @param block
+   *        The text block to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
    */
-  protected boolean hasRelevantElementType(HasElementType element) {
-    if (element == null) {
-      return false;
-    }
+  protected List<String> serializeTextBlock(TextBlock block) {
+    return serializePdfElement(block);
+  }
 
-    if (this.typesFilter == null || this.typesFilter.isEmpty()) {
-      // No filter is given -> The element is relevant.
-      return true;
-    }
-
-    ElementType elementType = element.getType();
-    if (elementType == null) {
-      return false;
-    }
-
-    return this.typesFilter.contains(elementType);
+ 
+  /**
+   * Serializes the given text line.
+   * 
+   * @param line
+   *        The text line to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeTextLine(TextLine line) {
+    return serializePdfElement(line);
   }
 }

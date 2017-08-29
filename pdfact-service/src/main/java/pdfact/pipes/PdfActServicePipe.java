@@ -4,11 +4,11 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
-import pdfact.model.ElementType;
 import pdfact.model.LogLevel;
 import pdfact.model.SemanticRole;
+import pdfact.model.SerializationFormat;
+import pdfact.model.TextUnit;
 import pdfact.util.pipeline.Pipe;
-import pdfact.model.PdfSerializationFormat;
 
 /**
  * A pipe that wires up all necessary steps to identify the document structure
@@ -83,7 +83,7 @@ public interface PdfActServicePipe extends Pipe {
    * 
    * @return The target serialization format.
    */
-  PdfSerializationFormat getSerializationFormat();
+  SerializationFormat getSerializationFormat();
 
   /**
    * Sets the target serialization format.
@@ -91,7 +91,7 @@ public interface PdfActServicePipe extends Pipe {
    * @param format
    *        The target serialization format.
    */
-  void setSerializationFormat(PdfSerializationFormat format);
+  void setSerializationFormat(SerializationFormat format);
 
   // ==========================================================================
 
@@ -147,19 +147,19 @@ public interface PdfActServicePipe extends Pipe {
   // ==========================================================================
 
   /**
-   * Returns the element types filter.
+   * Returns the text unit.
    * 
-   * @return The element types filter.
+   * @return The text unit.
    */
-  Set<ElementType> getElementTypesFilters();
+  TextUnit getTextUnit();
 
   /**
-   * Sets the element types filters.
+   * Sets the text unit.
    * 
-   * @param filter
-   *        The element types filters.
+   * @param unit
+   *        The text unit.
    */
-  void setElementTypesFilters(Set<ElementType> filter);
+  void setTextUnit(TextUnit unit);
 
   // ==========================================================================
 

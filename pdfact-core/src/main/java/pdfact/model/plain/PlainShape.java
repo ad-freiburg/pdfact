@@ -4,7 +4,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.model.Color;
-import pdfact.model.ElementType;
 import pdfact.model.Position;
 import pdfact.model.Shape;
 
@@ -23,13 +22,6 @@ public class PlainShape extends PlainElement implements Shape {
    * The color of this shape.
    */
   protected Color color;
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.SHAPE;
-  }
 
   // ==========================================================================
 

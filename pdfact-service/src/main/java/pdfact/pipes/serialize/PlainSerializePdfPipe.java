@@ -2,7 +2,7 @@ package pdfact.pipes.serialize;
 
 import static pdfact.PdfActSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
 import static pdfact.PdfActSettings.DEFAULT_SERIALIZATION_FORMAT;
-import static pdfact.PdfActSettings.DEFAULT_TEXT_UNITS_TO_INCLUDE;
+import static pdfact.PdfActSettings.DEFAULT_TEXT_UNIT;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,9 +15,9 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.exception.PdfActSerializeException;
 import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
-import pdfact.model.PdfSerializationFormat;
+import pdfact.model.SerializationFormat;
+import pdfact.model.TextUnit;
 import pdfact.pipes.serialize.PdfSerializer.PdfSerializerFactory;
 import pdfact.util.exception.PdfActException;
 
@@ -30,12 +30,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * The available serializers.
    */
-  protected Map<PdfSerializationFormat, PdfSerializerFactory> serializers;
+  protected Map<SerializationFormat, PdfSerializerFactory> serializers;
 
   /**
    * The serialization format.
    */
-  protected PdfSerializationFormat format;
+  protected SerializationFormat format;
 
   /**
    * The serialization target, given as a file.
@@ -48,9 +48,9 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   protected OutputStream targetStream;
 
   /**
-   * The element types filter.
+   * The text unit.
    */
-  protected Set<ElementType> types;
+  protected TextUnit textUnit;
 
   /**
    * The semantic roles filter.
@@ -67,10 +67,10 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   @AssistedInject
   public PlainSerializePdfPipe(
-      Map<PdfSerializationFormat, PdfSerializerFactory> serializers) {
+      Map<SerializationFormat, PdfSerializerFactory> serializers) {
     this.serializers = serializers;
     this.format = DEFAULT_SERIALIZATION_FORMAT;
-    this.types = DEFAULT_TEXT_UNITS_TO_INCLUDE;
+    this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
 
@@ -86,7 +86,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     }
 
     // Create the serializer.
-    PdfSerializer serializer = factory.create(this.types, this.roles);
+    PdfSerializer serializer = factory.create(this.textUnit, this.roles);
     // Serialize the PDF document.
     byte[] serialization = serializer.serialize(pdf);
 
@@ -144,13 +144,13 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==========================================================================
 
   @Override
-  public Set<ElementType> getElementTypesFilters() {
-    return this.types;
+  public TextUnit getTextUnit() {
+    return this.textUnit;
   }
 
   @Override
-  public void setElementTypesFilters(Set<ElementType> filters) {
-    this.types = filters;
+  public void setTextUnit(TextUnit textUnit) {
+    this.textUnit = textUnit;
   }
 
   // ==========================================================================
@@ -168,12 +168,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==========================================================================
 
   @Override
-  public PdfSerializationFormat getSerializationFormat() {
+  public SerializationFormat getSerializationFormat() {
     return this.format;
   }
 
   @Override
-  public void setSerializationFormat(PdfSerializationFormat format) {
+  public void setSerializationFormat(SerializationFormat format) {
     this.format = format;
   }
 

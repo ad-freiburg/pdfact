@@ -5,7 +5,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import pdfact.model.Character;
 import pdfact.model.Color;
-import pdfact.model.ElementType;
 import pdfact.model.FontFace;
 import pdfact.model.Position;
 
@@ -39,13 +38,6 @@ public class PlainCharacter extends PlainElement implements Character {
    * The sequence number of this character in the extraction order.
    */
   protected int sequenceNumber;
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.CHARACTER;
-  }
 
   // ==========================================================================
 

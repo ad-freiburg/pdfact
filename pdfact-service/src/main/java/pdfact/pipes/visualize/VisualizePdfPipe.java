@@ -4,8 +4,8 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 import pdfact.util.pipeline.Pipe;
 
 /**
@@ -13,7 +13,7 @@ import pdfact.util.pipeline.Pipe;
  * 
  * @author Claudius Korzen
  */
-public interface VisualizePdfPipe extends Pipe {  
+public interface VisualizePdfPipe extends Pipe {
   /**
    * Returns the target stream.
    * 
@@ -28,9 +28,9 @@ public interface VisualizePdfPipe extends Pipe {
    *        The target stream.
    */
   void setTargetStream(OutputStream stream);
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the target path.
    * 
@@ -45,23 +45,23 @@ public interface VisualizePdfPipe extends Pipe {
    *        The target path.
    */
   void setTargetPath(Path path);
-  
+
   // ==========================================================================
-  
-  /**
-   * Returns the element types filter.
-   * 
-   * @return The element types filter.
-   */
-  Set<ElementType> getElementTypesFilters();
 
   /**
-   * Sets the element types filter to include on visualization.
+   * Returns the text unit.
    * 
-   * @param types
-   *        The element types filter to include on visualization.
+   * @return The text unit.
    */
-  void setElementTypesFilters(Set<ElementType> types);
+  TextUnit getTextUnit();
+
+  /**
+   * Sets the text unit.
+   * 
+   * @param unit
+   *        The text unit.
+   */
+  void setTextUnit(TextUnit unit);
 
   // ==========================================================================
 

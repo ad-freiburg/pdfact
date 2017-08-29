@@ -3,8 +3,8 @@ package pdfact.pipes.serialize;
 import java.util.Set;
 
 import pdfact.model.PdfDocument;
-import pdfact.model.ElementType;
 import pdfact.model.SemanticRole;
+import pdfact.model.TextUnit;
 import pdfact.util.exception.PdfActException;
 
 /**
@@ -27,19 +27,19 @@ public interface PdfSerializer {
   // ==========================================================================
 
   /**
-   * Returns the element types filter.
+   * Returns the text unit.
    * 
-   * @return The element types filter.
+   * @return The text unit.
    */
-  Set<ElementType> getElementTypesFilter();
+  TextUnit getTextUnit();
 
   /**
-   * Sets the element types filter to include on serialization.
+   * Sets the text unit.
    * 
-   * @param types
-   *        The element types filter to include on serialization.
+   * @param textUnit
+   *        The text unit.
    */
-  void setElementTypesFilter(Set<ElementType> types);
+  void setTextUnit(TextUnit textUnit);
 
   // ==========================================================================
 
@@ -76,13 +76,13 @@ public interface PdfSerializer {
     /**
      * Creates a new PdfSerializer.
      * 
-     * @param types
-     *        The element types filter.
+     * @param textUnit
+     *        The text unit.
      * @param roles
      *        The semantic roles filter.
      * 
      * @return An instance of PdfSerializer.
      */
-    PdfSerializer create(Set<ElementType> types, Set<SemanticRole> roles);
+    PdfSerializer create(TextUnit textUnit, Set<SemanticRole> roles);
   }
 }

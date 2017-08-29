@@ -9,7 +9,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.model.Character;
 import pdfact.model.CharacterStatistic;
-import pdfact.model.ElementType;
 import pdfact.model.Position;
 import pdfact.model.Word;
 import pdfact.util.list.CharacterList;
@@ -62,13 +61,6 @@ public class PlainWord extends PlainElement implements Word {
   @AssistedInject
   public PlainWord(CharacterListFactory characterListFactory) {
     this.characters = characterListFactory.create();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public ElementType getType() {
-    return ElementType.WORD;
   }
 
   // ==========================================================================
