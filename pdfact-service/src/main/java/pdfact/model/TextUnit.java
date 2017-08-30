@@ -19,6 +19,16 @@ public enum TextUnit {
   PARAGRAPH("paragraphs"),
 
   /**
+   * The text blocks.
+   */
+  TEXT_BLOCK("blocks"),
+  
+  /**
+   * The text lines.
+   */
+  TEXT_LINE("lines"),
+  
+  /**
    * The words.
    */
   WORD("words"),
@@ -26,7 +36,12 @@ public enum TextUnit {
   /**
    * The characters.
    */
-  CHARACTER("characters");
+  CHARACTER("characters"),
+  
+  /**
+   * The text areas.
+   */
+  TEXT_AREA("areas");
 
   /**
    * The plural name of this unit.

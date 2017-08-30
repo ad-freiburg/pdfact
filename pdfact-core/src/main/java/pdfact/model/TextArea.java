@@ -7,7 +7,7 @@ package pdfact.model;
  * 
  * @author Claudius Korzen
  */
-public interface TextArea extends HasCharacters, HasPosition {
+public interface TextArea extends Element, HasCharacters, HasPosition {
   /**
    * The factory to create instances of {@link TextArea}.
    * 
