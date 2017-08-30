@@ -1,4 +1,4 @@
-package pdfact.pipes.tokenize.xycut;
+package pdfact.util.xycut;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -3,30 +3,31 @@ package pdfact.guice;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 
-import pdfact.model.Point;
-import pdfact.model.Point.PointFactory;
 import pdfact.model.Character;
+import pdfact.model.Character.CharacterFactory;
 import pdfact.model.CharacterStatistic;
 import pdfact.model.CharacterStatistic.CharacterStatisticFactory;
 import pdfact.model.Color;
-import pdfact.model.Figure;
 import pdfact.model.Color.ColorFactory;
+import pdfact.model.Figure;
 import pdfact.model.Figure.FigureFactory;
-import pdfact.model.PdfDocument;
-import pdfact.model.PdfDocument.PdfDocumentFactory;
 import pdfact.model.Font;
 import pdfact.model.Font.FontFactory;
 import pdfact.model.FontFace;
-import pdfact.model.Line;
 import pdfact.model.FontFace.FontFaceFactory;
+import pdfact.model.Line;
 import pdfact.model.Line.LineFactory;
 import pdfact.model.Page;
 import pdfact.model.Page.PageFactory;
 import pdfact.model.Paragraph;
 import pdfact.model.Paragraph.ParagraphFactory;
+import pdfact.model.PdfDocument;
+import pdfact.model.PdfDocument.PdfDocumentFactory;
+import pdfact.model.Point;
+import pdfact.model.Point.PointFactory;
 import pdfact.model.Position;
-import pdfact.model.Rectangle;
 import pdfact.model.Position.PositionFactory;
+import pdfact.model.Rectangle;
 import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.Shape;
 import pdfact.model.Shape.ShapeFactory;
@@ -39,20 +40,19 @@ import pdfact.model.TextLine.TextLineFactory;
 import pdfact.model.TextLineStatistic;
 import pdfact.model.TextLineStatistic.TextLineStatisticFactory;
 import pdfact.model.Word;
-import pdfact.model.Character.CharacterFactory;
 import pdfact.model.Word.WordFactory;
-import pdfact.model.plain.PlainPipeline;
-import pdfact.model.plain.PlainPoint;
 import pdfact.model.plain.PlainCharacter;
 import pdfact.model.plain.PlainCharacterStatistic;
 import pdfact.model.plain.PlainColor;
-import pdfact.model.plain.PlainPdfDocument;
 import pdfact.model.plain.PlainFigure;
 import pdfact.model.plain.PlainFont;
 import pdfact.model.plain.PlainFontFace;
 import pdfact.model.plain.PlainLine;
 import pdfact.model.plain.PlainPage;
 import pdfact.model.plain.PlainParagraph;
+import pdfact.model.plain.PlainPdfDocument;
+import pdfact.model.plain.PlainPipeline;
+import pdfact.model.plain.PlainPoint;
 import pdfact.model.plain.PlainPosition;
 import pdfact.model.plain.PlainRectangle;
 import pdfact.model.plain.PlainShape;
@@ -66,26 +66,26 @@ import pdfact.pipes.PdfActCorePipe.PdfActCorePipeFactory;
 import pdfact.pipes.PlainPdfActCorePipe;
 import pdfact.pipes.dehyphenate.DehyphenateWordsPipe;
 import pdfact.pipes.dehyphenate.DehyphenateWordsPipe.DehyphenateWordsPipeFactory;
+import pdfact.pipes.dehyphenate.PlainDehyphenateWordsPipe;
+import pdfact.pipes.filter.characters.FilterCharactersPipe;
+import pdfact.pipes.filter.characters.FilterCharactersPipe.FilterCharactersPipeFactory;
+import pdfact.pipes.filter.characters.PlainFilterCharactersPipe;
+import pdfact.pipes.filter.figures.FilterFiguresPipe;
+import pdfact.pipes.filter.figures.FilterFiguresPipe.FilterFiguresPipeFactory;
+import pdfact.pipes.filter.figures.PlainFilterFiguresPipe;
+import pdfact.pipes.filter.shapes.FilterShapesPipe;
+import pdfact.pipes.filter.shapes.FilterShapesPipe.FilterShapesPipeFactory;
+import pdfact.pipes.filter.shapes.PlainFilterShapesPipe;
 import pdfact.pipes.parse.ParsePdfStreamsPipe;
-import pdfact.pipes.parse.PlainParsePdfStreamsPipe;
 import pdfact.pipes.parse.ParsePdfStreamsPipe.ParsePdfPipeFactory;
+import pdfact.pipes.parse.PlainParsePdfStreamsPipe;
 import pdfact.pipes.parse.stream.PdfStreamsParser;
 import pdfact.pipes.parse.stream.PdfStreamsParser.PdfStreamsParserFactory;
 import pdfact.pipes.parse.stream.pdfbox.PdfBoxPdfStreamsParser;
 import pdfact.pipes.parse.stream.pdfbox.guice.PdfBoxOperatorProcessorGuiceModule;
-import pdfact.pipes.dehyphenate.PlainDehyphenateWordsPipe;
-import pdfact.pipes.filter.characters.FilterCharactersPipe;
-import pdfact.pipes.filter.characters.PlainFilterCharactersPipe;
-import pdfact.pipes.filter.figures.FilterFiguresPipe;
-import pdfact.pipes.filter.figures.PlainFilterFiguresPipe;
-import pdfact.pipes.filter.figures.FilterFiguresPipe.FilterFiguresPipeFactory;
-import pdfact.pipes.filter.shapes.FilterShapesPipe;
-import pdfact.pipes.filter.shapes.FilterShapesPipe.FilterShapesPipeFactory;
-import pdfact.pipes.filter.shapes.PlainFilterShapesPipe;
-import pdfact.pipes.filter.characters.FilterCharactersPipe.FilterCharactersPipeFactory;
-import pdfact.pipes.semanticize.PlainDetectSemanticsPipe;
 import pdfact.pipes.semanticize.DetectSemanticsPipe;
 import pdfact.pipes.semanticize.DetectSemanticsPipe.DetectSemanticsPipeFactory;
+import pdfact.pipes.semanticize.PlainDetectSemanticsPipe;
 import pdfact.pipes.semanticize.modules.AbstractModule;
 import pdfact.pipes.semanticize.modules.AcknowledgmentsModule;
 import pdfact.pipes.semanticize.modules.BodyTextModule;
@@ -100,30 +100,24 @@ import pdfact.pipes.semanticize.modules.PdfTextSemanticizerModule;
 import pdfact.pipes.semanticize.modules.ReferenceModule;
 import pdfact.pipes.semanticize.modules.TableModule;
 import pdfact.pipes.semanticize.modules.TitleModule;
-import pdfact.pipes.tokenize.blocks.DetectTextBlocksPipe;
-import pdfact.pipes.tokenize.blocks.PlainDetectTextBlocksPipe;
-import pdfact.pipes.tokenize.blocks.DetectTextBlocksPipe.DetectTextBlocksPipeFactory;
-import pdfact.pipes.tokenize.blocks.blocks.PlainTextBlockTokenizer;
-import pdfact.pipes.tokenize.blocks.blocks.TextBlockTokenizer;
-import pdfact.pipes.tokenize.blocks.blocks.TextBlockTokenizer.TextBlockTokenizerFactory;
-import pdfact.pipes.tokenize.lines.DetectTextLinesPipe;
-import pdfact.pipes.tokenize.lines.DetectTextLinesPipe.DetectTextLinesPipeFactory;
-import pdfact.pipes.tokenize.lines.PlainDetectTextLinesPipe;
-import pdfact.pipes.tokenize.lines.areas.TextAreaTokenizer;
-import pdfact.pipes.tokenize.lines.areas.XYCutTextAreaTokenizer;
-import pdfact.pipes.tokenize.lines.areas.TextAreaTokenizer.TextAreaTokenizerFactory;
-import pdfact.pipes.tokenize.lines.lines.TextLineTokenizer;
-import pdfact.pipes.tokenize.lines.lines.XYCutTextLineTokenizer;
-import pdfact.pipes.tokenize.lines.lines.TextLineTokenizer.TextLineTokenizerFactory;
-import pdfact.pipes.tokenize.lines.words.WordTokenizer;
-import pdfact.pipes.tokenize.lines.words.XYCutWordTokenizer;
-import pdfact.pipes.tokenize.lines.words.WordTokenizer.WordTokenizerFactory;
-import pdfact.pipes.tokenize.paragraphs.DetectParagraphsPipe;
-import pdfact.pipes.tokenize.paragraphs.PlainDetectParagraphsPipe;
-import pdfact.pipes.tokenize.paragraphs.DetectParagraphsPipe.DetectParagraphsPipeFactory;
+import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe;
+import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe.TokenizeToTextAreasPipeFactory;
+import pdfact.pipes.tokenize.areas.XYCutTokenizeToTextAreasPipe;
+import pdfact.pipes.tokenize.blocks.PlainTokenizeToTextBlocksPipe;
+import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe;
+import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe.TokenizeToTextBlocksPipeFactory;
+import pdfact.pipes.tokenize.lines.PlainTokenizeToTextLinesPipe;
+import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe;
+import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe.TokenizeToTextLinesPipeFactory;
+import pdfact.pipes.tokenize.paragraphs.PlainTokenizeToParagraphsPipe;
+import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe;
+import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParagraphsPipeFactory;
+import pdfact.pipes.tokenize.words.TokenizeToWordsPipe;
+import pdfact.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
+import pdfact.pipes.tokenize.words.XYCutTokenizeToWordsPipe;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe;
-import pdfact.pipes.translate.diacritics.PlainMergeDiacriticsPipe;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
+import pdfact.pipes.translate.diacritics.PlainMergeDiacriticsPipe;
 import pdfact.pipes.translate.ligatures.PlainSplitLigaturesPipe;
 import pdfact.pipes.translate.ligatures.SplitLigaturesPipe;
 import pdfact.pipes.translate.ligatures.SplitLigaturesPipe.SplitLigaturesPipeFactory;
@@ -131,10 +125,10 @@ import pdfact.pipes.validate.PlainValidatePdfPathPipe;
 import pdfact.pipes.validate.ValidatePdfPathPipe;
 import pdfact.pipes.validate.ValidatePdfPathPipe.ValidatePdfPathPipeFactory;
 import pdfact.util.list.CharacterList;
-import pdfact.util.list.TextLineList;
-import pdfact.util.list.WordList;
 import pdfact.util.list.CharacterList.CharacterListFactory;
+import pdfact.util.list.TextLineList;
 import pdfact.util.list.TextLineList.TextLineListFactory;
+import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
 import pdfact.util.list.plain.PlainCharacterList;
 import pdfact.util.list.plain.PlainTextLineList;
@@ -147,31 +141,26 @@ import pdfact.util.statistic.plain.PlainCharacterStatistician;
 import pdfact.util.statistic.plain.PlainTextLineStatistician;
 
 /**
- * A module that defines the basic Guice bindings for PdfAct.
+ * A module that defines the basic Guice bindings of PdfAct.
  * 
  * @author Claudius Korzen
  */
 public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
-
   @Override
   protected void configure() {
-
-    // ========================================================================
     // Install the factory of the pipeline.
-
     install(new FactoryModuleBuilder()
         .implement(Pipeline.class, PlainPipeline.class)
         .build(PdfActPipelineFactory.class));
 
     // ========================================================================
-    // Install the factories of the pipes.
 
-    // Install the factory of the pipe that validates paths of PDF files.
+    // Install the factory of the pipe that validates the paths of PDF files.
     install(new FactoryModuleBuilder()
         .implement(ValidatePdfPathPipe.class, PlainValidatePdfPathPipe.class)
         .build(ValidatePdfPathPipeFactory.class));
 
-    // Install the factory of the pipe that extracts characters from PDF files.
+    // Install the factory of the pipe that parses streams of PDF files.
     install(new FactoryModuleBuilder()
         .implement(ParsePdfStreamsPipe.class, PlainParsePdfStreamsPipe.class)
         .build(ParsePdfPipeFactory.class));
@@ -190,69 +179,60 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
     install(new FactoryModuleBuilder()
         .implement(FilterCharactersPipe.class, PlainFilterCharactersPipe.class)
         .build(FilterCharactersPipeFactory.class));
-    
+
     // Install the factory of the pipe that filters figures.
     install(new FactoryModuleBuilder()
         .implement(FilterFiguresPipe.class, PlainFilterFiguresPipe.class)
         .build(FilterFiguresPipeFactory.class));
-    
+
     // Install the factory of the pipe that filters shapes.
     install(new FactoryModuleBuilder()
         .implement(FilterShapesPipe.class, PlainFilterShapesPipe.class)
         .build(FilterShapesPipeFactory.class));
-    
-    // Install the factory of the pipe that detects text lines.
+
+    // Install the factory of the pipe that tokenizes pages into text areas.
     install(new FactoryModuleBuilder()
-        .implement(DetectTextLinesPipe.class, PlainDetectTextLinesPipe.class)
-        .build(DetectTextLinesPipeFactory.class));
-    
-    // Install the factory of the pipe that detects text blocks.
+        .implement(TokenizeToTextAreasPipe.class,
+            XYCutTokenizeToTextAreasPipe.class)
+        .build(TokenizeToTextAreasPipeFactory.class));
+
+    // Install the factory of the pipe that tokenizes text areas into lines.
     install(new FactoryModuleBuilder()
-        .implement(DetectTextBlocksPipe.class, PlainDetectTextBlocksPipe.class)
-        .build(DetectTextBlocksPipeFactory.class));
+        .implement(TokenizeToTextLinesPipe.class,
+            PlainTokenizeToTextLinesPipe.class)
+        .build(TokenizeToTextLinesPipeFactory.class));
+
+    // Install the factory of the pipe that tokenizes text lines into words.
+    install(new FactoryModuleBuilder()
+        .implement(TokenizeToWordsPipe.class, XYCutTokenizeToWordsPipe.class)
+        .build(TokenizeToWordsPipeFactory.class));
+
+    // Install the factory of the pipe that tokenizes text lines into blocks.
+    install(new FactoryModuleBuilder()
+        .implement(TokenizeToTextBlocksPipe.class,
+            PlainTokenizeToTextBlocksPipe.class)
+        .build(TokenizeToTextBlocksPipeFactory.class));
 
     // Install the factory of the pipe that detects semantics of text blocks.
     install(new FactoryModuleBuilder()
         .implement(DetectSemanticsPipe.class, PlainDetectSemanticsPipe.class)
         .build(DetectSemanticsPipeFactory.class));
 
-    // Install the factory of the pipe that detects paragraphs.
+    // Install the factory of the pipe that tokenizes blocks into paragraphs.
     install(new FactoryModuleBuilder()
-        .implement(DetectParagraphsPipe.class, PlainDetectParagraphsPipe.class)
-        .build(DetectParagraphsPipeFactory.class));
+        .implement(TokenizeToParagraphsPipe.class,
+            PlainTokenizeToParagraphsPipe.class)
+        .build(TokenizeToParagraphsPipeFactory.class));
 
     // Install the factory of the pipe that dehyphenates words.
     install(new FactoryModuleBuilder()
         .implement(DehyphenateWordsPipe.class, PlainDehyphenateWordsPipe.class)
         .build(DehyphenateWordsPipeFactory.class));
 
-    // Install the factory of the pipe that combines all core pipes.
+    // Install the factory of the pipe that combines all core module pipes.
     install(new FactoryModuleBuilder()
         .implement(PdfActCorePipe.class, PlainPdfActCorePipe.class)
         .build(PdfActCorePipeFactory.class));
-
-    // ========================================================================
-    // Install the factories of the tokenizers.
-
-    // Install the factory of the text area tokenizer.
-    install(new FactoryModuleBuilder()
-        .implement(TextAreaTokenizer.class, XYCutTextAreaTokenizer.class)
-        .build(TextAreaTokenizerFactory.class));
-
-    // Install the factory of the text line tokenizer.
-    install(new FactoryModuleBuilder()
-        .implement(TextLineTokenizer.class, XYCutTextLineTokenizer.class)
-        .build(TextLineTokenizerFactory.class));
-
-    // Install the factory of the text block tokenizer.
-    install(new FactoryModuleBuilder()
-        .implement(TextBlockTokenizer.class, PlainTextBlockTokenizer.class)
-        .build(TextBlockTokenizerFactory.class));
-
-    // Install the factory of the word tokenizer.
-    install(new FactoryModuleBuilder()
-        .implement(WordTokenizer.class, XYCutWordTokenizer.class)
-        .build(WordTokenizerFactory.class));
 
     // ========================================================================
     // Install the factories of the base models.

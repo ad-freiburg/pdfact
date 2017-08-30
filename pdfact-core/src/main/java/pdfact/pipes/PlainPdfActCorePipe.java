@@ -19,12 +19,16 @@ import pdfact.pipes.parse.ParsePdfStreamsPipe;
 import pdfact.pipes.parse.ParsePdfStreamsPipe.ParsePdfPipeFactory;
 import pdfact.pipes.semanticize.DetectSemanticsPipe;
 import pdfact.pipes.semanticize.DetectSemanticsPipe.DetectSemanticsPipeFactory;
-import pdfact.pipes.tokenize.blocks.DetectTextBlocksPipe;
-import pdfact.pipes.tokenize.blocks.DetectTextBlocksPipe.DetectTextBlocksPipeFactory;
-import pdfact.pipes.tokenize.lines.DetectTextLinesPipe;
-import pdfact.pipes.tokenize.lines.DetectTextLinesPipe.DetectTextLinesPipeFactory;
-import pdfact.pipes.tokenize.paragraphs.DetectParagraphsPipe;
-import pdfact.pipes.tokenize.paragraphs.DetectParagraphsPipe.DetectParagraphsPipeFactory;
+import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe;
+import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe.TokenizeToTextAreasPipeFactory;
+import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe;
+import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe.TokenizeToTextBlocksPipeFactory;
+import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe;
+import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe.TokenizeToTextLinesPipeFactory;
+import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe;
+import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParagraphsPipeFactory;
+import pdfact.pipes.tokenize.words.TokenizeToWordsPipe;
+import pdfact.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
 import pdfact.pipes.translate.ligatures.SplitLigaturesPipe;
@@ -94,14 +98,24 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
   protected FilterShapesPipeFactory filterShapesPipeFactory;
 
   /**
-   * The factory to create instances of {@link DetectTextLinesPipe}.
+   * The factory to create instances of {@link TokenizeToTextAreasPipe}.
    */
-  protected DetectTextLinesPipeFactory tokenizeTextLinesPipeFactory;
-  
+  protected TokenizeToTextAreasPipeFactory tokenizeToTextAreasPipeFactory;
+
   /**
-   * The factory to create instances of {@link DetectTextBlocksPipe}.
+   * The factory to create instances of {@link TokenizeToTextLinesPipe}.
    */
-  protected DetectTextBlocksPipeFactory tokenizeTextBlocksPipeFactory;
+  protected TokenizeToTextLinesPipeFactory tokenizeToTextLinesPipeFactory;
+
+  /**
+   * The factory to create instances of {@link TokenizeToWordsPipe}.
+   */
+  protected TokenizeToWordsPipeFactory tokenizeToWordsPipeFactory;
+
+  /**
+   * The factory to create instances of {@link TokenizeToTextBlocksPipe}.
+   */
+  protected TokenizeToTextBlocksPipeFactory tokenizeToTextBlocksPipeFactory;
 
   /**
    * The factory to create instances of {@link DetectSemanticsPipe}.
@@ -109,9 +123,9 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
   protected DetectSemanticsPipeFactory semanticizeTextBlocksPipeFactory;
 
   /**
-   * The factory to create instances of {@link DetectParagraphsPipe}.
+   * The factory to create instances of {@link TokenizeToParagraphsPipe}.
    */
-  protected DetectParagraphsPipeFactory tokenizeParagraphsPipeFactory;
+  protected TokenizeToParagraphsPipeFactory tokenizeToParagraphsPipeFactory;
 
   /**
    * The factory to create instances of {@link DehyphenateWordsPipe}.
@@ -139,14 +153,18 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    *        A factory to create instances of {@link FilterShapesPipe}.
    * @param splitLigaturesFactory
    *        A factory to create instances of {@link SplitLigaturesPipeFactory}.
-   * @param tokenizeTextLinesPipeFactory
-   *        A factory to create instances of {@link DetectTextLinesPipe}.
-   * @param tokenizeTextBlocksPipeFactory
-   *        A factory to create instances of {@link DetectTextBlocksPipe}.
+   * @param tokenizeToTextAreasPipeFactory
+   *        A factory to create instances of {@link TokenizeToTextAreasPipe}.
+   * @param tokenizeToTextLinesPipeFactory
+   *        A factory to create instances of {@link TokenizeToTextLinesPipe}.
+   * @param tokenizeToWordsPipeFactory
+   *        A factory to create instances of {@link TokenizeToWordsPipe}.
+   * @param tokenizeToTextBlocksPipeFactory
+   *        A factory to create instances of {@link TokenizeToTextBlocksPipe}.
    * @param semanticizeTextBlocksPipeFactory
    *        A factory to create instances of {@link DetectSemanticsPipe}.
-   * @param tokenizeParagraphsPipeFactory
-   *        A factory to create instances of {@link DetectParagraphsPipe}.
+   * @param tokenizeToParagraphsPipeFactory
+   *        A factory to create instances of {@link TokenizeToParagraphsPipe}.
    * @param dehyphenateWordsPipeFactory
    *        A factory to create instances of {@link DehyphenateWordsPipe}.
    */
@@ -159,10 +177,12 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
       FilterCharactersPipeFactory filterCharactersPipeFactory,
       FilterFiguresPipeFactory filterFiguresPipeFactory,
       FilterShapesPipeFactory filterShapesPipeFactory,
-      DetectTextLinesPipeFactory tokenizeTextLinesPipeFactory,
-      DetectTextBlocksPipeFactory tokenizeTextBlocksPipeFactory,
+      TokenizeToTextAreasPipeFactory tokenizeToTextAreasPipeFactory,
+      TokenizeToTextLinesPipeFactory tokenizeToTextLinesPipeFactory,
+      TokenizeToWordsPipeFactory tokenizeToWordsPipeFactory,
+      TokenizeToTextBlocksPipeFactory tokenizeToTextBlocksPipeFactory,
       DetectSemanticsPipeFactory semanticizeTextBlocksPipeFactory,
-      DetectParagraphsPipeFactory tokenizeParagraphsPipeFactory,
+      TokenizeToParagraphsPipeFactory tokenizeToParagraphsPipeFactory,
       DehyphenateWordsPipeFactory dehyphenateWordsPipeFactory) {
     this.pipelineFactory = pipelineFactory;
     this.validatePdfPathPipeFactory = validatePdfPathPipeFactory;
@@ -172,10 +192,12 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     this.filterCharactersPipeFactory = filterCharactersPipeFactory;
     this.filterFiguresPipeFactory = filterFiguresPipeFactory;
     this.filterShapesPipeFactory = filterShapesPipeFactory;
+    this.tokenizeToTextAreasPipeFactory = tokenizeToTextAreasPipeFactory;
+    this.tokenizeToTextLinesPipeFactory = tokenizeToTextLinesPipeFactory;
+    this.tokenizeToWordsPipeFactory = tokenizeToWordsPipeFactory;
+    this.tokenizeToTextBlocksPipeFactory = tokenizeToTextBlocksPipeFactory;
     this.semanticizeTextBlocksPipeFactory = semanticizeTextBlocksPipeFactory;
-    this.tokenizeTextLinesPipeFactory = tokenizeTextLinesPipeFactory;
-    this.tokenizeTextBlocksPipeFactory = tokenizeTextBlocksPipeFactory;
-    this.tokenizeParagraphsPipeFactory = tokenizeParagraphsPipeFactory;
+    this.tokenizeToParagraphsPipeFactory = tokenizeToParagraphsPipeFactory;
     this.dehyphenateWordsPipeFactory = dehyphenateWordsPipeFactory;
   }
 
@@ -210,23 +232,21 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     pipeline.addPipe(this.filterFiguresPipeFactory.create());
     // Filter the shapes.
     pipeline.addPipe(this.filterShapesPipeFactory.create());
-    // Tokenize the text lines.
-    pipeline.addPipe(this.tokenizeTextLinesPipeFactory.create());
-    // Tokenize the text blocks.
-    pipeline.addPipe(this.tokenizeTextBlocksPipeFactory.create());
+    // Tokenize the page into text areas.
+    pipeline.addPipe(this.tokenizeToTextAreasPipeFactory.create());
+    // Tokenize the text areas into text lines.
+    pipeline.addPipe(this.tokenizeToTextLinesPipeFactory.create());
+    // Tokenize the text lines into words.
+    pipeline.addPipe(this.tokenizeToWordsPipeFactory.create());
+    // Tokenize the text lines into text blocks.
+    pipeline.addPipe(this.tokenizeToTextBlocksPipeFactory.create());
     // Identify the roles of the text blocks.
     pipeline.addPipe(this.semanticizeTextBlocksPipeFactory.create());
-    // Tokenize the paragraphs.
-    pipeline.addPipe(this.tokenizeParagraphsPipeFactory.create());
+    // Tokenize the text blocks into paragraphs.
+    pipeline.addPipe(this.tokenizeToParagraphsPipeFactory.create());
     // Dehyphenate the words.
     pipeline.addPipe(this.dehyphenateWordsPipeFactory.create());
 
-    long start = System.currentTimeMillis();
-    pipeline.process(pdf);
-    long end = System.currentTimeMillis();
-
-    System.out.println(end - start);
-
-    return pdf;
+    return pipeline.process(pdf);
   }
 }

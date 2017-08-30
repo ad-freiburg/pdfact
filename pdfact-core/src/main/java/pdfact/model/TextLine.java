@@ -5,9 +5,10 @@ package pdfact.model;
  * 
  * @author Claudius Korzen
  */
-public interface TextLine extends Element, HasWords, HasText, HasPosition {
+public interface TextLine extends Element, HasCharacters, HasWords, HasText,
+    HasPosition {
   /**
-   * Returns the baseline of this text line. For the concept of baselines, see 
+   * Returns the baseline of this text line. For the concept of baselines, see
    * https://en.wikipedia.org/wiki/Baseline_(typography).
    * 
    * @return The base line of this text line.

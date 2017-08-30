@@ -5,11 +5,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
+import pdfact.model.Character;
 import pdfact.model.CharacterStatistic;
 import pdfact.model.Line;
 import pdfact.model.Position;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
+import pdfact.util.list.CharacterList;
+import pdfact.util.list.CharacterList.CharacterListFactory;
 import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
 
@@ -19,6 +22,11 @@ import pdfact.util.list.WordList.WordListFactory;
  * @author Claudius Korzen
  */
 public class PlainTextLine extends PlainElement implements TextLine {
+  /**
+   * The characters of this text line.
+   */
+  protected CharacterList characters;
+
   /**
    * The words of this text line.
    */
@@ -49,14 +57,56 @@ public class PlainTextLine extends PlainElement implements TextLine {
   /**
    * Creates a new text line.
    * 
+   * @param characterListFactory 
+   *        The factory to create instances of {@link CharacterList}.
    * @param wordListFactory
    *        The factory to create instances of {@link WordList}.
    */
   @AssistedInject
-  public PlainTextLine(WordListFactory wordListFactory) {
+  public PlainTextLine(CharacterListFactory characterListFactory,
+      WordListFactory wordListFactory) {
+    this.characters = characterListFactory.create();
     this.words = wordListFactory.create();
   }
 
+  // ==========================================================================
+  
+  @Override
+  public CharacterList getCharacters() {
+    return this.characters;
+  }
+
+  @Override
+  public Character getFirstCharacter() {
+    if (this.characters == null || this.characters.isEmpty()) {
+      return null;
+    }
+    return this.characters.get(0);
+  }
+
+  @Override
+  public Character getLastCharacter() {
+    if (this.characters == null || this.characters.isEmpty()) {
+      return null;
+    }
+    return this.characters.get(this.characters.size() - 1);
+  }
+
+  @Override
+  public void setCharacters(CharacterList characters) {
+    this.characters = characters;
+  }
+
+  @Override
+  public void addCharacters(CharacterList characters) {
+    this.characters.addAll(characters);
+  }
+
+  @Override
+  public void addCharacter(Character character) {
+    this.characters.add(character);
+  }
+  
   // ==========================================================================
 
   @Override

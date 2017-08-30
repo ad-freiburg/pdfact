@@ -7,40 +7,63 @@ import com.google.inject.Inject;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import pdfact.model.PdfDocument;
 import pdfact.model.Character;
+import pdfact.model.CharacterStatistic;
 import pdfact.model.Page;
 import pdfact.model.Paragraph;
 import pdfact.model.Paragraph.ParagraphFactory;
-import pdfact.util.CharacterUtils;
-import pdfact.util.CollectionUtils;
-import pdfact.util.exception.PdfActException;
+import pdfact.model.PdfDocument;
 import pdfact.model.Position;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
+import pdfact.util.CharacterUtils;
+import pdfact.util.CollectionUtils;
+import pdfact.util.exception.PdfActException;
+import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.statistic.TextLineStatistician;
 
 /**
- * A plain implementation of {@link DetectParagraphsPipe}.
+ * A plain implementation of {@link TokenizeToParagraphsPipe}.
  * 
  * @author Claudius Korzen
  */
-public class PlainDetectParagraphsPipe implements DetectParagraphsPipe {
+public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   /**
    * The factory to create instances of {@link Paragraph}.
    */
   protected ParagraphFactory paragraphFactory;
 
   /**
-   * The default constructor.
+   * The statistician to compute statistics about characters.
+   */
+  protected CharacterStatistician characterStatistician;
+
+  /**
+   * The statistician to compute statistics about text lines.
+   */
+  protected TextLineStatistician textLineStatistician;
+
+  /**
+   * Creates a new pipe that tokenizes the text blocks of a PDF document into
+   * paragraphs.
    * 
    * @param paragraphFactory
    *        The factory to create instances of {@link Paragraph}.
+   * @param characterStatistician
+   *        The statistician to compute statistics about characters.
+   * @param textLineStatistician
+   *        The statistician to compute statistics about text lines.
    */
   @Inject
-  public PlainDetectParagraphsPipe(ParagraphFactory paragraphFactory) {
+  public PlainTokenizeToParagraphsPipe(
+      ParagraphFactory paragraphFactory,
+      CharacterStatistician characterStatistician,
+      TextLineStatistician textLineStatistician) {
     this.paragraphFactory = paragraphFactory;
+    this.characterStatistician = characterStatistician;
+    this.textLineStatistician = textLineStatistician;
   }
 
   @Override
@@ -61,16 +84,70 @@ public class PlainDetectParagraphsPipe implements DetectParagraphsPipe {
       paragraph.setText(computeText(paragraph));
       paragraph.setPositions(computePositions(segment));
       paragraph.setSemanticRole(computeRole(segment));
-      // paragraph.setCharacterStatistic(computeCharacterStatistics(paragraph));
-      // paragraph.setTextLineStatistic(computeTextLineStatistics(paragraph));
+      paragraph.setCharacterStatistic(computeCharacterStatistic(paragraph));
       paragraphs.add(paragraph);
     }
-    
+
     pdf.setParagraphs(paragraphs);
 
     return pdf;
   }
 
+  /**
+   * Computes the text for the given paragraph.
+   * 
+   * @param p
+   *        The paragraph to process.
+   * @return The text for the given paragraph.
+   */
+  protected String computeText(Paragraph p) {
+    return CollectionUtils.join(p.getWords(), " ");
+  }
+
+  /**
+   * Computes the positions for the given paragraph.
+   * 
+   * @param blocks
+   *        The blocks of the paragraph to process.
+   * 
+   * @return The positions for the given paragraph.
+   */
+  protected List<Position> computePositions(List<TextBlock> blocks) {
+    List<Position> positions = new ArrayList<>();
+    for (TextBlock block : blocks) {
+      positions.add(block.getPosition());
+    }
+    return positions;
+  }
+
+  /**
+   * Computes the role for the given paragraph.
+   * 
+   * @param blocks
+   *        The blocks of the paragraph to process.
+   * 
+   * @return The role for the given paragraph.
+   */
+  protected SemanticRole computeRole(List<TextBlock> blocks) {
+    if (blocks == null || blocks.isEmpty()) {
+      return null;
+    }
+    // Return the role of the first text block.
+    return blocks.get(0).getSemanticRole();
+  }
+
+  /**
+   * Computes the statistic about the characters of the given paragraph.
+   * 
+   * @param paragraph
+   *        The paragraph to process.
+   * 
+   * @return The statistic.
+   */
+  protected CharacterStatistic computeCharacterStatistic(Paragraph paragraph) {
+    return this.characterStatistician.aggregate(paragraph.getWords());
+  }
+  
   // ==========================================================================
 
   /**
@@ -89,7 +166,7 @@ public class PlainDetectParagraphsPipe implements DetectParagraphsPipe {
     for (Page page : pdf.getPages()) {
       allTextBlocks.addAll(page.getTextBlocks());
     }
-    
+
     TIntSet indexesOfAlreadyProcessedBlocks = new TIntHashSet();
 
     // Identify the paragraphs from the text blocks.
@@ -130,50 +207,6 @@ public class PlainDetectParagraphsPipe implements DetectParagraphsPipe {
   }
 
   // ==========================================================================
-
-  /**
-   * Computes the text for the given paragraph.
-   * 
-   * @param p
-   *        The paragraph to process.
-   * @return The text for the given paragraph.
-   */
-  protected String computeText(Paragraph p) {
-    // TODO: Dehyphenate
-    return CollectionUtils.join(p.getWords(), " ");
-  }
-
-  /**
-   * Computes the positions for the given paragraph.
-   * 
-   * @param blocks
-   *        The blocks of the paragraph to process.
-   * 
-   * @return The positions for the given paragraph.
-   */
-  protected List<Position> computePositions(List<TextBlock> blocks) {
-    List<Position> positions = new ArrayList<>();
-    for (TextBlock block : blocks) {
-      positions.add(block.getPosition());
-    }
-    return positions;
-  }
-
-  /**
-   * Computes the role for the given paragraph.
-   * 
-   * @param blocks
-   *        The blocks of the paragraph to process.
-   * 
-   * @return The role for the given paragraph.
-   */
-  protected SemanticRole computeRole(List<TextBlock> blocks) {
-    if (blocks == null || blocks.isEmpty()) {
-      return null;
-    }
-    // Return the role of the first text block.
-    return blocks.get(0).getSemanticRole();
-  }
 
   /**
    * Checks, if the given text block belongs to the given paragraph.

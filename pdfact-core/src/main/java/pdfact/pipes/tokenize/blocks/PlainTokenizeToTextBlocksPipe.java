@@ -1,4 +1,4 @@
-package pdfact.pipes.tokenize.blocks.blocks;
+package pdfact.pipes.tokenize.blocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,11 @@ import pdfact.util.statistic.CharacterStatistician;
 import pdfact.util.statistic.TextLineStatistician;
 
 /**
- * A plain implementation of {@link TextBlockTokenizer}.
+ * A plain implementation of {@link TokenizeToTextBlocksPipe}.
  * 
  * @author Claudius Korzen
  */
-public class PlainTextBlockTokenizer implements TextBlockTokenizer {
+public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * The factory to create instances of {@link TextBlock}.
    */
@@ -72,7 +72,7 @@ public class PlainTextBlockTokenizer implements TextBlockTokenizer {
    *        The statistician to compute statistics about text lines.
    */
   @Inject
-  public PlainTextBlockTokenizer(
+  public PlainTokenizeToTextBlocksPipe(
       TextBlockFactory textBlockFactory,
       RectangleFactory rectangleFactory,
       PositionFactory positionFactory,
@@ -88,11 +88,63 @@ public class PlainTextBlockTokenizer implements TextBlockTokenizer {
   // ==========================================================================
 
   @Override
-  public List<TextBlock> tokenize(PdfDocument pdf, Page page,
-      TextLineList lines) throws PdfActException {
+  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    tokenizeToTextBlocks(pdf);
+    return pdf;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Tokenizes the text lines in the pages of the given PDF document into text
+   * blocks.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  protected void tokenizeToTextBlocks(PdfDocument pdf) throws PdfActException {
+    if (pdf == null) {
+      return;
+    }
+
+    List<Page> pages = pdf.getPages();
+    if (pages == null) {
+      return;
+    }
+
+    for (Page page : pages) {
+      if (page == null) {
+        continue;
+      }
+
+      page.setTextBlocks(tokenizeToTextBlocks(pdf, page));
+    }
+  }
+
+  // ==========================================================================
+
+  /**
+   * Tokenizes the text lines in the given page into text lines.
+   * 
+   * @param pdf
+   *        The PDF document to which the given page belongs to.
+   * @param page
+   *        The PDF page to process.
+   * 
+   * @return The list of text blocks.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  protected List<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page)
+      throws PdfActException {
     List<TextBlock> textBlocks = new ArrayList<>();
     TextBlock textBlock = this.textBlockFactory.create();
 
+    TextLineList lines = page.getTextLines();
     for (int i = 0; i < lines.size(); i++) {
       TextLine prev = i > 0 ? lines.get(i - 1) : null;
       TextLine line = lines.get(i);
@@ -116,14 +168,68 @@ public class PlainTextBlockTokenizer implements TextBlockTokenizer {
 
     // Iterate through the text blocks in order to compute their properties.
     for (TextBlock block : textBlocks) {
-      block.setCharacterStatistic(computeCharStatistics(block));
-      block.setTextLineStatistic(computeTextLineStatistics(block));
+      block.setCharacterStatistic(computeCharacterStatistic(block));
+      block.setTextLineStatistic(computeTextLineStatistic(block));
       block.setPosition(computePosition(page, block));
       block.setText(computeText(block));
     }
 
     return textBlocks;
   }
+
+  // ==========================================================================
+
+  /**
+   * Computes the character statistic for the given text block.
+   *
+   * @param block
+   *        The text block to process.
+   *        
+   * @return The character statistic for the given text block.
+   */
+  protected CharacterStatistic computeCharacterStatistic(TextBlock block) {
+    return this.characterStatistician.aggregate(block.getTextLines());
+  }
+
+  /**
+   * Computes the text line statistic for the given text block.
+   *
+   * @param block
+   *        The text block to process.
+   * 
+   * @return The text line statistic for the given text block.
+   */
+  protected TextLineStatistic computeTextLineStatistic(TextBlock block) {
+    return this.textLineStatistician.compute(block.getTextLines());
+  }
+
+  /**
+   * Computes the position for the given text block.
+   *
+   * @param page
+   *        The PDF page in which the block is located.
+   * @param block
+   *        The text block to process.
+   * @return The position for the given text block.
+   */
+  protected Position computePosition(Page page, TextBlock block) {
+    TextLineList textLines = block.getTextLines();
+    Rectangle rect = this.rectangleFactory.fromHasPositionElements(textLines);
+    return this.positionFactory.create(page, rect);
+  }
+
+  /**
+   * Computes the text for the given text block.
+   *
+   * @param block
+   *        The text block to process.
+   * @return The text for the given text block.
+   */
+  protected String computeText(TextBlock block) {
+    return CollectionUtils.join(block.getTextLines(), " ");
+  }
+
+  // ===========================================================================
 
   /**
    * Checks if the given text line introduces a new text block.
@@ -548,56 +654,5 @@ public class PlainTextBlockTokenizer implements TextBlockTokenizer {
 
     // TODO
     return Math.abs(rectangle1.getMinX() - rectangle2.getMinX()) < 1;
-  }
-
-  // ==========================================================================
-
-  /**
-   * Computes the character statistics for the given text block.
-   *
-   * @param block
-   *        The text block to process.
-   * @return The character statistics for the given text block.
-   */
-  protected CharacterStatistic computeCharStatistics(TextBlock block) {
-    return this.characterStatistician.aggregate(block.getTextLines());
-  }
-
-  /**
-   * Computes the text line statistic for the given text block.
-   *
-   * @param block
-   *        The text block to process.
-   *        
-   * @return The text line statistic for the given text block.
-   */
-  protected TextLineStatistic computeTextLineStatistics(TextBlock block) {
-    return this.textLineStatistician.compute(block.getTextLines());
-  }
-
-  /**
-   * Computes the position for the given text block.
-   *
-   * @param page
-   *        The PDF page in which the block is located.
-   * @param block
-   *        The text block to process.
-   * @return The position for the given text block.
-   */
-  protected Position computePosition(Page page, TextBlock block) {
-    TextLineList textLines = block.getTextLines();
-    Rectangle rect = this.rectangleFactory.fromHasPositionElements(textLines);
-    return this.positionFactory.create(page, rect);
-  }
-
-  /**
-   * Computes the text for the given text block.
-   *
-   * @param block
-   *        The text block to process.
-   * @return The text for the given text block.
-   */
-  protected String computeText(TextBlock block) {
-    return CollectionUtils.join(block.getTextLines(), " ");
   }
 }

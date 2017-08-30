@@ -5,8 +5,8 @@ package pdfact.model;
  * 
  * @author Claudius Korzen
  */
-public interface Page extends HasTextBlocks, HasTextLines, HasCharacters,
-    HasFigures, HasShapes {
+public interface Page extends HasCharacters, HasFigures, HasShapes,
+    HasTextAreas, HasTextLines, HasTextBlocks {
   /**
    * Returns the page number.
    * 

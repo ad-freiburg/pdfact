@@ -1,4 +1,4 @@
-package pdfact.pipes.tokenize.lines.areas;
+package pdfact.pipes.tokenize.areas;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,18 +17,19 @@ import pdfact.model.Position.PositionFactory;
 import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextArea;
 import pdfact.model.TextArea.TextAreaFactory;
-import pdfact.pipes.tokenize.xycut.XYCut;
 import pdfact.util.MathUtils;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.list.CharacterList;
 import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.xycut.XYCut;
 
 /**
- * An implementation of {@link TextAreaTokenizer} based on XYCut.
+ * An implementation of {@link TokenizeToTextAreasPipe} based on XYCut.
  * 
  * @author Claudius Korzen
  */
-public class XYCutTextAreaTokenizer extends XYCut implements TextAreaTokenizer {
+public class XYCutTokenizeToTextAreasPipe extends XYCut
+    implements TokenizeToTextAreasPipe {
   /**
    * The factory to create instances of {@link TextArea}.
    */
@@ -50,7 +51,8 @@ public class XYCutTextAreaTokenizer extends XYCut implements TextAreaTokenizer {
   protected CharacterStatistician characterStatistician;
 
   /**
-   * Creates a new tokenizer that tokenizes characters into text areas.
+   * Creates a new pipe that tokenizes the pages of a PDF document into text
+   * areas.
    * 
    * @param textAreaFactory
    *        The factory to create instances of {@link TextArea}.
@@ -62,7 +64,7 @@ public class XYCutTextAreaTokenizer extends XYCut implements TextAreaTokenizer {
    *        The statistician to compute statistics about characters.
    */
   @Inject
-  public XYCutTextAreaTokenizer(
+  public XYCutTokenizeToTextAreasPipe(
       TextAreaFactory textAreaFactory,
       PositionFactory positionFactory,
       RectangleFactory rectangleFactory,
@@ -76,24 +78,74 @@ public class XYCutTextAreaTokenizer extends XYCut implements TextAreaTokenizer {
   // ==========================================================================
 
   @Override
-  public List<TextArea> tokenize(PdfDocument pdf, Page page,
-      CharacterList characters) throws PdfActException {
+  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    tokenizeToTextAreas(pdf);
+    return pdf;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Tokenizes the pages of the given PDF document into text areas.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  protected void tokenizeToTextAreas(PdfDocument pdf) throws PdfActException {
+    if (pdf == null) {
+      return;
+    }
+
+    List<Page> pages = pdf.getPages();
+    if (pages == null) {
+      return;
+    }
+
+    for (Page page : pages) {
+      if (page == null) {
+        continue;
+      }
+
+      page.setTextAreas(tokenizeToTextAreas(pdf, page));
+    }
+  }
+
+  /**
+   * Tokenizes the given page into text areas.
+   * 
+   * @param pdf
+   *        The PDF document to which the given page belongs to.
+   * @param page
+   *        The PDF page to process.
+   * 
+   * @return The list of text areas.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  protected List<TextArea> tokenizeToTextAreas(PdfDocument pdf, Page page)
+      throws PdfActException {
     List<TextArea> result = new ArrayList<>();
 
-    List<CharacterList> groups = cut(pdf, page, characters);
-    for (CharacterList group : groups) {
-      TextArea area = this.textAreaFactory.create();
-      area.setCharacters(group);
-      area.setPosition(computePosition(pdf, page, area));
-      area.setCharacterStatistic(computeCharacterStatistic(pdf, page, area));
-      result.add(area);
+    List<CharacterList> areaCharsList = cut(pdf, page, page.getCharacters());
+    if (areaCharsList != null) {
+      for (CharacterList areaChars : areaCharsList) {
+        TextArea area = this.textAreaFactory.create();
+        area.setCharacters(areaChars);
+        area.setPosition(computePosition(pdf, page, area));
+        area.setCharacterStatistic(computeCharacterStatistic(pdf, page, area));
+        result.add(area);
+      }
     }
 
     return result;
   }
 
   /**
-   * Computes the position of the given text area.
+   * Computes the position for the given text area.
    * 
    * @param pdf
    *        The PDF document to which the given text area belongs to.
@@ -122,7 +174,7 @@ public class XYCutTextAreaTokenizer extends XYCut implements TextAreaTokenizer {
    * 
    * @return The computed statistic.
    */
-  protected CharacterStatistic computeCharacterStatistic(PdfDocument pdf, 
+  protected CharacterStatistic computeCharacterStatistic(PdfDocument pdf,
       Page page, TextArea area) {
     return this.characterStatistician.compute(area.getCharacters());
   }

@@ -1,4 +1,4 @@
-package pdfact.pipes.tokenize.lines.words;
+package pdfact.pipes.tokenize.words;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,6 @@ import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
 import pdfact.model.Word.WordFactory;
-import pdfact.pipes.tokenize.xycut.XYCut;
 import pdfact.util.CharacterUtils;
 import pdfact.util.CollectionUtils;
 import pdfact.util.comparator.MinXComparator;
@@ -25,13 +24,15 @@ import pdfact.util.list.CharacterList;
 import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
 import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.xycut.XYCut;
 
 /**
- * An implementation of {@link WordTokenizer} based on XYCut.
+ * An implementation of {@link TokenizeToWordsPipe} based on XYCut.
  * 
  * @author Claudius Korzen
  */
-public class XYCutWordTokenizer extends XYCut implements WordTokenizer {
+public class XYCutTokenizeToWordsPipe extends XYCut
+    implements TokenizeToWordsPipe {
   /**
    * The factory to create instances of {@link WordList}.
    */
@@ -72,7 +73,7 @@ public class XYCutWordTokenizer extends XYCut implements WordTokenizer {
    *        The factory to create instances of {@link Rectangle}.
    */
   @Inject
-  public XYCutWordTokenizer(
+  public XYCutTokenizeToWordsPipe(
       WordListFactory wordListFactory,
       WordFactory wordFactory,
       PositionFactory positionFactory,
@@ -88,12 +89,56 @@ public class XYCutWordTokenizer extends XYCut implements WordTokenizer {
   // ==========================================================================
 
   @Override
-  public WordList tokenize(PdfDocument pdf, Page page, TextLine line,
-      CharacterList lineCharacters) throws PdfActException {
+  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    tokenizeToWords(pdf);
+    return pdf;
+  }
 
+  // ==========================================================================
+
+  /**
+   * Tokenizes the text lines in the pages of the given PDF document into words.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  protected void tokenizeToWords(PdfDocument pdf) throws PdfActException {
+    if (pdf == null) {
+      return;
+    }
+
+    for (Page page : pdf.getPages()) {
+      for (TextLine line : page.getTextLines()) {
+        WordList words = tokenizeToWords(pdf, page, line);
+        line.setWords(words);
+        line.setText(CollectionUtils.join(words, " "));
+      }
+    }
+  }
+
+  /**
+   * Tokenizes the given text line into words.
+   * 
+   * @param pdf
+   *        The PDF document to which the given text line belongs to.
+   * @param page
+   *        The PDF document to which the given page belongs to.
+   * @param line
+   *        The text line to process.
+   * 
+   * @return The words.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while tokenization.
+   */
+  public WordList tokenizeToWords(PdfDocument pdf, Page page, TextLine line)
+      throws PdfActException {
     WordList result = this.wordListFactory.create();
 
-    List<CharacterList> charLists = cut(pdf, page, lineCharacters);
+    List<CharacterList> charLists = cut(pdf, page, line.getCharacters());
     Word word = null;
     for (CharacterList charList : charLists) {
       word = this.wordFactory.create();
@@ -202,5 +247,4 @@ public class XYCutWordTokenizer extends XYCut implements WordTokenizer {
 
     return CharacterUtils.isHyphen(word.getLastCharacter());
   }
-
 }

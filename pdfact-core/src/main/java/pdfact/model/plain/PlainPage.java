@@ -14,12 +14,14 @@ import pdfact.model.CharacterStatistic;
 import pdfact.model.Figure;
 import pdfact.model.Page;
 import pdfact.model.Shape;
+import pdfact.model.TextArea;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
 import pdfact.model.TextLineStatistic;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.CharacterList.CharacterListFactory;
 import pdfact.util.list.TextLineList;
+import pdfact.util.list.TextLineList.TextLineListFactory;
 
 /**
  * A plain implementation of {@link Page}.
@@ -28,20 +30,10 @@ import pdfact.util.list.TextLineList;
  */
 public class PlainPage implements Page {
   /**
-   * The text blocks of this page.
-   */
-  protected List<TextBlock> textBlocks;
-  
-  /**
-   * The text lines of this page.
-   */
-  protected TextLineList textLines;
-  
-  /**
    * The characters of this page.
    */
   protected CharacterList characters;
-  
+
   /**
    * The figures of this page.
    */
@@ -51,7 +43,22 @@ public class PlainPage implements Page {
    * The shapes of this page.
    */
   protected List<Shape> shapes;
-  
+
+  /**
+   * The text areas of this page.
+   */
+  protected List<TextArea> textAreas;
+
+  /**
+   * The text lines of this page.
+   */
+  protected TextLineList textLines;
+
+  /**
+   * The text blocks of this page.
+   */
+  protected List<TextBlock> textBlocks;
+
   /**
    * The number of this page in the PDF document.
    */
@@ -75,107 +82,39 @@ public class PlainPage implements Page {
    * 
    * @param characterListFactory
    *        The factory to create instances of {@link CharacterList}.
+   * @param textLineListFactory
+   *        The factory to create instances of {@link TextLineList}.
    */
   @AssistedInject
-  public PlainPage(CharacterListFactory characterListFactory) {
-    this(characterListFactory, 0);
+  public PlainPage(CharacterListFactory characterListFactory,
+      TextLineListFactory textLineListFactory) {
+    this(characterListFactory, textLineListFactory, 0);
   }
 
   /**
    * Creates a new PDF page.
    * 
-   * @param charListFactory
+   * @param characterListFactory
    *        The factory to create instances of {@link CharacterList}.
+   * @param textLineListFactory
+   *        The factory to create instances of {@link TextLineList}.
    * @param num
    *        The number of this page in the PDF document.
    */
   @AssistedInject
-  public PlainPage(CharacterListFactory charListFactory, @Assisted int num) {
-    this.characters = charListFactory.create();
+  public PlainPage(CharacterListFactory characterListFactory,
+      TextLineListFactory textLineListFactory, @Assisted int num) {
+    this.characters = characterListFactory.create();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
+    this.textAreas = new ArrayList<>();
+    this.textLines = textLineListFactory.create();
     this.textBlocks = new ArrayList<>();
     this.pageNumber = num;
   }
 
   // ==========================================================================
 
-  @Override
-  public List<TextBlock> getTextBlocks() {
-    return this.textBlocks;
-  }
-
-  @Override
-  public TextBlock getFirstTextBlock() {
-    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
-      return null;
-    }
-    return this.textBlocks.get(0);
-  }
-
-  @Override
-  public TextBlock getLastTextBlock() {
-    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
-      return null;
-    }
-    return this.textBlocks.get(this.textBlocks.size() - 1);
-  }
-
-  @Override
-  public void setTextBlocks(List<TextBlock> blocks) {
-    this.textBlocks = blocks;
-  }
-
-  @Override
-  public void addTextBlocks(List<TextBlock> blocks) {
-    this.textBlocks.addAll(blocks);
-  }
-
-  @Override
-  public void addTextBlock(TextBlock block) {
-    this.textBlocks.add(block);
-  }
-  
-  // ==========================================================================
-  
-  @Override
-  public TextLineList getTextLines() {
-    return this.textLines;
-  }
-
-  @Override
-  public TextLine getFirstTextLine() {
-    if (this.textLines == null || this.textLines.isEmpty()) {
-      return null;
-    }
-    return this.textLines.get(0);
-  }
-
-  @Override
-  public TextLine getLastTextLine() {
-    if (this.textLines == null || this.textLines.isEmpty()) {
-      return null;
-    }
-    return this.textLines.get(this.textLines.size() - 1);
-  }
-
-  @Override
-  public void setTextLines(TextLineList textLines) {
-    this.textLines = textLines;
-  }
-
-  @Override
-  public void addTextLines(TextLineList textLines) {
-    this.textLines.addAll(textLines);
-  }
-
-  @Override
-  public void addTextLine(TextLine textLine) {
-    this.textLines.add(textLine);
-  }
-  
-  // ==========================================================================
-  
   @Override
   public CharacterList getCharacters() {
     return this.characters;
@@ -289,7 +228,121 @@ public class PlainPage implements Page {
   }
 
   // ==========================================================================
-  
+
+  @Override
+  public List<TextArea> getTextAreas() {
+    return this.textAreas;
+  }
+
+  @Override
+  public TextArea getFirstTextArea() {
+    if (this.textAreas == null || this.textAreas.isEmpty()) {
+      return null;
+    }
+    return this.textAreas.get(0);
+  }
+
+  @Override
+  public TextArea getLastTextArea() {
+    if (this.textAreas == null || this.textAreas.isEmpty()) {
+      return null;
+    }
+    return this.textAreas.get(this.textAreas.size() - 1);
+  }
+
+  @Override
+  public void setTextAreas(List<TextArea> areas) {
+    this.textAreas = areas;
+  }
+
+  @Override
+  public void addTextAreas(List<TextArea> areas) {
+    this.textAreas.addAll(areas);
+  }
+
+  @Override
+  public void addTextArea(TextArea area) {
+    this.textAreas.add(area);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public TextLineList getTextLines() {
+    return this.textLines;
+  }
+
+  @Override
+  public TextLine getFirstTextLine() {
+    if (this.textLines == null || this.textLines.isEmpty()) {
+      return null;
+    }
+    return this.textLines.get(0);
+  }
+
+  @Override
+  public TextLine getLastTextLine() {
+    if (this.textLines == null || this.textLines.isEmpty()) {
+      return null;
+    }
+    return this.textLines.get(this.textLines.size() - 1);
+  }
+
+  @Override
+  public void setTextLines(TextLineList textLines) {
+    this.textLines = textLines;
+  }
+
+  @Override
+  public void addTextLines(TextLineList textLines) {
+    this.textLines.addAll(textLines);
+  }
+
+  @Override
+  public void addTextLine(TextLine textLine) {
+    this.textLines.add(textLine);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public List<TextBlock> getTextBlocks() {
+    return this.textBlocks;
+  }
+
+  @Override
+  public TextBlock getFirstTextBlock() {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
+      return null;
+    }
+    return this.textBlocks.get(0);
+  }
+
+  @Override
+  public TextBlock getLastTextBlock() {
+    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
+      return null;
+    }
+    return this.textBlocks.get(this.textBlocks.size() - 1);
+  }
+
+  @Override
+  public void setTextBlocks(List<TextBlock> blocks) {
+    this.textBlocks = blocks;
+  }
+
+  @Override
+  public void addTextBlocks(List<TextBlock> blocks) {
+    this.textBlocks.addAll(blocks);
+  }
+
+  @Override
+  public void addTextBlock(TextBlock block) {
+    this.textBlocks.add(block);
+  }
+
+  // ==========================================================================
+
   @Override
   public int getPageNumber() {
     return this.pageNumber;
@@ -299,7 +352,7 @@ public class PlainPage implements Page {
   public void setPageNumber(int pageNumber) {
     this.pageNumber = pageNumber;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -339,12 +392,14 @@ public class PlainPage implements Page {
       Page otherPage = (Page) other;
 
       EqualsBuilder builder = new EqualsBuilder();
-      builder.append(getTextBlocks(), otherPage.getTextBlocks());
       builder.append(getCharacters(), otherPage.getCharacters());
       builder.append(getFigures(), otherPage.getShapes());
       builder.append(getShapes(), otherPage.getShapes());
+      builder.append(getTextAreas(), otherPage.getTextAreas());
+      builder.append(getTextLines(), otherPage.getTextLines());
+      builder.append(getTextBlocks(), otherPage.getTextBlocks());
       builder.append(getPageNumber(), otherPage.getPageNumber());
-      
+
       return builder.isEquals();
     }
     return false;
@@ -353,10 +408,12 @@ public class PlainPage implements Page {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
-    builder.append(getTextBlocks());
     builder.append(getCharacters());
     builder.append(getFigures());
     builder.append(getShapes());
+    builder.append(getTextAreas());
+    builder.append(getTextLines());
+    builder.append(getTextBlocks());
     builder.append(getPageNumber());
     return builder.hashCode();
   }
