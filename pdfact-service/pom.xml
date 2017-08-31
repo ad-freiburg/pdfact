@@ -15,6 +15,8 @@
 
   <properties>
     <project.dirs.root>${project.parent.basedir}</project.dirs.root>
+    <project.files.scriptTemplateSource>src/main/resources/cli_script_template.sh</project.files.scriptTemplateSource>
+    <project.files.scriptTemplateTarget>${project.dirs.root}/pdfact.sh</project.files.scriptTemplateTarget>
   </properties>
 
   <dependencies>

@@ -10,7 +10,16 @@
   <packaging>pom</packaging>
 
   <properties>
+    <project.basename>pdfact</project.basename>
+    
     <project.dirs.root>${project.basedir}</project.dirs.root>
+    <project.dirs.bin>${project.dirs.root}/bin</project.dirs.bin>
+    <project.dirs.resources>${project.dirs.root}/resources</project.dirs.resources>
+
+    <project.files.checkstyle>${project.dirs.resources}/checkstyle_config.xml</project.files.checkstyle>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <licenses>
@@ -91,30 +100,6 @@
               <goal>checkstyle</goal>
             </goals>
             <phase>prepare-package</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Configure the properties plugin !-->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>read-project-properties</goal>
-            </goals>
-            <configuration>
-              <files>
-                <!-- Add a global properties file -->
-                <file>${project.dirs.root}/pom.properties</file>
-                <!-- Add properties file specific to a submodule -->
-                <file>pom.properties</file>
-              </files>
-              <quiet>true</quiet>
-            </configuration>
           </execution>
         </executions>
       </plugin>
