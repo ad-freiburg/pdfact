@@ -19,10 +19,10 @@ import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
 import pdfact.util.CharacterUtils;
-import pdfact.util.CollectionUtils;
+import pdfact.util.PdfActUtils;
 import pdfact.util.exception.PdfActException;
-import pdfact.util.statistic.CharacterStatistician;
-import pdfact.util.statistic.TextLineStatistician;
+import pdfact.util.statistician.CharacterStatistician;
+import pdfact.util.statistician.TextLineStatistician;
 
 /**
  * A plain implementation of {@link TokenizeToParagraphsPipe}.
@@ -101,7 +101,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * @return The text for the given paragraph.
    */
   protected String computeText(Paragraph p) {
-    return CollectionUtils.join(p.getWords(), " ");
+    return PdfActUtils.join(p.getWords(), " ");
   }
 
   /**

@@ -11,8 +11,7 @@ import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.afm.FontMetrics;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
-import pdfact.util.FontUtils;
-import pdfact.util.PathUtils;
+import pdfact.util.PdfActUtils;
 
 // TODO: Check if this works as suggested.
 
@@ -65,12 +64,12 @@ public class PdfBoxAFMUtils {
       String path) {
     Map<String, PdfBoxFontMetricsWrapper> result = new HashMap<>();
     try {
-      Map<String, InputStream> files = PathUtils.readDirectory(path);
+      Map<String, InputStream> files = PdfActUtils.readDirectory(path);
 
       for (Entry<String, InputStream> file : files.entrySet()) {
         String name = file.getKey();
         try (InputStream stream = file.getValue()) {
-          String basename = PathUtils.getBasename(name);
+          String basename = PdfActUtils.getBasename(name);
 
           try {
             AFMParser parser = new AFMParser(stream);

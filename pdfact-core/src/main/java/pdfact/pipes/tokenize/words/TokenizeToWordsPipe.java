@@ -1,6 +1,5 @@
 package pdfact.pipes.tokenize.words;
 
-import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe;
 import pdfact.util.pipeline.Pipe;
 
 /**
@@ -10,15 +9,15 @@ import pdfact.util.pipeline.Pipe;
  */
 public interface TokenizeToWordsPipe extends Pipe {
   /**
-   * The factory to create instances of {@link TokenizeToParagraphsPipe}.
+   * The factory to create instances of {@link TokenizeToWordsPipe}.
    * 
    * @author Claudius Korzen
    */
   public interface TokenizeToWordsPipeFactory {
     /**
-     * Creates a new instance of {@link TokenizeToParagraphsPipe}.
+     * Creates a new instance of {@link TokenizeToWordsPipe}.
      * 
-     * @return A new instance of {@link TokenizeToParagraphsPipe}.
+     * @return A new instance of {@link TokenizeToWordsPipe}.
      */
     TokenizeToWordsPipe create();
   }

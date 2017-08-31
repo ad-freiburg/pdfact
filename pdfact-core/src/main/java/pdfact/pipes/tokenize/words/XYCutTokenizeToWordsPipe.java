@@ -7,23 +7,23 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import pdfact.model.CharacterStatistic;
-import pdfact.model.PdfDocument;
 import pdfact.model.Page;
+import pdfact.model.PdfDocument;
 import pdfact.model.Position;
-import pdfact.model.Rectangle;
 import pdfact.model.Position.PositionFactory;
+import pdfact.model.Rectangle;
 import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
 import pdfact.model.Word.WordFactory;
 import pdfact.util.CharacterUtils;
-import pdfact.util.CollectionUtils;
+import pdfact.util.PdfActUtils;
 import pdfact.util.comparator.MinXComparator;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
-import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.statistician.CharacterStatistician;
 import pdfact.util.xycut.XYCut;
 
 /**
@@ -114,7 +114,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
       for (TextLine line : page.getTextLines()) {
         WordList words = tokenizeToWords(pdf, page, line);
         line.setWords(words);
-        line.setText(CollectionUtils.join(words, " "));
+        line.setText(PdfActUtils.join(words, " "));
       }
     }
   }
@@ -225,7 +225,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    */
   protected String computeText(Word word) {
     Collections.sort(word.getCharacters(), new MinXComparator());
-    return CollectionUtils.join(word.getCharacters(), "");
+    return PdfActUtils.join(word.getCharacters(), "");
   }
 
   /**

@@ -18,7 +18,7 @@ import pdfact.model.TextLine;
 import pdfact.model.Word;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.CharacterList.CharacterListFactory;
-import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.statistician.CharacterStatistician;
 
 /**
  * A module that identifies the text blocks with the semantic role "heading".

@@ -12,8 +12,7 @@ import pdfact.model.PdfDocument;
 import pdfact.model.Position;
 import pdfact.model.Word;
 import pdfact.model.Word.WordFactory;
-import pdfact.util.CollectionUtils;
-import pdfact.util.StringUtils;
+import pdfact.util.PdfActUtils;
 import pdfact.util.counter.ObjectCounter;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.list.WordList;
@@ -88,10 +87,10 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
         .getMostCommonFontFace();
     for (Paragraph paragraph : pdf.getParagraphs()) {
       for (Word word : paragraph.getWords()) {
-        String text = StringUtils.normalize(word.getText(), false, true, true);
+        String text = PdfActUtils.normalize(word.getText(), false, true, true);
 
         // Find all indexes of hyphens.
-        List<Integer> hyphenIndexes = StringUtils.indexesOf(text, HYPHENS);
+        List<Integer> hyphenIndexes = PdfActUtils.indexesOf(text, HYPHENS);
 
         // If there are no hyphens, the word is a non-hyphenated words.
         if (hyphenIndexes.isEmpty()) {
@@ -144,7 +143,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
             }
           }
           paragraph.setWords(after);
-          paragraph.setText(CollectionUtils.join(after, " "));
+          paragraph.setText(PdfActUtils.join(after, " "));
         }
       }
     }
@@ -198,10 +197,10 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    *         False otherwise.
    */
   protected boolean isHyphenMandatory(Word word1, Word word2) {
-    String prefix = StringUtils.normalize(word1.getText(), false, true, true);
+    String prefix = PdfActUtils.normalize(word1.getText(), false, true, true);
 
     String textWithoutHyphen =
-        prefix + StringUtils.normalize(word2.getText(), false, true, true);
+        prefix + PdfActUtils.normalize(word2.getText(), false, true, true);
 
     if (prefix.isEmpty() || textWithoutHyphen.isEmpty()) {
       return false;

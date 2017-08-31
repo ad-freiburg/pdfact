@@ -135,10 +135,10 @@ import pdfact.util.list.plain.PlainTextLineList;
 import pdfact.util.list.plain.PlainWordList;
 import pdfact.util.pipeline.Pipeline;
 import pdfact.util.pipeline.Pipeline.PdfActPipelineFactory;
-import pdfact.util.statistic.CharacterStatistician;
-import pdfact.util.statistic.TextLineStatistician;
-import pdfact.util.statistic.plain.PlainCharacterStatistician;
-import pdfact.util.statistic.plain.PlainTextLineStatistician;
+import pdfact.util.statistician.CharacterStatistician;
+import pdfact.util.statistician.TextLineStatistician;
+import pdfact.util.statistician.plain.PlainCharacterStatistician;
+import pdfact.util.statistician.plain.PlainTextLineStatistician;
 
 /**
  * A module that defines the basic Guice bindings of PdfAct.

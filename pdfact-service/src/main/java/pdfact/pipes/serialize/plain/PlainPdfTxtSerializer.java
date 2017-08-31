@@ -21,7 +21,7 @@ import pdfact.model.TextLine;
 import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfTxtSerializer;
-import pdfact.util.CollectionUtils;
+import pdfact.util.PdfActUtils;
 
 /**
  * An implementation of {@link PdfTxtSerializer} that serializes a PDF document
@@ -89,7 +89,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
         lines.addAll(elementsLines);
       }
 
-      result = CollectionUtils.join(elementsLines, TYPES_DELIMITER);
+      result = PdfActUtils.join(elementsLines, TYPES_DELIMITER);
     }
 
     return result.getBytes(DEFAULT_ENCODING);

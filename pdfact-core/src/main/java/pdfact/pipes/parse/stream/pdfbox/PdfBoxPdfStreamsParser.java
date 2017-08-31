@@ -37,7 +37,7 @@ import pdfact.pipes.parse.stream.PdfStreamsParser;
 import pdfact.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.exception.PdfActParseException;
-import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.statistician.CharacterStatistician;
 
 /**
  * Parses PDF content streams and interprets the related operations. Provides a

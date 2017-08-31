@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import pdfact.model.LogLevel;
-import pdfact.pipes.parse.stream.pdfbox.convert.PDFontConverter;
 
 /**
  * Some global settings to control the behavior of PdfAct.
@@ -36,7 +35,7 @@ public class PdfActCoreSettings {
   // ==========================================================================
 
   /**
-   * The path to the AFM file (used in {@link PDFontConverter}.
+   * The path to the AFM file.
    */
   public static final String AFM_FILE_PATH = "afm.map";
 

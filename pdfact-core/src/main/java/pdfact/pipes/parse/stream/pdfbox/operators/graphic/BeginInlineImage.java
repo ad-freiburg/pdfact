@@ -16,20 +16,20 @@ import org.apache.pdfbox.util.Matrix;
 import com.google.inject.Inject;
 
 import pdfact.model.Color;
-import pdfact.model.Figure;
 import pdfact.model.Color.ColorFactory;
+import pdfact.model.Figure;
 import pdfact.model.Figure.FigureFactory;
-import pdfact.model.Point.PointFactory;
 import pdfact.model.Page;
 import pdfact.model.PdfDocument;
 import pdfact.model.Point;
+import pdfact.model.Point.PointFactory;
 import pdfact.model.Position;
 import pdfact.model.Position.PositionFactory;
 import pdfact.model.Shape;
 import pdfact.model.Shape.ShapeFactory;
 import pdfact.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
-import pdfact.util.ColorUtils;
-import pdfact.util.MathUtils;
+import pdfact.pipes.parse.stream.pdfbox.utils.ColorUtils;
+import pdfact.util.PdfActUtils;
 
 /**
  * BI: Begin inline image.
@@ -109,10 +109,10 @@ public class BeginInlineImage extends OperatorProcessor {
     float maxY = minY + (height * ctm.getScaleY());
 
     // Round the values.
-    minX = MathUtils.round(minX, FLOATING_NUMBER_PRECISION);
-    minY = MathUtils.round(minY, FLOATING_NUMBER_PRECISION);
-    maxX = MathUtils.round(maxX, FLOATING_NUMBER_PRECISION);
-    maxY = MathUtils.round(maxY, FLOATING_NUMBER_PRECISION);
+    minX = PdfActUtils.round(minX, FLOATING_NUMBER_PRECISION);
+    minY = PdfActUtils.round(minY, FLOATING_NUMBER_PRECISION);
+    maxX = PdfActUtils.round(maxX, FLOATING_NUMBER_PRECISION);
+    maxY = PdfActUtils.round(maxY, FLOATING_NUMBER_PRECISION);
 
     // Type3 streams may contain BI operands, but we don't want to consider
     // those.

@@ -12,7 +12,7 @@ import pdfact.model.Rectangle;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
-import pdfact.util.MathUtils;
+import pdfact.util.PdfActUtils;
 
 /**
  * A module that identifies the text blocks with the semantic role "footnote".
@@ -64,7 +64,7 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
 
         // The block is *not* a footnote, if the first char is not raised.
         // TODO
-        if (MathUtils.isSmallerOrEqual(firstCharMinY, lineBaseLineY, 1)) {
+        if (PdfActUtils.isSmallerOrEqual(firstCharMinY, lineBaseLineY, 1)) {
           continue;
         }
 

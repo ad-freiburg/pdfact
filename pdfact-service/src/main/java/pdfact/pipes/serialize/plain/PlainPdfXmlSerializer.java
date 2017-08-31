@@ -62,7 +62,7 @@ import pdfact.model.TextLine;
 import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfXmlSerializer;
-import pdfact.util.CollectionUtils;
+import pdfact.util.PdfActUtils;
 
 /**
  * An implementation of {@link PdfXmlSerializer} that serializes a PDF document
@@ -176,7 +176,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
       resultLines.add(end(PDF, --level));
 
       // Join the lines to a single string.
-      result = CollectionUtils.join(resultLines, LINE_DELIMITER);
+      result = PdfActUtils.join(resultLines, LINE_DELIMITER);
     }
 
     return result.getBytes(DEFAULT_ENCODING);

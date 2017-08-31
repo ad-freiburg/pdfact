@@ -12,7 +12,7 @@ import pdfact.util.pipeline.Pipe;
 
 /**
  * A pipe that wires up all necessary steps to identify the document structure
- * of PDF documents, serialize and visualize them to files
+ * of PDF documents, serialize and visualize them to files.
  * 
  * @author Claudius Korzen
  */

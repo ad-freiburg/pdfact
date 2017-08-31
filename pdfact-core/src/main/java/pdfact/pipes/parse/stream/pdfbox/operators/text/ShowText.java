@@ -33,18 +33,18 @@ import org.apache.pdfbox.util.Vector;
 
 import com.google.inject.Inject;
 
-import pdfact.model.Point.PointFactory;
 import pdfact.model.Character;
+import pdfact.model.Character.CharacterFactory;
 import pdfact.model.Color;
 import pdfact.model.Font;
 import pdfact.model.FontFace;
 import pdfact.model.Page;
 import pdfact.model.PdfDocument;
 import pdfact.model.Point;
+import pdfact.model.Point.PointFactory;
 import pdfact.model.Position;
-import pdfact.model.Rectangle;
-import pdfact.model.Character.CharacterFactory;
 import pdfact.model.Position.PositionFactory;
+import pdfact.model.Rectangle;
 import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.pipes.parse.stream.pdfbox.convert.PDColorConverter;
 import pdfact.pipes.parse.stream.pdfbox.convert.PDFontConverter;
@@ -52,7 +52,7 @@ import pdfact.pipes.parse.stream.pdfbox.convert.PDFontFaceConverter;
 import pdfact.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.pipes.parse.stream.pdfbox.utils.PdfBoxAFMUtils;
 import pdfact.pipes.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
-import pdfact.util.MathUtils;
+import pdfact.util.PdfActUtils;
 
 /**
  * Tj: Show a text string.
@@ -263,12 +263,12 @@ public class ShowText extends OperatorProcessor {
 
     if (box != null) {
       // Bounding boxes need some adjustments.
-      if (MathUtils.isEqual(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
+      if (PdfActUtils.isEqual(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
         // Don't adjust bounding box if the width is 0.
         box.setMinX(pdfBoxBoundBox.getMinX());
         box.setMaxX(pdfBoxBoundBox.getMaxX());
       } else
-        if (MathUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
+        if (PdfActUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
           if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
             box.setMinX(pdfBoxBoundBox.getMinX());
           }
@@ -360,14 +360,14 @@ public class ShowText extends OperatorProcessor {
     // Convert the font.
     Font font = this.fontTranslator.convert(pdFont);
     // Round the font size.
-    fontSize = MathUtils.round(fontSize, FLOATING_NUMBER_PRECISION);
+    fontSize = PdfActUtils.round(fontSize, FLOATING_NUMBER_PRECISION);
     FontFace fontFace = this.fontFaceConverter.convert(font, fontSize);
 
     // Round the values of boundingbox.
-    box.setMinX(MathUtils.round(box.getMinX(), FLOATING_NUMBER_PRECISION));
-    box.setMinY(MathUtils.round(box.getMinY(), FLOATING_NUMBER_PRECISION));
-    box.setMaxX(MathUtils.round(box.getMaxX(), FLOATING_NUMBER_PRECISION));
-    box.setMaxY(MathUtils.round(box.getMaxY(), FLOATING_NUMBER_PRECISION));
+    box.setMinX(PdfActUtils.round(box.getMinX(), FLOATING_NUMBER_PRECISION));
+    box.setMinY(PdfActUtils.round(box.getMinY(), FLOATING_NUMBER_PRECISION));
+    box.setMaxX(PdfActUtils.round(box.getMaxX(), FLOATING_NUMBER_PRECISION));
+    box.setMaxY(PdfActUtils.round(box.getMaxY(), FLOATING_NUMBER_PRECISION));
 
     Position position = this.positionFactory.create(page, box);
 

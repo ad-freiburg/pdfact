@@ -25,8 +25,8 @@ import pdfact.util.exception.PdfActException;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.TextLineList;
 import pdfact.util.list.TextLineList.TextLineListFactory;
-import pdfact.util.statistic.CharacterStatistician;
-import pdfact.util.statistic.TextLineStatistician;
+import pdfact.util.statistician.CharacterStatistician;
+import pdfact.util.statistician.TextLineStatistician;
 import pdfact.util.xycut.XYCut;
 
 /**

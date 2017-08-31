@@ -406,7 +406,7 @@ public class CharacterUtils {
    * @return True if the given character is a letter; false otherwise.
    */
   public static boolean isLetter(Character character) {
-    return java.lang.Character.isLetter(getChar(character));
+    return java.lang.Character.isLetter(toChar(character));
   }
 
   /**
@@ -418,7 +418,7 @@ public class CharacterUtils {
    * @return True if the given character is a digit; false otherwise.
    */
   public static boolean isDigit(Character character) {
-    return java.lang.Character.isDigit(getChar(character));
+    return java.lang.Character.isDigit(toChar(character));
   }
 
   /**
@@ -430,7 +430,7 @@ public class CharacterUtils {
    * @return True if the given character is a latin letter; false otherwise.
    */
   public static boolean isLatinLetter(Character character) {
-    char ch = getChar(character);
+    char ch = toChar(character);
     return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
   }
 
@@ -444,7 +444,7 @@ public class CharacterUtils {
    *         otherwise.
    */
   public static boolean isLetterOrDigit(Character character) {
-    return java.lang.Character.isLetterOrDigit(getChar(character));
+    return java.lang.Character.isLetterOrDigit(toChar(character));
   }
 
   /**
@@ -469,7 +469,7 @@ public class CharacterUtils {
    * @return True if the given character is a punctuation mark; false otherwise.
    */
   public static boolean isPunctuationMark(Character character) {
-    char ch = getChar(character);
+    char ch = toChar(character);
     return BASELINE_PUNCTUATION_MARKS.contains(ch)
         || MEANLINE_PUNCTUATION_MARKS.contains(ch);
   }
@@ -485,7 +485,7 @@ public class CharacterUtils {
    *         mean line; false otherwise.
    */
   public static boolean isMeanlinePunctuationMark(Character character) {
-    return MEANLINE_PUNCTUATION_MARKS.contains(getChar(character));
+    return MEANLINE_PUNCTUATION_MARKS.contains(toChar(character));
   }
 
   /**
@@ -499,7 +499,7 @@ public class CharacterUtils {
    *         base line; false otherwise.
    */
   public static boolean isBaselinePunctuationMark(Character character) {
-    return BASELINE_PUNCTUATION_MARKS.contains(getChar(character));
+    return BASELINE_PUNCTUATION_MARKS.contains(toChar(character));
   }
 
   /**
@@ -524,7 +524,7 @@ public class CharacterUtils {
    * @return True if the given character is a descender.
    */
   public static boolean isDescender(Character character) {
-    return DESCENDERS.contains(getChar(character));
+    return DESCENDERS.contains(toChar(character));
   }
 
   /**
@@ -536,7 +536,7 @@ public class CharacterUtils {
    * @return True if the given character is an ascender; false otherwise
    */
   public static boolean isAscender(Character character) {
-    char ch = getChar(character);
+    char ch = toChar(character);
     return java.lang.Character.isUpperCase(ch)
         || java.lang.Character.isDigit(ch)
         || ASCENDERS.contains(ch);
@@ -552,7 +552,7 @@ public class CharacterUtils {
    *         otherwise.
    */
   public static boolean isMeanlineCharacter(Character character) {
-    return MEANLINE_CHARACTERS.contains(getChar(character));
+    return MEANLINE_CHARACTERS.contains(toChar(character));
   }
 
   /**
@@ -565,7 +565,7 @@ public class CharacterUtils {
    *         otherwise.
    */
   public static boolean isBaselineCharacter(Character character) {
-    return BASELINE_CHARACTERS.contains(getChar(character));
+    return BASELINE_CHARACTERS.contains(toChar(character));
   }
 
   /**
@@ -578,7 +578,7 @@ public class CharacterUtils {
    *         otherwise.
    */
   public static boolean isUppercase(Character character) {
-    return java.lang.Character.isUpperCase(getChar(character));
+    return java.lang.Character.isUpperCase(toChar(character));
   }
 
   /**
@@ -591,7 +591,7 @@ public class CharacterUtils {
    *         otherwise.
    */
   public static boolean isLowercase(Character character) {
-    return java.lang.Character.isLowerCase(getChar(character));
+    return java.lang.Character.isLowerCase(toChar(character));
   }
 
   /**
@@ -618,7 +618,7 @@ public class CharacterUtils {
    * @return True if the given character is a hyphen; false otherwise.
    */
   public static boolean isHyphen(Character character) {
-    return HYPHENS.contains(getChar(character));
+    return HYPHENS.contains(toChar(character));
   }
 
   // ==========================================================================
@@ -632,7 +632,7 @@ public class CharacterUtils {
    * @return The primitive char value, or CharacterUtils.NULL if the given
    *         character is null or empty.
    */
-  protected static char getChar(Character character) {
+  protected static char toChar(Character character) {
     if (character == null) {
       return NULL;
     }

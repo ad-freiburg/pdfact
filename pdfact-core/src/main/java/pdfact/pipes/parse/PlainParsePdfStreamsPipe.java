@@ -3,7 +3,6 @@ package pdfact.pipes.parse;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.model.PdfDocument;
-import pdfact.pipes.parse.stream.PdfStreamsParser;
 import pdfact.pipes.parse.stream.PdfStreamsParser.PdfStreamsParserFactory;
 import pdfact.util.exception.PdfActException;
 
@@ -14,7 +13,7 @@ import pdfact.util.exception.PdfActException;
  */
 public class PlainParsePdfStreamsPipe implements ParsePdfStreamsPipe {
   /**
-   * The factory to create instances of {@link PdfStreamsParser}.
+   * The factory to create a parser that parses PDF streams.
    */
   protected PdfStreamsParserFactory factory;
 
@@ -23,7 +22,7 @@ public class PlainParsePdfStreamsPipe implements ParsePdfStreamsPipe {
    * figures and shapes.
    * 
    * @param factory
-   *        The factory to create instances of {@link PdfStreamsParser}.
+   *        The factory to create a parser that parses PDF streams.
    */
   @AssistedInject
   public PlainParsePdfStreamsPipe(PdfStreamsParserFactory factory) {

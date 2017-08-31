@@ -20,11 +20,11 @@ import pdfact.model.TextBlock;
 import pdfact.model.TextBlock.TextBlockFactory;
 import pdfact.model.TextLine;
 import pdfact.model.TextLineStatistic;
-import pdfact.util.CollectionUtils;
+import pdfact.util.PdfActUtils;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.list.TextLineList;
-import pdfact.util.statistic.CharacterStatistician;
-import pdfact.util.statistic.TextLineStatistician;
+import pdfact.util.statistician.CharacterStatistician;
+import pdfact.util.statistician.TextLineStatistician;
 
 /**
  * A plain implementation of {@link TokenizeToTextBlocksPipe}.
@@ -226,7 +226,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @return The text for the given text block.
    */
   protected String computeText(TextBlock block) {
-    return CollectionUtils.join(block.getTextLines(), " ");
+    return PdfActUtils.join(block.getTextLines(), " ");
   }
 
   // ===========================================================================

@@ -7,33 +7,19 @@ import com.google.inject.Inject;
 import pdfact.PdfActCoreSettings;
 import pdfact.model.LogLevel;
 import pdfact.model.PdfDocument;
-import pdfact.pipes.dehyphenate.DehyphenateWordsPipe;
 import pdfact.pipes.dehyphenate.DehyphenateWordsPipe.DehyphenateWordsPipeFactory;
-import pdfact.pipes.filter.characters.FilterCharactersPipe;
 import pdfact.pipes.filter.characters.FilterCharactersPipe.FilterCharactersPipeFactory;
-import pdfact.pipes.filter.figures.FilterFiguresPipe;
 import pdfact.pipes.filter.figures.FilterFiguresPipe.FilterFiguresPipeFactory;
-import pdfact.pipes.filter.shapes.FilterShapesPipe;
 import pdfact.pipes.filter.shapes.FilterShapesPipe.FilterShapesPipeFactory;
-import pdfact.pipes.parse.ParsePdfStreamsPipe;
 import pdfact.pipes.parse.ParsePdfStreamsPipe.ParsePdfPipeFactory;
-import pdfact.pipes.semanticize.DetectSemanticsPipe;
 import pdfact.pipes.semanticize.DetectSemanticsPipe.DetectSemanticsPipeFactory;
-import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe;
 import pdfact.pipes.tokenize.areas.TokenizeToTextAreasPipe.TokenizeToTextAreasPipeFactory;
-import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe;
 import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe.TokenizeToTextBlocksPipeFactory;
-import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe;
 import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe.TokenizeToTextLinesPipeFactory;
-import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe;
 import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParagraphsPipeFactory;
-import pdfact.pipes.tokenize.words.TokenizeToWordsPipe;
 import pdfact.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
-import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
-import pdfact.pipes.translate.ligatures.SplitLigaturesPipe;
 import pdfact.pipes.translate.ligatures.SplitLigaturesPipe.SplitLigaturesPipeFactory;
-import pdfact.pipes.validate.ValidatePdfPathPipe;
 import pdfact.pipes.validate.ValidatePdfPathPipe.ValidatePdfPathPipeFactory;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.pipeline.Pipeline;
@@ -58,77 +44,77 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
   // ==========================================================================
 
   /**
-   * The factory to create instance of {@link Pipeline}.
+   * The factory to create pipelines.
    */
   protected PdfActPipelineFactory pipelineFactory;
 
   /**
-   * The factory to create instances of {@link ValidatePdfPathPipe}.
+   * The factory to create the pipe that validates PDF paths.
    */
   protected ValidatePdfPathPipeFactory validatePdfPathPipeFactory;
 
   /**
-   * The factory to create instances of {@link ParsePdfStreamsPipe}.
+   * The factory to create the pipe that parses PDF files.
    */
   protected ParsePdfPipeFactory parsePdfPipeFactory;
 
   /**
-   * The factory to create instances of {@link MergeDiacriticsPipe}.
+   * The factory to create the pipe that merges diacritic characters.
    */
   protected MergeDiacriticsPipeFactory mergeDiacriticsPipeFactory;
 
   /**
-   * The factory to create instances of {@link SplitLigaturesPipe}.
+   * The factory to create the pipe that splits ligatures.
    */
   protected SplitLigaturesPipeFactory splitLigaturesPipeFactory;
 
   /**
-   * The factory to create instances of {@link FilterCharactersPipe}.
+   * The factory to create the pipe that filters chosen characters.
    */
   protected FilterCharactersPipeFactory filterCharactersPipeFactory;
 
   /**
-   * The factory to create instances of {@link FilterFiguresPipe}.
+   * The factory to create the pipe that filters chosen figures.
    */
   protected FilterFiguresPipeFactory filterFiguresPipeFactory;
 
   /**
-   * The factory to create instances of {@link FilterShapesPipe}.
+   * The factory to create the pipe that filters chosen shapes.
    */
   protected FilterShapesPipeFactory filterShapesPipeFactory;
 
   /**
-   * The factory to create instances of {@link TokenizeToTextAreasPipe}.
+   * The factory to create the pipe that tokenizes pages to text areas.
    */
   protected TokenizeToTextAreasPipeFactory tokenizeToTextAreasPipeFactory;
 
   /**
-   * The factory to create instances of {@link TokenizeToTextLinesPipe}.
+   * The factory to create the pipe that tokenizes text areas to lines.
    */
   protected TokenizeToTextLinesPipeFactory tokenizeToTextLinesPipeFactory;
 
   /**
-   * The factory to create instances of {@link TokenizeToWordsPipe}.
+   * The factory to create the pipe that tokenizes text lines to words.
    */
   protected TokenizeToWordsPipeFactory tokenizeToWordsPipeFactory;
 
   /**
-   * The factory to create instances of {@link TokenizeToTextBlocksPipe}.
+   * The factory to create the pipe that tokenizes text lines to blocks.
    */
   protected TokenizeToTextBlocksPipeFactory tokenizeToTextBlocksPipeFactory;
 
   /**
-   * The factory to create instances of {@link DetectSemanticsPipe}.
+   * The factory to create the pipe that detects the semantics of blocks.
    */
   protected DetectSemanticsPipeFactory semanticizeTextBlocksPipeFactory;
 
   /**
-   * The factory to create instances of {@link TokenizeToParagraphsPipe}.
+   * The factory to create the pipe that tokenizes blocks to paragraphs.
    */
   protected TokenizeToParagraphsPipeFactory tokenizeToParagraphsPipeFactory;
 
   /**
-   * The factory to create instances of {@link DehyphenateWordsPipe}.
+   * The factory to create the pipe that dehyphenates words.
    */
   protected DehyphenateWordsPipeFactory dehyphenateWordsPipeFactory;
 
@@ -138,35 +124,35 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    * The default constructor.
    *
    * @param pipelineFactory
-   *        A factory to create instances of {@link Pipeline}.
+   *        The factory to create pipelines.
    * @param validatePdfPathPipeFactory
-   *        A factory to create instances of {@link ValidatePdfPathPipe}.
+   *        The factory to create the pipe that validates PDF paths.
    * @param parsePdfPipeFactory
-   *        A factory to create instances of {@link ParsePdfStreamsPipe}.
+   *        The factory to create the pipe that parses PDF files.
    * @param mergeDiacriticsFactory
-   *        A factory to create instances of {@link MergeDiacriticsPipeFactory}.
-   * @param filterCharactersPipeFactory
-   *        A factory to create instances of {@link FilterCharactersPipe}.
-   * @param filterFiguresPipeFactory
-   *        A factory to create instances of {@link FilterFiguresPipe}.
-   * @param filterShapesPipeFactory
-   *        A factory to create instances of {@link FilterShapesPipe}.
+   *        The factory to create the pipe that merges diacritic characters.
    * @param splitLigaturesFactory
-   *        A factory to create instances of {@link SplitLigaturesPipeFactory}.
+   *        The factory to create the pipe that splits ligatures.
+   * @param filterCharactersPipeFactory
+   *        The factory to create the pipe that filters chosen characters.
+   * @param filterFiguresPipeFactory
+   *        The factory to create the pipe that filters chosen figures.
+   * @param filterShapesPipeFactory
+   *        The factory to create the pipe that filters chosen shapes.
    * @param tokenizeToTextAreasPipeFactory
-   *        A factory to create instances of {@link TokenizeToTextAreasPipe}.
+   *        The factory to create the pipe that tokenizes pages to text areas.
    * @param tokenizeToTextLinesPipeFactory
-   *        A factory to create instances of {@link TokenizeToTextLinesPipe}.
+   *        The factory to create the pipe that tokenizes text areas to lines.
    * @param tokenizeToWordsPipeFactory
-   *        A factory to create instances of {@link TokenizeToWordsPipe}.
+   *        The factory to create the pipe that tokenizes text lines to words.
    * @param tokenizeToTextBlocksPipeFactory
-   *        A factory to create instances of {@link TokenizeToTextBlocksPipe}.
+   *        The factory to create the pipe that tokenizes text lines to blocks.
    * @param semanticizeTextBlocksPipeFactory
-   *        A factory to create instances of {@link DetectSemanticsPipe}.
+   *        The factory to create the pipe that detects the semantics of blocks.
    * @param tokenizeToParagraphsPipeFactory
-   *        A factory to create instances of {@link TokenizeToParagraphsPipe}.
+   *        The factory to create the pipe that tokenizes blocks to paragraphs.
    * @param dehyphenateWordsPipeFactory
-   *        A factory to create instances of {@link DehyphenateWordsPipe}.
+   *        The factory to create the pipe that dehyphenates words.
    */
   @Inject
   public PlainPdfActCorePipe(PdfActPipelineFactory pipelineFactory,

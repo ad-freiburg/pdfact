@@ -12,15 +12,15 @@ import pdfact.model.CharacterStatistic;
 import pdfact.model.Page;
 import pdfact.model.PdfDocument;
 import pdfact.model.Position;
-import pdfact.model.Rectangle;
 import pdfact.model.Position.PositionFactory;
+import pdfact.model.Rectangle;
 import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextArea;
 import pdfact.model.TextArea.TextAreaFactory;
-import pdfact.util.MathUtils;
+import pdfact.util.PdfActUtils;
 import pdfact.util.exception.PdfActException;
 import pdfact.util.list.CharacterList;
-import pdfact.util.statistic.CharacterStatistician;
+import pdfact.util.statistician.CharacterStatistician;
 import pdfact.util.xycut.XYCut;
 
 /**
@@ -276,7 +276,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     for (Character c : left) {
       // TODO: Allow a certain threshold value.
       Rectangle rect = c.getPosition().getRectangle();
-      if (MathUtils.isEqual(rect.getMaxX(), largestMaxX, 1f)) {
+      if (PdfActUtils.isEqual(rect.getMaxX(), largestMaxX, 1f)) {
         leftChars.add(c);
       }
     }
@@ -286,7 +286,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     for (Character c : right) {
       // TODO: Allow a certain threshold value.
       Rectangle rect = c.getPosition().getRectangle();
-      if (MathUtils.isEqual(rect.getMinX(), smallestMinX, 1f)) {
+      if (PdfActUtils.isEqual(rect.getMinX(), smallestMinX, 1f)) {
         rightChars.add(c);
       }
     }
