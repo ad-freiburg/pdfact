@@ -65,7 +65,7 @@ public interface PdfSerializer {
    * 
    * @author Claudius Korzen
    */
-  public interface PdfSerializerFactory {
+  public interface SerializerFactory {
     /**
      * Creates a new PdfSerializer.
      * 

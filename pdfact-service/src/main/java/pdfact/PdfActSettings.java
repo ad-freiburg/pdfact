@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import pdfact.model.SemanticRole;
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.model.TextUnit;
 
 /**
@@ -13,14 +13,11 @@ import pdfact.model.TextUnit;
  * @author Claudius Korzen
  */
 public class PdfActSettings {
-  // ==========================================================================
-  // Serialization settings.
-
   /**
    * The default serialization format.
    */
-  public static final SerializationFormat DEFAULT_SERIALIZATION_FORMAT =
-      SerializationFormat.TXT;
+  public static final SerializeFormat DEFAULT_SERIALIZE_FORMAT =
+      SerializeFormat.TXT;
 
   /**
    * The default text unit to include on serialization and visualization.

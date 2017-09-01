@@ -18,9 +18,9 @@ import pdfact.model.SemanticRole;
 import pdfact.model.TextBlock;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
-import pdfact.util.CharacterUtils;
 import pdfact.util.PdfActUtils;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.lexicon.CharacterLexicon;
 import pdfact.util.statistician.CharacterStatistician;
 import pdfact.util.statistician.TextLineStatistician;
 
@@ -234,14 +234,14 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     // a punctuation mark.
     Word word = lastParaBlock.getLastTextLine().getLastWord();
     Character lastChar = word != null ? word.getLastCharacter() : null;
-    if (!CharacterUtils.isPunctuationMark(lastChar)) {
+    if (!CharacterLexicon.isPunctuationMark(lastChar)) {
       return true;
     }
 
     // The block belongs to the paragraph, if the block starts with an
     // lowercased letter.
     Word firstWord = block.getFirstTextLine().getFirstWord();
-    if (CharacterUtils.isLowercase(firstWord.getFirstCharacter())) {
+    if (CharacterLexicon.isLowercase(firstWord.getFirstCharacter())) {
       return true;
     }
 

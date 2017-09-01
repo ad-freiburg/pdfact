@@ -1,4 +1,4 @@
-package pdfact.cli;
+package pdfact.main;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,31 +16,31 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.internal.HelpScreenException;
 import pdfact.PdfActCoreSettings;
-import pdfact.exception.PdfActParseCommandLineException;
-import pdfact.guice.PdfActServiceGuiceModule;
+import pdfact.guice.PdfActCliGuiceModule;
 import pdfact.model.LogLevel;
 import pdfact.model.PdfDocument;
 import pdfact.model.PdfDocument.PdfDocumentFactory;
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextUnit;
 import pdfact.pipes.PdfActServicePipe;
 import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.exception.PdfActParseCommandLineException;
 
 /**
- * The command line interface of PdfAct.
+ * The main class for the command line interface of PdfAct.
  * 
  * @author Claudius Korzen
  */
-public class PdfActCommandLineInterface {
+public class PdfActCli {
   /**
-   * The factory to create instances of {@link PdfDocument}.
+   * The factory to create new PDF documents.
    */
   protected PdfDocumentFactory pdfDocumentFactory;
 
   /**
-   * The factory to create instances of {@link PdfActServicePipe}.
+   * The factory to create service pipes of PdfAct.
    */
   protected PdfActServicePipeFactory serviceFactory;
 
@@ -49,14 +49,14 @@ public class PdfActCommandLineInterface {
   /**
    * Creates a new command line interface of PdfAct.
    */
-  public PdfActCommandLineInterface() {
-    Injector injector = Guice.createInjector(new PdfActServiceGuiceModule());
-    this.serviceFactory = injector.getInstance(PdfActServicePipeFactory.class);
+  public PdfActCli() {
+    Injector injector = Guice.createInjector(new PdfActCliGuiceModule());
     this.pdfDocumentFactory = injector.getInstance(PdfDocumentFactory.class);
+    this.serviceFactory = injector.getInstance(PdfActServicePipeFactory.class);
   }
 
   /**
-   * Runs the command line interface of PdfAct.
+   * Starts the command line interface of PdfAct.
    * 
    * @param args
    *        The command line arguments.
@@ -69,7 +69,7 @@ public class PdfActCommandLineInterface {
     // Create the command line argument parser.
     PdfActCommandLineParser parser = new PdfActCommandLineParser();
 
-    // Create the service pipe.
+    // Create a service pipe.
     PdfActServicePipe service = this.serviceFactory.create();
 
     try {
@@ -84,8 +84,8 @@ public class PdfActCommandLineInterface {
 
       // Pass the serialization format if there is any.
       if (parser.hasSerializationFormat()) {
-        String sf = parser.getSerializationFormat();
-        service.setSerializationFormat(SerializationFormat.fromString(sf));
+        String format = parser.getSerializeFormat();
+        service.setSerializationFormat(SerializeFormat.fromString(format));
       }
 
       // Pass the target of the serialization.
@@ -140,13 +140,13 @@ public class PdfActCommandLineInterface {
    *        The command line arguments.
    */
   public static void main(String[] args) {
-    new PdfActCommandLineInterface().run(args);
+    new PdfActCli().run(args);
   }
 
   // ==========================================================================
 
   /**
-   * A parser that parses the command line arguments in order to run PdfAct.
+   * A parser that parses the command line arguments for the CLI of PdfAct.
    *
    * @author Claudius Korzen
    */
@@ -174,26 +174,26 @@ public class PdfActCommandLineInterface {
     /**
      * The name of the option to define the target path for the serialization.
      */
-    protected static final String SERIALIZATION_PATH = "serializationPath";
+    protected static final String SERIALIZE_PATH = "serializationPath";
 
     /**
      * The target path for the serialization.
      */
-    @Arg(dest = SERIALIZATION_PATH)
-    protected String serializationPath;
+    @Arg(dest = SERIALIZE_PATH)
+    protected String serializePath;
 
     // ========================================================================
 
     /**
      * The name of the option to define the serialization format.
      */
-    protected static final String SERIALIZATION_FORMAT = "format";
+    protected static final String SERIALIZE_FORMAT = "format";
 
     /**
      * The serialization format.
      */
-    @Arg(dest = SERIALIZATION_FORMAT)
-    protected String serializationFormat;
+    @Arg(dest = SERIALIZE_FORMAT)
+    protected String serializeFormat;
 
     // ========================================================================
 
@@ -211,7 +211,7 @@ public class PdfActCommandLineInterface {
     // ========================================================================
 
     /**
-     * The name of the option to define the text unit.
+     * The name of the option to define the text unit to extract.
      */
     protected static final String TEXT_UNIT = "unit";
 
@@ -264,8 +264,8 @@ public class PdfActCommandLineInterface {
           .help("Defines the path to the PDF file to process.");
 
       // Add an argument to define the target path for the serialization.
-      this.parser.addArgument(SERIALIZATION_PATH)
-          .dest(SERIALIZATION_PATH)
+      this.parser.addArgument(SERIALIZE_PATH)
+          .dest(SERIALIZE_PATH)
           .nargs("?")
           .metavar("<output-file>")
           .help("Defines the path to the file where pdfact should write the "
@@ -273,9 +273,9 @@ public class PdfActCommandLineInterface {
               + "to stdout.");
 
       // Add an argument to define the serialization format.
-      Set<String> formatChoices = SerializationFormat.getNames();
-      this.parser.addArgument("--" + SERIALIZATION_FORMAT)
-          .dest(SERIALIZATION_FORMAT)
+      Set<String> formatChoices = SerializeFormat.getNames();
+      this.parser.addArgument("--" + SERIALIZE_FORMAT)
+          .dest(SERIALIZE_FORMAT)
           .required(false)
           .choices(formatChoices)
           .metavar("<format>")
@@ -405,7 +405,7 @@ public class PdfActCommandLineInterface {
      *         otherwise.
      */
     public boolean hasSerializationPath() {
-      return this.serializationPath != null;
+      return this.serializePath != null;
     }
 
     /**
@@ -414,7 +414,7 @@ public class PdfActCommandLineInterface {
      * @return The target path for the serialization.
      */
     public String getSerializationPath() {
-      return this.serializationPath;
+      return this.serializePath;
     }
 
     // ========================================================================
@@ -425,7 +425,7 @@ public class PdfActCommandLineInterface {
      * @return True, if an serialization format is given.
      */
     public boolean hasSerializationFormat() {
-      return this.serializationFormat != null;
+      return this.serializeFormat != null;
     }
 
     /**
@@ -433,8 +433,8 @@ public class PdfActCommandLineInterface {
      *
      * @return The serialization format.
      */
-    public String getSerializationFormat() {
-      return this.serializationFormat;
+    public String getSerializeFormat() {
+      return this.serializeFormat;
     }
 
     // ========================================================================

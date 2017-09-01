@@ -25,6 +25,9 @@ public interface CharacterList extends ElementList<Character> {
    */
   List<CharacterList> cut(int splitIndex);
 
+  @Override
+  CharacterList subList(int fromIndex, int toIndex);
+  
   // ==========================================================================
 
   /**

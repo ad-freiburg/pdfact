@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import gnu.trove.iterator.TCharIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TCharSet;
 import pdfact.model.HasText;
 
 /**
@@ -29,13 +33,13 @@ import pdfact.model.HasText;
  */
 public class PdfActUtils {
   // ==========================================================================
-  // Methods to join a collection to a string.
-  
+  // Methods to join collections.
+
   /**
    * The default delimiter on joining collections.
    */
   protected static final String DEFAULT_DELIMITER = " ";
-  
+
   /**
    * Returns the string that results from joining the elements in the given
    * collection with the default delimiter.
@@ -55,13 +59,13 @@ public class PdfActUtils {
    * 
    * @param collection
    *        The collection to join.
-   *        
+   * 
    * @return A string containing the joined collection.
    */
   public static String join(Iterable<?> collection) {
     return join(collection, DEFAULT_DELIMITER);
   }
-  
+
   /**
    * Returns the string that results from joining the elements in the given
    * collection with the given delimiter.
@@ -70,7 +74,7 @@ public class PdfActUtils {
    *        The objects to join.
    * @param delimiter
    *        The delimiter to use on joining.
-   *        
+   * 
    * @return A string containing the joined objects.
    */
   public static String join(Object[] objects, String delimiter) {
@@ -85,7 +89,7 @@ public class PdfActUtils {
    *        The iterable to join.
    * @param delimiter
    *        The delimiter to use on joining.
-   *        
+   * 
    * @return A string containing the joined objects.
    */
   public static String join(Iterable<?> iterable, String delimiter) {
@@ -114,7 +118,7 @@ public class PdfActUtils {
    *        The text elements to join.
    * @param delim
    *        The delimiter to use on joining.
-   *        
+   * 
    * @return The joined elements as a string.
    */
   public static String join(List<? extends HasText> elements, String delim) {
@@ -133,10 +137,10 @@ public class PdfActUtils {
 
     return result.toString();
   }
-  
+
   // ==========================================================================
   // Some mathematical methods.
-  
+
   /**
    * Rounds the given number and returns a floating number with the given number
    * of decimal places.
@@ -294,10 +298,10 @@ public class PdfActUtils {
   public static boolean isSmallerOrEqual(float f1, float f2, float tolerance) {
     return isSmaller(f1, f2, tolerance) || isEqual(f1, f2, tolerance);
   }
-  
+
   // ==========================================================================
   // Some path methods.
-  
+
   /**
    * Returns the base name of the given file, that is the filename without the
    * file-extension.
@@ -409,69 +413,31 @@ public class PdfActUtils {
     }
     return streams;
   }
-  
+
   // ==========================================================================
-  
+
+
+
+  // ==========================================================================
+
   /**
-   * Normalizes the given string, i.e. removes all non-alphanumeric characters
-   * and transform all characters to lower cases. You can protect certain
-   * non-alphanumeric characters from removing by specifying it as a protect.
+   * Returns the first index within the given haystack of the occurrence of one
+   * of the specified needles.
    * 
-   * @param text
-   *        The text to normalize.
-   * @param removeNumbers
-   *        A boolean flag to indicate whether numbers should be removed.
-   * @param removeWhitespaces
-   *        A boolean flag to indicate whether white spaces should be removed.
-   * @param toLowercases
-   *        A boolean flag to indicate whether all letters should be transformed
-   *        to lower cases.
-   * @param protects
-   *        The characters to protect from removing.
-   * @return The normalized text.
+   * @param haystack
+   *        The text to search.
+   * @param needles
+   *        The patterns to find.
+   *
+   * @return The first found index.
    */
-  public static String normalize(String text, boolean removeNumbers,
-      boolean removeWhitespaces, boolean toLowercases, char... protects) {
-    StringBuilder builder = new StringBuilder();
-
-    HashSet<Character> protectSet = new HashSet<Character>();
-    for (char protect : protects) {
-      protectSet.add(protect);
-    }
-
-    boolean prevCharIsWhitespace = false;
-    for (char c : text.toCharArray()) {
-      if (protectSet.contains(c)) {
-        builder.append(c);
-        continue;
-      }
-
-      if (toLowercases) {
-        c = Character.toLowerCase(c);
-      }
-
-      if (removeNumbers) {
-        builder.append(Character.isLetter(c) ? c : "");
-      } else {
-        builder.append(Character.isLetterOrDigit(c) ? c : "");
-      }
-
-      if (!removeWhitespaces) {
-        boolean charIsWhitespace = Character.isWhitespace(c);
-        if (!prevCharIsWhitespace && charIsWhitespace) {
-          builder.append(" ");
-        }
-        prevCharIsWhitespace = charIsWhitespace;
-      }
-    }
-    return builder.toString().trim();
+  public static int indexOf(String haystack, TCharSet... needles) {
+    return indexOf(haystack, 0, needles);
   }
 
-  // ==========================================================================
-
   /**
-   * Returns the first index within given haystack of the occurrence of one of
-   * the specified needles.
+   * Returns the first index within the given haystack of the occurrence of one
+   * of the specified needles.
    * 
    * @param haystack
    *        The text to search.
@@ -485,26 +451,60 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the first index within given haystack of the occurrence of one of
-   * the specified needles.
+   * Returns the first index within the given haystack of the occurrence of one
+   * of the specified needles.
    * 
    * @param haystack
    *        The text to search.
-   * @param fromIndex
+   * @param from
    *        The index in the text where to start the search.
    * @param needles
    *        The patterns to find.
    * 
    * @return The first found index.
    */
-  public static int indexOf(String haystack, int fromIndex, char... needles) {
+  public static int indexOf(String haystack, int from, TCharSet... needles) {
     if (haystack != null) {
-      if (fromIndex < 0 || fromIndex >= haystack.length()) {
+      if (from < 0 || from >= haystack.length()) {
         return -1;
       }
 
       final char[] chars = haystack.toCharArray();
-      for (int i = fromIndex; i < chars.length; i++) {
+      for (int i = from; i < chars.length; i++) {
+        for (TCharSet needle : needles) {
+          TCharIterator itr = needle.iterator();
+          while (itr.hasNext()) {
+            if (chars[i] == itr.next()) {
+              return i;
+            }
+          }
+        }
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the first index within given haystack of the occurrence of one of
+   * the specified needles.
+   * 
+   * @param haystack
+   *        The text to search.
+   * @param from
+   *        The index in the text where to start the search.
+   * @param needles
+   *        The patterns to find.
+   * 
+   * @return The first found index.
+   */
+  public static int indexOf(String haystack, int from, char... needles) {
+    if (haystack != null) {
+      if (from < 0 || from >= haystack.length()) {
+        return -1;
+      }
+
+      final char[] chars = haystack.toCharArray();
+      for (int i = from; i < chars.length; i++) {
         for (char needle : needles) {
           if (chars[i] == needle) {
             return i;
@@ -516,8 +516,8 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the indexes within given haystack of all occurrences of the
-   * specified needle.
+   * Returns the indexes within the given haystack of all occurrences of the
+   * given needles.
    * 
    * @param haystack
    *        The text to search.
@@ -526,8 +526,8 @@ public class PdfActUtils {
    * 
    * @return The found indexes.
    */
-  public static List<Integer> indexesOf(String haystack, char... needles) {
-    List<Integer> indexes = new ArrayList<>();
+  public static TIntList indexesOf(String haystack, TCharSet... needles) {
+    TIntList indexes = new TIntArrayList();
 
     int index = indexOf(haystack, needles);
 
@@ -535,6 +535,64 @@ public class PdfActUtils {
       indexes.add(index);
       index = indexOf(haystack, index + 1, needles);
     }
+    
     return indexes;
+  }
+
+  /**
+   * Returns the indexes within the given haystack of all occurrences of the
+   * given needles.
+   * 
+   * @param haystack
+   *        The text to search.
+   * @param needles
+   *        The patterns to find.
+   * 
+   * @return The found indexes.
+   */
+  public static TIntList indexesOf(String haystack, char... needles) {
+    TIntList indexes = new TIntArrayList();
+
+    int index = indexOf(haystack, needles);
+
+    while (index >= 0) {
+      indexes.add(index);
+      index = indexOf(haystack, index + 1, needles);
+    }
+    
+    return indexes;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Returns true, if the given haystack contains at least one of the given
+   * needles.
+   * 
+   * @param haystack
+   *        The collection to search.
+   * @param needles
+   *        The patterns to find.
+   *
+   * @return True, if the given haystack contains at least one of the given
+   *         needles; False otherwise.
+   */
+  public static boolean containsOneOf(Collection<?> haystack,
+      Object... needles) {
+    if (haystack == null) {
+      return false;
+    }
+
+    for (Object obj : haystack) {
+      if (obj == null) {
+        continue;
+      }
+      for (Object needle : needles) {
+        if (obj.equals(needle)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

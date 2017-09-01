@@ -9,7 +9,7 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>pdfact-service</artifactId>
+  <artifactId>pdfact-cli</artifactId>
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 

@@ -247,6 +247,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
    *        The text block to normalize.
    * @return The normalized text of the given text block.
    */
+  @Deprecated
   protected static String toNormalizedText(TextBlock block) {
     if (block == null || block.getText() == null) {
       return null;

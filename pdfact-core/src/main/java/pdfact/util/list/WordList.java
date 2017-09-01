@@ -25,6 +25,9 @@ public interface WordList extends ElementList<Word> {
    */
   List<WordList> cut(int splitIndex);
   
+  @Override
+  WordList subList(int fromIndex, int toIndex);
+  
   // ==========================================================================
   
   /**

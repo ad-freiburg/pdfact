@@ -1,4 +1,4 @@
-package pdfact.util;
+package pdfact.util.lexicon;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,77 +12,64 @@ import pdfact.model.Character;
  * 
  * @author Claudius Korzen
  */
-public class CharacterUtils {
+public class CharacterLexicon {
   /**
    * The null character.
    */
   public static final char NULL = '\u0000';
 
+  // ==========================================================================
+  // Letters.
+  
   /**
-   * The punctuation marks that are aligned to the base line.
+   * Upper case letters.
    */
-  public static final TCharSet BASELINE_PUNCTUATION_MARKS;
-
+  public static final TCharSet UPPERCASE_LETTERS = new TCharHashSet();
+  
+  static {
+    for (char i = 'A'; i <= 'Z'; i++) {
+      UPPERCASE_LETTERS.add(i);
+    }
+  }
+  
   /**
-   * The punctuation marks that are aligned to the mean line.
+   * Lower case letters.
    */
-  public static final TCharSet MEANLINE_PUNCTUATION_MARKS;
-
+  public static final TCharSet LOWERCASE_LETTERS = new TCharHashSet();
+  
+  static {
+    for (char i = 'a'; i <= 'z'; i++) {
+      LOWERCASE_LETTERS.add(i);
+    }
+  }
+  
+  /**
+   * All letters.
+   */
+  public static final TCharSet LETTERS = new TCharHashSet();
+  
+  static {
+    LETTERS.addAll(UPPERCASE_LETTERS);
+    LETTERS.addAll(LOWERCASE_LETTERS);
+  }
+  
+  /**
+   * Digits.
+   */
+  public static final TCharSet DIGITS = new TCharHashSet();
+  
+  static {
+    for (char i = '0'; i <= '9'; i++) {
+      DIGITS.add(i);
+    }
+  }
+  
+  // ==========================================================================
+  
   /**
    * The characters that aren't aligned to the baseline of a text line.
    */
   public static final TCharSet DESCENDERS;
-
-  /**
-   * The characters that aren't aligned to the meanline of a text line.
-   */
-  public static final TCharSet ASCENDERS;
-
-  /**
-   * The characters that are aligned to the baseline of a text line.
-   */
-  public static final TCharSet BASELINE_CHARACTERS;
-
-  /**
-   * The characters that are aligned to the baseline of a text line.
-   */
-  public static final TCharSet MEANLINE_CHARACTERS;
-
-  /**
-   * The math characters.
-   */
-  public static final Set<String> MATH_SYMBOLS;
-
-  /**
-   * The math operators (all symbols that must be surrounded by white spaces).
-   */
-  public static final Set<String> MATH_OPERATORS;
-
-  /**
-   * The characters that represent a hyphen.
-   */
-  public static final TCharSet HYPHENS;
-
-  static {
-    BASELINE_PUNCTUATION_MARKS = new TCharHashSet();
-    BASELINE_PUNCTUATION_MARKS.add('.');
-    BASELINE_PUNCTUATION_MARKS.add('?');
-    BASELINE_PUNCTUATION_MARKS.add('!');
-    BASELINE_PUNCTUATION_MARKS.add(':');
-    BASELINE_PUNCTUATION_MARKS.add(';');
-    BASELINE_PUNCTUATION_MARKS.add(',');
-  }
-
-  static {
-    MEANLINE_PUNCTUATION_MARKS = new TCharHashSet();
-    MEANLINE_PUNCTUATION_MARKS.add('\'');
-    MEANLINE_PUNCTUATION_MARKS.add('"');
-    MEANLINE_PUNCTUATION_MARKS.add('“');
-    MEANLINE_PUNCTUATION_MARKS.add('”');
-    MEANLINE_PUNCTUATION_MARKS.add('`');
-    MEANLINE_PUNCTUATION_MARKS.add('´');
-    MEANLINE_PUNCTUATION_MARKS.add('’');
-  }
 
   static {
     DESCENDERS = new TCharHashSet();
@@ -96,6 +83,11 @@ public class CharacterUtils {
     DESCENDERS.add('Q');
     DESCENDERS.add('J');
   }
+  
+  /**
+   * The characters that aren't aligned to the meanline of a text line.
+   */
+  public static final TCharSet ASCENDERS;
 
   static {
     ASCENDERS = new TCharHashSet();
@@ -110,33 +102,16 @@ public class CharacterUtils {
     ASCENDERS.add('t');
     ASCENDERS.add('β');
   }
+  
+  /**
+   * The characters that are aligned to the baseline of a text line.
+   */
+  public static final TCharSet BASELINE_CHARACTERS;
 
   static {
     BASELINE_CHARACTERS = new TCharHashSet();
-    BASELINE_CHARACTERS.add('A');
-    BASELINE_CHARACTERS.add('B');
-    BASELINE_CHARACTERS.add('C');
-    BASELINE_CHARACTERS.add('D');
-    BASELINE_CHARACTERS.add('E');
-    BASELINE_CHARACTERS.add('F');
-    BASELINE_CHARACTERS.add('G');
-    BASELINE_CHARACTERS.add('H');
-    BASELINE_CHARACTERS.add('I');
-    BASELINE_CHARACTERS.add('K');
-    BASELINE_CHARACTERS.add('L');
-    BASELINE_CHARACTERS.add('M');
-    BASELINE_CHARACTERS.add('N');
-    BASELINE_CHARACTERS.add('O');
-    BASELINE_CHARACTERS.add('P');
-    BASELINE_CHARACTERS.add('R');
-    BASELINE_CHARACTERS.add('S');
-    BASELINE_CHARACTERS.add('T');
-    BASELINE_CHARACTERS.add('U');
-    BASELINE_CHARACTERS.add('V');
-    BASELINE_CHARACTERS.add('W');
-    BASELINE_CHARACTERS.add('X');
-    BASELINE_CHARACTERS.add('Y');
-    BASELINE_CHARACTERS.add('Z');
+    BASELINE_CHARACTERS.addAll(DIGITS);
+    BASELINE_CHARACTERS.addAll(UPPERCASE_LETTERS);
     BASELINE_CHARACTERS.add('a');
     BASELINE_CHARACTERS.add('b');
     BASELINE_CHARACTERS.add('c');
@@ -158,18 +133,13 @@ public class CharacterUtils {
     BASELINE_CHARACTERS.add('w');
     BASELINE_CHARACTERS.add('x');
     BASELINE_CHARACTERS.add('z');
-    BASELINE_CHARACTERS.add('1');
-    BASELINE_CHARACTERS.add('2');
-    BASELINE_CHARACTERS.add('3');
-    BASELINE_CHARACTERS.add('4');
-    BASELINE_CHARACTERS.add('5');
-    BASELINE_CHARACTERS.add('6');
-    BASELINE_CHARACTERS.add('7');
-    BASELINE_CHARACTERS.add('8');
-    BASELINE_CHARACTERS.add('9');
-    BASELINE_CHARACTERS.add('0');
   }
-
+  
+  /**
+   * The characters that are aligned to the baseline of a text line.
+   */
+  public static final TCharSet MEANLINE_CHARACTERS;
+  
   static {
     MEANLINE_CHARACTERS = new TCharHashSet();
     MEANLINE_CHARACTERS.add('a');
@@ -190,6 +160,75 @@ public class CharacterUtils {
     MEANLINE_CHARACTERS.add('y');
     MEANLINE_CHARACTERS.add('z');
   }
+  
+  // ==========================================================================
+  // Punctuation marks.
+  
+  /**
+   * The punctuation marks that are aligned to the base line.
+   */
+  public static final TCharSet BASELINE_PUNCTUATION_MARKS;
+  
+  static {
+    BASELINE_PUNCTUATION_MARKS = new TCharHashSet();
+    BASELINE_PUNCTUATION_MARKS.add('.');
+    BASELINE_PUNCTUATION_MARKS.add('?');
+    BASELINE_PUNCTUATION_MARKS.add('!');
+    BASELINE_PUNCTUATION_MARKS.add(':');
+    BASELINE_PUNCTUATION_MARKS.add(';');
+    BASELINE_PUNCTUATION_MARKS.add(',');
+  }
+  
+  /**
+   * The punctuation marks that are aligned to the mean line.
+   */
+  public static final TCharSet MEANLINE_PUNCTUATION_MARKS;
+  
+  static {
+    MEANLINE_PUNCTUATION_MARKS = new TCharHashSet();
+    MEANLINE_PUNCTUATION_MARKS.add('\'');
+    MEANLINE_PUNCTUATION_MARKS.add('"');
+    MEANLINE_PUNCTUATION_MARKS.add('“');
+    MEANLINE_PUNCTUATION_MARKS.add('”');
+    MEANLINE_PUNCTUATION_MARKS.add('`');
+    MEANLINE_PUNCTUATION_MARKS.add('´');
+    MEANLINE_PUNCTUATION_MARKS.add('’');
+  }
+  
+  /**
+   * The characters that represent a hyphen.
+   */
+  public static final TCharSet HYPHENS;
+  
+  static {
+    HYPHENS = new TCharHashSet();
+    HYPHENS.add('-');
+    HYPHENS.add('–');
+  }
+  
+  /**
+   * All punctuation marks.
+   */
+  public static final TCharSet PUNCTUATION_MARKS;
+  
+  static {
+    PUNCTUATION_MARKS = new TCharHashSet();
+    PUNCTUATION_MARKS.addAll(BASELINE_CHARACTERS);
+    PUNCTUATION_MARKS.addAll(MEANLINE_CHARACTERS);
+    PUNCTUATION_MARKS.addAll(HYPHENS);
+  }
+  
+  // ==========================================================================
+
+  /**
+   * The math characters.
+   */
+  public static final Set<String> MATH_SYMBOLS;
+
+  /**
+   * The math operators (all symbols that must be surrounded by white spaces).
+   */
+  public static final Set<String> MATH_OPERATORS;
 
   static {
     MATH_OPERATORS = new HashSet<>();
@@ -390,12 +429,8 @@ public class CharacterUtils {
     MATH_SYMBOLS.add("ω");
     MATH_SYMBOLS.add("Ω");
   }
-
-  static {
-    HYPHENS = new TCharHashSet();
-    HYPHENS.add('-');
-    HYPHENS.add('–');
-  }
+  
+  // ==========================================================================
 
   /**
    * Returns true if the given character is a letter.

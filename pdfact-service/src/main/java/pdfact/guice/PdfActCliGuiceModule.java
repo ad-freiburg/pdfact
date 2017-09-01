@@ -4,17 +4,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.pipes.PdfActServicePipe;
 import pdfact.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.pipes.PlainPdfActServicePipe;
 import pdfact.pipes.serialize.PdfJsonSerializer;
-import pdfact.pipes.serialize.PdfJsonSerializer.PdfJsonSerializerFactory;
-import pdfact.pipes.serialize.PdfSerializer.PdfSerializerFactory;
+import pdfact.pipes.serialize.PdfJsonSerializer.JsonSerializerFactory;
+import pdfact.pipes.serialize.PdfSerializer.SerializerFactory;
 import pdfact.pipes.serialize.PdfTxtSerializer;
-import pdfact.pipes.serialize.PdfTxtSerializer.PdfTxtSerializerFactory;
+import pdfact.pipes.serialize.PdfTxtSerializer.TxtSerializerFactory;
 import pdfact.pipes.serialize.PdfXmlSerializer;
-import pdfact.pipes.serialize.PdfXmlSerializer.PdfXmlSerializerFactory;
+import pdfact.pipes.serialize.PdfXmlSerializer.XmlSerializerFactory;
 import pdfact.pipes.serialize.PlainSerializePdfPipe;
 import pdfact.pipes.serialize.SerializePdfPipe;
 import pdfact.pipes.serialize.SerializePdfPipe.SerializePdfPipeFactory;
@@ -35,11 +35,11 @@ import pdfact.pipes.visualize.VisualizePdfPipe.VisualizePdfPipeFactory;
 import pdfact.pipes.visualize.pdfbox.PdfBoxDrawer;
 
 /**
- * A module that defines the basic Guice bindings for the PdfAct services.
+ * A Guice module that defines the basic bindings for the CLI of PdfAct.
  * 
  * @author Claudius Korzen
  */
-public class PdfActServiceGuiceModule extends AbstractModule {
+public class PdfActCliGuiceModule extends AbstractModule {
   @Override
   protected void configure() {
     install(new PdfActCoreGuiceModule());
@@ -49,53 +49,54 @@ public class PdfActServiceGuiceModule extends AbstractModule {
         .implement(PdfActServicePipe.class, PlainPdfActServicePipe.class)
         .build(PdfActServicePipeFactory.class));
 
-    // Install the factory of the pipe to validate paths to write to.
+    // Install the factory of the pipe that validates paths to write to.
     install(new FactoryModuleBuilder()
         .implement(ValidatePathToWritePipe.class,
             PlainValidatePathToWritePipe.class)
         .build(ValidatePathToWritePipeFactory.class));
 
-    // Install the factory of the pipe to serialize PDF documents.
+    // Install the factory of the pipe that serializes PDF documents.
     install(new FactoryModuleBuilder()
         .implement(SerializePdfPipe.class, PlainSerializePdfPipe.class)
         .build(SerializePdfPipeFactory.class));
 
-    // Install the factory of the pipe to visualize PDF documents.
+    // Install the factory of the pipe that visualizes PDF documents.
     install(new FactoryModuleBuilder()
         .implement(VisualizePdfPipe.class, PlainVisualizePdfPipe.class)
         .build(VisualizePdfPipeFactory.class));
 
-    // Install the serializer factories.
+    // Install the factory of the TXT serializer.
     install(new FactoryModuleBuilder()
         .implement(PdfTxtSerializer.class, PlainPdfTxtSerializer.class)
-        .build(PdfTxtSerializerFactory.class));
+        .build(TxtSerializerFactory.class));
 
+    // Install the factory of the XML serializer.
     install(new FactoryModuleBuilder()
         .implement(PdfXmlSerializer.class, PlainPdfXmlSerializer.class)
-        .build(PdfXmlSerializerFactory.class));
+        .build(XmlSerializerFactory.class));
 
+    // Install the factory of the JSON serializer.
     install(new FactoryModuleBuilder()
         .implement(PdfJsonSerializer.class, PlainPdfJsonSerializer.class)
-        .build(PdfJsonSerializerFactory.class));
+        .build(JsonSerializerFactory.class));
 
-    MapBinder<SerializationFormat, PdfSerializerFactory> binder = MapBinder
-        .newMapBinder(binder(), SerializationFormat.class,
-            PdfSerializerFactory.class);
-
-    binder.addBinding(SerializationFormat.TXT)
-        .to(PdfTxtSerializerFactory.class);
-    binder.addBinding(SerializationFormat.XML)
-        .to(PdfXmlSerializerFactory.class);
-    binder.addBinding(SerializationFormat.JSON)
-        .to(PdfJsonSerializerFactory.class);
-
-    // Bind the visualizers.
+    // Install the factory of the PDF drawer.
     install(new FactoryModuleBuilder()
         .implement(PdfDrawer.class, PdfBoxDrawer.class)
         .build(PdfDrawerFactory.class));
 
+    // Install the factory of the PDF visualizer.
     install(new FactoryModuleBuilder()
         .implement(PdfVisualizer.class, PlainPdfVisualizer.class)
         .build(PdfVisualizerFactory.class));
+
+    // ========================================================================
+
+    MapBinder<SerializeFormat, SerializerFactory> binder = MapBinder
+        .newMapBinder(binder(), SerializeFormat.class, SerializerFactory.class);
+
+    binder.addBinding(SerializeFormat.TXT).to(TxtSerializerFactory.class);
+    binder.addBinding(SerializeFormat.XML).to(XmlSerializerFactory.class);
+    binder.addBinding(SerializeFormat.JSON).to(JsonSerializerFactory.class);
   }
 }

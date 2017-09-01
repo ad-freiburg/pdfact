@@ -49,6 +49,11 @@ public class PlainTextLineList extends PlainElementList<TextLine>
     TextLineListView right = new TextLineListView(this, index, this.size());
     return Arrays.asList(left, right);
   }
+  
+  @Override
+  public TextLineList subList(int fromIndex, int toIndex) {
+    return new TextLineListView(this, fromIndex, toIndex);
+  }
 
   // ==========================================================================
 
@@ -89,6 +94,11 @@ public class PlainTextLineList extends PlainElementList<TextLine>
       TextLineListView v1 = new TextLineListView(this.parent, left, cut);
       TextLineListView v2 = new TextLineListView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
+    }
+    
+    @Override
+    public TextLineList subList(int fromIndex, int toIndex) {
+      return new TextLineListView(this, fromIndex, toIndex);
     }
   }
 }

@@ -1,7 +1,7 @@
 package pdfact.pipes.serialize;
 
 import static pdfact.PdfActSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
-import static pdfact.PdfActSettings.DEFAULT_SERIALIZATION_FORMAT;
+import static pdfact.PdfActSettings.DEFAULT_SERIALIZE_FORMAT;
 import static pdfact.PdfActSettings.DEFAULT_TEXT_UNIT;
 
 import java.io.IOException;
@@ -13,13 +13,13 @@ import java.util.Set;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.exception.PdfActSerializeException;
 import pdfact.model.PdfDocument;
 import pdfact.model.SemanticRole;
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.model.TextUnit;
-import pdfact.pipes.serialize.PdfSerializer.PdfSerializerFactory;
+import pdfact.pipes.serialize.PdfSerializer.SerializerFactory;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.exception.PdfActSerializeException;
 
 /**
  * A plain implementation of {@link SerializePdfPipe}.
@@ -30,12 +30,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * The available serializers.
    */
-  protected Map<SerializationFormat, PdfSerializerFactory> serializers;
+  protected Map<SerializeFormat, SerializerFactory> serializers;
 
   /**
    * The serialization format.
    */
-  protected SerializationFormat format;
+  protected SerializeFormat format;
 
   /**
    * The serialization target, given as a file.
@@ -67,9 +67,9 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   @AssistedInject
   public PlainSerializePdfPipe(
-      Map<SerializationFormat, PdfSerializerFactory> serializers) {
+      Map<SerializeFormat, SerializerFactory> serializers) {
     this.serializers = serializers;
-    this.format = DEFAULT_SERIALIZATION_FORMAT;
+    this.format = DEFAULT_SERIALIZE_FORMAT;
     this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
@@ -79,7 +79,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
     // Obtain the serializer factory to use.
-    PdfSerializerFactory factory = this.serializers.get(this.format);
+    SerializerFactory factory = this.serializers.get(this.format);
     if (factory == null) {
       throw new PdfActSerializeException(
           "Couldn't find a serializer for the format '" + this.format + "'.");
@@ -168,12 +168,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==========================================================================
 
   @Override
-  public SerializationFormat getSerializationFormat() {
+  public SerializeFormat getSerializationFormat() {
     return this.format;
   }
 
   @Override
-  public void setSerializationFormat(SerializationFormat format) {
+  public void setSerializationFormat(SerializeFormat format) {
     this.format = format;
   }
 

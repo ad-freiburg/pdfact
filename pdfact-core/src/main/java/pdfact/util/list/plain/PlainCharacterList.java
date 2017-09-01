@@ -50,6 +50,11 @@ public class PlainCharacterList extends PlainElementList<Character>
     return Arrays.asList(left, right);
   }
 
+  @Override
+  public CharacterList subList(int fromIndex, int toIndex) {
+    return new CharacterListView(this, fromIndex, toIndex);
+  }
+  
   // ==========================================================================
 
   /**
@@ -90,6 +95,11 @@ public class PlainCharacterList extends PlainElementList<Character>
       CharacterListView v1 = new CharacterListView(this.parent, left, cut);
       CharacterListView v2 = new CharacterListView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
+    }
+    
+    @Override
+    public CharacterList subList(int fromIndex, int toIndex) {
+      return new CharacterListView(this, fromIndex, toIndex);
     }
   }
 }

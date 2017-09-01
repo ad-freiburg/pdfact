@@ -39,7 +39,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.exception.PdfActSerializeException;
 import pdfact.model.Character;
 import pdfact.model.Color;
 import pdfact.model.Element;
@@ -63,6 +62,7 @@ import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.serialize.PdfXmlSerializer;
 import pdfact.util.PdfActUtils;
+import pdfact.util.exception.PdfActSerializeException;
 
 /**
  * An implementation of {@link PdfXmlSerializer} that serializes a PDF document

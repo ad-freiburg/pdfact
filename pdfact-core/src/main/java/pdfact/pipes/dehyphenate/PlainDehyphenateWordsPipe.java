@@ -1,22 +1,27 @@
 package pdfact.pipes.dehyphenate;
 
-import java.util.ArrayList;
+import static pdfact.util.lexicon.CharacterLexicon.HYPHENS;
+import static pdfact.util.lexicon.CharacterLexicon.LETTERS;
+
+import java.util.Iterator;
 import java.util.List;
 
 import com.google.inject.Inject;
 
-import pdfact.model.CharacterStatistic;
-import pdfact.model.FontFace;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
 import pdfact.model.Paragraph;
 import pdfact.model.PdfDocument;
-import pdfact.model.Position;
 import pdfact.model.Word;
-import pdfact.model.Word.WordFactory;
 import pdfact.util.PdfActUtils;
 import pdfact.util.counter.ObjectCounter;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.list.CharacterList;
+import pdfact.util.list.CharacterList.CharacterListFactory;
 import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
+import pdfact.util.normalize.WordNormalizer;
+import pdfact.util.normalize.WordNormalizer.WordNormalizerFactory;
 
 /**
  * A plain implementation of {@link DehyphenateWordsPipe}.
@@ -25,9 +30,9 @@ import pdfact.util.list.WordList.WordListFactory;
  */
 public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   /**
-   * The hyphens to consider.
+   * The factory to create instances of {@link CharacterList}.
    */
-  protected static final char[] HYPHENS = { '-', '–' };
+  protected CharacterListFactory characterListFactory;
 
   /**
    * The factory to create instances of {@link WordList}.
@@ -35,158 +40,227 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   protected WordListFactory wordListFactory;
 
   /**
-   * The factory to create instances of {@link Word}.
+   * The factory to create instances of {@link WordNormalizer}.
    */
-  protected WordFactory wordFactory;
+  protected WordNormalizer wordNormalizer;
 
   /**
-   * The counter for non hyphenated words.
+   * The counter for all words which do not include a hyphen.
    */
-  protected ObjectCounter<String> noHyphenWords = new ObjectCounter<>();
+  protected ObjectCounter<String> singleWords;
 
   /**
-   * The counter for all subwords in front of a hyphen.
+   * The counter for all compound words (word that include a hyphen).
    */
-  protected ObjectCounter<String> hyphenPrefixes = new ObjectCounter<>();
+  protected ObjectCounter<String> compoundWords;
+
+  /**
+   * The counter for all prefixes of compound words.
+   */
+  protected ObjectCounter<String> compoundWordPrefixes;
 
   /**
    * Creates a new pipe that dehyphenates words.
    * 
+   * @param characterListFactory
+   *        The factory to create instances of {@link CharacterListFactory}.
    * @param wordListFactory
    *        The factory to create instances of {@link WordList}.
-   * @param wordFactory
-   *        The factory to create instances of {@link Word}.
+   * @param wordNormalizerFactory
+   *        The factory to create instances of {@link WordNormalizer}.
    */
   @Inject
-  public PlainDehyphenateWordsPipe(WordListFactory wordListFactory,
-      WordFactory wordFactory) {
+  public PlainDehyphenateWordsPipe(CharacterListFactory characterListFactory,
+      WordListFactory wordListFactory,
+      WordNormalizerFactory wordNormalizerFactory) {
+    this.singleWords = new ObjectCounter<>();
+    this.compoundWords = new ObjectCounter<>();
+    this.compoundWordPrefixes = new ObjectCounter<>();
+    this.characterListFactory = characterListFactory;
     this.wordListFactory = wordListFactory;
-    this.wordFactory = wordFactory;
+
+    this.wordNormalizer = wordNormalizerFactory.create();
+    this.wordNormalizer.setIsToLowerCase(true);
+    this.wordNormalizer.setLeadingCharactersToKeep(LETTERS, HYPHENS);
+    this.wordNormalizer.setTrailingCharactersToKeep(LETTERS, HYPHENS);
   }
 
   // ==========================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
-    preprocess(pdf);
-    dehyphenateWords(pdf);
+    countWords(pdf);
+    dehyphenate(pdf);
     return pdf;
   }
 
   // ==========================================================================
 
   /**
-   * Precomputes some statistics: Counts non-hyphenated words and counts the
-   * prefixes of hyphenated words.
+   * Counts single, compound and prefixes of compound words.
    * 
    * @param pdf
    *        The PDF document to process.
    */
-  protected void preprocess(PdfDocument pdf) {
-    FontFace pdfFontFace = pdf.getCharacterStatistic()
-        .getMostCommonFontFace();
+  protected void countWords(PdfDocument pdf) {
+    if (pdf == null) {
+      return;
+    }
+
+    List<Paragraph> paragraphs = pdf.getParagraphs();
+    if (paragraphs == null) {
+      return;
+    }
+
     for (Paragraph paragraph : pdf.getParagraphs()) {
-      for (Word word : paragraph.getWords()) {
-        String text = PdfActUtils.normalize(word.getText(), false, true, true);
+      if (paragraph == null) {
+        continue;
+      }
 
-        // Find all indexes of hyphens.
-        List<Integer> hyphenIndexes = PdfActUtils.indexesOf(text, HYPHENS);
+      List<Word> words = paragraph.getWords();
+      if (words == null) {
+        continue;
+      }
 
-        // If there are no hyphens, the word is a non-hyphenated words.
-        if (hyphenIndexes.isEmpty()) {
-          // Consider only words with most common font. Formula element
-          // "(cIR" affects "cir-cumstance".
-          CharacterStatistic charStats = word.getCharacterStatistic();
-          FontFace fontFace = charStats.getMostCommonFontFace();
-          if (fontFace == pdfFontFace) {
-            this.noHyphenWords.add(text);
-          }
-        } else {
-          // There are hyphens. Get the prefixes.
-          for (int indexOfHyphen : hyphenIndexes) {
-            // Only consider "middle" hyphens.
-            if (indexOfHyphen > 0 && indexOfHyphen < text.length() - 1) {
-              // Add the prefix, e.g. for word "sugar-free", add "sugar".
-              this.hyphenPrefixes.add(text.substring(0, indexOfHyphen));
-            }
-          }
+      for (Word word : words) {
+        if (word == null) {
+          continue;
+        }
+
+        // Count (a) words without hyphens (single words), (b) words with inner
+        // hyphens (compound words) and (c) all prefixes of compound words.
+
+        // Normalize the word: Remove leading and trailing punctuation marks.
+        String wordStr = this.wordNormalizer.normalize(word);
+
+        if (wordStr == null || wordStr.isEmpty()) {
+          continue;
+        }
+
+        // Find the indexes of hyphens.
+        TIntList idxsHyphens = PdfActUtils.indexesOf(wordStr, HYPHENS);
+
+        if (idxsHyphens.isEmpty()) {
+          // No hyphen was found. The word is a single word.
+          this.singleWords.add(wordStr);
+          continue;
+        }
+
+        if (idxsHyphens.get(0) == 0) {
+          // The word starts with an hyphen. Ignore it.
+          continue;
+        }
+
+        if (idxsHyphens.get(idxsHyphens.size() - 1) == wordStr.length() - 1) {
+          // The word ends with an hyphen. Ignore it.
+          continue;
+        }
+
+        this.compoundWords.add(wordStr);
+
+        TIntIterator itr = idxsHyphens.iterator();
+        while (itr.hasNext()) {
+          // Add the prefix, e.g. for word "sugar-free", add "sugar".
+          this.compoundWordPrefixes.add(wordStr.substring(0, itr.next()));
         }
       }
     }
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * Dehyphenates the hyphenated words in the given PDF document.
    * 
    * @param pdf
    *        The PDF document to process.
    */
-  protected void dehyphenateWords(PdfDocument pdf) {
-    if (pdf != null) {
-      List<Paragraph> paragraphs = pdf.getParagraphs();
-      if (paragraphs != null) {
-        for (Paragraph paragraph : paragraphs) {
-          WordList before = paragraph.getWords();
-          WordList after = this.wordListFactory.create(before.size());
-          for (int i = 0; i < before.size(); i++) {
-            Word word = before.get(i);
-            
-            if (!word.isHyphenated()) {
-              after.add(word);
-            } else {
-              Word nextWord = i < before.size() - 1 ? before.get(i + 1) : null;
-              Word dehyphenated = dehyphenate(word, nextWord);
-              after.add(dehyphenated);
-              i++;
-            }
-          }
-          paragraph.setWords(after);
-          paragraph.setText(PdfActUtils.join(after, " "));
-        }
+  protected void dehyphenate(PdfDocument pdf) {
+    if (pdf == null) {
+      return;
+    }
+
+    List<Paragraph> paragraphs = pdf.getParagraphs();
+    if (paragraphs == null) {
+      return;
+    }
+
+    for (Paragraph paragraph : paragraphs) {
+      if (paragraph == null) {
+        continue;
       }
+
+      WordList words = paragraph.getWords();
+      if (words == null) {
+        continue;
+      }
+
+      Iterator<Word> wordItr = words.iterator();
+      WordList dehyphenatedWords = this.wordListFactory.create(words.size());
+
+      while (wordItr.hasNext()) {
+        Word word = wordItr.next();
+
+        if (word == null) {
+          continue;
+        }
+
+        if (!word.isHyphenated()) {
+          dehyphenatedWords.add(word);
+          continue;
+        }
+
+        Word nextWord = wordItr.hasNext() ? wordItr.next() : null;
+        dehyphenatedWords.add(dehyphenate(word, nextWord));
+      }
+
+      paragraph.setWords(dehyphenatedWords);
+      paragraph.setText(PdfActUtils.join(dehyphenatedWords, " "));
     }
   }
 
   /**
-   * Merges the two given words.
+   * Dehyphenates the two given words.
    * 
-   * @param word1 The first word to process.
-   * @param word2 The second word to process.
+   * @param word1
+   *        The first word to process.
+   * @param word2
+   *        The second word to process.
    * 
    * @return The dehyphenated word.
    */
   public Word dehyphenate(Word word1, Word word2) {
-    boolean isHyphenMandatory = isHyphenMandatory(word1, word2);
-
-    Word dehyphenated = this.wordFactory.create();
-    
-    if (isHyphenMandatory) {
-      dehyphenated.addCharacters(word1.getCharacters());
-      dehyphenated.addCharacters(word2.getCharacters());
-      dehyphenated.setText(word1.getText() + word2.getText());
-    } else {
-      for (int i = 0; i < word1.getCharacters().size() - 1; i++) {
-        dehyphenated.addCharacter(word1.getCharacters().get(i));
-      }
-      dehyphenated.addCharacters(word2.getCharacters());
-      dehyphenated.setText(word1.getText().substring(0,
-          word1.getText().length() - 1) + word2.getText());
+    if (word1 == null) {
+      return null;
     }
 
-    dehyphenated.setIsDehyphenated(true);
-    
-    List<Position> positions = new ArrayList<>();
-    positions.add(word1.getFirstPosition());
-    positions.add(word2.getFirstPosition());
-    dehyphenated.setPositions(positions);
+    if (word2 == null) {
+      return word1;
+    }
 
-    return dehyphenated;
+    CharacterList chars1 = word1.getCharacters();
+    CharacterList chars2 = word2.getCharacters();
+    CharacterList mergedChars = this.characterListFactory.create();
+
+    if (isHyphenMandatory(word1, word2)) {
+      mergedChars.addAll(chars1);
+    } else {
+      mergedChars.addAll(chars1.subList(0, chars1.size() - 1));
+    }
+
+    mergedChars.addAll(chars2);
+    word1.setCharacters(chars2);
+    
+    word1.addPositions(word2.getPositions());
+    word1.setIsHyphenated(false);
+    word1.setIsDehyphenated(true);
+    word1.setText(PdfActUtils.join(mergedChars, ""));
+
+    return word1;
   }
 
   /**
-   * Returns true if we have to ignore the hyphen between the two given words.
+   * Returns true if the hyphen between the two given words is mandatory on.
    * 
    * @param word1
    *        The first word (the part before the hyphen).
@@ -197,54 +271,21 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    *         False otherwise.
    */
   protected boolean isHyphenMandatory(Word word1, Word word2) {
-    String prefix = PdfActUtils.normalize(word1.getText(), false, true, true);
+    String word1Str = this.wordNormalizer.normalize(word1);
+    String word2Str = this.wordNormalizer.normalize(word2);
 
-    String textWithoutHyphen =
-        prefix + PdfActUtils.normalize(word2.getText(), false, true, true);
+    String prefix = word1Str.replaceAll("[-]$", "");
+    String withHyphen = word1Str + word2Str;
+    String withoutHyphen = prefix + word2Str;
 
-    if (prefix.isEmpty() || textWithoutHyphen.isEmpty()) {
-      return false;
+    int singleWordFreq = this.singleWords.get(withoutHyphen);
+    int compoundWordFreq = this.compoundWords.get(withHyphen);
+    int compoundWordPrefixFreq = this.compoundWordPrefixes.get(prefix);
+
+    if (compoundWordFreq != singleWordFreq) {
+      return compoundWordFreq > singleWordFreq;
     }
 
-    int numPrefixes = this.hyphenPrefixes.get(prefix);
-    int numWithoutHyphen = this.noHyphenWords.get(textWithoutHyphen);
-
-    if (numPrefixes > 0 || numWithoutHyphen > 0) {
-      return numPrefixes > numWithoutHyphen;
-    }
-
-    char charBeforeHyphen = prefix.charAt(prefix.length() - 1);
-    char charAfterHyphen = word2.getText().charAt(0);
-
-    if (!Character.isAlphabetic(charBeforeHyphen)) {
-      return false;
-    }
-
-    if (Character.isDigit(charBeforeHyphen)) {
-      return false;
-    }
-
-    if (Character.isUpperCase(charBeforeHyphen)) {
-      return false;
-    }
-
-    if (!Character.isAlphabetic(charAfterHyphen)) {
-      return false;
-    }
-
-    if (Character.isDigit(charAfterHyphen)) {
-      return false;
-    }
-
-    if (Character.isUpperCase(charAfterHyphen)) {
-      return false;
-    }
-
-    // Don't ignore the hyphen if the prefix is a "well-known" word.
-    if (prefix.length() > 2 && this.noHyphenWords.get(prefix) > 0) {
-      return false;
-    }
-
-    return true;
+    return compoundWordPrefixFreq > 0;
   }
 }

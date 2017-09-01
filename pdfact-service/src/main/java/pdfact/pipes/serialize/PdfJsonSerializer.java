@@ -18,7 +18,7 @@ public interface PdfJsonSerializer extends PdfSerializer {
    * 
    * @author Claudius Korzen
    */
-  public interface PdfJsonSerializerFactory extends PdfSerializerFactory {
+  public interface JsonSerializerFactory extends SerializerFactory {
     /**
      * Creates a new PdfJsonSerializer.
      * 

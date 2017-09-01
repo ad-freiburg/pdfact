@@ -2,10 +2,10 @@ package pdfact.pipes.visualize;
 
 import java.util.Set;
 
-import pdfact.exception.PdfActVisualizeException;
 import pdfact.model.PdfDocument;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextUnit;
+import pdfact.util.exception.PdfActVisualizeException;
 
 /**
  * The interface for all concrete implementations to visualize the features of a

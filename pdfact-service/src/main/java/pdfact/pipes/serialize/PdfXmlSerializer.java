@@ -18,7 +18,7 @@ public interface PdfXmlSerializer extends PdfSerializer {
    * 
    * @author Claudius Korzen
    */
-  public interface PdfXmlSerializerFactory extends PdfSerializerFactory {
+  public interface XmlSerializerFactory extends SerializerFactory {
     /**
      * Creates a new PdfXmlSerializer.
      * 

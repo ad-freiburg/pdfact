@@ -31,7 +31,7 @@
 
   <modules>
     <module>pdfact-core</module>
-    <module>pdfact-service</module>
+    <module>pdfact-cli</module>
   </modules>
 
   <contributors>

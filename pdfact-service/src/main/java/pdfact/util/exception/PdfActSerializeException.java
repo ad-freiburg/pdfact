@@ -1,13 +1,11 @@
-package pdfact.exception;
-
-import pdfact.util.exception.PdfActException;
+package pdfact.util.exception;
 
 /**
- * The standard exception to throw on any visualization error.
+ * The standard exception to throw on any serialization error.
  * 
  * @author Claudius Korzen
  */
-public class PdfActVisualizeException extends PdfActException {
+public class PdfActSerializeException extends PdfActException {
   /**
    * The serial id.
    */
@@ -16,7 +14,7 @@ public class PdfActVisualizeException extends PdfActException {
   /**
    * The default exit code of this exception.
    */
-  protected static final int EXIT_CODE = 40;
+  protected static final int EXIT_CODE = 30;
 
   /**
    * Creates a new exception.
@@ -24,19 +22,19 @@ public class PdfActVisualizeException extends PdfActException {
    * @param message
    *        The message of this exception.
    */
-  public PdfActVisualizeException(String message) {
+  public PdfActSerializeException(String message) {
     super(EXIT_CODE, message);
   }
 
   /**
-   * Creates a new exception.
+   * Creates a new Exception.
    * 
    * @param message
    *        The message of this exception.
    * @param cause
    *        The cause of this exception.
    */
-  public PdfActVisualizeException(String message, Throwable cause) {
+  public PdfActSerializeException(String message, Throwable cause) {
     super(EXIT_CODE, message, cause);
   }
 }

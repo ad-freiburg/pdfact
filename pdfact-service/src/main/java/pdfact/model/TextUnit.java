@@ -8,64 +8,47 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The text units that can be extracted with PdfAct.
+ * An enumeration of all available text units.
  *
  * @author Claudius Korzen
  */
 public enum TextUnit {
   /**
-   * The paragraphs.
+   * The text unit "paragraphs".
    */
   PARAGRAPH("paragraphs"),
 
   /**
-   * The text blocks.
+   * The text unit "text blocks".
    */
   TEXT_BLOCK("blocks"),
-  
+
   /**
-   * The text lines.
+   * The text unit "text lines".
    */
   TEXT_LINE("lines"),
-  
+
   /**
-   * The words.
+   * The text unit "words".
    */
   WORD("words"),
 
   /**
-   * The characters.
+   * The text unit "characters".
    */
   CHARACTER("characters"),
-  
+
   /**
-   * The text areas.
+   * The text unit "text areas".
    */
   TEXT_AREA("areas");
 
-  /**
-   * The plural name of this unit.
-   */
-  String pluralName;
+  // ==========================================================================
 
   /**
-   * Creates a new text unit.
-   * 
-   * @param pluralName
-   *        The plural name of this text unit.
+   * The plural name of this text unit.
    */
-  TextUnit(String pluralName) {
-    this.pluralName = pluralName;
-  }
-
-  /**
-   * Returns the plural name of this text unit.
-   * 
-   * @return The plural name of this text unit.
-   */
-  public String getPluralName() {
-    return this.pluralName;
-  }
+  protected String pluralName;
 
   /**
    * The text units per plural names.
@@ -80,7 +63,30 @@ public enum TextUnit {
       index.put(type.getPluralName(), type);
     }
   }
+  
+  /**
+   * Creates a new text unit.
+   * 
+   * @param pluralName
+   *        The plural name of this text unit.
+   */
+  private TextUnit(String pluralName) {
+    this.pluralName = pluralName;
+  }
 
+  // ==========================================================================
+  
+  /**
+   * Returns the plural name of this text unit.
+   * 
+   * @return The plural name of this text unit.
+   */
+  public String getPluralName() {
+    return this.pluralName;
+  }
+
+  // ==========================================================================
+  
   /**
    * Returns a set of the plural names of all text units.
    * 

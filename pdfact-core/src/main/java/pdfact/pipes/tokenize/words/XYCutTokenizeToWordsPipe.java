@@ -16,10 +16,10 @@ import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextLine;
 import pdfact.model.Word;
 import pdfact.model.Word.WordFactory;
-import pdfact.util.CharacterUtils;
 import pdfact.util.PdfActUtils;
 import pdfact.util.comparator.MinXComparator;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.lexicon.CharacterLexicon;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.WordList;
 import pdfact.util.list.WordList.WordListFactory;
@@ -245,6 +245,6 @@ public class XYCutTokenizeToWordsPipe extends XYCut
       return false;
     }
 
-    return CharacterUtils.isHyphen(word.getLastCharacter());
+    return CharacterLexicon.isHyphen(word.getLastCharacter());
   }
 }

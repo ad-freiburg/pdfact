@@ -149,7 +149,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       TextLine prev = i > 0 ? lines.get(i - 1) : null;
       TextLine line = lines.get(i);
       TextLine next = i < lines.size() - 1 ? lines.get(i + 1) : null;
-
+      
       if (introducesNewTextBlock(pdf, page, textBlock, prev, line, next)) {
         if (!textBlock.getTextLines().isEmpty()) {
           textBlocks.add(textBlock);
@@ -500,15 +500,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     if (prevLine == null || line == null) {
       return false;
     }
-
+    
     // If the font of the previous line and the font of the current line are
     // not from the same base, the line has a special font face.
-    CharacterStatistic prevLineCharStats = prevLine
-        .getCharacterStatistic();
+    CharacterStatistic prevLineCharStats = prevLine.getCharacterStatistic();
     FontFace prevLineFontFace = prevLineCharStats.getMostCommonFontFace();
     Font prevLineFont = prevLineFontFace.getFont();
     float prevLineFontsize = prevLineFontFace.getFontSize();
-
+    
     CharacterStatistic lineCharStats = line.getCharacterStatistic();
     FontFace lineFontFace = lineCharStats.getMostCommonFontFace();
     Font lineFont = lineFontFace.getFont();
@@ -516,8 +515,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
     String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
     String lineFontFamilyName = lineFont.getFontFamilyName();
-    if (prevLineFontFamilyName == null || lineFontFamilyName == null) {
-      return false;
+    
+    if (prevLineFontFamilyName == null && lineFontFamilyName != null) {
+      return true;
+    }
+    if (prevLineFontFamilyName != null && lineFontFamilyName == null) {
+      return true;
     }
     if (!prevLineFontFamilyName.equals(lineFontFamilyName)) {
       return true;

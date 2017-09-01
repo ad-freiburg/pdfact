@@ -18,10 +18,10 @@ import pdfact.model.Rectangle.RectangleFactory;
 import pdfact.model.TextArea;
 import pdfact.model.TextLine;
 import pdfact.model.TextLine.TextLineFactory;
-import pdfact.util.CharacterUtils;
 import pdfact.util.comparator.MinXComparator;
 import pdfact.util.counter.FloatCounter;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.lexicon.CharacterLexicon;
 import pdfact.util.list.CharacterList;
 import pdfact.util.list.TextLineList;
 import pdfact.util.list.TextLineList.TextLineListFactory;
@@ -203,7 +203,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
       float minX = Float.MAX_VALUE;
       float maxX = -Float.MAX_VALUE;
       for (Character character : characters) {
-        if (CharacterUtils.isBaselineCharacter(character)) {
+        if (CharacterLexicon.isBaselineCharacter(character)) {
           minYCounter.add(character.getPosition().getRectangle().getMinY());
         }
 

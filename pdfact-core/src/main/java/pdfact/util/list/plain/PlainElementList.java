@@ -177,8 +177,8 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
   // ==========================================================================
 
   @Override
-  public List<T> subList(int fromIndex, int toIndex) {
-    return this.list.subList(fromIndex, toIndex);
+  public ElementList<T> subList(int fromIndex, int toIndex) {
+    return new ElementListView<>(this, fromIndex, toIndex);
   }
 
   // ==========================================================================

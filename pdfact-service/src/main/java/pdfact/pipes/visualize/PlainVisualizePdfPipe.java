@@ -8,12 +8,12 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 
-import pdfact.exception.PdfActSerializeException;
 import pdfact.model.PdfDocument;
 import pdfact.model.SemanticRole;
 import pdfact.model.TextUnit;
 import pdfact.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.util.exception.PdfActException;
+import pdfact.util.exception.PdfActSerializeException;
 
 /**
  * A plain implementation of {@link VisualizePdfPipe}.

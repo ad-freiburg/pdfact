@@ -25,6 +25,11 @@ public interface TextLineList extends ElementList<TextLine> {
    */
   List<TextLineList> cut(int splitIndex);
   
+  @Override
+  TextLineList subList(int fromIndex, int toIndex);
+  
+  // ==========================================================================
+  
   /**
    * The factory to create instances of {@link TextLineList}.
    * 

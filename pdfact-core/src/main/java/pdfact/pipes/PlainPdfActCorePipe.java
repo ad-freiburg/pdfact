@@ -18,6 +18,7 @@ import pdfact.pipes.tokenize.blocks.TokenizeToTextBlocksPipe.TokenizeToTextBlock
 import pdfact.pipes.tokenize.lines.TokenizeToTextLinesPipe.TokenizeToTextLinesPipeFactory;
 import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParagraphsPipeFactory;
 import pdfact.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
+import pdfact.pipes.translate.characters.StandardizeCharactersPipe.StandardizeCharactersPipeFactory;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
 import pdfact.pipes.translate.ligatures.SplitLigaturesPipe.SplitLigaturesPipeFactory;
 import pdfact.pipes.validate.ValidatePdfPathPipe.ValidatePdfPathPipeFactory;
@@ -68,6 +69,11 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    */
   protected SplitLigaturesPipeFactory splitLigaturesPipeFactory;
 
+  /**
+   * The factory to create the pipe that standardizes characters.
+   */
+  protected StandardizeCharactersPipeFactory standardizeCharactersPipeFactory;
+  
   /**
    * The factory to create the pipe that filters chosen characters.
    */
@@ -129,10 +135,12 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    *        The factory to create the pipe that validates PDF paths.
    * @param parsePdfPipeFactory
    *        The factory to create the pipe that parses PDF files.
-   * @param mergeDiacriticsFactory
+   * @param mergeDiacriticsPipeFactory
    *        The factory to create the pipe that merges diacritic characters.
-   * @param splitLigaturesFactory
+   * @param splitLigaturesPipeFactory
    *        The factory to create the pipe that splits ligatures.
+   * @param standardizeCharactersPipeFactory 
+   *        The factory to create the pipe that standardizes characters.
    * @param filterCharactersPipeFactory
    *        The factory to create the pipe that filters chosen characters.
    * @param filterFiguresPipeFactory
@@ -158,8 +166,9 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
   public PlainPdfActCorePipe(PdfActPipelineFactory pipelineFactory,
       ValidatePdfPathPipeFactory validatePdfPathPipeFactory,
       ParsePdfPipeFactory parsePdfPipeFactory,
-      MergeDiacriticsPipeFactory mergeDiacriticsFactory,
-      SplitLigaturesPipeFactory splitLigaturesFactory,
+      MergeDiacriticsPipeFactory mergeDiacriticsPipeFactory,
+      SplitLigaturesPipeFactory splitLigaturesPipeFactory,
+      StandardizeCharactersPipeFactory standardizeCharactersPipeFactory,
       FilterCharactersPipeFactory filterCharactersPipeFactory,
       FilterFiguresPipeFactory filterFiguresPipeFactory,
       FilterShapesPipeFactory filterShapesPipeFactory,
@@ -173,8 +182,9 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     this.pipelineFactory = pipelineFactory;
     this.validatePdfPathPipeFactory = validatePdfPathPipeFactory;
     this.parsePdfPipeFactory = parsePdfPipeFactory;
-    this.mergeDiacriticsPipeFactory = mergeDiacriticsFactory;
-    this.splitLigaturesPipeFactory = splitLigaturesFactory;
+    this.mergeDiacriticsPipeFactory = mergeDiacriticsPipeFactory;
+    this.splitLigaturesPipeFactory = splitLigaturesPipeFactory;
+    this.standardizeCharactersPipeFactory = standardizeCharactersPipeFactory;
     this.filterCharactersPipeFactory = filterCharactersPipeFactory;
     this.filterFiguresPipeFactory = filterFiguresPipeFactory;
     this.filterShapesPipeFactory = filterShapesPipeFactory;
@@ -212,6 +222,8 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     pipeline.addPipe(this.mergeDiacriticsPipeFactory.create());
     // Split the ligatures.
     pipeline.addPipe(this.splitLigaturesPipeFactory.create());
+    // Standardize characters.
+    pipeline.addPipe(this.standardizeCharactersPipeFactory.create());
     // Filter the characters.
     pipeline.addPipe(this.filterCharactersPipeFactory.create());
     // Filter the figures.

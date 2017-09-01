@@ -6,7 +6,7 @@ import java.util.Set;
 
 import pdfact.model.LogLevel;
 import pdfact.model.SemanticRole;
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.model.TextUnit;
 import pdfact.util.pipeline.Pipe;
 
@@ -83,7 +83,7 @@ public interface PdfActServicePipe extends Pipe {
    * 
    * @return The target serialization format.
    */
-  SerializationFormat getSerializationFormat();
+  SerializeFormat getSerializationFormat();
 
   /**
    * Sets the target serialization format.
@@ -91,7 +91,7 @@ public interface PdfActServicePipe extends Pipe {
    * @param format
    *        The target serialization format.
    */
-  void setSerializationFormat(SerializationFormat format);
+  void setSerializationFormat(SerializeFormat format);
 
   // ==========================================================================
 

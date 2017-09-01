@@ -42,5 +42,5 @@ public class PdfActCoreSettings {
   /**
    * The field delimiter in the AFM file.
    */
-  public static final String AFM_FILE_FIELD_DELIMITER = "\n";
+  public static final String AFM_FILE_FIELD_DELIMITER = "\t";
 }

@@ -96,6 +96,7 @@ import pdfact.pipes.semanticize.modules.GeneralTermsModule;
 import pdfact.pipes.semanticize.modules.HeadingModule;
 import pdfact.pipes.semanticize.modules.ItemizeItemModule;
 import pdfact.pipes.semanticize.modules.KeywordsModule;
+import pdfact.pipes.semanticize.modules.PageHeaderFooterModule;
 import pdfact.pipes.semanticize.modules.PdfTextSemanticizerModule;
 import pdfact.pipes.semanticize.modules.ReferenceModule;
 import pdfact.pipes.semanticize.modules.TableModule;
@@ -115,6 +116,9 @@ import pdfact.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParag
 import pdfact.pipes.tokenize.words.TokenizeToWordsPipe;
 import pdfact.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
 import pdfact.pipes.tokenize.words.XYCutTokenizeToWordsPipe;
+import pdfact.pipes.translate.characters.PlainStandardizeCharactersPipe;
+import pdfact.pipes.translate.characters.StandardizeCharactersPipe;
+import pdfact.pipes.translate.characters.StandardizeCharactersPipe.StandardizeCharactersPipeFactory;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe;
 import pdfact.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
 import pdfact.pipes.translate.diacritics.PlainMergeDiacriticsPipe;
@@ -133,6 +137,9 @@ import pdfact.util.list.WordList.WordListFactory;
 import pdfact.util.list.plain.PlainCharacterList;
 import pdfact.util.list.plain.PlainTextLineList;
 import pdfact.util.list.plain.PlainWordList;
+import pdfact.util.normalize.PlainWordNormalizer;
+import pdfact.util.normalize.WordNormalizer;
+import pdfact.util.normalize.WordNormalizer.WordNormalizerFactory;
 import pdfact.util.pipeline.Pipeline;
 import pdfact.util.pipeline.Pipeline.PdfActPipelineFactory;
 import pdfact.util.statistician.CharacterStatistician;
@@ -174,6 +181,12 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
     install(new FactoryModuleBuilder()
         .implement(SplitLigaturesPipe.class, PlainSplitLigaturesPipe.class)
         .build(SplitLigaturesPipeFactory.class));
+
+    // Install the factory of the pipe that standardizes characters.
+    install(new FactoryModuleBuilder()
+        .implement(StandardizeCharactersPipe.class,
+            PlainStandardizeCharactersPipe.class)
+        .build(StandardizeCharactersPipeFactory.class));
 
     // Install the factory of the pipe that filters characters.
     install(new FactoryModuleBuilder()
@@ -363,12 +376,20 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .build(PdfStreamsParserFactory.class));
 
     // ========================================================================
+    
+    // Install the factory of the word normalizer.
+    install(new FactoryModuleBuilder()
+        .implement(WordNormalizer.class, PlainWordNormalizer.class)
+        .build(WordNormalizerFactory.class));
+    
+    // ========================================================================
     // Install stuff needed for the pipe that semanticizes text blocks.
 
     // Install the semanticizer modules.
     Multibinder<PdfTextSemanticizerModule> binder =
         Multibinder.newSetBinder(binder(), PdfTextSemanticizerModule.class);
     binder.addBinding().to(TitleModule.class);
+    binder.addBinding().to(PageHeaderFooterModule.class);
     binder.addBinding().to(HeadingModule.class);
     binder.addBinding().to(AbstractModule.class);
     binder.addBinding().to(KeywordsModule.class);

@@ -98,7 +98,7 @@ public class PDFontConverter {
     // Read the AFM file that contains some metadata about common fonts.
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     InputStream afm = classLoader.getResourceAsStream(AFM_FILE_PATH);
-
+    
     try (BufferedReader br =
         new BufferedReader(new InputStreamReader(afm, DEFAULT_ENCODING))) {
       String line;

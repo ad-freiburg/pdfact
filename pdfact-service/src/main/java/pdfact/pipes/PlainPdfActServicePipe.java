@@ -1,7 +1,7 @@
 package pdfact.pipes;
 
 import static pdfact.PdfActSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
-import static pdfact.PdfActSettings.DEFAULT_SERIALIZATION_FORMAT;
+import static pdfact.PdfActSettings.DEFAULT_SERIALIZE_FORMAT;
 import static pdfact.PdfActSettings.DEFAULT_TEXT_UNIT;
 
 import java.io.OutputStream;
@@ -16,7 +16,7 @@ import pdfact.PdfActCoreSettings;
 import pdfact.model.PdfDocument;
 import pdfact.model.LogLevel;
 import pdfact.model.SemanticRole;
-import pdfact.model.SerializationFormat;
+import pdfact.model.SerializeFormat;
 import pdfact.model.TextUnit;
 import pdfact.pipes.PdfActCorePipe.PdfActCorePipeFactory;
 import pdfact.pipes.serialize.SerializePdfPipe;
@@ -101,7 +101,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   /**
    * The serialization format.
    */
-  protected SerializationFormat serializationFormat;
+  protected SerializeFormat serializationFormat;
 
   /**
    * The text unit to use in serialization and visualization.
@@ -140,7 +140,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.validatePathPipeFactory = validatePathFactory;
     this.serializePdfPipeFactory = serializePdfPipeFactory;
     this.visualizePdfPipeFactory = visualizePdfPipeFactory;
-    this.serializationFormat = DEFAULT_SERIALIZATION_FORMAT;
+    this.serializationFormat = DEFAULT_SERIALIZE_FORMAT;
     this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
@@ -246,12 +246,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==========================================================================
 
   @Override
-  public SerializationFormat getSerializationFormat() {
+  public SerializeFormat getSerializationFormat() {
     return this.serializationFormat;
   }
 
   @Override
-  public void setSerializationFormat(SerializationFormat format) {
+  public void setSerializationFormat(SerializeFormat format) {
     this.serializationFormat = format;
   }
 

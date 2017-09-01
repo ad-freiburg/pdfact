@@ -9,7 +9,6 @@ import java.util.Set;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.exception.PdfActVisualizeException;
 import pdfact.model.Character;
 import pdfact.model.Element;
 import pdfact.model.Figure;
@@ -19,6 +18,7 @@ import pdfact.model.HasSemanticRole;
 import pdfact.model.Page;
 import pdfact.model.Paragraph;
 import pdfact.model.PdfDocument;
+import pdfact.model.Point;
 import pdfact.model.Position;
 import pdfact.model.Rectangle;
 import pdfact.model.SemanticRole;
@@ -29,6 +29,7 @@ import pdfact.model.TextLine;
 import pdfact.model.TextUnit;
 import pdfact.model.Word;
 import pdfact.pipes.visualize.PdfDrawer.PdfDrawerFactory;
+import pdfact.util.exception.PdfActVisualizeException;
 
 /**
  * A plain implementation of {@link PdfVisualizer}.
@@ -307,8 +308,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected void visualizeTextBlocks(PdfDocument pdf, PdfDrawer drawer)
       throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
-      for (TextLine line : page.getTextLines()) {
-        visualizeTextLine(line, drawer);
+      for (TextBlock block : page.getTextBlocks()) {
+        visualizeTextBlock(block, drawer);
       }
     }
   }
@@ -425,14 +426,14 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       HasPositions hasPositions = (HasPositions) element;
       List<Position> positions = hasPositions.getPositions();
 
-      visualizePositions(drawer, color, positions);
+      visualizePositions(drawer, color, element, positions);
     }
 
     if (element instanceof HasPosition) {
       HasPosition hasPosition = (HasPosition) element;
       Position position = hasPosition.getPosition();
 
-      visualizePositions(drawer, color, position);
+      visualizePositions(drawer, color, element, position);
     }
   }
 
@@ -443,14 +444,16 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *        The drawer to use.
    * @param color
    *        The color to use.
+   * @param element
+   *        The element to which the given positions belong to.
    * @param positions
    *        The positions to visualize.
    * @throws PdfActVisualizeException
    *         If something went wrong on visualization.
    */
   protected void visualizePositions(PdfDrawer drawer, Color color,
-      Position... positions) throws PdfActVisualizeException {
-    visualizePositions(drawer, color, Arrays.asList(positions));
+      Element element, Position... positions) throws PdfActVisualizeException {
+    visualizePositions(drawer, color, element, Arrays.asList(positions));
   }
 
   /**
@@ -460,13 +463,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *        The drawer to use.
    * @param color
    *        The color to use.
+   * @param elem
+   *        The element to which the given positions belong to.
    * @param positions
    *        The positions to visualize.
    * @throws PdfActVisualizeException
    *         If something went wrong on visualization.
    */
   protected void visualizePositions(PdfDrawer drawer, Color color,
-      List<Position> positions) throws PdfActVisualizeException {
+      Element elem, List<Position> positions) throws PdfActVisualizeException {
     if (drawer == null) {
       return;
     }
@@ -476,13 +481,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
 
     for (Position position : positions) {
-      visualizePosition(position, drawer, color);
+      visualizePosition(elem, position, drawer, color);
     }
   }
 
   /**
-   * Visualizes the given PDF position.
+   * Visualizes the given PDF position of the given element.
    * 
+   * @param element
+   *        The element to which the given position belongs to.
    * @param position
    *        The position to visualize.
    * @param drawer
@@ -492,8 +499,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @throws PdfActVisualizeException
    *         If something went wrong on visualization.
    */
-  private void visualizePosition(Position position, PdfDrawer drawer,
-      Color color) throws PdfActVisualizeException {
+  protected void visualizePosition(Element element, Position position,
+      PdfDrawer drawer, Color color) throws PdfActVisualizeException {
     if (position != null) {
       Page page = position.getPage();
       Rectangle rect = position.getRectangle();
@@ -502,6 +509,18 @@ public class PlainPdfVisualizer implements PdfVisualizer {
         int pageNum = page.getPageNumber();
         try {
           drawer.drawBoundingBox(rect, pageNum, color, null, 1f);
+
+          // Draw the semantic role, if there is any.
+          if (element instanceof HasSemanticRole) {
+            HasSemanticRole hasSemanticRole = (HasSemanticRole) element;
+            SemanticRole role = hasSemanticRole.getSemanticRole();
+
+            if (role != null) {
+              String roleStr = role.getName();
+              Point pos = rect.getUpperLeft();
+              drawer.drawText(roleStr, pageNum, pos, color, 8f);
+            }
+          }
         } catch (IOException e) {
           throw new PdfActVisualizeException(
               "Couldn't visualize the PDF document", e);
