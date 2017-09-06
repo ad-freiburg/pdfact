@@ -2,14 +2,12 @@ package pdfact.core.model;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.core.model.plain.Geometric;
-
 /**
  * The interface that declares the methods of a 2-dim point.
  * 
  * @author Claudius Korzen.
  */
-public abstract class Point extends Geometric {
+public abstract class Point extends PlainGeometric {
   /**
    * Returns the x coordinate of this point.
    * 

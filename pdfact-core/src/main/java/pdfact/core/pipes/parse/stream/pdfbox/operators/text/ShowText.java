@@ -299,8 +299,6 @@ public class ShowText extends OperatorProcessor {
     // Use our additional glyph list for Unicode mapping
     GlyphList additionalGlyphs = PdfBoxGlyphUtils.getAdditionalGlyphs();
     String unicode = pdFont.toUnicode(code, additionalGlyphs);
-
-    PdfBoxAFMUtils.getCharMetric(null, null);
     
     // TODO: If we need the hasEncoding flag, uncomment the following:
     // boolean hasEncoding = unicode != null;

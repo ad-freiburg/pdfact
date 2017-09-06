@@ -2,14 +2,12 @@ package pdfact.core.model;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.core.model.plain.Geometric;
-
 /**
  * The interface that declares the methods of a line.
  * 
  * @author Claudius Korzen.
  */
-public abstract class Line extends Geometric {
+public abstract class Line extends PlainGeometric {
   /**
    * Returns the start point of this line.
    * 

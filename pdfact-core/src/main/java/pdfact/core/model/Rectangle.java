@@ -2,14 +2,12 @@ package pdfact.core.model;
 
 import com.google.inject.assistedinject.Assisted;
 
-import pdfact.core.model.plain.Geometric;
-
 /**
  * The interface that declares the methods of a rectangle.
  * 
  * @author Claudius Korzen.
  */
-public abstract class Rectangle extends Geometric {
+public abstract class Rectangle extends PlainGeometric {
   /**
    * Returns the minimal x value of this rectangle.
    * 
@@ -147,7 +145,7 @@ public abstract class Rectangle extends Geometric {
    *        The other geoemtric object.
    * @return The overlap ratio of this rectangle with the given geometric.
    */
-  public abstract float getOverlapRatio(Geometric geom);
+  public abstract float getOverlapRatio(PlainGeometric geom);
 
   /**
    * Extends this rect by the given rect.
