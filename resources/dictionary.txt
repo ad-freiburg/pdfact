@@ -33,3 +33,4 @@ latin
 iterable
 quicksort
 precomputes
+haystack
