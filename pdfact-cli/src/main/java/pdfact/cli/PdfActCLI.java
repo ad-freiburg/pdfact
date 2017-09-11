@@ -21,12 +21,12 @@ import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
-import pdfact.core.PdfActCoreSettings;
 import pdfact.core.model.LogLevel;
 import pdfact.core.model.PdfDocument;
-import pdfact.core.model.SemanticRole;
 import pdfact.core.model.PdfDocument.PdfDocumentFactory;
+import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.Log4JTypeListener;
 
 /**
  * The main class for the command line interface of PdfAct.
@@ -64,7 +64,7 @@ public class PdfActCLI {
   protected void run(String[] args) {
     int statusCode = 0;
     String errorMessage = null;
-    Throwable errorCause = null;
+    Throwable cause = null;
 
     // Create the command line argument parser.
     PdfActCommandLineParser parser = new PdfActCommandLineParser();
@@ -80,7 +80,8 @@ public class PdfActCLI {
       PdfDocument pdf = this.pdfDocumentFactory.create(parser.getPdfPath());
 
       // Pass the log level.
-      service.setLogLevel(LogLevel.getLogLevel(parser.getLogLevel()));
+      int logLevel = parser.getLogLevel();
+      Log4JTypeListener.setLogLevel(LogLevel.getLogLevel(logLevel));
 
       // Pass the serialization format if there is any.
       if (parser.hasSerializationFormat()) {
@@ -116,15 +117,15 @@ public class PdfActCLI {
     } catch (PdfActException e) {
       statusCode = e.getExitCode();
       errorMessage = e.getMessage();
-      errorCause = e.getCause();
+      cause = e.getCause();
     }
 
     if (statusCode != 0) {
       // Print the error message (regardless of the log level).
       System.err.println(errorMessage);
       // Print the stack trace if there is any and debugging is enabled.
-      if (errorCause != null && service.hasLogLevel(LogLevel.DEBUG)) {
-        errorCause.printStackTrace();
+      if (cause != null && Log4JTypeListener.hasLogLevel(LogLevel.DEBUG)) {
+        cause.printStackTrace();
       }
     }
 
@@ -328,7 +329,7 @@ public class PdfActCLI {
           .nargs("?")
           .metavar("<level>")
           .type(Integer.class)
-          .setDefault(PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel())
+          .setDefault(Log4JTypeListener.getLogLevel().getIntLevel())
           .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
           .help("Defines the verbosity of debug messages. The level defines "
               + "the minimum level of severity required for a message to be "

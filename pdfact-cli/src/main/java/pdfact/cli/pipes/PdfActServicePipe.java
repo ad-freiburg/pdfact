@@ -6,7 +6,6 @@ import java.util.Set;
 
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
@@ -17,33 +16,6 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface PdfActServicePipe extends Pipe {
-  /**
-   * Returns the log level.
-   * 
-   * @return The log level.
-   */
-  LogLevel getLogLevel();
-
-  /**
-   * Returns true, if the log level of this pipe is at least the given log
-   * level.
-   * 
-   * @param level The level to check.
-   * @return True, if the log level of this pipe is at least the given log
-   *         level.
-   */
-  boolean hasLogLevel(LogLevel level);
-
-  /**
-   * Sets the log level.
-   * 
-   * @param logLevel
-   *        The log level.
-   */
-  void setLogLevel(LogLevel logLevel);
-
-  // ==========================================================================
-
   /**
    * Returns the path to the file where the serialization should be stored.
    * 

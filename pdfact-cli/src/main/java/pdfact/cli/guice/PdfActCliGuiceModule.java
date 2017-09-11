@@ -6,31 +6,31 @@ import com.google.inject.multibindings.MapBinder;
 
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.pipes.PdfActServicePipe;
-import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.cli.pipes.PdfActServicePipe.PdfActServicePipeFactory;
+import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.cli.pipes.serialize.PdfJsonSerializer;
+import pdfact.cli.pipes.serialize.PdfJsonSerializer.JsonSerializerFactory;
+import pdfact.cli.pipes.serialize.PdfSerializer.SerializerFactory;
 import pdfact.cli.pipes.serialize.PdfTxtSerializer;
+import pdfact.cli.pipes.serialize.PdfTxtSerializer.TxtSerializerFactory;
 import pdfact.cli.pipes.serialize.PdfXmlSerializer;
+import pdfact.cli.pipes.serialize.PdfXmlSerializer.XmlSerializerFactory;
 import pdfact.cli.pipes.serialize.PlainPdfJsonSerializer;
 import pdfact.cli.pipes.serialize.PlainPdfTxtSerializer;
 import pdfact.cli.pipes.serialize.PlainPdfXmlSerializer;
 import pdfact.cli.pipes.serialize.PlainSerializePdfPipe;
 import pdfact.cli.pipes.serialize.SerializePdfPipe;
-import pdfact.cli.pipes.serialize.PdfJsonSerializer.JsonSerializerFactory;
-import pdfact.cli.pipes.serialize.PdfSerializer.SerializerFactory;
-import pdfact.cli.pipes.serialize.PdfTxtSerializer.TxtSerializerFactory;
-import pdfact.cli.pipes.serialize.PdfXmlSerializer.XmlSerializerFactory;
 import pdfact.cli.pipes.serialize.SerializePdfPipe.SerializePdfPipeFactory;
 import pdfact.cli.pipes.validate.PlainValidatePathToWritePipe;
 import pdfact.cli.pipes.validate.ValidatePathToWritePipe;
 import pdfact.cli.pipes.validate.ValidatePathToWritePipe.ValidatePathToWritePipeFactory;
 import pdfact.cli.pipes.visualize.PdfDrawer;
+import pdfact.cli.pipes.visualize.PdfDrawer.PdfDrawerFactory;
 import pdfact.cli.pipes.visualize.PdfVisualizer;
+import pdfact.cli.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.cli.pipes.visualize.PlainPdfVisualizer;
 import pdfact.cli.pipes.visualize.PlainVisualizePdfPipe;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe;
-import pdfact.cli.pipes.visualize.PdfDrawer.PdfDrawerFactory;
-import pdfact.cli.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe.VisualizePdfPipeFactory;
 import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.core.guice.PdfActCoreGuiceModule;
@@ -44,7 +44,7 @@ public class PdfActCliGuiceModule extends AbstractModule {
   @Override
   protected void configure() {
     install(new PdfActCoreGuiceModule());
-
+    
     // Install the factory of the service pipe.
     install(new FactoryModuleBuilder()
         .implement(PdfActServicePipe.class, PlainPdfActServicePipe.class)

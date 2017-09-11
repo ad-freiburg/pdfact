@@ -1,11 +1,7 @@
 package pdfact.core.pipes;
 
-import org.apache.log4j.Logger;
-
 import com.google.inject.Inject;
 
-import pdfact.core.PdfActCoreSettings;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.pipes.dehyphenate.DehyphenateWordsPipe.DehyphenateWordsPipeFactory;
 import pdfact.core.pipes.filter.characters.FilterCharactersPipe.FilterCharactersPipeFactory;
@@ -32,18 +28,6 @@ import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfActCorePipe implements PdfActCorePipe {
-  /**
-   * The logger.
-   */
-  protected static final Logger LOG = Logger.getLogger(PdfActCorePipe.class);
-
-  /**
-   * The logger level.
-   */
-  protected LogLevel logLevel = PdfActCoreSettings.DEFAULT_LOG_LEVEL;
-
-  // ==========================================================================
-
   /**
    * The factory to create pipelines.
    */

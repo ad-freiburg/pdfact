@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import com.google.inject.Inject;
 
 import pdfact.cli.model.SerializeFormat;
@@ -20,8 +18,6 @@ import pdfact.cli.pipes.validate.ValidatePathToWritePipe;
 import pdfact.cli.pipes.validate.ValidatePathToWritePipe.ValidatePathToWritePipeFactory;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe.VisualizePdfPipeFactory;
-import pdfact.core.PdfActCoreSettings;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.pipes.PdfActCorePipe.PdfActCorePipeFactory;
@@ -35,18 +31,6 @@ import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfActServicePipe implements PdfActServicePipe {
-  /**
-   * The logger.
-   */
-  protected static final Logger LOG = Logger.getLogger(PdfActServicePipe.class);
-
-  /**
-   * The logger level.
-   */
-  protected LogLevel logLevel = PdfActCoreSettings.DEFAULT_LOG_LEVEL;
-
-  // ==========================================================================
-
   /**
    * The factory to create a pipeline.
    */
@@ -163,7 +147,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
 
     // Parse the PDF document.
     pipeline.addPipe(this.pdfActCoreFactory.create());
-
+    
     // Validate the target path for the serialization if there is any given.
     if (this.serializationPath != null) {
       ValidatePathToWritePipe valPipe = this.validatePathPipeFactory.create();
@@ -200,23 +184,6 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     }
 
     return pipeline.process(pdf);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public LogLevel getLogLevel() {
-    return this.logLevel;
-  }
-
-  @Override
-  public boolean hasLogLevel(LogLevel level) {
-    return this.logLevel != null && this.logLevel.implies(level);
-  }
-
-  @Override
-  public void setLogLevel(LogLevel logLevel) {
-    this.logLevel = logLevel;
   }
 
   // ==========================================================================
