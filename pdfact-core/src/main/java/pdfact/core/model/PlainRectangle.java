@@ -4,41 +4,43 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.core.model.PdfDocument.PdfDocumentFactory;
 
 /**
- * A plain implementation of {@link Rectangle} where (0,0) is in the lower left
- * and increasing coordinates to the upper right.
+ * A plain implementation of {@link Rectangle}.
  * 
  * @author Claudius Korzen
- * 
  */
 public class PlainRectangle extends Rectangle {
   /**
-   * The x value of the lower left.
+   * The x-coordinate of the lower left point of the rectangle.
    */
   protected float minX = Float.MAX_VALUE;
 
   /**
-   * The y value of the lower left.
+   * The y-coordinate of the lower left point of the rectangle.
    */
   protected float minY = Float.MAX_VALUE;
 
   /**
-   * The x value of the upper right.
+   * The x-coordinate of the upper right point of the rectangle.
    */
   protected float maxX = -Float.MAX_VALUE;
 
   /**
-   * The y value of the upper right.
+   * The y-coordinate of the upper right point of the rectangle.
    */
   protected float maxY = -Float.MAX_VALUE;
 
   /**
-   * Creates a new rectangle that is spanned by the points (0, 0) and (0, 0).
+   * Creates a new rectangle with the lower left point (0, 0) and the upper
+   * right point (0, 0).
    */
   @AssistedInject
   public PlainRectangle() {
@@ -46,8 +48,7 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a new rectangle with the same position and dimensions of the given
-   * rectangle.
+   * Creates a copy of the given rectangle.
    * 
    * @param rect
    *        The rectangle to copy.
@@ -58,8 +59,7 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a new rectangle with the same position and dimensions of the given
-   * rectangle.
+   * Creates a copy of the given rectangle.
    * 
    * @param rect
    *        The rectangle to copy.
@@ -70,31 +70,32 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a new rectangle that is spanned by point1 and point2.
+   * Creates a new rectangle with the given lower left point and the given upper
+   * right point.
    * 
-   * @param point1
+   * @param ll
    *        The lower left point.
-   * @param point2
+   * @param ur
    *        The upper right point.
    */
   @AssistedInject
   public PlainRectangle(
-      @Assisted("point1") Point point1,
-      @Assisted("point2") Point point2) {
-    this(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+      @Assisted("lowerLeft") Point ll,
+      @Assisted("upperRight") Point ur) {
+    this(ll.getX(), ll.getY(), ur.getX(), ur.getY());
   }
 
   /**
    * Creates a new rectangle with the given coordinates.
    * 
    * @param minX
-   *        The x coordinate of the lower left vertex.
+   *        The x-coordinate of the lower left point of the rectangle.
    * @param minY
-   *        The y coordinate of the lower left vertex.
+   *        The y-coordinate of the lower left point of the rectangle.
    * @param maxX
-   *        The x coordinate of the upper right vertex.
+   *        The x-coordinate of the upper right point of the rectangle.
    * @param maxY
-   *        The y coordinate of the upper right vertex.
+   *        The y-coordinate of the upper right point of the rectangle.
    */
   @AssistedInject
   public PlainRectangle(
@@ -106,17 +107,17 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a new rectangle that is spanned by the points (minX, minY) and
-   * (maxX, maxY).
+   * Creates a new rectangle with the lower left point (minX, minY) and the
+   * upper right (maxX, maxY).
    * 
    * @param minX
-   *        The minimum x value.
+   *        The minimum x-coordinate.
    * @param minY
-   *        The minimum y value.
+   *        The minimum y-coordinate.
    * @param maxX
-   *        The maximum x value.
+   *        The maximum x-coordinate.
    * @param maxY
-   *        The maximum y value.
+   *        The maximum y-coordinate.
    */
   @AssistedInject
   public PlainRectangle(
@@ -129,11 +130,12 @@ public class PlainRectangle extends Rectangle {
     setMaxX(maxX);
     setMaxY(maxY);
   }
-  
+
   /**
    * Creates a new rectangle from the union of the given rectangles.
    * 
-   * @param rectangles The rectangles to process.
+   * @param rectangles
+   *        The rectangles to process.
    */
   @AssistedInject
   public PlainRectangle(@Assisted Rectangle... rectangles) {
@@ -157,7 +159,7 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a rectangle that represents the bounding box around the given
+   * Creates a new rectangle that represents the bounding box around the given
    * elements that have a single position.
    * 
    * @param elements
@@ -187,7 +189,7 @@ public class PlainRectangle extends Rectangle {
   }
 
   /**
-   * Creates a rectangle that represents the bounding box around the given
+   * Creates a new rectangle that represents the bounding box around the given
    * elements that have multiple positions.
    * 
    * @param xxx
@@ -227,16 +229,17 @@ public class PlainRectangle extends Rectangle {
   // ==========================================================================
 
   /**
-   * Creates a new rectangle from the 2 given vertices. The vertices need not be
-   * in any special order.
+   * Creates a new rectangle from the two given points. The points need not to
+   * be in any special order.
    *
    * @param point1
-   *        The first vertex.
+   *        The first point.
    * @param point2
-   *        The second vertex.
-   * @return The constructed rectangle.
+   *        The second point.
+   * 
+   * @return A rectangle that is spanned by point1 and point2.
    */
-  public static Rectangle from2Vertices(Point point1, Point point2) {
+  public static Rectangle from2Points(Point point1, Point point2) {
     float x1 = point1.getX();
     float y1 = point1.getY();
     float x2 = point2.getX();
@@ -247,47 +250,26 @@ public class PlainRectangle extends Rectangle {
     float maxX = Math.max(x1, x2);
     float maxY = Math.max(y1, y2);
 
+    // TODO: Use Guice here.
     return new PlainRectangle(minX, minY, maxX, maxY);
   }
 
   /**
-   * Creates a new rectangles that results from the union of the two given
-   * rectangles.
-   * 
-   * @param hb1
-   *        The first rectangle.
-   * @param hb2
-   *        The second rectangle.
-   * 
-   * @return A rectangle that represents the union of the two rectangles.
-   */
-  public static Rectangle fromUnion(HasPosition hb1, HasPosition hb2) {
-    Rectangle rect1 = hb1.getPosition().getRectangle();
-    Rectangle rect2 = hb2.getPosition().getRectangle();
-
-    float minX = Math.min(rect1.getMinX(), rect2.getMinX());
-    float maxX = Math.max(rect1.getMaxX(), rect2.getMaxX());
-    float minY = Math.min(rect1.getMinY(), rect2.getMinY());
-    float maxY = Math.max(rect1.getMaxY(), rect2.getMaxY());
-
-    return new PlainRectangle(minX, minY, maxX, maxY);
-  }
-
-  /**
-   * Creates a new rectangle from the 4 given vertices. The vertices need not be
-   * in any special order.
+   * Creates a new rectangle from the four given points. The points need not to
+   * be in any special order.
    *
    * @param point1
-   *        The first vertex.
+   *        The first point.
    * @param point2
-   *        The second vertex.
+   *        The second point.
    * @param point3
-   *        The third vertex.
+   *        The third point.
    * @param point4
-   *        The fourth vertex.
-   * @return The constructed rectangle.
+   *        The fourth point.
+   * 
+   * @return A rectangle that is spanned by point1, point2, point3 and point4.
    */
-  public static Rectangle from4Vertices(Point point1, Point point2,
+  public static Rectangle from4Points(Point point1, Point point2,
       Point point3, Point point4) {
     float x1 = point1.getX();
     float y1 = point1.getY();
@@ -303,32 +285,61 @@ public class PlainRectangle extends Rectangle {
     float maxX = Math.max(Math.max(x1, x2), Math.max(x3, x4));
     float maxY = Math.max(Math.max(y1, y2), Math.max(y3, y4));
 
+    // TODO: Use Guice here.
     return new PlainRectangle(minX, minY, maxX, maxY);
   }
 
+  // ==========================================================================
+
   /**
-   * Returns the bounding box of all given objects, that is the smallest
-   * possible rectangle that includes all the given objects.
+   * Creates a new rectangle from the union of the two given elements that have
+   * a rectangle.
    * 
-   * @param rects
-   *        The objects to include.
+   * @param hb1
+   *        The first element that has a rectangle.
+   * @param hb2
+   *        The second element that has a rectangle.
+   * 
+   * @return A rectangle that represents the union of the two rectangles.
+   */
+  public static Rectangle fromUnion(HasPosition hb1, HasPosition hb2) {
+    Rectangle rect1 = hb1.getPosition().getRectangle();
+    Rectangle rect2 = hb2.getPosition().getRectangle();
+
+    float minX = Math.min(rect1.getMinX(), rect2.getMinX());
+    float maxX = Math.max(rect1.getMaxX(), rect2.getMaxX());
+    float minY = Math.min(rect1.getMinY(), rect2.getMinY());
+    float maxY = Math.max(rect1.getMaxY(), rect2.getMaxY());
+
+    // TODO: Use Guice here.
+    return new PlainRectangle(minX, minY, maxX, maxY);
+  }
+
+  // ==========================================================================
+
+  /**
+   * Creates a new rectangle from the bounding box around all given elements.
+   * 
+   * @param elements
+   *        The elements to process.
+   * 
    * @return The bounding box.
    */
-  public static Rectangle fromBoundingBoxOf(HasPosition... rects) {
-    return fromBoundingBoxOf(new ArrayList<>(Arrays.asList(rects)));
+  public static Rectangle fromBoundingBoxOf(HasPosition... elements) {
+    return fromBoundingBoxOf(new ArrayList<>(Arrays.asList(elements)));
   }
 
   /**
-   * Returns the bounding box of all given objects, that is the smallest
-   * possible rectangle that includes all the given objects.
+   * Creates a new rectangle from the bounding box around all given elements.
    * 
-   * @param objects
-   *        The objects to include.
+   * @param elements
+   *        The elements to process.
+   * 
    * @return The bounding box.
    */
   public static Rectangle fromBoundingBoxOf(
-      Iterable<? extends HasPosition> objects) {
-    if (objects == null) {
+      Iterable<? extends HasPosition> elements) {
+    if (elements == null) {
       return null;
     }
 
@@ -337,7 +348,7 @@ public class PlainRectangle extends Rectangle {
     float maxX = -Float.MAX_VALUE;
     float maxY = -Float.MAX_VALUE;
 
-    for (HasPosition object : objects) {
+    for (HasPosition object : elements) {
       Rectangle rectangle = object.getPosition().getRectangle();
       if (rectangle.getMinX() < minX) {
         minX = rectangle.getMinX();
@@ -355,8 +366,26 @@ public class PlainRectangle extends Rectangle {
         maxY = rectangle.getMaxY();
       }
     }
+    // TODO: Use Guice here.
     return new PlainRectangle(minX, minY, maxX, maxY);
   }
+
+  // ==========================================================================
+
+  @Override
+  public Rectangle getRectangle() {
+    return this;
+  }
+
+  @Override
+  public void setRectangle(Rectangle boundingBox) {
+    setMinX(boundingBox.getMinX());
+    setMinY(boundingBox.getMinY());
+    setMaxX(boundingBox.getMaxX());
+    setMaxY(boundingBox.getMaxY());
+  }
+
+  // ==========================================================================
 
   @Override
   public float getMinX() {
@@ -368,6 +397,8 @@ public class PlainRectangle extends Rectangle {
     this.minX = minX;
   }
 
+  // ==========================================================================
+
   @Override
   public float getMinY() {
     return this.minY;
@@ -377,6 +408,8 @@ public class PlainRectangle extends Rectangle {
   public void setMinY(float minY) {
     this.minY = minY;
   }
+
+  // ==========================================================================
 
   @Override
   public float getMaxX() {
@@ -388,6 +421,8 @@ public class PlainRectangle extends Rectangle {
     this.maxX = maxX;
   }
 
+  // ==========================================================================
+
   @Override
   public float getMaxY() {
     return this.maxY;
@@ -398,35 +433,33 @@ public class PlainRectangle extends Rectangle {
     this.maxY = maxY;
   }
 
+  // ==========================================================================
+
   @Override
   public Point getLowerLeft() {
+    // TODO: Use Guice here.
     return new PlainPoint(this.minX, this.minY);
   }
 
   @Override
   public Point getUpperLeft() {
+    // TODO: Use Guice here.
     return new PlainPoint(this.minX, this.maxY);
   }
 
   @Override
   public Point getLowerRight() {
+    // TODO: Use Guice here.
     return new PlainPoint(this.maxX, this.minY);
   }
 
   @Override
   public Point getUpperRight() {
+    // TODO: Use Guice here.
     return new PlainPoint(this.maxX, this.maxY);
   }
 
-  @Override
-  public float getWidth() {
-    return this.maxX - this.minX;
-  }
-
-  @Override
-  public float getHeight() {
-    return this.maxY - this.minY;
-  }
+  // ==========================================================================
 
   @Override
   public Point getMidpoint() {
@@ -443,42 +476,33 @@ public class PlainRectangle extends Rectangle {
     return this.minY + (getHeight() / 2f);
   }
 
-  /**
-   * Returns true if the given point (x,y) lies inside this rectangle.
-   * 
-   * @param x
-   *        The x-coordinate of point to test.
-   * @param y
-   *        The y-coordinate of point to test.
-   * 
-   * @return True if the point is inside this rectangle.
-   */
-  public boolean contains(float x, float y) { // TODO: Use Geometric.
-    return x >= getMinX() && x <= getMaxX() && y >= getMinY() && y <= getMaxY();
+  // ==========================================================================
+
+  @Override
+  public float getWidth() {
+    return this.maxX - this.minX;
   }
 
   @Override
-  public Rectangle getRectangle() {
-    return this;
+  public float getHeight() {
+    return this.maxY - this.minY;
   }
 
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    setMinX(boundingBox.getMinX());
-    setMinY(boundingBox.getMinY());
-    setMaxX(boundingBox.getMaxX());
-    setMaxY(boundingBox.getMaxY());
-  }
+  // ==========================================================================
 
   @Override
   public float getArea() {
     return getWidth() * getHeight();
   }
 
+  // ==========================================================================
+
   @Override
   public float getOverlapRatio(PlainGeometric geom) {
     return computeOverlapArea(geom) / getArea();
   }
+
+  // ==========================================================================
 
   @Override
   public void extend(HasPosition rect) {
@@ -489,21 +513,21 @@ public class PlainRectangle extends Rectangle {
   }
 
   @Override
-  public Rectangle union(Rectangle rect) {
-    float minX = Math.min(getMinX(), rect.getMinX());
-    float maxX = Math.max(getMaxX(), rect.getMaxX());
-    float minY = Math.min(getMinY(), rect.getMinY());
-    float maxY = Math.max(getMaxY(), rect.getMaxY());
+  public Rectangle union(HasRectangle rect) {
+    float minX = Math.min(getMinX(), rect.getRectangle().getMinX());
+    float maxX = Math.max(getMaxX(), rect.getRectangle().getMaxX());
+    float minY = Math.min(getMinY(), rect.getRectangle().getMinY());
+    float maxY = Math.max(getMaxY(), rect.getRectangle().getMaxY());
 
     return new PlainRectangle(minX, minY, maxX, maxY);
   }
 
   @Override
-  public Rectangle intersection(Rectangle rect) {
-    float maxMinX = Math.max(getMinX(), rect.getMinX());
-    float minMaxX = Math.min(getMaxX(), rect.getMaxX());
-    float maxMinY = Math.max(getMinY(), rect.getMinY());
-    float minMaxY = Math.min(getMaxY(), rect.getMaxY());
+  public Rectangle intersection(HasRectangle rect) {
+    float maxMinX = Math.max(getMinX(), rect.getRectangle().getMinX());
+    float minMaxX = Math.min(getMaxX(), rect.getRectangle().getMaxX());
+    float maxMinY = Math.max(getMinY(), rect.getRectangle().getMinY());
+    float minMaxY = Math.min(getMaxY(), rect.getRectangle().getMaxY());
 
     if (minMaxX <= maxMinX) {
       return null;
@@ -516,39 +540,39 @@ public class PlainRectangle extends Rectangle {
     return new PlainRectangle(maxMinX, maxMinY, minMaxX, minMaxY);
   }
 
+  // ==========================================================================
+
   @Override
-  public boolean equals(Object object) {
-    if (!(object instanceof Rectangle)) {
-      return false;
-    }
-    Rectangle rect = (Rectangle) object;
-    if (rect.getMinX() != getMinX()) {
-      return false;
-    }
+  public String toString() {
+    return "Rectangle(" + getMinX() + "," + getMinY() + "," + getMaxX()
+        + "," + getMaxY() + ")";
+  }
 
-    if (rect.getMinY() != getMinY()) {
-      return false;
-    }
+  // ==========================================================================
 
-    if (rect.getMaxX() != getMaxX()) {
-      return false;
-    }
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Rectangle) {
+      Rectangle otherRectangle = (Rectangle) other;
 
-    if (rect.getMaxY() != getMaxY()) {
-      return false;
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getMinX(), otherRectangle.getMinX());
+      builder.append(getMinY(), otherRectangle.getMinY());
+      builder.append(getMaxX(), otherRectangle.getMaxX());
+      builder.append(getMaxY(), otherRectangle.getMaxY());
+
+      return builder.isEquals();
     }
-    return true;
+    return false;
   }
 
   @Override
   public int hashCode() {
-    return Float.floatToIntBits(
-        this.minX + 2 * this.minY + 3 * this.maxX + 4 * this.maxY);
-  }
-
-  @Override
-  public String toString() {
-    return "PlainRectangle(" + getMinX() + "," + getMinY() + "," + getMaxX()
-        + "," + getMaxY() + ")";
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getMinX());
+    builder.append(getMinY());
+    builder.append(getMaxX());
+    builder.append(getMaxY());
+    return builder.hashCode();
   }
 }

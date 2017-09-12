@@ -556,12 +556,12 @@ class Quicksort {
     if (list == null) {
       return;
     }
-    
+
     // Do nothing, if the array contains less than 2 elements.
     if (list.size() < 2) {
       return;
     }
-    
+
     quickSortRecursive(list, c, 0, list.size() - 1);
   }
 

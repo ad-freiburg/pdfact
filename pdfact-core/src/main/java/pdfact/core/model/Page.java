@@ -8,17 +8,17 @@ package pdfact.core.model;
 public interface Page extends HasCharacters, HasFigures, HasShapes,
     HasTextAreas, HasTextLines, HasTextBlocks {
   /**
-   * Returns the page number.
+   * Returns the page number of this page.
    * 
-   * @return The page number.
+   * @return The page number of this page.
    */
   int getPageNumber();
 
   /**
-   * Sets the page number.
+   * Sets the page number of this page.
    * 
    * @param pageNumber
-   *        The page number.
+   *        The page number of this page.
    */
   void setPageNumber(int pageNumber);
 
@@ -40,11 +40,11 @@ public interface Page extends HasCharacters, HasFigures, HasShapes,
     /**
      * Creates a new instance of {@link Page}.
      * 
-     * @param pageNum
+     * @param pageNumber
      *        The page number.
      * 
      * @return A new instance of {@link Page}.
      */
-    Page create(int pageNum);
+    Page create(int pageNumber);
   }
 }

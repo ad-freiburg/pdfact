@@ -35,19 +35,18 @@ public class PlainColor extends PlainResource implements Color {
   }
 
   /**
-   * Creates a new color based on the given RGB value.
+   * Creates a new color.
    * 
    * @param rgb
    *        The RGB value given as an array of three float values in [0,1].
    */
   @AssistedInject
   public PlainColor(@Assisted float[] rgb) {
-    this();
     this.rgb = rgb;
   }
 
   /**
-   * Creates a new color based on the given RGB value.
+   * Creates a new color.
    * 
    * @param r
    *        The R value.
@@ -102,7 +101,7 @@ public class PlainColor extends PlainResource implements Color {
 
   @Override
   public String toString() {
-    return "PlainColor(" + Arrays.toString(this.rgb) + ")";
+    return "Color(" + Arrays.toString(this.rgb) + ")";
   }
 
   // ==========================================================================
@@ -115,6 +114,7 @@ public class PlainColor extends PlainResource implements Color {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getName(), otherColor.getName());
       builder.append(getRGB(), otherColor.getRGB());
+
       return builder.isEquals();
     }
     return false;

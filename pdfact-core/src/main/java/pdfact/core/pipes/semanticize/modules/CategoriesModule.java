@@ -41,7 +41,7 @@ public class CategoriesModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondaryRole = block.getSecondaryRole();
+        SemanticRole secondaryRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the Categories section).
@@ -55,7 +55,7 @@ public class CategoriesModule implements PdfTextSemanticizerModule {
 
         // Check if the current block is the heading of the Categories section
         // (which would denote the start of the Categories section).
-        if (role == SemanticRole.HEADING 
+        if (role == SemanticRole.HEADING
             && secondaryRole == SemanticRole.CATEGORIES) {
           this.isCategories = true;
         }

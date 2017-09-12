@@ -44,7 +44,7 @@ public class PlainCharacterStatistician implements CharacterStatistician {
    * The factory to create instances of {@link ObjectCounterFactory}.
    */
   protected ObjectCounterFactory<FontFace> fontFaceCounterFactory;
-  
+
   /**
    * Creates a new statistician to compute statistics about characters.
    * 
@@ -85,7 +85,7 @@ public class PlainCharacterStatistician implements CharacterStatistician {
     FloatCounter heightsFrequencies = this.floatCounterFactory.create();
     FloatCounter widthsFrequencies = this.floatCounterFactory.create();
     FloatCounter fontsizeFrequencies = this.floatCounterFactory.create();
-    
+
     // Initialize counters for the colors and font faces.
     ObjectCounter<Color> colorFreqs = this.colorCounterFactory.create();
     ObjectCounter<FontFace> fontFreqs = this.fontFaceCounterFactory.create();

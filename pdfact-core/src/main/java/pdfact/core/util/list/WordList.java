@@ -4,7 +4,7 @@ import java.util.List;
 
 import pdfact.core.model.Word;
 
-//TODO: Is WordList still needed?
+// TODO: Is WordList still needed?
 
 /**
  * A list of words in a PDF document.
@@ -24,12 +24,12 @@ public interface WordList extends ElementList<Word> {
    * @return A list of length 2, containing the two resulting views.
    */
   List<WordList> cut(int splitIndex);
-  
+
   @Override
   WordList subList(int fromIndex, int toIndex);
-  
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link WordList}.
    * 

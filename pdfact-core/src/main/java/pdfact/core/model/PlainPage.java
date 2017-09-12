@@ -56,17 +56,14 @@ public class PlainPage implements Page {
   protected int pageNumber;
 
   /**
-   * The statistics about the characters of this page.
+   * The statistic about the characters of this page.
    */
   protected CharacterStatistic characterStatistic;
 
   /**
-   * The statistics about the text lines of this page.
+   * The statistic about the text lines of this page.
    */
   protected TextLineStatistic textLineStatistic;
-
-  // ==========================================================================
-  // Constructors.
 
   /**
    * Creates a new PDF page.
@@ -89,19 +86,19 @@ public class PlainPage implements Page {
    *        The factory to create instances of {@link CharacterList}.
    * @param textLineListFactory
    *        The factory to create instances of {@link TextLineList}.
-   * @param num
+   * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
   public PlainPage(CharacterListFactory characterListFactory,
-      TextLineListFactory textLineListFactory, @Assisted int num) {
+      TextLineListFactory textLineListFactory, @Assisted int pageNumber) {
     this.characters = characterListFactory.create();
     this.figures = new ArrayList<>();
     this.shapes = new ArrayList<>();
     this.textAreas = new ArrayList<>();
     this.textLines = textLineListFactory.create();
     this.textBlocks = new ArrayList<>();
-    this.pageNumber = num;
+    this.pageNumber = pageNumber;
   }
 
   // ==========================================================================
@@ -140,6 +137,18 @@ public class PlainPage implements Page {
   @Override
   public void addCharacter(Character character) {
     this.characters.add(character);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public CharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
+  }
+
+  @Override
+  public void setCharacterStatistic(CharacterStatistic statistic) {
+    this.characterStatistic = statistic;
   }
 
   // ==========================================================================
@@ -297,6 +306,18 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
+  public TextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
+  }
+
+  @Override
+  public void setTextLineStatistic(TextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
+  }
+
+  // ==========================================================================
+
+  @Override
   public List<TextBlock> getTextBlocks() {
     return this.textBlocks;
   }
@@ -347,32 +368,8 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public CharacterStatistic getCharacterStatistic() {
-    return this.characterStatistic;
-  }
-
-  @Override
-  public void setCharacterStatistic(CharacterStatistic statistic) {
-    this.characterStatistic = statistic;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public TextLineStatistic getTextLineStatistic() {
-    return this.textLineStatistic;
-  }
-
-  @Override
-  public void setTextLineStatistic(TextLineStatistic statistic) {
-    this.textLineStatistic = statistic;
-  }
-
-  // ==========================================================================
-
-  @Override
   public String toString() {
-    return "PlainPage(" + this.pageNumber + ")";
+    return "Page(" + this.pageNumber + ")";
   }
 
   // ==========================================================================

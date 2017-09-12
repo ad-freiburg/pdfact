@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An enumeration of available semantic roles.
+ * An enumeration of all available semantic roles.
  * 
  * @author Claudius Korzen
  */
@@ -101,12 +101,12 @@ public enum SemanticRole {
   // ==========================================================================
 
   /**
-   * The name of this role.
+   * The name of this semantic role.
    */
   protected String name;
 
   /**
-   * Creates a new PDF role.
+   * Creates a new semantic role.
    * 
    * @param name
    *        The name of the role.
@@ -116,7 +116,7 @@ public enum SemanticRole {
   }
 
   // ==========================================================================
-  
+
   /**
    * Returns the name of this role.
    * 
@@ -129,7 +129,7 @@ public enum SemanticRole {
   // ==========================================================================
 
   /**
-   * The roles by names.
+   * The semantic roles by names.
    */
   protected static final Map<String, SemanticRole> ROLES;
 
@@ -143,28 +143,29 @@ public enum SemanticRole {
   }
 
   /**
-   * Returns a set of the names of all roles.
+   * Returns the names of all available semantic roles.
    * 
-   * @return A set of the names of all roles.
+   * @return The names of all available semantic roles as a set.
    */
   public static Set<String> getNames() {
     return ROLES.keySet();
   }
 
   /**
-   * Checks if the given name is a valid name of an existing role.
+   * Checks if there exists a semantic role with the given name.
    * 
    * @param name
    *        The name to check.
    *
-   * @return True, if the given name is a valid name of an existing role.
+   * @return True, if there exists a semantic role with the given name; false
+   *         otherwise.
    */
   public static boolean isValidSemanticRole(String name) {
     return ROLES.containsKey(name.toLowerCase());
   }
 
   /**
-   * Returns the roles that relate to the given names.
+   * Returns all semantic roles that relate to the given names.
    * 
    * @param names
    *        The names of the roles to fetch.
@@ -174,9 +175,9 @@ public enum SemanticRole {
   public static Set<SemanticRole> fromStrings(String... names) {
     return fromStrings(Arrays.asList(names));
   }
-  
+
   /**
-   * Returns the roles that relate to the given names.
+   * Returns all semantic roles that relate to the given names.
    * 
    * @param names
    *        The names of the roles to fetch.
@@ -197,18 +198,14 @@ public enum SemanticRole {
   }
 
   /**
-   * Returns the role that relates to the given name.
+   * Returns the semantic role that relates to the given name.
    * 
    * @param name
    *        The name of the role to fetch.
    * 
-   * @return The role that relates to the given name.
+   * @return The semantic role that relates to the given name.
    */
   public static SemanticRole fromString(String name) {
-    // TODO: Throw an exception or not? If yes, throw a PdfActException.
-    if (!isValidSemanticRole(name)) {
-      throw new IllegalArgumentException(name + " isn't a valid role.");
-    }
-    return ROLES.get(name.toLowerCase());
+    return ROLES.get(name);
   }
 }

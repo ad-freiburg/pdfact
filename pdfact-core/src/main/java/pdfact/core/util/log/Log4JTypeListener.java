@@ -1,6 +1,7 @@
 package pdfact.core.util.log;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,12 +40,23 @@ public class Log4JTypeListener implements TypeListener {
       for (Field field : clazz.getDeclaredFields()) {
         if (field.getType() == Logger.class
             && field.isAnnotationPresent(InjectLogger.class)) {
-          Log4JMembersInjector<T> injector = new Log4JMembersInjector<T>(field);
-          encounter.register(injector);
-
-          Logger logger = injector.getLogger();
-          logger.setLevel(logLevel.getLog4jEquivalent());
-          loggers.add(logger);
+          if (Modifier.isStatic(field.getModifiers())) {
+            field.setAccessible(true);
+            Logger logger = Logger.getLogger(field.getDeclaringClass());
+            try {
+              field.set(null, logger);
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
+            logger.setLevel(logLevel.getLog4jEquivalent());
+            loggers.add(logger);
+          } else {
+            Log4JMembersInjector<T> inj = new Log4JMembersInjector<T>(field);
+            encounter.register(inj);
+            Logger logger = inj.getLogger();
+            logger.setLevel(logLevel.getLog4jEquivalent());
+            loggers.add(logger);
+          }
         }
       }
       clazz = clazz.getSuperclass();

@@ -41,7 +41,7 @@ public class AppendixModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondaryRole = block.getSecondaryRole();
+        SemanticRole secondaryRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the appendix).

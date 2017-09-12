@@ -41,7 +41,7 @@ public class ReferenceModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondaryRole = block.getSecondaryRole();
+        SemanticRole secondaryRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the Reference section).
@@ -55,7 +55,7 @@ public class ReferenceModule implements PdfTextSemanticizerModule {
 
         // Check if the current block is the section heading of the Reference
         // section (which would denote the end of the Reference section).
-        if (role == SemanticRole.HEADING 
+        if (role == SemanticRole.HEADING
             && secondaryRole == SemanticRole.REFERENCE) {
           this.isReferences = true;
         }

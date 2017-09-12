@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 
 // FIXME: Adjust bounding box.
 
@@ -18,9 +21,25 @@ import pdfact.core.util.exception.PdfActException;
  */
 public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
   /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
+  /**
    * A map with the unicodes of ligatures and its individual characters.
    */
   protected static final Map<String, String> LIGATURES;
+
+  /**
+   * The number of processed characters.
+   */
+  protected int numProcessedCharacters;
+
+  /**
+   * The number of split ligatures.
+   */
+  protected int numSplitLigatures;
 
   static {
     // Fill the ligatures.
@@ -59,7 +78,17 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Splitting the ligatures.");
     splitLigatures(pdf);
+
+    log.debug("Splitting the ligatures done.");
+    log.debug("# processed characters: " + this.numProcessedCharacters);
+    log.debug("# split ligatures: " + this.numSplitLigatures);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
     return pdf;
   }
 
@@ -99,7 +128,9 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
   protected void splitLigature(Character character) {
     if (isLigature(character)) {
       character.setText(getResolvedLigatureText(character));
+      this.numSplitLigatures++;
     }
+    this.numProcessedCharacters++;
   }
 
   /**

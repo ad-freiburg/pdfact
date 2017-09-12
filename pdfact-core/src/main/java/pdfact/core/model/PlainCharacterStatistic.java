@@ -26,12 +26,12 @@ public class PlainCharacterStatistic implements CharacterStatistic {
    * The font face frequencies.
    */
   protected ObjectCounter<FontFace> fontFaceFrequencies;
-  
+
   /**
    * The font size frequencies.
    */
   protected FloatCounter fontsizeFrequencies;
-  
+
   /**
    * The color frequencies.
    */

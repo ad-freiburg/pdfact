@@ -3,7 +3,7 @@ package pdfact.core.util.exception;
 // TODO: Create more exceptions that are thrown in the individual pipes.
 
 /**
- * The base exception for any exceptions to throw on errors while executing 
+ * The base exception for any exceptions to throw on errors while executing
  * PdfAct.
  * 
  * @author Claudius Korzen

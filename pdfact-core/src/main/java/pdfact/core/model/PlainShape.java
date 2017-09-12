@@ -13,7 +13,7 @@ public class PlainShape extends PlainElement implements Shape {
    * The position of this shape.
    */
   protected Position position;
-  
+
   /**
    * The color of this shape.
    */
@@ -30,9 +30,9 @@ public class PlainShape extends PlainElement implements Shape {
   public void setPosition(Position position) {
     this.position = position;
   }
-  
+
   // ==========================================================================
-  
+
   @Override
   public Color getColor() {
     return this.color;
@@ -47,7 +47,7 @@ public class PlainShape extends PlainElement implements Shape {
 
   @Override
   public String toString() {
-    return "PlainShape(pos: " + getPosition() + ", color: " + getColor() + ")";
+    return "Shape(pos: " + getPosition() + ", color: " + getColor() + ")";
   }
 
   // ==========================================================================

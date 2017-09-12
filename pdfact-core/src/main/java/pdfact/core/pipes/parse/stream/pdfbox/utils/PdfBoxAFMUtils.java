@@ -9,9 +9,11 @@ import java.util.Map.Entry;
 import org.apache.fontbox.afm.AFMParser;
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.afm.FontMetrics;
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.log.InjectLogger;
 
 // TODO: This doesn't work, because the afm files are missing.
 
@@ -21,6 +23,12 @@ import pdfact.core.util.PdfActUtils;
  * @author Claudius Korzen
  */
 public class PdfBoxAFMUtils {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The additional glyphs.
    */
@@ -62,6 +70,8 @@ public class PdfBoxAFMUtils {
    */
   protected static Map<String, PdfBoxFontMetricsWrapper> readAdditionalAFMFiles(
       String path) {
+    log.debug("Reading additional AFM files from path '" + path + "'.");
+
     Map<String, PdfBoxFontMetricsWrapper> result = new HashMap<>();
     try {
       Map<String, InputStream> files = PdfActUtils.readDirectory(path);
@@ -83,8 +93,11 @@ public class PdfBoxAFMUtils {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.warn("An error occurred while reading additional AFM files.", e);
     }
+
+    log.debug("Reading additional AFM files from path done.");
+    log.debug("# read additional AFM files: " + result.size());
 
     return result;
   }

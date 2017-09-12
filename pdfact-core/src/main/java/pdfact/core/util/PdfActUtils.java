@@ -530,7 +530,7 @@ public class PdfActUtils {
       indexes.add(index);
       index = indexOf(haystack, index + 1, needles);
     }
-    
+
     return indexes;
   }
 
@@ -554,7 +554,7 @@ public class PdfActUtils {
       indexes.add(index);
       index = indexOf(haystack, index + 1, needles);
     }
-    
+
     return indexes;
   }
 

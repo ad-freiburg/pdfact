@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
 
@@ -12,6 +13,7 @@ import com.google.inject.Inject;
 
 import pdfact.core.model.Color;
 import pdfact.core.model.Color.ColorFactory;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDColor objects to {@link Color} objects.
@@ -19,6 +21,12 @@ import pdfact.core.model.Color.ColorFactory;
  * @author Claudius Korzen
  */
 public class PDColorConverter {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link Color}.
    */
@@ -72,6 +80,7 @@ public class PDColorConverter {
 
     // Add the new color to the map of known colors.
     this.knownColors.put(newColor.getName(), newColor);
+    log.debug("A new color was registered: " + newColor);
 
     return newColor;
   }

@@ -36,18 +36,18 @@ public class PlainTextLineStatistician implements TextLineStatistician {
    * The factory to create instances of {@link FloatCounterFactory}.
    */
   protected FloatCounterFactory floatCounterFactory;
-  
+
   /**
    * Creates a new statistician to compute statistics about text lines.
    * 
    * @param textLineStatisticFactory
    *        The factory to create instances of {@link TextLineStatistic}.
-   * @param floatCounterFactory 
+   * @param floatCounterFactory
    *        The factory to create instances of {@link FloatCounterFactory}.
    */
   @Inject
   public PlainTextLineStatistician(
-      TextLineStatisticFactory textLineStatisticFactory, 
+      TextLineStatisticFactory textLineStatisticFactory,
       FloatCounterFactory floatCounterFactory) {
     this.textLineStatisticFactory = textLineStatisticFactory;
     this.floatCounterFactory = floatCounterFactory;
@@ -145,9 +145,9 @@ public class PlainTextLineStatistician implements TextLineStatistician {
 
     return statistic;
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * Computes the line pitch between the given lines. Both lines must share the
    * same page.

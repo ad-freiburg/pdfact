@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.CharacterStatistic;
@@ -23,6 +25,7 @@ import pdfact.core.util.lexicon.CharacterLexicon;
 import pdfact.core.util.list.CharacterList;
 import pdfact.core.util.list.WordList;
 import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
 
@@ -33,6 +36,12 @@ import pdfact.core.util.xycut.XYCut;
  */
 public class XYCutTokenizeToWordsPipe extends XYCut
     implements TokenizeToWordsPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link WordList}.
    */
@@ -57,6 +66,16 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    * The factory to create instances of Rectangle.
    */
   protected RectangleFactory rectangleFactory;
+
+  /**
+   * The number of processed text lines.
+   */
+  protected int numProcessedTextLines;
+
+  /**
+   * The number of tokenized words.
+   */
+  protected int numTokenizedWords;
 
   /**
    * Creates a new word tokenizer.
@@ -90,7 +109,17 @@ public class XYCutTokenizeToWordsPipe extends XYCut
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Tokenizing the text lines into words.");
     tokenizeToWords(pdf);
+
+    log.debug("Tokenizing the text lines into words done.");
+    log.debug("# processed text lines: " + this.numProcessedTextLines);
+    log.debug("# tokenized words : " + this.numTokenizedWords);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
     return pdf;
   }
 
@@ -115,6 +144,9 @@ public class XYCutTokenizeToWordsPipe extends XYCut
         WordList words = tokenizeToWords(pdf, page, line);
         line.setWords(words);
         line.setText(PdfActUtils.join(words, " "));
+
+        this.numProcessedTextLines++;
+        this.numTokenizedWords += words.size();
       }
     }
   }

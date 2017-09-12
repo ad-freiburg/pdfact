@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.cli.model.TextUnit;
@@ -14,6 +16,7 @@ import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link VisualizePdfPipe}.
@@ -21,6 +24,12 @@ import pdfact.core.util.exception.PdfActException;
  * @author Claudius Korzen
  */
 public class PlainVisualizePdfPipe implements VisualizePdfPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link PdfVisualizer}.
    */
@@ -61,6 +70,32 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Visualizing the PDF document.");
+    visualize(pdf);
+
+    log.debug("Visualizing the PDF document done.");
+    log.debug("text unit: " + this.textUnit);
+    log.debug("semantic roles: " + this.roles);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
+    return pdf;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Visualizes the given PDF document.
+   * 
+   * @param pdf
+   *        The PDf document to serialize.
+   * 
+   * @throws PdfActException
+   *         If something went wrong while serializing the PDF document.
+   */
+  protected void visualize(PdfDocument pdf) throws PdfActException {
     // Create the visualizer.
     PdfVisualizer visualizer = this.factory.create(this.textUnit, this.roles);
 
@@ -76,8 +111,6 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     if (this.targetPath != null) {
       writeToFile(visualization, this.targetPath);
     }
-
-    return pdf;
   }
 
   // ==========================================================================

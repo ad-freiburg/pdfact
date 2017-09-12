@@ -3,38 +3,40 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * The interface that declares the methods of a 2-dim point.
+ * A single, 2-dim point.
  * 
  * @author Claudius Korzen.
  */
 public abstract class Point extends PlainGeometric {
   /**
-   * Returns the x coordinate of this point.
+   * Returns the x-coordinate of this point.
    * 
-   * @return The x coordinate of this point.
+   * @return The x-coordinate of this point.
    */
   public abstract float getX();
 
   /**
-   * Sets the x coordinate of this point.
+   * Sets the x-coordinate of this point.
    * 
    * @param x
-   *        The x coordinate of this point.
+   *        The x-coordinate of this point.
    */
   public abstract void setX(float x);
 
+  // ==========================================================================
+
   /**
-   * Returns the y coordinate of this point.
+   * Returns the y-coordinate of this point.
    * 
-   * @return The y coordinate of this point.
+   * @return The y-coordinate of this point.
    */
   public abstract float getY();
 
   /**
-   * Sets the y coordinate of this point.
+   * Sets the y-coordinate of this point.
    * 
    * @param y
-   *        The y coordinate of this point.
+   *        The y-coordinate of this point.
    */
   public abstract void setY(float y);
 
@@ -47,35 +49,34 @@ public abstract class Point extends PlainGeometric {
    */
   public interface PointFactory {
     /**
-     * Creates a new Point.
+     * Creates a new instance of {@link Point}.
      * 
-     * @return An instance of {@link Point}.
+     * @return A new instance of {@link Point}.
      */
     Point create();
 
     /**
-     * Creates a new Point.
+     * Creates a new instance of {@link Point}.
      * 
      * @param x
-     *        The x value of the point
+     *        The x-coordinate of the point
      * @param y
-     *        The y value of the point
+     *        The y-coordinate of the point
      * 
-     * @return An instance of {@link Point}.
+     * @return A new instance of {@link Point}.
      */
     Point create(@Assisted("x") float x, @Assisted("y") float y);
 
     /**
-     * Creates a new Point.
+     * Creates a new instance of {@link Point}.
      * 
      * @param x
-     *        The x value of the point
+     *        The x-coordinate of the point
      * @param y
-     *        The y value of the point
+     *        The y-coordinate of the point
      * 
-     * @return An instance of {@link Point}.
+     * @return A new instance of {@link Point}.
      */
     Point create(@Assisted("x") double x, @Assisted("y") double y);
   }
-
 }

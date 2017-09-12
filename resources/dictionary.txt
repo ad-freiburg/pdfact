@@ -34,3 +34,7 @@ iterable
 quicksort
 precomputes
 haystack
+refactor
+unicode
+glyphs
+tokenized

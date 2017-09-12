@@ -58,6 +58,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetType3GlyphWidthAn
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetWordSpacing;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPositioning;
+import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
 
 /**
  * A module that defines the Guice bindings to the operator processors.
@@ -69,14 +70,19 @@ public class PdfBoxOperatorProcessorGuiceModule extends AbstractModule {
   protected void configure() {
     // ========================================================================
     // Install the converters.
-    
+
     bind(PDFontFaceConverter.class).in(Singleton.class);
     bind(PDFontConverter.class).in(Singleton.class);
     bind(PDColorConverter.class).in(Singleton.class);
 
     // ========================================================================
+    // Install the utils.
+
+    bind(PdfBoxGlyphUtils.class).in(Singleton.class);
+
+    // ========================================================================
     // Install the PDF operator modules.
-    
+
     Multibinder<OperatorProcessor> binder = Multibinder.newSetBinder(binder(),
         OperatorProcessor.class);
 

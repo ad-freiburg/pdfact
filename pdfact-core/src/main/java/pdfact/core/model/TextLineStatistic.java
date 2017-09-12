@@ -5,7 +5,7 @@ import java.util.Map;
 import pdfact.core.util.counter.FloatCounter;
 
 /**
- * A statistic about a list of text lines.
+ * A statistic about text lines.
  * 
  * @author Claudius Korzen
  */

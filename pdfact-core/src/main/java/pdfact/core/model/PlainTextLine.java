@@ -51,7 +51,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   /**
    * Creates a new text line.
    * 
-   * @param characterListFactory 
+   * @param characterListFactory
    *        The factory to create instances of {@link CharacterList}.
    * @param wordListFactory
    *        The factory to create instances of {@link WordList}.
@@ -64,7 +64,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   }
 
   // ==========================================================================
-  
+
   @Override
   public CharacterList getCharacters() {
     return this.characters;
@@ -100,7 +100,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   public void addCharacter(Character character) {
     this.characters.add(character);
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -191,7 +191,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
 
   @Override
   public String toString() {
-    return "PlainTextLine(" + this.text + ")";
+    return "TextLine(" + this.text + ")";
   }
 
   // ==========================================================================
@@ -202,6 +202,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
       TextLine otherTextLine = (TextLine) other;
 
       EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getCharacters(), otherTextLine.getCharacters());
       builder.append(getWords(), otherTextLine.getWords());
       builder.append(getText(), otherTextLine.getText());
       builder.append(getPosition(), otherTextLine.getPosition());
@@ -215,6 +216,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   @Override
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getCharacters());
     builder.append(getWords());
     builder.append(getText());
     builder.append(getPosition());

@@ -157,7 +157,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
           for (SemanticRole role : KNOWN_HEADINGS.keySet()) {
             Set<String> headings = KNOWN_HEADINGS.get(role);
             if (headings.contains(text)) {
-              block.setSecondaryRole(role);
+              block.setSecondarySemanticRole(role);
               break;
             }
           }

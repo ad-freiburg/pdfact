@@ -17,7 +17,7 @@ public class PlainFloatCounter extends TFloatIntHashMap
    * The default initial capacity of this counter.
    */
   protected static final int DEFAULT_INITIAL_CAPACITY = 10;
-  
+
   /**
    * The most common float.
    */

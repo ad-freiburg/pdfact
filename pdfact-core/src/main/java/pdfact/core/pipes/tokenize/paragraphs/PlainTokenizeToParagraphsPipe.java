@@ -3,6 +3,8 @@ package pdfact.core.pipes.tokenize.paragraphs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import gnu.trove.set.TIntSet;
@@ -21,6 +23,7 @@ import pdfact.core.model.Paragraph.ParagraphFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 
@@ -30,6 +33,12 @@ import pdfact.core.util.statistician.TextLineStatistician;
  * @author Claudius Korzen
  */
 public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link Paragraph}.
    */
@@ -44,6 +53,16 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * The statistician to compute statistics about text lines.
    */
   protected TextLineStatistician textLineStatistician;
+
+  /**
+   * The number of processed text blocks.
+   */
+  protected int numProcessedTextBlocks;
+
+  /**
+   * The number of tokenized paragraphs.
+   */
+  protected int numTokenizedParagraphs;
 
   /**
    * Creates a new pipe that tokenizes the text blocks of a PDF document into
@@ -68,6 +87,29 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Tokenizing the text blocks into text paragraphs.");
+    tokenizeToParagraphs(pdf);
+
+    log.debug("Tokenizing the text blocks into text paragraphs done.");
+    log.debug("# processed text blocks: " + this.numProcessedTextBlocks);
+    log.debug("# tokenized paragraphs : " + this.numTokenizedParagraphs);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
+    return pdf;
+  }
+
+  // ==========================================================================
+
+  /**
+   * Tokenizes the text block of the given PDF document into paragraphs.
+   * 
+   * @param pdf
+   *        The PDF document to process.
+   */
+  protected void tokenizeToParagraphs(PdfDocument pdf) {
     List<Paragraph> paragraphs = new ArrayList<>();
 
     // Segment the PDF document into paragraphs.
@@ -88,9 +130,9 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
       paragraphs.add(paragraph);
     }
 
-    pdf.setParagraphs(paragraphs);
+    this.numTokenizedParagraphs += paragraphs.size();
 
-    return pdf;
+    pdf.setParagraphs(paragraphs);
   }
 
   /**
@@ -147,7 +189,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   protected CharacterStatistic computeCharacterStatistic(Paragraph paragraph) {
     return this.characterStatistician.aggregate(paragraph.getWords());
   }
-  
+
   // ==========================================================================
 
   /**
@@ -172,6 +214,8 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     // Identify the paragraphs from the text blocks.
     for (int i = 0; i < allTextBlocks.size(); i++) {
       TextBlock block = allTextBlocks.get(i);
+
+      this.numProcessedTextBlocks++;
 
       if (indexesOfAlreadyProcessedBlocks.contains(i)) {
         // The block was already added to a paragraph. Ignore it.

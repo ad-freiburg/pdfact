@@ -81,6 +81,13 @@ public interface ObjectCounter<T> {
    */
   boolean isEmpty();
 
+  /**
+   * Returns the number of unique objects in this counter.
+   * 
+   * @return The number of unique objects in this counter.
+   */
+  int size();
+
   // ==========================================================================
 
   /**

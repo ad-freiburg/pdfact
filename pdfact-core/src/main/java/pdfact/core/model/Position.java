@@ -3,40 +3,49 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * A position in a PDF document (a pair of a page and a bounding box).
+ * A position in a PDF document (a pair of a page and a bounding box, rpresented
+ * by a rectangle).
  * 
  * @author Claudius Korzen
  */
 public interface Position {
   /**
-   * Returns the rectangle.
+   * Returns the rectangle of this position.
    * 
-   * @return The rectangle.
+   * @return The rectangle of this position.
    */
   Rectangle getRectangle();
 
   /**
-   * Sets the rectangle.
+   * Sets the rectangle of this position.
    * 
    * @param rectangle
-   *        The rectangle.
+   *        The rectangle of this position.
    */
   void setRectangle(Rectangle rectangle);
 
   // ==========================================================================
 
   /**
-   * Returns the page.
+   * Returns the page of this position.
    * 
-   * @return The page.
+   * @return The page of this position.
    */
   Page getPage();
 
   /**
-   * Sets the page.
+   * Returns the page number of the page of this position.
+   * 
+   * @return The page number of the page of this position or 0 if there is no
+   *         page given.
+   */
+  int getPageNumber();
+
+  /**
+   * Sets the page of this position.
    * 
    * @param page
-   *        The page.
+   *        The page of this position.
    */
   void setPage(Page page);
 
@@ -66,13 +75,13 @@ public interface Position {
      * @param page
      *        The page.
      * @param minX
-     *        The minX value of the rectangle to be created.
+     *        The minX value of the rectangle.
      * @param minY
-     *        The minY value of the rectangle to be created.
+     *        The minY value of the rectangle.
      * @param maxX
-     *        The maxX value of the rectangle to be created.
+     *        The maxX value of the rectangle.
      * @param maxY
-     *        The maxY value of the rectangle to be created.
+     *        The maxY value of the rectangle.
      * 
      * @return A new instance of {@link Position}.
      */
@@ -88,16 +97,16 @@ public interface Position {
      * 
      * @param page
      *        The page.
-     * @param point1
-     *        The lower left vertex of the rectangle to be created.
-     * @param point2
-     *        The upper right vertex of the rectangle to be created.
+     * @param lowerLeft
+     *        The lower left point of the rectangle.
+     * @param upperRight
+     *        The upper right point of the rectangle.
      * 
      * @return A new instance of {@link Position}.
      */
     Position create(
         @Assisted("page") Page page,
-        @Assisted("point1") Point point1,
-        @Assisted("point2") Point point2);
+        @Assisted("point1") Point lowerLeft,
+        @Assisted("point2") Point upperRight);
   }
 }

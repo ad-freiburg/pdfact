@@ -1,24 +1,24 @@
 package pdfact.core.model;
 
 /**
- * An interface that is implemented by PDF elements that have statistics about
- * the contained text lines.
+ * An interface that is implemented by PDF elements that have text lines and
+ * provide a statistic about the text lines.
  * 
  * @author Claudius Korzen
  */
 public interface HasTextLineStatistic {
   /**
-   * Returns a statistic about text lines.
+   * Returns the statistic about the text lines.
    * 
-   * @return A statistic about text lines.
+   * @return The statistic about the text lines.
    */
   TextLineStatistic getTextLineStatistic();
 
   /**
-   * Returns a statistic about text lines.
+   * Returns the statistic about the text lines.
    * 
    * @param statistic
-   *        A statistic about text lines.
+   *        The statistic about the text lines.
    */
   void setTextLineStatistic(TextLineStatistic statistic);
 }

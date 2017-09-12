@@ -12,15 +12,15 @@ public interface Character extends Element, HasText, HasPosition, HasFontFace,
    *
    * @return The rank in the extraction order.
    */
-  int getSequenceNumber();
+  int getExtractionRank();
 
   /**
    * Sets the rank of this character.
    *
-   * @param num
-   *        The sequence number.
+   * @param rank
+   *        The rank in the extraction order.
    */
-  void setSequenceNumber(int num);
+  void setExtractionRank(int rank);
 
   // ==========================================================================
 
@@ -31,9 +31,9 @@ public interface Character extends Element, HasText, HasPosition, HasFontFace,
    */
   public interface CharacterFactory {
     /**
-     * Creates a new {@link Character}.
+     * Creates a new instance of {@link Character}.
      * 
-     * @return An instance of {@link Character}.
+     * @return A new instance of {@link Character}.
      */
     Character create();
   }

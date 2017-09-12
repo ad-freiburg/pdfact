@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.cli.model.SerializeFormat;
@@ -20,6 +22,7 @@ import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link SerializePdfPipe}.
@@ -27,6 +30,12 @@ import pdfact.core.util.exception.PdfActException;
  * @author Claudius Korzen
  */
 public class PlainSerializePdfPipe implements SerializePdfPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The available serializers.
    */
@@ -78,6 +87,30 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Serializing the PDF document.");
+    serialize(pdf);
+
+    log.debug("Serializing the PDF document done.");
+    log.debug("serialization format: " + this.format);
+    log.debug("text unit: " + this.textUnit);
+    log.debug("semantic roles: " + this.roles);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
+    return pdf;
+  }
+
+  /**
+   * Serializes the given PDF document.
+   * 
+   * @param pdf
+   *        The PDf document to serialize.
+   * @throws PdfActException
+   *         If something went wrong while serializing the PDF document.
+   */
+  protected void serialize(PdfDocument pdf) throws PdfActException {
     // Obtain the serializer factory to use.
     SerializerFactory factory = this.serializers.get(this.format);
     if (factory == null) {
@@ -99,8 +132,6 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     if (this.targetPath != null) {
       writeToPath(serialization, this.targetPath);
     }
-
-    return pdf;
   }
 
   /**

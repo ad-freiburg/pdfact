@@ -10,38 +10,38 @@ import java.util.List;
 public interface HasTextBlocks extends HasTextLineStatistic,
     HasCharacterStatistic {
   /**
-   * Returns the text blocks of the element.
+   * Returns the text blocks of this element.
    * 
-   * @return The text blocks.
+   * @return The text blocks of this element.
    */
   List<TextBlock> getTextBlocks();
 
   /**
-   * Returns the first text block of the element.
+   * Returns the first text block of this element.
    * 
-   * @return the first text block.
+   * @return the first text block or null if there are no text lines.
    */
   TextBlock getFirstTextBlock();
 
   /**
-   * Returns the last text block of the element.
+   * Returns the last text block of this element.
    * 
-   * @return the last text block.
+   * @return the last text block or null if there are no text lines.
    */
   TextBlock getLastTextBlock();
 
   // ==========================================================================
 
   /**
-   * Sets the text blocks of the element.
+   * Sets the text blocks of this element.
    * 
    * @param blocks
-   *        The text blocks to set.
+   *        The text blocks of this element.
    */
   void setTextBlocks(List<TextBlock> blocks);
 
   /**
-   * Adds the given text blocks to the element.
+   * Adds the given text blocks to this element.
    * 
    * @param blocks
    *        The text blocks to add.
@@ -49,7 +49,7 @@ public interface HasTextBlocks extends HasTextLineStatistic,
   void addTextBlocks(List<TextBlock> blocks);
 
   /**
-   * Adds a text block to the element.
+   * Adds the given text block to this element.
    * 
    * @param block
    *        The text block to add.

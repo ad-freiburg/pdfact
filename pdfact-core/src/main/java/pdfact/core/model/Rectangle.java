@@ -3,70 +3,78 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * The interface that declares the methods of a rectangle.
+ * A simple (geometric rectangle).
  * 
  * @author Claudius Korzen.
  */
 public abstract class Rectangle extends PlainGeometric {
   /**
-   * Returns the minimal x value of this rectangle.
+   * Returns the minimum x-coordinate of this rectangle.
    * 
-   * @return The minimal x value of this rectangle.
+   * @return The minimum x-coordinate of this rectangle.
    */
   public abstract float getMinX();
 
   /**
-   * Sets the minimal x value of this rectangle.
+   * Sets the minimum x-coordinate of this rectangle.
    * 
    * @param minX
-   *        The minimal x value of this rectangle.
+   *        The minimum x-coordinate of this rectangle.
    */
   public abstract void setMinX(float minX);
 
+  // ==========================================================================
+
   /**
-   * Returns the minimal y value of this rectangle.
+   * Returns the minimum y-coordinate of this rectangle.
    * 
-   * @return The minimal y value of this rectangle.
+   * @return The minimum y-coordinate of this rectangle.
    */
   public abstract float getMinY();
 
   /**
-   * Sets the minimal y value of this rectangle.
+   * Sets the minimum y-coordinate of this rectangle.
    * 
    * @param minY
-   *        The minimal y value of this rectangle.
+   *        The minimum y-coordinate of this rectangle.
    */
   public abstract void setMinY(float minY);
 
+  // ==========================================================================
+
   /**
-   * Returns the maximal x value of this rectangle.
+   * Returns the maximum x-coordinate of this rectangle.
    * 
-   * @return The maximal x value of this rectangle.
+   * @return The maximum x-coordinate of this rectangle.
    */
   public abstract float getMaxX();
 
   /**
-   * Sets the maximal x value of this rectangle.
+   * Sets the maximum x-coordinate of this rectangle.
    * 
    * @param maxX
-   *        The maximal x value of this rectangle.
+   *        The maximum x-coordinate of this rectangle.
    */
   public abstract void setMaxX(float maxX);
 
+  // ==========================================================================
+
   /**
-   * Returns the maximal y value of this rectangle.
+   * Returns the maximum y-coordinate of this rectangle.
    * 
-   * @return The maximal y value of this rectangle.
+   * @return The maximum y-coordinate of this rectangle.
    */
   public abstract float getMaxY();
 
   /**
-   * Sets the maximal y value of this rectangle.
+   * Sets the maximum y-coordinate of this rectangle.
    * 
    * @param maxY
-   *        The maximal y value of this rectangle.
+   *        The maximum y-coordinate of this rectangle.
    */
   public abstract void setMaxY(float maxY);
+
+  // ==========================================================================
 
   /**
    * Returns the lower left point of this rectangle.
@@ -83,9 +91,9 @@ public abstract class Rectangle extends PlainGeometric {
   public abstract Point getLowerRight();
 
   /**
-   * Returns the lower left point of this rectangle.
+   * Returns the upper left point of this rectangle.
    * 
-   * @return the lower left point of this rectangle.
+   * @return The upper left point of this rectangle.
    */
   public abstract Point getUpperLeft();
 
@@ -96,6 +104,8 @@ public abstract class Rectangle extends PlainGeometric {
    */
   public abstract Point getUpperRight();
 
+  // ==========================================================================
+
   /**
    * Returns the midpoint of this rectangle.
    * 
@@ -104,18 +114,20 @@ public abstract class Rectangle extends PlainGeometric {
   public abstract Point getMidpoint();
 
   /**
-   * Returns the midpoint of this rectangle in x dimension.
+   * Returns the midpoint of this rectangle in x-dimension.
    * 
-   * @return The midpoint of this rectangle in x dimension.
+   * @return The midpoint of this rectangle in x-dimension.
    */
   public abstract float getXMidpoint();
 
   /**
-   * Returns the midpoint of this rectangle in y dimension.
+   * Returns the midpoint of this rectangle in y-dimension.
    * 
-   * @return The midpoint of this rectangle in y dimension.
+   * @return The midpoint of this rectangle in y-dimension.
    */
   public abstract float getYMidpoint();
+
+  // ==========================================================================
 
   /**
    * Returns the width of this rectangle.
@@ -131,6 +143,8 @@ public abstract class Rectangle extends PlainGeometric {
    */
   public abstract float getHeight();
 
+  // ==========================================================================
+
   /**
    * Get the area of this rectangle.
    * 
@@ -138,43 +152,50 @@ public abstract class Rectangle extends PlainGeometric {
    */
   public abstract float getArea();
 
+  // ==========================================================================
+
   /**
-   * Computes the overlap ratio of this rectangle with the given geometric.
+   * Computes the overlap ratio of this rectangle with the given geometric
+   * object.
    *
    * @param geom
-   *        The other geoemtric object.
-   * @return The overlap ratio of this rectangle with the given geometric.
+   *        The other geometric object.
+   * 
+   * @return The overlap ratio of this rectangle with the given geometric
+   *         object.
    */
   public abstract float getOverlapRatio(PlainGeometric geom);
 
+  // ==========================================================================
+
   /**
-   * Extends this rect by the given rect.
+   * Extends this rectangle by the rectangle of the given element.
    * 
    * @param rect
-   *        The other rectangle.
+   *        The element with a rectangle to process.
    */
   public abstract void extend(HasPosition rect);
 
   /**
-   * Merges this rect with given rect. Returns the minimum bounding box that
-   * contains both rectangles.
+   * Merges this rectangle with rectangle of the given element. Returns the
+   * minimum bounding box that contains both rectangles.
    * 
    * @param rect
-   *        The other rectangle.
+   *        The element with a rectangle to process.
    * 
-   * @return A new, merged rectangle object.
+   * @return The minimum bounding box that contains both rectangles.
    */
-  public abstract Rectangle union(Rectangle rect);
+  public abstract Rectangle union(HasRectangle rect);
 
   /**
-   * Intersects this rectangle with the given other rectangle.
+   * Intersects this rectangle with the rectangle of the given element.
    * 
    * @param rect
-   *        The rectangle to process.
+   *        The element with a rectangle to process.
    * 
-   * @return A rectangle, representing the intersection.
+   * @return A rectangle that represents the intersection of both rectangles.
    */
-  public abstract Rectangle intersection(Rectangle rect);
+  public abstract Rectangle intersection(HasRectangle rect);
 
   // ==========================================================================
 
@@ -185,59 +206,59 @@ public abstract class Rectangle extends PlainGeometric {
    */
   public interface RectangleFactory {
     /**
-     * Creates a new Rectangle.
+     * Creates a new instance of {@link Rectangle}.
      * 
-     * @return An instance of Rectangle.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle create();
 
     /**
-     * Creates a new Rectangle from given rectangle.
+     * Creates a copy of the given {@link Rectangle}.
      * 
      * @param rect
-     *        The rectangle to copy.
+     *        The rectangle to create a copy from.
      * 
-     * @return An instance of Rectangle.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle create(Rectangle rect);
 
     /**
-     * Creates a new Rectangle from given rectangle.
+     * Creates a new instance of {@link Rectangle} from given rectangle.
      * 
      * @param rect
-     *        The rectangle to copy.
+     *        The rectangle to create a copy from.
      * 
-     * @return An instance of Rectangle.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle create(java.awt.Rectangle rect);
 
     /**
-     * Creates a new Rectangle.
+     * Creates a new instance of {@link Rectangle}.
      * 
-     * @param point1
-     *        The lower left vertex.
-     * @param point2
-     *        The upper right vertex.
+     * @param lowerLeft
+     *        The lower left point of the rectangle.
+     * @param upperRight
+     *        The upper right point of the rectangle.
      * 
-     * @return An instance of Rectangle.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle create(
-        @Assisted("point1") Point point1,
-        @Assisted("point2") Point point2);
+        @Assisted("lowerLeft") Point lowerLeft,
+        @Assisted("upperRight") Point upperRight);
 
     /**
-     * Creates a new Rectangle.
+     * Creates a new instance of {@link Rectangle}.
      * 
      * @param minX
-     *        The x value of the lower left vertex.
+     *        The x-coordinate of the lower left point of the rectangle.
      * @param minY
-     *        The y value of the lower left vertex.
+     *        The y-coordinate of the lower left point of the rectangle.
      * @param maxX
-     *        The x value of the upper right vertex.
+     *        The x-coordinate of the upper right point of the rectangle.
      * @param maxY
-     *        The y value of the upper right vertex.
+     *        The y-coordinate of the upper right point of the rectangle.
      * 
-     * @return An instance of Rectangle.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle create(
         @Assisted("minX") double minX,
@@ -246,19 +267,19 @@ public abstract class Rectangle extends PlainGeometric {
         @Assisted("maxY") double maxY);
 
     /**
-     * Creates a new rectangle from the union of the given rectangles.
+     * Creates a new instance of {@link Rectangle} from the union of the given
+     * rectangles.
      * 
      * @param rectangles
      *        The rectangle to process.
      * 
-     * @return The rectangle that results from the union of the given
-     *         rectangles.
+     * @return A new instance of {@link Rectangle}.
      */
     Rectangle fromUnion(@Assisted Rectangle... rectangles);
 
     /**
-     * Creates a rectangle that represents the bounding box around the given
-     * elements that have a single position.
+     * Creates a new instance of {@link Rectangle} that represents the bounding
+     * box around the given elements that have a single position.
      * 
      * @param elements
      *        The elements to process.
@@ -269,8 +290,8 @@ public abstract class Rectangle extends PlainGeometric {
         @Assisted("hasPosition") Iterable<? extends HasPosition> elements);
 
     /**
-     * Creates a rectangle that represents the bounding box around the given
-     * elements that have multiple positions.
+     * Creates a new instance of {@link Rectangle} that represents the bounding
+     * box around the given elements that have multiple positions.
      * 
      * @param elements
      *        The elements to process.

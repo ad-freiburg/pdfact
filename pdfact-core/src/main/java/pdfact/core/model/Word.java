@@ -7,9 +7,9 @@ package pdfact.core.model;
  */
 public interface Word extends Element, HasCharacters, HasText, HasPositions {
   /**
-   * Returns a boolean flag that indicates whether this word is hyphenated.
+   * Returns true if this word is hyphenated.
    * 
-   * @return True, if this word is hyphenated, false otherwise.
+   * @return True if this word is hyphenated; false otherwise.
    */
   boolean isHyphenated();
 
@@ -17,27 +17,24 @@ public interface Word extends Element, HasCharacters, HasText, HasPositions {
    * Sets the boolean flag that indicates whether this word is hyphenated.
    * 
    * @param isHyphenated
-   *        True, if this word is hyphenated, false otherwise.
+   *        The boolean flag that indicates whether this word is hyphenated.
    */
   void setIsHyphenated(boolean isHyphenated);
 
   // ==========================================================================
 
   /**
-   * Returns true, if this word resulted from the dehyphenation of words.
+   * Returns true if this word is dehyphenated.
    * 
-   * @return True, if this word resulted from the dehyphenation of words; false
-   *         otherwise.
+   * @return True if this word is dehyphenated; false otherwise.
    */
   boolean isDehyphenated();
 
   /**
-   * Sets the boolean flag that indicates whether this word resulted from the
-   * dehyphenation of words.
+   * Sets the boolean flag that indicates whether this word is dehyphenated.
    * 
    * @param isDehyphenated
-   *        True, if this word resulted from the dehyphenation of words; false
-   *        otherwise.
+   *        The boolean flag that indicates whether this word is dehyphenated.
    */
   void setIsDehyphenated(boolean isDehyphenated);
 

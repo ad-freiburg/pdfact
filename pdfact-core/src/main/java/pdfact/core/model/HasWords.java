@@ -9,38 +9,38 @@ import pdfact.core.util.list.WordList;
  */
 public interface HasWords extends HasCharacterStatistic {
   /**
-   * Returns the words of the element.
+   * Returns the words of this element.
    * 
-   * @return The words.
+   * @return The words of this element.
    */
   WordList getWords();
 
   /**
-   * Returns the first word of the element.
+   * Returns the first word of this element.
    * 
-   * @return The first word.
+   * @return The first word or null if there are no words.
    */
   Word getFirstWord();
 
   /**
-   * Returns the last word of the element.
+   * Returns the last word of this element.
    * 
-   * @return The last word.
+   * @return The last word or null if there are no words.
    */
   Word getLastWord();
 
   // ==========================================================================
 
   /**
-   * Sets the words of the element.
+   * Sets the words of this element.
    * 
    * @param words
-   *        The words to set.
+   *        The words of this element.
    */
   void setWords(WordList words);
 
   /**
-   * Adds the given words to the element.
+   * Adds the given words to this element.
    * 
    * @param words
    *        The words to add.
@@ -48,7 +48,7 @@ public interface HasWords extends HasCharacterStatistic {
   void addWords(WordList words);
 
   /**
-   * Adds the given word.
+   * Adds the given word to this element.
    * 
    * @param word
    *        The word to add.

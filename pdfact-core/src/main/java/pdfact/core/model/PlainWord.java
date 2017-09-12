@@ -32,17 +32,17 @@ public class PlainWord extends PlainElement implements Word {
   protected List<Position> positions;
 
   /**
-   * The boolean flag that indicates if this word is hyphenated.
+   * The boolean flag that indicates whether this word is hyphenated.
    */
   protected boolean isHyphenated;
 
   /**
-   * The boolean flag that indicates if this word is dehyphenated.
+   * The boolean flag that indicates whether this word is dehyphenated.
    */
   protected boolean isDehyphenated;
 
   /**
-   * The statistics about the characters in this word.
+   * The statistic about the characters.
    */
   protected CharacterStatistic characterStatistic;
 
@@ -187,7 +187,7 @@ public class PlainWord extends PlainElement implements Word {
 
   @Override
   public String toString() {
-    return "PlainWord(" + this.text + ")";
+    return "Word(" + this.text + ")";
   }
 
   // ==========================================================================

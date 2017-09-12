@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -28,18 +27,19 @@ import com.google.inject.Inject;
 import pdfact.core.model.Character;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
+import pdfact.core.model.Page.PageFactory;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.Shape;
-import pdfact.core.model.Page.PageFactory;
 import pdfact.core.pipes.parse.stream.PdfStreamsParser;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActParseException;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 
-// TODO: Refactor all the PDFBox utils.
+// TODO: Refactor all the PDFBox utils (remove unnecessary stuff).
 
 /**
  * Parses PDF content streams and interprets the related operations. Provides a
@@ -48,6 +48,12 @@ import pdfact.core.util.statistician.CharacterStatistician;
  * @author Claudius Korzen
  */
 public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of PdfPage.
    */
@@ -125,10 +131,24 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   protected boolean isType3Stream;
 
   /**
-   * The log.
+   * The number of extracted pages.
    */
-  protected static final Log LOG = LogFactory
-      .getLog(PdfBoxPdfStreamsParser.class);
+  protected int numPages;
+
+  /**
+   * The number of extracted characters.
+   */
+  protected int numCharacters;
+
+  /**
+   * The number of extracted figures.
+   */
+  protected int numFigures;
+
+  /**
+   * The number of extracted shapes.
+   */
+  protected int numShapes;
 
   /**
    * Creates a new stream engine.
@@ -158,12 +178,22 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
 
   @Override
   public void parse(PdfDocument pdf) throws PdfActException {
+    log.debug("Parsing the streams of the PDF file.");
     try (PDDocument doc = PDDocument.load(pdf.getFile())) {
+      int numProcessors = this.operatorProcessors.size();
+      log.debug("# registered PDF operator processors: " + numProcessors);
+
       handlePdfFileStart(pdf);
       for (int i = 0; i < doc.getPages().getCount(); i++) {
         processPage(pdf, doc.getPages().get(i), i + 1);
       }
       handlePdfFileEnd(pdf);
+
+      log.debug("Parsing the streams of the PDF file done.");
+      log.debug("# extracted pages: " + this.numPages);
+      log.debug("# extracted characters: " + this.numCharacters);
+      log.debug("# extracted figures: " + this.numFigures);
+      log.debug("# extracted shapes: " + this.numShapes);
     } catch (IOException e) {
       throw new PdfActParseException("Couldn't parse the PDF.", e);
     }
@@ -304,13 +334,12 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     for (Object token : parser.getTokens()) {
       if (token instanceof COSObject) {
         arguments.add(((COSObject) token).getObject());
-      } else
-        if (token instanceof Operator) {
-          processOperator(pdf, page, (Operator) token, arguments);
-          arguments = new ArrayList<COSBase>();
-        } else {
-          arguments.add((COSBase) token);
-        }
+      } else if (token instanceof Operator) {
+        processOperator(pdf, page, (Operator) token, arguments);
+        arguments = new ArrayList<COSBase>();
+      } else {
+        arguments.add((COSBase) token);
+      }
     }
   }
 
@@ -352,17 +381,17 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
       List<COSBase> args) throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
-    // System.out.println(pageNum + " " + operator + " " + operands);
+    log.trace("Processing PDF operator: " + op + "; args: " + args);
 
     if (processor != null) {
       try {
         processor.setStreamEngine(this);
         processor.process(pdf, page, op, args);
       } catch (IOException e) {
-        LOG.warn("Error on processing operator '" + op + "'. ", e);
+        log.warn("Error on processing operator '" + op + "'. ", e);
       }
     } else {
-      LOG.trace("Unsupported operator: " + op);
+      log.trace("Unsupported operator: " + op + "; args: " + args);
     }
   }
 
@@ -727,6 +756,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    */
   public void handlePdfPageStart(PdfDocument pdf, Page page) {
     pdf.addPage(page);
+    this.numPages++;
   }
 
   /**
@@ -754,6 +784,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    */
   public void handlePdfCharacter(PdfDocument pdf, Page page, Character c) {
     page.addCharacter(c);
+    this.numCharacters++;
   }
 
   /**
@@ -768,6 +799,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    */
   public void handlePdfFigure(PdfDocument pdf, Page page, Figure figure) {
     page.addFigure(figure);
+    this.numFigures++;
   }
 
   /**
@@ -782,5 +814,6 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    */
   public void handlePdfShape(PdfDocument pdf, Page page, Shape shape) {
     page.addShape(shape);
+    this.numShapes++;
   }
 }

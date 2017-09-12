@@ -30,9 +30,9 @@ public class PlainCharacter extends PlainElement implements Character {
   protected Color color;
 
   /**
-   * The sequence number of this character in the extraction order.
+   * The rank of this character in the extraction order of PDF elements.
    */
-  protected int sequenceNumber;
+  protected int extractionRank;
 
   // ==========================================================================
 
@@ -85,20 +85,20 @@ public class PlainCharacter extends PlainElement implements Character {
   // ==========================================================================
 
   @Override
-  public int getSequenceNumber() {
-    return this.sequenceNumber;
+  public int getExtractionRank() {
+    return this.extractionRank;
   }
 
   @Override
-  public void setSequenceNumber(int num) {
-    this.sequenceNumber = num;
+  public void setExtractionRank(int num) {
+    this.extractionRank = num;
   }
 
   // ==========================================================================
 
   @Override
   public String toString() {
-    return "PlainCharacter(" + getText() + ", " + getPosition() + ")";
+    return "Character(" + getText() + ", " + getPosition() + ")";
   }
 
   // ==========================================================================
@@ -113,7 +113,7 @@ public class PlainCharacter extends PlainElement implements Character {
       builder.append(getPosition(), otherCharacter.getPosition());
       builder.append(getFontFace(), otherCharacter.getFontFace());
       builder.append(getColor(), otherCharacter.getColor());
-      builder.append(getSequenceNumber(), otherCharacter.getSequenceNumber());
+      builder.append(getExtractionRank(), otherCharacter.getExtractionRank());
 
       return builder.isEquals();
     }
@@ -127,7 +127,7 @@ public class PlainCharacter extends PlainElement implements Character {
     builder.append(getPosition());
     builder.append(getFontFace());
     builder.append(getColor());
-    builder.append(getSequenceNumber());
+    builder.append(getExtractionRank());
     return builder.hashCode();
   }
 }

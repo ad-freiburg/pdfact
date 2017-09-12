@@ -9,38 +9,38 @@ import java.util.List;
  */
 public interface HasFigures {
   /**
-   * Returns the figures of the element.
+   * Returns the figures of this element.
    * 
    * @return The figures.
    */
   List<Figure> getFigures();
 
   /**
-   * Returns the first figure of the element.
+   * Returns the first figure of this element.
    * 
-   * @return The first figure.
+   * @return The first figure or null if there are no figures.
    */
   Figure getFirstFigure();
 
   /**
    * Returns the last figure of the element.
    * 
-   * @return The last figure.
+   * @return The last figure or null if there are no figures.
    */
   Figure getLastFigure();
 
   // ==========================================================================
 
   /**
-   * Sets the figures of the element.
+   * Sets the figures of this element.
    * 
    * @param figures
-   *        The figures to set.
+   *        The figures of this element.
    */
   void setFigures(List<Figure> figures);
 
   /**
-   * Adds the given figures to the element.
+   * Adds the given figures to this element.
    * 
    * @param figures
    *        The figures to add.
@@ -48,7 +48,7 @@ public interface HasFigures {
   void addFigures(List<Figure> figures);
 
   /**
-   * Adds the given figure to the element.
+   * Adds the given figure to this element.
    * 
    * @param figure
    *        The figure to add.

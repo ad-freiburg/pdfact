@@ -65,7 +65,7 @@ public interface WordNormalizer {
    * @return The set of characters to keep on removing leading characters.
    */
   TCharSet getLeadingCharactersToKeep();
-  
+
   // ==========================================================================
 
   /**

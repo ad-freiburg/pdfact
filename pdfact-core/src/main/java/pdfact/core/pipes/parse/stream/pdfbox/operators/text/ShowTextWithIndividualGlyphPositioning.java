@@ -62,15 +62,14 @@ public class ShowTextWithIndividualGlyphPositioning extends OperatorProcessor {
 
         Matrix translate = Matrix.getTranslateInstance(tx, ty);
         this.engine.getTextMatrix().concatenate(translate);
-      } else
-        if (obj instanceof COSString) {
-          List<COSBase> otherArgs = new ArrayList<COSBase>();
-          otherArgs.add(obj);
-          this.engine.processOperator(pdf, page, "Tj", otherArgs);
-        } else {
-          throw new IOException(
-              "Unknown type in array for TJ operation:" + obj);
-        }
+      } else if (obj instanceof COSString) {
+        List<COSBase> otherArgs = new ArrayList<COSBase>();
+        otherArgs.add(obj);
+        this.engine.processOperator(pdf, page, "Tj", otherArgs);
+      } else {
+        throw new IOException(
+            "Unknown type in array for TJ operation:" + obj);
+      }
     }
   }
 

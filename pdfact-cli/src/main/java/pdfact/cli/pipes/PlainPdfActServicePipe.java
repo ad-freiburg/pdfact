@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.cli.model.SerializeFormat;
@@ -22,6 +24,7 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.pipes.PdfActCorePipe.PdfActCorePipeFactory;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.pipeline.Pipeline;
 import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
 
@@ -31,6 +34,12 @@ import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfActServicePipe implements PdfActServicePipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create a pipeline.
    */
@@ -143,18 +152,22 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    *         If something went wrong on processing the PDF document.
    */
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Processing the service pipeline.");
+    
     Pipeline pipeline = this.pipelineFactory.create();
 
     // Parse the PDF document.
     pipeline.addPipe(this.pdfActCoreFactory.create());
-    
+
     // Validate the target path for the serialization if there is any given.
     if (this.serializationPath != null) {
       ValidatePathToWritePipe valPipe = this.validatePathPipeFactory.create();
       valPipe.setPath(this.serializationPath);
       pipeline.addPipe(valPipe);
     }
-    
+
     // Serialize if there is a target given for the serialization.
     if (this.serializationStream != null || this.serializationPath != null) {
       SerializePdfPipe serializePipe = this.serializePdfPipeFactory.create();
@@ -172,7 +185,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
       valPipe.setPath(this.visualizationPath);
       pipeline.addPipe(valPipe);
     }
-    
+
     // Visualize if there is a target given for the visualization.
     if (this.visualizationStream != null || this.visualizationPath != null) {
       VisualizePdfPipe visualizePipe = this.visualizePdfPipeFactory.create();
@@ -183,7 +196,18 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
       pipeline.addPipe(visualizePipe);
     }
 
-    return pipeline.process(pdf);
+    log.debug("# pipes in the pipeline: " + pipeline.size());
+
+    long start = System.currentTimeMillis();
+    pipeline.process(pdf);
+    long length = System.currentTimeMillis() - start;
+
+    log.debug("Processing the service pipeline done.");
+    log.debug("Time needed to process the service pipeline: " + length + "ms.");
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+    
+    return pdf;
   }
 
   // ==========================================================================

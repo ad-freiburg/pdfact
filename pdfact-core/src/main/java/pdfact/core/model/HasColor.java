@@ -7,17 +7,17 @@ package pdfact.core.model;
  */
 public interface HasColor {
   /**
-   * Returns the color of the element.
+   * Returns the color of this element.
    * 
-   * @return The color.
+   * @return The color of this element.
    */
   Color getColor();
 
   /**
-   * Sets the color of the element.
+   * Sets the color of this element.
    * 
    * @param color
-   *        The color to set.
+   *        The color of this element.
    */
   void setColor(Color color);
 }

@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
@@ -20,6 +22,7 @@ import pdfact.core.model.TextArea.TextAreaFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
 
@@ -30,6 +33,12 @@ import pdfact.core.util.xycut.XYCut;
  */
 public class XYCutTokenizeToTextAreasPipe extends XYCut
     implements TokenizeToTextAreasPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link TextArea}.
    */
@@ -49,6 +58,16 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    * The statistician to compute statistics about characters.
    */
   protected CharacterStatistician characterStatistician;
+
+  /**
+   * The number of processed pages.
+   */
+  protected int numProcessedPages;
+
+  /**
+   * The number of tokenized text areas.
+   */
+  protected int numTokenizedTextAreas;
 
   /**
    * Creates a new pipe that tokenizes the pages of a PDF document into text
@@ -79,7 +98,16 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Tokenizing the pages into text areas.");
     tokenizeToTextAreas(pdf);
+
+    log.debug("Tokenizing the pages into text areas done.");
+    log.debug("# processed pages     : " + this.numProcessedPages);
+    log.debug("# tokenized text areas: " + this.numTokenizedTextAreas);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -109,7 +137,12 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
         continue;
       }
 
-      page.setTextAreas(tokenizeToTextAreas(pdf, page));
+      this.numProcessedPages++;
+
+      List<TextArea> textAreas = tokenizeToTextAreas(pdf, page);
+
+      page.setTextAreas(textAreas);
+      this.numTokenizedTextAreas += textAreas.size();
     }
   }
 
@@ -292,10 +325,10 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     }
 
     for (Character leftChar : leftChars) {
-      int leftCharNum = leftChar.getSequenceNumber();
+      int leftCharNum = leftChar.getExtractionRank();
       Rectangle leftCharBox = leftChar.getPosition().getRectangle();
       for (Character rightChar : rightChars) {
-        int rightCharNum = rightChar.getSequenceNumber();
+        int rightCharNum = rightChar.getExtractionRank();
         Rectangle rightCharNox = rightChar.getPosition().getRectangle();
 
         // Check if the characters are consecutive.

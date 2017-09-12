@@ -30,7 +30,7 @@ public class PlainResource implements Resource {
 
   @Override
   public String toString() {
-    return "PlainResource(" + getId() + ")";
+    return "Resource(" + getId() + ")";
   }
 
   // ==========================================================================
@@ -42,7 +42,7 @@ public class PlainResource implements Resource {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getId(), otherResource.getId());
-      
+
       return builder.isEquals();
     }
     return false;

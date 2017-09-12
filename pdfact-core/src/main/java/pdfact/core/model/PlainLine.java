@@ -1,5 +1,8 @@
 package pdfact.core.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -10,24 +13,24 @@ import com.google.inject.assistedinject.AssistedInject;
  */
 public class PlainLine extends Line {
   /**
-   * The x value of the lower left of this line.
+   * The start point of this line.
    */
   protected Point startPoint;
 
   /**
-   * The y value of the lower left of this line.
+   * The end point of this line.
    */
   protected Point endPoint;
 
   /**
    * The bounding box of this line.
    */
-  protected Rectangle boundingBox;
+  protected Rectangle rectangle;
 
   /**
    * Flag to indicate, whether the bounding box needs an update.
    */
-  protected boolean isBoundingBoxOutdated;
+  protected boolean isRectangleOutdated;
 
   /**
    * Creates a new line with start point (0,0) and end point (0,0).
@@ -42,18 +45,21 @@ public class PlainLine extends Line {
    * endY).
    * 
    * @param startX
-   *        The x value of the start point.
+   *        The x-coordinate of the start point.
    * @param startY
-   *        The y value of the start point.
+   *        The y-coordinate of the start point.
    * @param endX
-   *        The x value of the end point.
+   *        The x-coordinate of the end point.
    * @param endY
-   *        The y value of the end point.
+   *        The y-coordinate of the end point.
    */
   @AssistedInject
-  public PlainLine(@Assisted("startX") float startX,
-      @Assisted("startY") float startY, @Assisted("endX") float endX,
+  public PlainLine(
+      @Assisted("startX") float startX,
+      @Assisted("startY") float startY,
+      @Assisted("endX") float endX,
       @Assisted("endY") float endY) {
+    // TODO: Use Guice here.
     this(new PlainPoint(startX, startY), new PlainPoint(endX, endY));
   }
 
@@ -67,13 +73,17 @@ public class PlainLine extends Line {
    *        The end point of this line.
    */
   @AssistedInject
-  public PlainLine(@Assisted("start") Point startPoint,
+  public PlainLine(
+      @Assisted("start") Point startPoint,
       @Assisted("end") Point endPoint) {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
-    this.boundingBox = new PlainRectangle();
-    this.isBoundingBoxOutdated = true;
+    // TODO: Use Guice here.
+    this.rectangle = new PlainRectangle();
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public Point getStartPoint() {
@@ -85,6 +95,8 @@ public class PlainLine extends Line {
     this.startPoint = start;
   }
 
+  // ==========================================================================
+
   @Override
   public float getStartX() {
     return this.startPoint.getX();
@@ -93,8 +105,10 @@ public class PlainLine extends Line {
   @Override
   public void setStartX(float x) {
     this.startPoint.setX(x);
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public float getStartY() {
@@ -104,8 +118,10 @@ public class PlainLine extends Line {
   @Override
   public void setStartY(float y) {
     this.startPoint.setY(y);
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public Point getEndPoint() {
@@ -117,6 +133,8 @@ public class PlainLine extends Line {
     this.endPoint = end;
   }
 
+  // ==========================================================================
+
   @Override
   public float getEndX() {
     return this.endPoint.getX();
@@ -125,8 +143,10 @@ public class PlainLine extends Line {
   @Override
   public void setEndX(float x) {
     this.endPoint.setX(x);
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public float getEndY() {
@@ -136,47 +156,61 @@ public class PlainLine extends Line {
   @Override
   public void setEndY(float y) {
     this.endPoint.setY(y);
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public Rectangle getRectangle() {
-    if (this.isBoundingBoxOutdated) {
-      this.boundingBox.setMinX(getStartX());
-      this.boundingBox.setMinY(getStartY());
-      this.boundingBox.setMaxX(getEndX());
-      this.boundingBox.setMaxY(getEndY());
-      this.isBoundingBoxOutdated = false;
+    if (this.isRectangleOutdated) {
+      this.rectangle.setMinX(getStartX());
+      this.rectangle.setMinY(getStartY());
+      this.rectangle.setMaxX(getEndX());
+      this.rectangle.setMaxY(getEndY());
+      this.isRectangleOutdated = false;
     }
-    return this.boundingBox;
+    return this.rectangle;
   }
 
   @Override
   public void setRectangle(Rectangle boundingBox) {
-    this.boundingBox = boundingBox;
-    this.isBoundingBoxOutdated = false;
+    this.rectangle = boundingBox;
+    this.isRectangleOutdated = false;
   }
+
+  // ==========================================================================
 
   @Override
   public String toString() {
-    return "PlainLine(" + getStartPoint() + "," + getEndPoint() + ")";
+    return "Line(" + getStartPoint() + "," + getEndPoint() + ")";
   }
+
+  // ==========================================================================
 
   @Override
   public boolean equals(Object other) {
     if (other instanceof Line) {
       Line otherLine = (Line) other;
-      return getStartX() == otherLine.getStartX()
-          && getStartY() == otherLine.getStartY()
-          && getEndX() == otherLine.getEndX()
-          && getEndY() == otherLine.getEndY();
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getStartX(), otherLine.getStartX());
+      builder.append(getStartY(), otherLine.getStartY());
+      builder.append(getEndX(), otherLine.getEndX());
+      builder.append(getEndY(), otherLine.getEndY());
+
+      return builder.isEquals();
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Float.floatToIntBits(
-        getStartX() + 2 * getStartY() + 3 * getEndX() + 4 * getEndY());
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getStartX());
+    builder.append(getStartY());
+    builder.append(getEndX());
+    builder.append(getEndY());
+    return builder.hashCode();
   }
 }

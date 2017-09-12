@@ -78,6 +78,13 @@ public interface FloatCounter {
    */
   boolean isEmpty();
 
+  /**
+   * Returns the number of unique floats in this counter.
+   * 
+   * @return The number of unique floats in this counter.
+   */
+  int size();
+
   // ==========================================================================
 
   /**

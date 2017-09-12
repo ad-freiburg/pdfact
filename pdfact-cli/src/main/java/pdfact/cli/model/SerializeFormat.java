@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An enumeration of the available serialization formats.
+ * An enumeration of all available serialization formats.
  * 
  * @author Claudius Korzen
  */
@@ -34,14 +34,14 @@ public enum SerializeFormat {
   protected String name;
 
   /**
-   * The formats per names.
+   * The serialization formats per names.
    */
   protected static final Map<String, SerializeFormat> FORMATS;
 
   static {
     FORMATS = new HashMap<>();
 
-    // Fill the map of formats per name.
+    // Fill the map of serialization formats per name.
     for (SerializeFormat format : values()) {
       FORMATS.put(format.getName(), format);
     }
@@ -71,9 +71,9 @@ public enum SerializeFormat {
   // ==========================================================================
   
   /**
-   * Returns a set of the names of all serialization formats.
+   * Returns the names of all available serialization formats.
    * 
-   * @return A set of the names of all serialization formats.
+   * @return The names of all available serialization formats as a set.
    */
   public static Set<String> getNames() {
     return FORMATS.keySet();

@@ -43,9 +43,6 @@ public class PlainPdfDocument implements PdfDocument {
    */
   protected TextLineStatistic textLineStatistic;
 
-  // ==========================================================================
-  // Constructors.
-
   /**
    * Creates a new PDF document.
    * 
@@ -56,7 +53,7 @@ public class PlainPdfDocument implements PdfDocument {
   public PlainPdfDocument(@Assisted String path) {
     this(Paths.get(path));
   }
-  
+
   /**
    * Creates a new PDF document.
    * 
@@ -84,10 +81,34 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
+  public File getFile() {
+    return this.path != null ? this.path.toFile() : null;
+  }
+
+  @Override
+  public void setFile(File file) {
+    this.path = file != null ? file.toPath() : null;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Path getPath() {
+    return this.path;
+  }
+
+  @Override
+  public void setPath(Path path) {
+    this.path = path;
+  }
+
+  // ==========================================================================
+
+  @Override
   public List<Page> getPages() {
     return this.pages;
   }
-  
+
   @Override
   public Page getFirstPage() {
     if (this.pages == null || this.pages.isEmpty()) {
@@ -112,30 +133,6 @@ public class PlainPdfDocument implements PdfDocument {
   @Override
   public void addPage(Page page) {
     this.pages.add(page);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public File getFile() {
-    return this.path != null ? this.path.toFile() : null;
-  }
-
-  @Override
-  public void setFile(File file) {
-    this.path = file != null ? file.toPath() : null;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public Path getPath() {
-    return this.path;
-  }
-
-  @Override
-  public void setPath(Path path) {
-    this.path = path;
   }
 
   // ==========================================================================
@@ -168,9 +165,7 @@ public class PlainPdfDocument implements PdfDocument {
 
   @Override
   public void addParagraphs(List<Paragraph> paragraphs) {
-    for (Paragraph paragraph : paragraphs) {
-      addParagraph(paragraph);
-    }
+    this.paragraphs.addAll(paragraphs);
   }
 
   @Override
@@ -206,7 +201,7 @@ public class PlainPdfDocument implements PdfDocument {
 
   @Override
   public String toString() {
-    return "PlainPdfDocument(" + this.path + ")";
+    return "PdfDocument(" + this.path + ")";
   }
 
   // ==========================================================================
@@ -218,6 +213,7 @@ public class PlainPdfDocument implements PdfDocument {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPath(), otherDocument.getPath());
+
       return builder.isEquals();
     }
     return false;

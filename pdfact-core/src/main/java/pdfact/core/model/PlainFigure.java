@@ -30,7 +30,7 @@ public class PlainFigure extends PlainElement implements Figure {
 
   @Override
   public String toString() {
-    return "PlainFigure(pos: " + getPosition() + ")";
+    return "Figure(pos: " + getPosition() + ")";
   }
 
   // ==========================================================================
@@ -42,6 +42,7 @@ public class PlainFigure extends PlainElement implements Figure {
 
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getPosition(), otherFigure.getPosition());
+
       return builder.isEquals();
     }
     return false;

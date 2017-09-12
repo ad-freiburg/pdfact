@@ -101,17 +101,19 @@ public interface Font extends Resource {
   // ==========================================================================
 
   /**
-   * Returns true, if this font is an italic font.
+   * Returns true, if this font is an italic-faced font.
    * 
-   * @return True, if this font is an italic font, false otherwise.
+   * @return True, if this font is an italic-faced font, false otherwise.
    */
   boolean isItalic();
 
   /**
-   * Sets the boolean flag that indicates whether this font is an italic font.
+   * Sets the boolean flag that indicates whether this font is an italic-faced
+   * font.
    * 
    * @param isItalic
-   *        The boolean flag that indicates whether this font is an italic font.
+   *        The boolean flag that indicates whether this font is an italic-faced
+   *        font.
    */
   void setIsItalic(boolean isItalic);
 

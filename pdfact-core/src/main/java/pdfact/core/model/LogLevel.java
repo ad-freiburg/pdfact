@@ -55,7 +55,7 @@ public enum LogLevel {
    * @param intLevel
    *        The level given as an integer value.
    * @param log4jEquivalent
-   *        The log4j level that is equivalent to this level.
+   *        The log4j level that is equivalent to this log level.
    */
   LogLevel(int intLevel, Level log4jEquivalent) {
     this.intLevel = intLevel;
@@ -63,9 +63,9 @@ public enum LogLevel {
   }
 
   /**
-   * Returns the level as an integer value.
+   * Returns this level as an integer value.
    * 
-   * @return The level as an integer value.
+   * @return This level as an integer value.
    */
   public int getIntLevel() {
     return this.intLevel;
@@ -85,6 +85,7 @@ public enum LogLevel {
    * 
    * @param level
    *        The other log level.
+   * 
    * @return True, if this log level implies the given log level, False
    *         otherwise.
    */
@@ -117,18 +118,18 @@ public enum LogLevel {
   }
 
   /**
-   * Returns a set of the integer values of the available log levels.
+   * Returns the integer values of all available log levels.
    * 
-   * @return A set of the integer values of the available log levels.
+   * @return The integer values of all available log levels in a set.
    */
   public static TIntSet getIntValues() {
     return LOG_LEVELS.keySet();
   }
 
   /**
-   * Returns a collection of all available log levels.
+   * Returns all available log levels.
    * 
-   * @return A collection of all available log levels.
+   * @return All available log levels in a collection.
    */
   public static Collection<LogLevel> getLogLevels() {
     return LOG_LEVELS.valueCollection();
@@ -140,15 +141,15 @@ public enum LogLevel {
    * @param value
    *        The integer value to check.
    *
-   * @return True, if there exists a log level with the given integer value;
-   *         false otherwise.
+   * @return True, if there exists a log level whose integer values is equal to
+   *         the given integer value; false otherwise.
    */
   public static boolean isValidLogLevel(int value) {
     return LOG_LEVELS.containsKey(value);
   }
 
   /**
-   * Returns the log levels that relate to the given integer values.
+   * Returns all log levels that relate to the given integer values.
    * 
    * @param values
    *        The integer values to process.
@@ -177,10 +178,6 @@ public enum LogLevel {
    * @return The log level that relates to the given integer value.
    */
   public static LogLevel getLogLevel(int value) {
-    // TODO: Throw an exception or not? If yes, throw a PdfActException.
-    if (!isValidLogLevel(value)) {
-      throw new IllegalArgumentException(value + " isn't a valid log level.");
-    }
     return LOG_LEVELS.get(value);
   }
 }

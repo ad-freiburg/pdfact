@@ -23,4 +23,3 @@ public interface FilterFiguresPipe extends Pipe {
     FilterFiguresPipe create();
   }
 }
-

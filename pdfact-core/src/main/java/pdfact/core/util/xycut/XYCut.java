@@ -97,37 +97,36 @@ public abstract class XYCut {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
       Collections.sort(chars, new MinXComparator());
-  
+
       // The score of the best cut found so far.
       float bestCutScore = 0;
       // The index of the best cut found so far.
       int bestCutIndex = -1;
       // The current position in the list of characters.
       float currentPos = chars.get(0).getPosition().getRectangle().getMaxX();
-  
+
       for (int index = 1; index < chars.size(); index++) {
         Character character = chars.get(index);
-  
+
         if (character.getPosition().getRectangle().getMinX() > currentPos) {
           List<CharacterList> halves = chars.cut(index);
           // Find the position of the "best" cut.
           while (index < chars.size()) {
             // The score of the current cut.
             float cutScore = assessVerticalCut(pdf, page, halves);
-  
+
             if (cutScore < 0) {
               break;
-            } else
-              if (cutScore > bestCutScore) {
-                bestCutScore = cutScore;
-                bestCutIndex = index;
-              }
+            } else if (cutScore > bestCutScore) {
+              bestCutScore = cutScore;
+              bestCutIndex = index;
+            }
             halves = chars.cut(++index);
           }
         }
         currentPos = character.getPosition().getRectangle().getMaxX();
       }
-  
+
       if (bestCutIndex > -1) {
         // A cut was found. Return the resulting halves.
         return chars.cut(bestCutIndex);
@@ -159,40 +158,39 @@ public abstract class XYCut {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
       Collections.sort(chars, Collections.reverseOrder(new MaxYComparator()));
-  
+
       // The score of the best cut found so far.
       float bestCutScore = 0;
       // The index of the best cut found so far.
       int bestCutIndex = -1;
       // The current position in the list of characters.
       float currentPos = chars.get(0).getPosition().getRectangle().getMinY();
-  
+
       for (int index = 1; index < chars.size(); index++) {
         Character character = chars.get(index);
-  
+
         if (character.getPosition().getRectangle().getMaxY() < currentPos) {
           List<CharacterList> halves = chars.cut(index);
           // Find the position of the "best" cut.
           while (index < chars.size()) {
             float cutScore = assessHorizontalCut(pdf, page, halves);
-  
+
             if (cutScore < 0) {
               break;
-            } else
-              if (cutScore > bestCutScore) {
-                bestCutScore = cutScore;
-                bestCutIndex = index;
-              }
+            } else if (cutScore > bestCutScore) {
+              bestCutScore = cutScore;
+              bestCutIndex = index;
+            }
             halves = chars.cut(++index);
           }
         }
         currentPos = character.getPosition().getRectangle().getMinY();
       }
-  
+
       if (bestCutIndex > -1) {
         // A cut was found. Return the resulting halves.
         return chars.cut(bestCutIndex);
-      } 
+      }
     }
     return Arrays.asList(chars);
   }

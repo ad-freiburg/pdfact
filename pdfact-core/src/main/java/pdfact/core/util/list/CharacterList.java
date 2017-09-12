@@ -27,7 +27,7 @@ public interface CharacterList extends ElementList<Character> {
 
   @Override
   CharacterList subList(int fromIndex, int toIndex);
-  
+
   // ==========================================================================
 
   /**

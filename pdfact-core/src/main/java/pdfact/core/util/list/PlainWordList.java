@@ -46,7 +46,7 @@ public class PlainWordList extends PlainElementList<Word> implements WordList {
     WordListView right = new WordListView(this, index, this.size());
     return Arrays.asList(left, right);
   }
-  
+
   @Override
   public WordList subList(int fromIndex, int toIndex) {
     return new WordListView(this, fromIndex, toIndex);
@@ -87,7 +87,7 @@ public class PlainWordList extends PlainElementList<Word> implements WordList {
       WordListView v2 = new WordListView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
     }
-    
+
     @Override
     public WordList subList(int fromIndex, int toIndex) {
       return new WordListView(this, fromIndex, toIndex);

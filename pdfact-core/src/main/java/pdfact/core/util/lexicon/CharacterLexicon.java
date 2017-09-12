@@ -20,52 +20,52 @@ public class CharacterLexicon {
 
   // ==========================================================================
   // Letters.
-  
+
   /**
    * Upper case letters.
    */
   public static final TCharSet UPPERCASE_LETTERS = new TCharHashSet();
-  
+
   static {
     for (char i = 'A'; i <= 'Z'; i++) {
       UPPERCASE_LETTERS.add(i);
     }
   }
-  
+
   /**
    * Lower case letters.
    */
   public static final TCharSet LOWERCASE_LETTERS = new TCharHashSet();
-  
+
   static {
     for (char i = 'a'; i <= 'z'; i++) {
       LOWERCASE_LETTERS.add(i);
     }
   }
-  
+
   /**
    * All letters.
    */
   public static final TCharSet LETTERS = new TCharHashSet();
-  
+
   static {
     LETTERS.addAll(UPPERCASE_LETTERS);
     LETTERS.addAll(LOWERCASE_LETTERS);
   }
-  
+
   /**
    * Digits.
    */
   public static final TCharSet DIGITS = new TCharHashSet();
-  
+
   static {
     for (char i = '0'; i <= '9'; i++) {
       DIGITS.add(i);
     }
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * The characters that aren't aligned to the baseline of a text line.
    */
@@ -83,7 +83,7 @@ public class CharacterLexicon {
     DESCENDERS.add('Q');
     DESCENDERS.add('J');
   }
-  
+
   /**
    * The characters that aren't aligned to the meanline of a text line.
    */
@@ -102,7 +102,7 @@ public class CharacterLexicon {
     ASCENDERS.add('t');
     ASCENDERS.add('β');
   }
-  
+
   /**
    * The characters that are aligned to the baseline of a text line.
    */
@@ -134,12 +134,12 @@ public class CharacterLexicon {
     BASELINE_CHARACTERS.add('x');
     BASELINE_CHARACTERS.add('z');
   }
-  
+
   /**
    * The characters that are aligned to the baseline of a text line.
    */
   public static final TCharSet MEANLINE_CHARACTERS;
-  
+
   static {
     MEANLINE_CHARACTERS = new TCharHashSet();
     MEANLINE_CHARACTERS.add('a');
@@ -160,15 +160,15 @@ public class CharacterLexicon {
     MEANLINE_CHARACTERS.add('y');
     MEANLINE_CHARACTERS.add('z');
   }
-  
+
   // ==========================================================================
   // Punctuation marks.
-  
+
   /**
    * The punctuation marks that are aligned to the base line.
    */
   public static final TCharSet BASELINE_PUNCTUATION_MARKS;
-  
+
   static {
     BASELINE_PUNCTUATION_MARKS = new TCharHashSet();
     BASELINE_PUNCTUATION_MARKS.add('.');
@@ -178,12 +178,12 @@ public class CharacterLexicon {
     BASELINE_PUNCTUATION_MARKS.add(';');
     BASELINE_PUNCTUATION_MARKS.add(',');
   }
-  
+
   /**
    * The punctuation marks that are aligned to the mean line.
    */
   public static final TCharSet MEANLINE_PUNCTUATION_MARKS;
-  
+
   static {
     MEANLINE_PUNCTUATION_MARKS = new TCharHashSet();
     MEANLINE_PUNCTUATION_MARKS.add('\'');
@@ -194,30 +194,30 @@ public class CharacterLexicon {
     MEANLINE_PUNCTUATION_MARKS.add('´');
     MEANLINE_PUNCTUATION_MARKS.add('’');
   }
-  
+
   /**
    * The characters that represent a hyphen.
    */
   public static final TCharSet HYPHENS;
-  
+
   static {
     HYPHENS = new TCharHashSet();
     HYPHENS.add('-');
     HYPHENS.add('–');
   }
-  
+
   /**
    * All punctuation marks.
    */
   public static final TCharSet PUNCTUATION_MARKS;
-  
+
   static {
     PUNCTUATION_MARKS = new TCharHashSet();
     PUNCTUATION_MARKS.addAll(BASELINE_CHARACTERS);
     PUNCTUATION_MARKS.addAll(MEANLINE_CHARACTERS);
     PUNCTUATION_MARKS.addAll(HYPHENS);
   }
-  
+
   // ==========================================================================
 
   /**
@@ -429,7 +429,7 @@ public class CharacterLexicon {
     MATH_SYMBOLS.add("ω");
     MATH_SYMBOLS.add("Ω");
   }
-  
+
   // ==========================================================================
 
   /**

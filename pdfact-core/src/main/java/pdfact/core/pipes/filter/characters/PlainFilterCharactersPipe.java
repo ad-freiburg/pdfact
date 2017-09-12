@@ -2,6 +2,8 @@ package pdfact.core.pipes.filter.characters;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
@@ -10,6 +12,7 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.CharacterList;
 import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link FilterCharactersPipe}.
@@ -18,9 +21,25 @@ import pdfact.core.util.list.CharacterList.CharacterListFactory;
  */
 public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
+  /**
    * The factory to create instances of {@link CharacterList}.
    */
   protected CharacterListFactory characterListFactory;
+
+  /**
+   * The number of processed characters.
+   */
+  protected int numProcessedCharacters;
+
+  /**
+   * The number of filtered characters.
+   */
+  protected int numFilteredCharacters;
 
   /**
    * Creates a pipe that filters those characters of a PDF document that should
@@ -38,16 +57,26 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Filtering characters.");
     filterCharacters(pdf);
+
+    log.debug("Filtering characters done.");
+    log.debug("# processed characters: " + this.numProcessedCharacters);
+    log.debug("# filtered characters : " + this.numFilteredCharacters);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
   // ==========================================================================
-  
+
   /**
    * Filters those characters of a PDF document that should not be considered.
    * 
-   * @param pdf The PDF document to process.
+   * @param pdf
+   *        The PDF document to process.
    */
   protected void filterCharacters(PdfDocument pdf) {
     if (pdf != null) {
@@ -57,15 +86,20 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
         // Create a new list of characters which should not be filtered.
         CharacterList after = this.characterListFactory.create(before.size());
         for (Character character : before) {
-          if (!isFilterCharacter(character)) {
-            after.add(character);
+          this.numProcessedCharacters++;
+
+          if (isFilterCharacter(character)) {
+            this.numFilteredCharacters++;
+            continue;
           }
+
+          after.add(character);
         }
         page.setCharacters(after);
       }
     }
   }
-  
+
   /**
    * Checks if the given characters should be filtered out.
    * 

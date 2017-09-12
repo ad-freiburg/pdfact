@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link StandardizeCharactersPipe}.
@@ -17,10 +20,26 @@ import pdfact.core.util.exception.PdfActException;
 public class PlainStandardizeCharactersPipe
     implements StandardizeCharactersPipe {
   /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
+  /**
    * A map that maps some characters to a character with the same semantic
    * meaning.
    */
   protected static final Map<String, String> CHARACTER_SYNONYMS;
+
+  /**
+   * The number of processed characters.
+   */
+  protected int numProcessedCharacters;
+
+  /**
+   * The number of standardized characters.
+   */
+  protected int numStandardizedCharacters;
 
   static {
     CHARACTER_SYNONYMS = new HashMap<String, String>();
@@ -40,7 +59,16 @@ public class PlainStandardizeCharactersPipe
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Standardizing the characters.");
     standardizeCharacters(pdf);
+
+    log.debug("Standardizing the characters done.");
+    log.debug("# processed characters: " + this.numProcessedCharacters);
+    log.debug("# standardized characters: " + this.numStandardizedCharacters);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -95,6 +123,10 @@ public class PlainStandardizeCharactersPipe
       return;
     }
 
-    ch.setText(CHARACTER_SYNONYMS.getOrDefault(ch.getText(), ch.getText()));
+    if (CHARACTER_SYNONYMS.containsKey(ch.getText())) {
+      ch.setText(CHARACTER_SYNONYMS.get(ch.getText()));
+      this.numStandardizedCharacters++;
+    }
+    this.numProcessedCharacters++;
   }
 }

@@ -22,4 +22,3 @@ public interface TokenizeToParagraphsPipe extends Pipe {
     TokenizeToParagraphsPipe create();
   }
 }
-

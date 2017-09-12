@@ -68,11 +68,11 @@ public class PlainWordNormalizer implements WordNormalizer {
     if (hasTrailingCharactersToKeep()) {
       endIndex = getIndexOfFirstTrailingCharacterToKeep(array);
     }
-    
+
     if (startIndex < 0 || endIndex < 0) {
       return "";
     }
-    
+
     if (startIndex >= array.length || endIndex >= array.length) {
       return "";
     }

@@ -52,7 +52,7 @@ public class PlainCharacterList extends PlainElementList<Character>
   public CharacterList subList(int fromIndex, int toIndex) {
     return new CharacterListView(this, fromIndex, toIndex);
   }
-  
+
   // ==========================================================================
 
   /**
@@ -60,7 +60,7 @@ public class PlainCharacterList extends PlainElementList<Character>
    * 
    * @author Claudius Korzen
    */
-  class CharacterListView extends ElementListView<Character> 
+  class CharacterListView extends ElementListView<Character>
       implements CharacterList {
 
     /**
@@ -94,7 +94,7 @@ public class PlainCharacterList extends PlainElementList<Character>
       CharacterListView v2 = new CharacterListView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
     }
-    
+
     @Override
     public CharacterList subList(int fromIndex, int toIndex) {
       return new CharacterListView(this, fromIndex, toIndex);

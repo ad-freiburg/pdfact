@@ -47,7 +47,7 @@ public class PlainTextLineList extends PlainElementList<TextLine>
     TextLineListView right = new TextLineListView(this, index, this.size());
     return Arrays.asList(left, right);
   }
-  
+
   @Override
   public TextLineList subList(int fromIndex, int toIndex) {
     return new TextLineListView(this, fromIndex, toIndex);
@@ -60,7 +60,7 @@ public class PlainTextLineList extends PlainElementList<TextLine>
    * 
    * @author Claudius Korzen
    */
-  class TextLineListView extends ElementListView<TextLine> 
+  class TextLineListView extends ElementListView<TextLine>
       implements TextLineList {
     /**
      * The serial id.
@@ -93,7 +93,7 @@ public class PlainTextLineList extends PlainElementList<TextLine>
       TextLineListView v2 = new TextLineListView(this.parent, cut, right);
       return Arrays.asList(v1, v2);
     }
-    
+
     @Override
     public TextLineList subList(int fromIndex, int toIndex) {
       return new TextLineListView(this, fromIndex, toIndex);

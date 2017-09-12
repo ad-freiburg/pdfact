@@ -1,5 +1,7 @@
 package pdfact.core.pipes;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.PdfDocument;
@@ -19,6 +21,7 @@ import pdfact.core.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacritic
 import pdfact.core.pipes.translate.ligatures.SplitLigaturesPipe.SplitLigaturesPipeFactory;
 import pdfact.core.pipes.validate.ValidatePdfPathPipe.ValidatePdfPathPipeFactory;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.pipeline.Pipeline;
 import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
 
@@ -28,6 +31,12 @@ import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfActCorePipe implements PdfActCorePipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create pipelines.
    */
@@ -57,7 +66,7 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    * The factory to create the pipe that standardizes characters.
    */
   protected StandardizeCharactersPipeFactory standardizeCharactersPipeFactory;
-  
+
   /**
    * The factory to create the pipe that filters chosen characters.
    */
@@ -123,7 +132,7 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    *        The factory to create the pipe that merges diacritic characters.
    * @param splitLigaturesPipeFactory
    *        The factory to create the pipe that splits ligatures.
-   * @param standardizeCharactersPipeFactory 
+   * @param standardizeCharactersPipeFactory
    *        The factory to create the pipe that standardizes characters.
    * @param filterCharactersPipeFactory
    *        The factory to create the pipe that filters chosen characters.
@@ -195,6 +204,10 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    *         If something went wrong on processing the PDF document.
    */
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Processing the core pipeline.");
+
     // Fill the pipeline with the pipes to execute
     Pipeline pipeline = this.pipelineFactory.create();
 
@@ -229,12 +242,16 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     // Dehyphenate the words.
     pipeline.addPipe(this.dehyphenateWordsPipeFactory.create());
 
+    log.debug("# pipes in the pipeline: " + pipeline.size());
+
     long start = System.currentTimeMillis();
     pipeline.process(pdf);
-    long end = System.currentTimeMillis();
-    
-    System.out.println(end - start);
-    
+    long length = System.currentTimeMillis() - start;
+
+    log.debug("Processing the core pipeline done.");
+    log.debug("Time needed to process the core pipeline: " + length + "ms.");
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 }

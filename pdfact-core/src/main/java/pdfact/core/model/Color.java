@@ -3,6 +3,7 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 // TODO: Implement the support of other color schemes (CMYK, etc.)
+// TODO: Clarify, if the rgb values are within the interval [0, 1] or [0, 255].
 
 /**
  * A color in a PDF document.
@@ -33,7 +34,7 @@ public interface Color extends Resource {
    * @return The RGB value given as an array of three float values in [0,1].
    */
   float[] getRGB();
-  
+
   /**
    * Sets the RGB value of this color.
    * 

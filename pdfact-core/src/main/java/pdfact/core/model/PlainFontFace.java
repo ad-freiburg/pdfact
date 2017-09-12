@@ -64,7 +64,7 @@ public class PlainFontFace implements FontFace {
 
   @Override
   public String toString() {
-    return "PlainFontFace(" + this.font + ", " + this.fontSize + ")";
+    return "FontFace(" + this.font + ", " + this.fontSize + ")";
   }
 
   // ==========================================================================
@@ -77,7 +77,7 @@ public class PlainFontFace implements FontFace {
       EqualsBuilder builder = new EqualsBuilder();
       builder.append(getFont(), otherCharacter.getFont());
       builder.append(getFontSize(), otherCharacter.getFontSize());
-      
+
       return builder.isEquals();
     }
     return false;

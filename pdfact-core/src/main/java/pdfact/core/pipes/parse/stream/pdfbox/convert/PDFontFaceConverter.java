@@ -3,11 +3,14 @@ package pdfact.core.pipes.parse.stream.pdfbox.convert;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.FontFace.FontFaceFactory;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDFont objects and font sizes to {@link FontFace}
@@ -16,6 +19,12 @@ import pdfact.core.model.FontFace.FontFaceFactory;
  * @author Claudius Korzen
  */
 public class PDFontFaceConverter {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link FontFace}.
    */
@@ -67,6 +76,7 @@ public class PDFontFaceConverter {
 
     // Add the new font face to the map of known font faces.
     this.knownFontFaces.put(font.getId() + ":" + fontSize, newFontFace);
+    log.debug("A new font face was registered: " + newFontFace);
 
     return newFontFace;
   }

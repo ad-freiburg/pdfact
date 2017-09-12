@@ -42,7 +42,7 @@ public class MaxXComparator implements Comparator<HasPosition>, Serializable {
     if (pos2 == null) {
       return -1;
     }
-    
+
     Page page1 = pos1.getPage();
     Page page2 = pos2.getPage();
     if (page1 == null && page2 == null) {
@@ -54,13 +54,13 @@ public class MaxXComparator implements Comparator<HasPosition>, Serializable {
     if (page2 == null) {
       return -1;
     }
-    
+
     int pageNum1 = page1.getPageNumber();
     int pageNum2 = page2.getPageNumber();
     if (pageNum1 != pageNum2) {
       return pageNum1 - pageNum2;
     }
-    
+
     Rectangle rect1 = pos1.getRectangle();
     Rectangle rect2 = pos2.getRectangle();
     if (rect1 == null && rect2 == null) {

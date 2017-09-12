@@ -59,4 +59,11 @@ public class PlainPipeline implements Pipeline {
   public void addPipe(Pipe pipe) {
     this.pipes.add(pipe);
   }
+
+  // ==========================================================================
+
+  @Override
+  public int size() {
+    return this.pipes != null ? this.pipes.size() : 0;
+  }
 }

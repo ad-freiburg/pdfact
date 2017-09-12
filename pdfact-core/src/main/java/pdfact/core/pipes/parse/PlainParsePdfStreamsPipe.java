@@ -1,10 +1,13 @@
 package pdfact.core.pipes.parse;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.core.model.PdfDocument;
 import pdfact.core.pipes.parse.stream.PdfStreamsParser.PdfStreamsParserFactory;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link ParsePdfStreamsPipe}.
@@ -12,6 +15,12 @@ import pdfact.core.util.exception.PdfActException;
  * @author Claudius Korzen
  */
 public class PlainParsePdfStreamsPipe implements ParsePdfStreamsPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create a parser that parses PDF streams.
    */
@@ -29,9 +38,17 @@ public class PlainParsePdfStreamsPipe implements ParsePdfStreamsPipe {
     this.factory = factory;
   }
 
+  // ==========================================================================
+
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Parsing the PDF.");
     parsePdf(pdf);
+    log.debug("Parsing the PDF done.");
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 

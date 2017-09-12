@@ -32,12 +32,12 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   protected List<Position> positions;
 
   /**
-   * The role of this paragraph.
+   * The semantic role of this paragraph.
    */
   protected SemanticRole role;
 
   /**
-   * The secondary role of this paragraph.
+   * The secondary semantic role of this paragraph.
    */
   protected SemanticRole secondaryRole;
 
@@ -47,7 +47,7 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   protected CharacterStatistic characterStatistic;
 
   /**
-   * Creates an empty paragraph.
+   * Creates a new paragraph.
    * 
    * @param wordListFactory
    *        The factory to create instances of {@link WordList}.
@@ -158,12 +158,12 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   }
 
   @Override
-  public SemanticRole getSecondaryRole() {
+  public SemanticRole getSecondarySemanticRole() {
     return this.secondaryRole;
   }
 
   @Override
-  public void setSecondaryRole(SemanticRole secondaryRole) {
+  public void setSecondarySemanticRole(SemanticRole secondaryRole) {
     this.secondaryRole = secondaryRole;
   }
 
@@ -183,7 +183,7 @@ public class PlainParagraph extends PlainElement implements Paragraph {
 
   @Override
   public String toString() {
-    return "PlainParagraph(" + this.getText() + ")";
+    return "Paragraph(" + this.getText() + ")";
   }
 
   // ==========================================================================
@@ -198,7 +198,9 @@ public class PlainParagraph extends PlainElement implements Paragraph {
       builder.append(getText(), otherParagraph.getText());
       builder.append(getPositions(), otherParagraph.getPositions());
       builder.append(getSemanticRole(), otherParagraph.getSemanticRole());
-      
+      builder.append(getSecondarySemanticRole(),
+          otherParagraph.getSecondarySemanticRole());
+
       return builder.isEquals();
     }
     return false;
@@ -211,6 +213,7 @@ public class PlainParagraph extends PlainElement implements Paragraph {
     builder.append(getText());
     builder.append(getPositions());
     builder.append(getSemanticRole());
+    builder.append(getSecondarySemanticRole());
     return builder.hashCode();
   }
 }

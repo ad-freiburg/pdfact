@@ -43,7 +43,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
    * The statistics about the characters in this text block.
    */
   protected CharacterStatistic characterStatistic;
-  
+
   /**
    * The statistics about the text lines in this text block.
    */
@@ -82,7 +82,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
     }
     return this.textLines.get(this.textLines.size() - 1);
   }
-  
+
   @Override
   public void setTextLines(TextLineList textLines) {
     this.textLines = textLines;
@@ -135,7 +135,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   }
 
   // ==========================================================================
-  
+
   @Override
   public TextLineStatistic getTextLineStatistic() {
     return this.textLineStatistic;
@@ -145,7 +145,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   public void setTextLineStatistic(TextLineStatistic statistic) {
     this.textLineStatistic = statistic;
   }
-  
+
   // ==========================================================================
 
   @Override
@@ -161,12 +161,12 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   // ==========================================================================
 
   @Override
-  public SemanticRole getSecondaryRole() {
+  public SemanticRole getSecondarySemanticRole() {
     return this.secondaryRole;
   }
 
   @Override
-  public void setSecondaryRole(SemanticRole secondaryRole) {
+  public void setSecondarySemanticRole(SemanticRole secondaryRole) {
     this.secondaryRole = secondaryRole;
   }
 
@@ -174,7 +174,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
 
   @Override
   public String toString() {
-    return "PlainTextBlock(pos: " + getPosition() + ")";
+    return "TextBlock(pos: " + getPosition() + ")";
   }
 
   // ==========================================================================
@@ -189,7 +189,9 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
       builder.append(getText(), otherTextBlock.getText());
       builder.append(getPosition(), otherTextBlock.getPosition());
       builder.append(getSemanticRole(), otherTextBlock.getSemanticRole());
-      
+      builder.append(getSecondarySemanticRole(),
+          otherTextBlock.getSecondarySemanticRole());
+
       return builder.isEquals();
     }
     return false;
@@ -202,6 +204,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
     builder.append(getText());
     builder.append(getPosition());
     builder.append(getSemanticRole());
+    builder.append(getSecondarySemanticRole());
     return builder.hashCode();
   }
 }

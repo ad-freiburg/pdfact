@@ -4,7 +4,7 @@ import pdfact.core.util.counter.FloatCounter;
 import pdfact.core.util.counter.ObjectCounter;
 
 /**
- * A statistic about a list of characters.
+ * A statistic about characters.
  * 
  * @author Claudius Korzen
  */

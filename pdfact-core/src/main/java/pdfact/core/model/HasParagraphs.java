@@ -10,38 +10,38 @@ import java.util.List;
 public interface HasParagraphs extends HasTextLineStatistic,
     HasCharacterStatistic {
   /**
-   * Returns the paragraphs of the element.
+   * Returns the paragraphs of this element.
    * 
-   * @return The paragraphs.
+   * @return The paragraphs of this element.
    */
   List<Paragraph> getParagraphs();
 
   /**
-   * Returns the first paragraph of the element.
+   * Returns the first paragraph of this element.
    * 
-   * @return The first paragraph.
+   * @return The first paragraph or null if there are no paragraphs.
    */
   Paragraph getFirstParagraph();
 
   /**
-   * Returns the last paragraph of the element.
+   * Returns the last paragraph of this element.
    * 
-   * @return The last paragraph.
+   * @return The last paragraph or null if there are no paragraphs.
    */
   Paragraph getLastParagraph();
 
   // ==========================================================================
 
   /**
-   * Sets the paragraphs of the element.
+   * Sets the paragraphs of this element.
    * 
    * @param paragraphs
-   *        The paragraphs to set.
+   *        The paragraphs of this element.
    */
   void setParagraphs(List<Paragraph> paragraphs);
 
   /**
-   * Adds paragraphs to the element.
+   * Adds the given paragraphs to this element.
    * 
    * @param paragraphs
    *        The paragraphs to add.
@@ -49,7 +49,7 @@ public interface HasParagraphs extends HasTextLineStatistic,
   void addParagraphs(List<Paragraph> paragraphs);
 
   /**
-   * Adds a paragraph to the element.
+   * Adds the given paragraph to this element.
    * 
    * @param paragraph
    *        The paragraph to add.

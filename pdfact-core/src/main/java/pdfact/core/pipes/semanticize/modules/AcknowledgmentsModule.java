@@ -42,7 +42,7 @@ public class AcknowledgmentsModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondRole = block.getSecondaryRole();
+        SemanticRole secondRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the Acknowledgments section).
@@ -57,7 +57,7 @@ public class AcknowledgmentsModule implements PdfTextSemanticizerModule {
         // Check if the current block is the heading of the Acknowledgments
         // section (which would denote the start of the Acknowledgments
         // section).
-        if (role == SemanticRole.HEADING 
+        if (role == SemanticRole.HEADING
             && secondRole == SemanticRole.ACKNOWLEDGMENTS) {
           this.isAcknowledgments = true;
         }

@@ -115,7 +115,7 @@ public class PlainFont extends PlainResource implements Font {
 
   @Override
   public String toString() {
-    return "PlainFont(" + this.normalizedName + ", " + this.basename + ", "
+    return "Font(" + this.normalizedName + ", " + this.basename + ", "
         + this.fontFamilyName + ", id: " + this.id + ", isType3: "
         + this.isType3Font + ", isBold: " + this.isBold + ", isItalic: "
         + this.isItalic() + ")";
@@ -133,7 +133,7 @@ public class PlainFont extends PlainResource implements Font {
       builder.append(isType3Font(), otherFont.isType3Font());
       builder.append(isBold(), otherFont.isBold());
       builder.append(isItalic(), otherFont.isItalic());
-      
+
       return builder.isEquals();
     }
     return false;

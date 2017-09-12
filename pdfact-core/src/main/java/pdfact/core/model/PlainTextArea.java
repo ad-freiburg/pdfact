@@ -22,7 +22,7 @@ public class PlainTextArea implements TextArea {
   protected Position position;
 
   /**
-   * The statistics about the characters in this area.
+   * The statistic about the characters in this area.
    */
   protected CharacterStatistic characterStatistic;
 
@@ -78,18 +78,6 @@ public class PlainTextArea implements TextArea {
   // ==========================================================================
 
   @Override
-  public Position getPosition() {
-    return this.position;
-  }
-
-  @Override
-  public void setPosition(Position position) {
-    this.position = position;
-  }
-
-  // ==========================================================================
-
-  @Override
   public CharacterStatistic getCharacterStatistic() {
     return this.characterStatistic;
   }
@@ -97,5 +85,17 @@ public class PlainTextArea implements TextArea {
   @Override
   public void setCharacterStatistic(CharacterStatistic statistic) {
     this.characterStatistic = statistic;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public Position getPosition() {
+    return this.position;
+  }
+
+  @Override
+  public void setPosition(Position position) {
+    this.position = position;
   }
 }

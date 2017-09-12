@@ -13,6 +13,7 @@ import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.cff.Type1CharString;
 import org.apache.fontbox.type1.Type1Font;
 import org.apache.fontbox.util.BoundingBox;
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSString;
@@ -53,6 +54,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxAFMUtils;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * Tj: Show a text string.
@@ -60,6 +62,12 @@ import pdfact.core.util.PdfActUtils;
  * @author Claudius Korzen
  */
 public class ShowText extends OperatorProcessor {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link CharacterFactory}.
    */
@@ -96,6 +104,11 @@ public class ShowText extends OperatorProcessor {
   protected PDColorConverter colorTranslator;
 
   /**
+   * The util to read the specifications of special glyphs.
+   */
+  protected PdfBoxGlyphUtils glyphUtils;
+
+  /**
    * The number of already processed characters (needed to define the sequence
    * number of a character).
    */
@@ -118,12 +131,15 @@ public class ShowText extends OperatorProcessor {
    *        The factory to create instances of {@link Point}.
    * @param positionFactory
    *        The factory to create instances of {@link Position}.
+   * @param glyphUtils
+   *        The util to read the specifications of special glyphs.
    */
   @Inject
   public ShowText(CharacterFactory characterFactory,
       PDFontConverter fontTranslator, PDFontFaceConverter fontFaceConverter,
       PDColorConverter colorTranslator, RectangleFactory rectangleFactory,
-      PointFactory pointFactory, PositionFactory positionFactory) {
+      PointFactory pointFactory, PositionFactory positionFactory,
+      PdfBoxGlyphUtils glyphUtils) {
     this.characterFactory = characterFactory;
     this.fontTranslator = fontTranslator;
     this.fontFaceConverter = fontFaceConverter;
@@ -131,6 +147,7 @@ public class ShowText extends OperatorProcessor {
     this.rectangleFactory = rectangleFactory;
     this.pointFactory = pointFactory;
     this.positionFactory = positionFactory;
+    this.glyphUtils = glyphUtils;
   }
 
   // ==========================================================================
@@ -224,6 +241,8 @@ public class ShowText extends OperatorProcessor {
         Matrix translate = Matrix.getTranslateInstance(tx, ty);
         this.engine.getTextMatrix().concatenate(translate);
       }
+    } catch (Exception e) {
+      log.warn("An error occurred on processing the character " + text, e);
     }
   }
 
@@ -238,7 +257,7 @@ public class ShowText extends OperatorProcessor {
    * @param page
    *        The PDF page to which the glyph belongs to.
    * @param glyph
-   *        The Unicode text for this glyph.
+   *        The unicode text for this glyph.
    * @param code
    *        The internal PDF character code for the glyph
    * @param pdFont
@@ -267,15 +286,14 @@ public class ShowText extends OperatorProcessor {
         // Don't adjust bounding box if the width is 0.
         box.setMinX(pdfBoxBoundBox.getMinX());
         box.setMaxX(pdfBoxBoundBox.getMaxX());
-      } else
-        if (PdfActUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
-          if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
-            box.setMinX(pdfBoxBoundBox.getMinX());
-          }
-          if (pdfBoxBoundBox.getMaxX() > box.getMaxX()) {
-            box.setMaxX(pdfBoxBoundBox.getMaxX());
-          }
+      } else if (PdfActUtils.isLarger(pdfBoxBoundBox.getWidth(), 0, 0.1f)) {
+        if (pdfBoxBoundBox.getMinX() < box.getMinX()) {
+          box.setMinX(pdfBoxBoundBox.getMinX());
         }
+        if (pdfBoxBoundBox.getMaxX() > box.getMaxX()) {
+          box.setMaxX(pdfBoxBoundBox.getMaxX());
+        }
+      }
     } else {
       // Use the bounding box of PdfBox.
       box = pdfBoxBoundBox;
@@ -297,9 +315,9 @@ public class ShowText extends OperatorProcessor {
     }
 
     // Use our additional glyph list for Unicode mapping
-    GlyphList additionalGlyphs = PdfBoxGlyphUtils.getAdditionalGlyphs();
+    GlyphList additionalGlyphs = this.glyphUtils.getAdditionalGlyphs();
     String unicode = pdFont.toUnicode(code, additionalGlyphs);
-    
+
     // TODO: If we need the hasEncoding flag, uncomment the following:
     // boolean hasEncoding = unicode != null;
     //
@@ -375,7 +393,7 @@ public class ShowText extends OperatorProcessor {
     character.setFontFace(fontFace);
     character.setColor(color);
     character.setPosition(position);
-    character.setSequenceNumber(this.sequenceNumber++);
+    character.setExtractionRank(this.sequenceNumber++);
 
     this.engine.handlePdfCharacter(pdf, page, character);
   }

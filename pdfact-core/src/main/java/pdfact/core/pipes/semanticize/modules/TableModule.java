@@ -43,7 +43,7 @@ public class TableModule implements PdfTextSemanticizerModule {
         }
 
         Rectangle blockRectangle = block.getPosition().getRectangle();
-        
+
         for (Shape shape : shapes) {
           // The block is a part of a table if there is a shape that overlaps
           // the block, but the shape is not completely included in the block

@@ -71,7 +71,7 @@ public class CaptionModule implements PdfTextSemanticizerModule {
             block.setSemanticRole(SemanticRole.CAPTION);
             // Set also the secondary role, e.g. "figure" for a figures
             // caption.
-            block.setSecondaryRole(role);
+            block.setSecondarySemanticRole(role);
             break;
           }
         }

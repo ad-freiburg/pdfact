@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
 
@@ -18,6 +19,7 @@ import com.google.inject.Inject;
 
 import pdfact.core.model.Font;
 import pdfact.core.model.Font.FontFactory;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDFont objects to {@link Font} objects.
@@ -25,6 +27,12 @@ import pdfact.core.model.Font.FontFactory;
  * @author Claudius Korzen
  */
 public class PDFontConverter {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link Font}.
    */
@@ -79,6 +87,7 @@ public class PDFontConverter {
 
     // Add the new font to the map of known fonts.
     this.knownFonts.put(newFont.getNormalizedName(), newFont);
+    log.debug("A new font was registered: " + newFont);
 
     return newFont;
   }
@@ -98,7 +107,9 @@ public class PDFontConverter {
     // Read the AFM file that contains some metadata about common fonts.
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     InputStream afm = classLoader.getResourceAsStream(AFM_FILE_PATH);
-    
+
+    log.debug("Reading the AFM file '" + AFM_FILE_PATH + "'.");
+
     try (BufferedReader br =
         new BufferedReader(new InputStreamReader(afm, DEFAULT_ENCODING))) {
       String line;
@@ -123,10 +134,14 @@ public class PDFontConverter {
         font.setIsType3Font(false);
 
         knownFonts.put(font.getNormalizedName(), font);
+        log.trace("Read font: " + font);
       }
     } catch (IOException e) {
-      // Nothing to do so far. TODO: Log message.
+      log.warn("An error occurred on reading the AFM file.", e);
     }
+
+    log.debug("Reading the AFM file done.");
+    log.debug("# read fonts: " + knownFonts.size());
     return knownFonts;
   }
 

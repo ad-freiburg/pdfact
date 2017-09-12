@@ -28,9 +28,9 @@ public class PlainPosition implements Position {
    * Creates a new position.
    * 
    * @param page
-   *        The page.
+   *        The page of the position.
    * @param rectangle
-   *        The rectangle.
+   *        The rectangle of the position.
    */
   @AssistedInject
   public PlainPosition(@Assisted Page page, @Assisted Rectangle rectangle) {
@@ -56,7 +56,8 @@ public class PlainPosition implements Position {
    * 
    */
   @AssistedInject
-  public PlainPosition(RectangleFactory rectangleFactory,
+  public PlainPosition(
+      RectangleFactory rectangleFactory,
       @Assisted("page") Page page,
       @Assisted("minX") float minX,
       @Assisted("minY") float minY,
@@ -79,7 +80,8 @@ public class PlainPosition implements Position {
    *        The upper right vertex of the rectangle to be created.
    */
   @AssistedInject
-  public PlainPosition(RectangleFactory rectangleFactory,
+  public PlainPosition(
+      RectangleFactory rectangleFactory,
       @Assisted("page") Page page,
       @Assisted("point1") Point point1,
       @Assisted("point2") Point point2) {
@@ -107,6 +109,11 @@ public class PlainPosition implements Position {
   }
 
   @Override
+  public int getPageNumber() {
+    return getPage() != null ? getPage().getPageNumber() : 0;
+  }
+
+  @Override
   public void setPage(Page page) {
     this.page = page;
   }
@@ -115,20 +122,20 @@ public class PlainPosition implements Position {
 
   @Override
   public String toString() {
-    return "PlainPosition(page: " + getPage() + ", rect: " + getRectangle()
-        + ")";
+    return "Position(page: " + getPage() + ", rect: " + getRectangle() + ")";
   }
 
   // ==========================================================================
 
   @Override
-  public boolean equals(Object o) {
-    if (o instanceof Position) {
-      Position other = (Position) o;
+  public boolean equals(Object other) {
+    if (other instanceof Position) {
+      Position otherPosition = (Position) other;
 
       EqualsBuilder build = new EqualsBuilder();
-      build.append(getRectangle(), other.getRectangle());
-      build.append(getPage().getPageNumber(), other.getPage().getPageNumber());
+      build.append(getRectangle(), otherPosition.getRectangle());
+      // Using getPage() here results in an infinite loop.
+      build.append(getPageNumber(), otherPosition.getPageNumber());
 
       return build.isEquals();
     }
@@ -139,7 +146,8 @@ public class PlainPosition implements Position {
   public int hashCode() {
     HashCodeBuilder builder = new HashCodeBuilder();
     builder.append(getRectangle());
-    builder.append(getPage().getPageNumber());
+    // Using getPage() here results in an infinite loop.
+    builder.append(getPageNumber());
     return builder.hashCode();
   }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 import pdfact.core.model.TextLine;
 
-//TODO: Is TextLineList still needed?
+// TODO: Is TextLineList still needed?
 
 /**
  * A list of text lines in a PDF document.
@@ -24,12 +24,12 @@ public interface TextLineList extends ElementList<TextLine> {
    * @return A list of length 2, containing the two resulting views.
    */
   List<TextLineList> cut(int splitIndex);
-  
+
   @Override
   TextLineList subList(int fromIndex, int toIndex);
-  
+
   // ==========================================================================
-  
+
   /**
    * The factory to create instances of {@link TextLineList}.
    * 

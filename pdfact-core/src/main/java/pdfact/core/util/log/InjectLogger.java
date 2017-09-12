@@ -14,5 +14,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RUNTIME)
 public @interface InjectLogger {
-  
+
 }

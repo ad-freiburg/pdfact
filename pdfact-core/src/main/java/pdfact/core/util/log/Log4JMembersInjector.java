@@ -11,7 +11,8 @@ import com.google.inject.MembersInjector;
  * 
  * @author Claudius Korzen
  * 
- * @param <T> The type to inject members of.
+ * @param <T>
+ *        The type to inject members of.
  */
 class Log4JMembersInjector<T> implements MembersInjector<T> {
   /**
@@ -26,7 +27,8 @@ class Log4JMembersInjector<T> implements MembersInjector<T> {
   /**
    * The default constructor.
    * 
-   * @param field The field to set.
+   * @param field
+   *        The field to set.
    */
   public Log4JMembersInjector(Field field) {
     this.field = field;
@@ -42,9 +44,9 @@ class Log4JMembersInjector<T> implements MembersInjector<T> {
       throw new RuntimeException(e);
     }
   }
-  
+
   // ==========================================================================
-  
+
   /**
    * Returns the created logger.
    * 

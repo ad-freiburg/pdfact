@@ -3,6 +3,8 @@ package pdfact.core.pipes.tokenize.lines;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
@@ -26,6 +28,7 @@ import pdfact.core.util.lexicon.CharacterLexicon;
 import pdfact.core.util.list.CharacterList;
 import pdfact.core.util.list.TextLineList;
 import pdfact.core.util.list.TextLineList.TextLineListFactory;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 import pdfact.core.util.xycut.XYCut;
@@ -37,6 +40,12 @@ import pdfact.core.util.xycut.XYCut;
  */
 public class PlainTokenizeToTextLinesPipe extends XYCut
     implements TokenizeToTextLinesPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link TextLineList}.
    */
@@ -76,6 +85,16 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    * The factory to create instances of {@link FloatCounter}.
    */
   protected FloatCounterFactory floatCounterFactory;
+
+  /**
+   * The number of processed text areas.
+   */
+  protected int numProcessedTextAreas;
+
+  /**
+   * The number of tokenized text lines.
+   */
+  protected int numTokenizedTextLines;
 
   /**
    * Creates a new text line tokenizer.
@@ -121,7 +140,17 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Tokenizing the text areas into text lines.");
     tokenizeToTextLines(pdf);
+
+    log.debug("Tokenizing the text areas into text lines done.");
+    log.debug("# processed text areas: " + this.numProcessedTextAreas);
+    log.debug("# tokenized text lines: " + this.numTokenizedTextLines);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
+
     return pdf;
   }
 
@@ -179,6 +208,8 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
     for (TextArea area : page.getTextAreas()) {
       List<CharacterList> charLists = cut(pdf, page, area.getCharacters());
 
+      this.numProcessedTextAreas++;
+
       for (CharacterList charList : charLists) {
         // Create a PdfTextLine object.
         TextLine textLine = this.textLineFactory.create();
@@ -189,6 +220,8 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
         result.add(textLine);
       }
     }
+
+    this.numTokenizedTextLines += result.size();
 
     return result;
   }

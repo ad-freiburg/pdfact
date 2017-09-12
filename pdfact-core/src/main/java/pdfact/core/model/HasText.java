@@ -7,17 +7,17 @@ package pdfact.core.model;
  */
 public interface HasText {
   /**
-   * Returns the text of the element.
+   * Returns the text of this element.
    * 
-   * @return The text.
+   * @return The text of this element.
    */
   String getText();
 
   /**
-   * Sets the text of the element.
+   * Sets the text of this element.
    * 
    * @param text
-   *        The text.
+   *        The text of this element.
    */
   void setText(String text);
 }

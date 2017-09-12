@@ -12,7 +12,7 @@ import pdfact.core.util.exception.PdfActException;
  */
 public interface Pipeline {
   /**
-   * Processes the pipes of this pipeline sequentially, with the given PDF 
+   * Processes the pipes of this pipeline sequentially, with the given PDF
    * document as input.
    * 
    * @param pdf
@@ -58,9 +58,18 @@ public interface Pipeline {
    *        The pipe to register to this pipeline.
    */
   void addPipe(Pipe pipe);
-  
+
   // ==========================================================================
-  
+
+  /**
+   * Returns the number of pipes in this pipeline.
+   * 
+   * @return The number of pipes in this pipeline.
+   */
+  int size();
+
+  // ==========================================================================
+
   /**
    * The factory to create instances of {@link Pipeline}.
    * 

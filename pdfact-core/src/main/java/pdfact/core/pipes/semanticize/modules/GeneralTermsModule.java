@@ -42,7 +42,7 @@ public class GeneralTermsModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondaryRole = block.getSecondaryRole();
+        SemanticRole secondaryRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the "General Terms" section).
@@ -57,7 +57,7 @@ public class GeneralTermsModule implements PdfTextSemanticizerModule {
         // Check if the current block is the heading of the "General Terms"
         // section heading (which would denote the start of the "General Terms"
         // section).
-        if (role == SemanticRole.HEADING 
+        if (role == SemanticRole.HEADING
             && secondaryRole == SemanticRole.GENERAL_TERMS) {
           this.isGeneralTerms = true;
         }

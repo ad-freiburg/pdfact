@@ -157,21 +157,21 @@ import pdfact.core.util.statistician.PlainTextLineStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 
 /**
- * A module that defines the basic Guice bindings of PdfAct.
+ * A module that defines the basic Guice bindings for PdfAct.
  * 
  * @author Claudius Korzen
  */
 public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
   @Override
   protected void configure() {
-    // Install the factory of the pipeline.
+    // Install the factory of the basic pipeline.
     install(new FactoryModuleBuilder()
         .implement(Pipeline.class, PlainPipeline.class)
         .build(PdfActPipelineFactory.class));
 
-    // Bind the log4j type listener.
+    // Bind the listener to inject log4j loggers.
     bindListener(Matchers.any(), new Log4JTypeListener());
-    
+
     // ========================================================================
 
     // Install the factory of the pipe that validates the paths of PDF files.
@@ -200,17 +200,17 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
             PlainStandardizeCharactersPipe.class)
         .build(StandardizeCharactersPipeFactory.class));
 
-    // Install the factory of the pipe that filters characters.
+    // Install the factory of the pipe that filters specific characters.
     install(new FactoryModuleBuilder()
         .implement(FilterCharactersPipe.class, PlainFilterCharactersPipe.class)
         .build(FilterCharactersPipeFactory.class));
 
-    // Install the factory of the pipe that filters figures.
+    // Install the factory of the pipe that filters specific figures.
     install(new FactoryModuleBuilder()
         .implement(FilterFiguresPipe.class, PlainFilterFiguresPipe.class)
         .build(FilterFiguresPipeFactory.class));
 
-    // Install the factory of the pipe that filters shapes.
+    // Install the factory of the pipe that filters specific shapes.
     install(new FactoryModuleBuilder()
         .implement(FilterShapesPipe.class, PlainFilterShapesPipe.class)
         .build(FilterShapesPipeFactory.class));
@@ -238,7 +238,7 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
             PlainTokenizeToTextBlocksPipe.class)
         .build(TokenizeToTextBlocksPipeFactory.class));
 
-    // Install the factory of the pipe that detects semantics of text blocks.
+    // Install the factory of the pipe that detects the semantics of blocks.
     install(new FactoryModuleBuilder()
         .implement(DetectSemanticsPipe.class, PlainDetectSemanticsPipe.class)
         .build(DetectSemanticsPipeFactory.class));
@@ -254,7 +254,7 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .implement(DehyphenateWordsPipe.class, PlainDehyphenateWordsPipe.class)
         .build(DehyphenateWordsPipeFactory.class));
 
-    // Install the factory of the pipe that combines all core module pipes.
+    // Install the factory of the core pipe (combining all core module pipes).
     install(new FactoryModuleBuilder()
         .implement(PdfActCorePipe.class, PlainPdfActCorePipe.class)
         .build(PdfActCorePipeFactory.class));
@@ -362,17 +362,17 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .implement(Paragraph.class, PlainParagraph.class)
         .build(ParagraphFactory.class));
 
-    // Install the factory to build a character statistic.
+    // Install the factory to build a statistic about characters.
     install(new FactoryModuleBuilder()
         .implement(CharacterStatistic.class, PlainCharacterStatistic.class)
         .build(CharacterStatisticFactory.class));
 
-    // Install the factory to build a text line statistic.
+    // Install the factory to build a statistics about text lines.
     install(new FactoryModuleBuilder()
         .implement(TextLineStatistic.class, PlainTextLineStatistic.class)
         .build(TextLineStatisticFactory.class));
 
-    // Install the statisticians (that compute the statistics).
+    // Install the statisticians (computing the statistics).
     bind(CharacterStatistician.class).to(PlainCharacterStatistician.class);
     bind(TextLineStatistician.class).to(PlainTextLineStatistician.class);
 

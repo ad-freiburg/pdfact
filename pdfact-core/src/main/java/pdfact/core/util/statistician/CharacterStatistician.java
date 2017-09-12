@@ -22,7 +22,7 @@ public interface CharacterStatistician {
    * @return The computed character statistics.
    */
   CharacterStatistic compute(HasCharacters hasCharacters);
-  
+
   /**
    * Computes the character statistic for the given characters.
    * 

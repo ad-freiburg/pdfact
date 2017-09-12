@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.CharacterStatistic;
@@ -23,6 +25,7 @@ import pdfact.core.model.TextBlock.TextBlockFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.TextLineList;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 
@@ -32,6 +35,12 @@ import pdfact.core.util.statistician.TextLineStatistician;
  * @author Claudius Korzen
  */
 public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link TextBlock}.
    */
@@ -56,6 +65,16 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * The statistician to compute statistics about text lines.
    */
   protected TextLineStatistician textLineStatistician;
+
+  /**
+   * The number of processed text lines.
+   */
+  protected int numProcessedTextLines;
+
+  /**
+   * The number of tokenized text blocks.
+   */
+  protected int numTokenizedTextBlocks;
 
   /**
    * The default constructor.
@@ -89,7 +108,16 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Tokenizing the text lines into text blocks.");
     tokenizeToTextBlocks(pdf);
+
+    log.debug("Tokenizing the text lines into text blocks done.");
+    log.debug("# processed text lines : " + this.numProcessedTextLines);
+    log.debug("# tokenized text blocks: " + this.numTokenizedTextBlocks);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -149,7 +177,9 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       TextLine prev = i > 0 ? lines.get(i - 1) : null;
       TextLine line = lines.get(i);
       TextLine next = i < lines.size() - 1 ? lines.get(i + 1) : null;
-      
+
+      this.numProcessedTextLines++;
+
       if (introducesNewTextBlock(pdf, page, textBlock, prev, line, next)) {
         if (!textBlock.getTextLines().isEmpty()) {
           textBlocks.add(textBlock);
@@ -174,6 +204,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       block.setText(computeText(block));
     }
 
+    this.numTokenizedTextBlocks += textBlocks.size();
+
     return textBlocks;
   }
 
@@ -184,7 +216,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    *
    * @param block
    *        The text block to process.
-   *        
+   * 
    * @return The character statistic for the given text block.
    */
   protected CharacterStatistic computeCharacterStatistic(TextBlock block) {
@@ -500,14 +532,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     if (prevLine == null || line == null) {
       return false;
     }
-    
+
     // If the font of the previous line and the font of the current line are
     // not from the same base, the line has a special font face.
     CharacterStatistic prevLineCharStats = prevLine.getCharacterStatistic();
     FontFace prevLineFontFace = prevLineCharStats.getMostCommonFontFace();
     Font prevLineFont = prevLineFontFace.getFont();
     float prevLineFontsize = prevLineFontFace.getFontSize();
-    
+
     CharacterStatistic lineCharStats = line.getCharacterStatistic();
     FontFace lineFontFace = lineCharStats.getMostCommonFontFace();
     Font lineFont = lineFontFace.getFont();
@@ -515,7 +547,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
     String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
     String lineFontFamilyName = lineFont.getFontFamilyName();
-    
+
     if (prevLineFontFamilyName == null && lineFontFamilyName != null) {
       return true;
     }

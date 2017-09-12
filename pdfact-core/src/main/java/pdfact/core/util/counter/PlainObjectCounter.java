@@ -111,7 +111,7 @@ public class PlainObjectCounter<T> extends TObjectIntHashMap<T>
   public int getFrequency(T object) {
     return get(object);
   }
-  
+
   // ==========================================================================
 
   /**

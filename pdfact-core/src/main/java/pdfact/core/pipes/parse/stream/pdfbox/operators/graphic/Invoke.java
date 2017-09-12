@@ -6,6 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSName;
@@ -30,6 +31,7 @@ import pdfact.core.model.Shape.ShapeFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.ColorUtils;
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * Do: Invoke a named xobject.
@@ -37,6 +39,12 @@ import pdfact.core.util.PdfActUtils;
  * @author Claudius Korzen
  */
 public class Invoke extends OperatorProcessor {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link Figure}.
    */
@@ -159,11 +167,17 @@ public class Invoke extends OperatorProcessor {
       if (exclusiveColor != null) {
         Color color = this.colorFactory.create();
         color.setRGB(exclusiveColor);
+
+        log.debug("The xobject consists only of the color " + color + ". "
+            + "Considering it as a shape.");
+
         Shape shape = this.shapeFactory.create();
         shape.setPosition(position);
         shape.setColor(color);
         this.engine.handlePdfShape(pdf, page, shape);
       } else {
+        log.debug("Considering the xobject as a figure.");
+
         Figure figure = this.figureFactory.create();
         figure.setPosition(position);
         this.engine.handlePdfFigure(pdf, page, figure);

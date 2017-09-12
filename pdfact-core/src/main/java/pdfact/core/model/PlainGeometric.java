@@ -1,8 +1,8 @@
 package pdfact.core.model;
 
 /**
- * The base class of a (two-dimensional) geometric object (e.g., a point, a
- * line, a rectangle, etc).
+ * The base class of (two-dimensional) geometric objects (e.g., a point, a line,
+ * a rectangle, etc).
  * 
  * @author Claudius Korzen
  */

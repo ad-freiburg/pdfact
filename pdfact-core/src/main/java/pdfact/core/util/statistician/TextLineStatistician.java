@@ -22,7 +22,7 @@ public interface TextLineStatistician {
    * @return The computed text line statistics.
    */
   TextLineStatistic compute(HasTextLines hasTextLines);
-  
+
   /**
    * Computes the text line statistic for the given text lines.
    * 

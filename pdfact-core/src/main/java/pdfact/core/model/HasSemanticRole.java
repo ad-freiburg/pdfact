@@ -7,14 +7,14 @@ package pdfact.core.model;
  */
 public interface HasSemanticRole {
   /**
-   * Returns the semantic role of the element.
+   * Returns the semantic role of this element.
    * 
    * @return The semantic role.
    */
   SemanticRole getSemanticRole();
 
   /**
-   * Sets the semantic role of the element.
+   * Sets the semantic role of this element.
    * 
    * @param role
    *        The semantic role.
@@ -29,15 +29,15 @@ public interface HasSemanticRole {
    * example, the primary role "section heading" could have a secondary role
    * that gives the role of the belonging section, e.g. "abstract".
    * 
-   * @return The secondary role of the element.
+   * @return The secondary role of this element.
    */
-  SemanticRole getSecondaryRole();
+  SemanticRole getSecondarySemanticRole();
 
   /**
-   * Sets the secondary role of the element.
+   * Sets the secondary role of this element.
    * 
    * @param role
-   *        The secondary role of the element.
+   *        The secondary role of this element.
    */
-  void setSecondaryRole(SemanticRole role);
+  void setSecondarySemanticRole(SemanticRole role);
 }

@@ -3,9 +3,12 @@ package pdfact.core.pipes.validate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.log4j.Logger;
+
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActValidateException;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link ValidatePdfPathPipe}.
@@ -13,16 +16,28 @@ import pdfact.core.util.exception.PdfActValidateException;
  * @author Claudius Korzen
  */
 public class PlainValidatePdfPathPipe implements ValidatePdfPathPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Validating the PDF path.");
     if (pdf == null) {
       String message = "No PDF document given.";
       throw new PdfActValidateException(message);
     }
 
+    log.debug("Validating the PDF path done.");
+    log.debug("validated PDF path: " + pdf.getPath());
     // Validate the path to the PDF file.
     validatePdfPath(pdf.getPath());
 
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 

@@ -41,7 +41,7 @@ public class KeywordsModule implements PdfTextSemanticizerModule {
         }
 
         SemanticRole role = block.getSemanticRole();
-        SemanticRole secondaryRole = block.getSecondaryRole();
+        SemanticRole secondaryRole = block.getSecondarySemanticRole();
 
         // Check if the current block is a section heading (which would
         // denote the end of the Keywords section).
@@ -55,7 +55,7 @@ public class KeywordsModule implements PdfTextSemanticizerModule {
 
         // Check if the current block is the heading of the Keywords section
         // (which would denote the start of the Keywords section).
-        if (role == SemanticRole.HEADING 
+        if (role == SemanticRole.HEADING
             && secondaryRole == SemanticRole.KEYWORDS) {
           this.isKeywords = true;
         }

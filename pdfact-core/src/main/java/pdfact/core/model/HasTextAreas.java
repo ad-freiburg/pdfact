@@ -9,38 +9,38 @@ import java.util.List;
  */
 public interface HasTextAreas extends HasCharacterStatistic {
   /**
-   * Returns the text areas of the element.
+   * Returns the text areas of this element.
    * 
-   * @return The text areas.
+   * @return The text areas of this element.
    */
   List<TextArea> getTextAreas();
 
   /**
-   * Returns the first text area of the element.
+   * Returns the first text area of this element.
    * 
-   * @return the first text area.
+   * @return The first text area or null if there are no text areas.
    */
   TextArea getFirstTextArea();
 
   /**
-   * Returns the last text area of the element.
+   * Returns the last text area of this element.
    * 
-   * @return the last text area.
+   * @return The last text area or null if there are no text areas.
    */
   TextArea getLastTextArea();
 
   // ==========================================================================
 
   /**
-   * Sets the text areas of the element.
+   * Sets the text areas of this element.
    * 
    * @param areas
-   *        The text areas to set.
+   *        The text areas of this element.
    */
   void setTextAreas(List<TextArea> areas);
 
   /**
-   * Adds the given text areas to the element.
+   * Adds the given text areas to this element.
    * 
    * @param areas
    *        The text areas to add.
@@ -48,7 +48,7 @@ public interface HasTextAreas extends HasCharacterStatistic {
   void addTextAreas(List<TextArea> areas);
 
   /**
-   * Adds the given text area to the element.
+   * Adds the given text area to this element.
    * 
    * @param area
    *        The text area to add.

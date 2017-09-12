@@ -3,7 +3,7 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * The interface that declares the methods of a line.
+ * A simple (geometric) line.
  * 
  * @author Claudius Korzen.
  */
@@ -23,35 +23,41 @@ public abstract class Line extends PlainGeometric {
    */
   public abstract void setStartPoint(Point start);
 
+  // ==========================================================================
+
   /**
-   * Returns the x coordinate of the start point.
+   * Returns the x-coordinate of the start point.
    * 
-   * @return The x coordinate of the start point.
+   * @return The x-coordinate of the start point.
    */
   public abstract float getStartX();
 
   /**
-   * Sets the x coordinate of the start point.
+   * Sets the x-coordinate of the start point.
    * 
    * @param x
-   *        The x coordinate of the start point.
+   *        The x-coordinate of the start point.
    */
   public abstract void setStartX(float x);
 
+  // ==========================================================================
+
   /**
-   * Returns the y coordinate of the start point.
+   * Returns the y-coordinate of the start point.
    * 
-   * @return The y coordinate of the start point.
+   * @return The y-coordinate of the start point.
    */
   public abstract float getStartY();
 
   /**
-   * Sets the y coordinate of the start point.
+   * Sets the y-coordinate of the start point.
    * 
    * @param y
-   *        The y coordinate of the start point.
+   *        The y-coordinate of the start point.
    */
   public abstract void setStartY(float y);
+
+  // ==========================================================================
 
   /**
    * Returns the end point of this line.
@@ -68,33 +74,37 @@ public abstract class Line extends PlainGeometric {
    */
   public abstract void setEndPoint(Point end);
 
+  // ==========================================================================
+
   /**
-   * Returns the x coordinate of the end point.
+   * Returns the x-coordinate of the end point.
    * 
-   * @return The x coordinate of the end point.
+   * @return The x-coordinate of the end point.
    */
   public abstract float getEndX();
 
   /**
-   * Sets the x coordinate of the end point.
+   * Sets the x-coordinate of the end point.
    * 
    * @param x
-   *        The x coordinate of the end point.
+   *        The x-coordinate of the end point.
    */
   public abstract void setEndX(float x);
 
+  // ==========================================================================
+
   /**
-   * Returns the y coordinate of the end point.
+   * Returns the y-coordinate of the end point.
    * 
-   * @return The y coordinate of the end point.
+   * @return The y-coordinate of the end point.
    */
   public abstract float getEndY();
 
   /**
-   * Sets the y coordinate of the end point.
+   * Sets the y-coordinate of the end point.
    * 
    * @param y
-   *        The y coordinate of the end point.
+   *        The y-coordinate of the end point.
    */
   public abstract void setEndY(float y);
 
@@ -107,41 +117,43 @@ public abstract class Line extends PlainGeometric {
    */
   public interface LineFactory {
     /**
-     * Creates a new line.
+     * Creates a new instance of {@link Line}.
      * 
-     * @return An instance of {@PdfLine}.
+     * @return A new instance of {@link Line}.
      */
     Line create();
 
     /**
-     * Creates a new line.
+     * Creates a new instance of {@link Line}.
      * 
      * @param startPoint
      *        The start point of the line.
      * @param endPoint
      *        The end point of the line.
      * 
-     * @return An instance of {@PdfLine}.
+     * @return A new instance of {@link Line}.
      */
     Line create(@Assisted("start") Point startPoint,
         @Assisted("end") Point endPoint);
 
     /**
-     * Creates a new line.
+     * Creates a new instance of {@link Line}.
      * 
      * @param startX
-     *        The x-value of the start point of the line.
+     *        The x-coordinate of the start point of the line.
      * @param startY
-     *        The y-value of the start point of the line.
+     *        The y-coordinate of the start point of the line.
      * @param endX
-     *        The x-value of the end point of the line.
+     *        The x-coordinate of the end point of the line.
      * @param endY
-     *        The y-value of the end point of the line.
+     *        The y-coordinate of the end point of the line.
      * 
-     * @return An instance of {@PdfLine}.
+     * @return A new instance of {@link Line}.
      */
-    Line create(@Assisted("startX") float startX,
-        @Assisted("startY") float startY, @Assisted("endX") float endX,
+    Line create(
+        @Assisted("startX") float startX,
+        @Assisted("startY") float startY,
+        @Assisted("endX") float endX,
         @Assisted("endY") float endY);
   }
 }

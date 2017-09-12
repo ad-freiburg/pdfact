@@ -6,6 +6,8 @@ import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import gnu.trove.iterator.TIntIterator;
@@ -21,6 +23,7 @@ import pdfact.core.util.list.CharacterList;
 import pdfact.core.util.list.CharacterList.CharacterListFactory;
 import pdfact.core.util.list.WordList;
 import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.normalize.WordNormalizer;
 import pdfact.core.util.normalize.WordNormalizer.WordNormalizerFactory;
 
@@ -30,6 +33,12 @@ import pdfact.core.util.normalize.WordNormalizer.WordNormalizerFactory;
  * @author Claudius Korzen
  */
 public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link CharacterList}.
    */
@@ -46,19 +55,44 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   protected WordNormalizer wordNormalizer;
 
   /**
-   * The counter for all words which do not include a hyphen.
+   * The index of all words which do not include a hyphen (normal words).
    */
-  protected ObjectCounter<String> singleWords;
+  protected ObjectCounter<String> normalWordsIndex;
 
   /**
-   * The counter for all compound words (word that include a hyphen).
+   * The index of all words with an inner hyphen (compound words).
    */
-  protected ObjectCounter<String> compoundWords;
+  protected ObjectCounter<String> compoundWordsIndex;
 
   /**
-   * The counter for all prefixes of compound words.
+   * The index of all prefixes of compound words.
    */
-  protected ObjectCounter<String> compoundWordPrefixes;
+  protected ObjectCounter<String> prefixesIndex;
+
+  /**
+   * The total number of words in the PDF document.
+   */
+  protected int numWords;
+
+  /**
+   * The total number of processed words on dehyphenation.
+   */
+  protected int numProcessedWords;
+
+  /**
+   * The total number of dehyphenated words.
+   */
+  protected int numDehyphenatedWords;
+
+  /**
+   * The number of dehyphenated words, which resulted in normal words.
+   */
+  protected int numNormalWords;
+
+  /**
+   * The number of dehyphenated words, which resulted in compound words.
+   */
+  protected int numCompoundWords;
 
   /**
    * Creates a new pipe that dehyphenates words.
@@ -73,15 +107,16 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    *        The factory to create instances of {@link ObjectCounter}.
    */
   @Inject
-  public PlainDehyphenateWordsPipe(CharacterListFactory characterListFactory,
+  public PlainDehyphenateWordsPipe(
+      CharacterListFactory characterListFactory,
       WordListFactory wordListFactory,
       WordNormalizerFactory wordNormalizerFactory,
       ObjectCounterFactory<String> objectCounterFactory) {
     this.characterListFactory = characterListFactory;
     this.wordListFactory = wordListFactory;
-    this.singleWords = objectCounterFactory.create();
-    this.compoundWords = objectCounterFactory.create();
-    this.compoundWordPrefixes = objectCounterFactory.create();
+    this.normalWordsIndex = objectCounterFactory.create();
+    this.compoundWordsIndex = objectCounterFactory.create();
+    this.prefixesIndex = objectCounterFactory.create();
 
     this.wordNormalizer = wordNormalizerFactory.create();
     this.wordNormalizer.setIsToLowerCase(true);
@@ -93,8 +128,27 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Preprocess: Counting words.");
     countWords(pdf);
+
+    log.debug("Counting words done.");
+    log.debug("# words               : " + this.numWords);
+    log.debug("# uniq. normal words  : " + this.normalWordsIndex.size());
+    log.debug("# uniq. compound words: " + this.compoundWordsIndex.size());
+    log.debug("# uniq. prefixes      : " + this.prefixesIndex.size());
+
+    log.debug("Process: Dehyphenating words.");
     dehyphenate(pdf);
+
+    log.debug("Dehyphenating words done.");
+    log.debug("# processed words   : " + this.numProcessedWords);
+    log.debug("# dehyphenated words: " + this.numDehyphenatedWords);
+    log.debug("> to normal words   : " + this.numNormalWords);
+    log.debug("> to compound words : " + this.numCompoundWords);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -131,27 +185,33 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
           continue;
         }
 
-        // Count (a) words without hyphens (single words), (b) words with inner
-        // hyphens (compound words) and (c) all prefixes of compound words.
+        this.numWords++;
 
-        // Normalize the word: Remove leading and trailing punctuation marks.
+        // Count normal words, compound words and prefixes of compound words.
+        // The prefixes of a compound word are the substrings before each
+        // hyphen, e.g. for the compound word "sugar-free", the prefix is
+        // "sugar".
+
+        // Normalize the word: Remove leading and trailing punctuation marks
+        // (but not hyphens).
         String wordStr = this.wordNormalizer.normalize(word);
 
         if (wordStr == null || wordStr.isEmpty()) {
           continue;
         }
 
-        // Find the indexes of hyphens.
+        // Check if the word contains hyphens.
         TIntList idxsHyphens = PdfActUtils.indexesOf(wordStr, HYPHENS);
 
         if (idxsHyphens.isEmpty()) {
           // No hyphen was found. The word is a single word.
-          this.singleWords.add(wordStr);
+          this.normalWordsIndex.add(wordStr);
           continue;
         }
 
+        // We are interested only in compound words with inner hyphens.
         if (idxsHyphens.get(0) == 0) {
-          // The word starts with an hyphen. Ignore it.
+          // The word starts with an hyphen. Ignore the word.
           continue;
         }
 
@@ -160,12 +220,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
           continue;
         }
 
-        this.compoundWords.add(wordStr);
+        this.compoundWordsIndex.add(wordStr);
 
+        // Count the prefixes of compound words.
         TIntIterator itr = idxsHyphens.iterator();
         while (itr.hasNext()) {
-          // Add the prefix, e.g. for word "sugar-free", add "sugar".
-          this.compoundWordPrefixes.add(wordStr.substring(0, itr.next()));
+          this.prefixesIndex.add(wordStr.substring(0, itr.next()));
         }
       }
     }
@@ -205,6 +265,8 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
       while (wordItr.hasNext()) {
         Word word = wordItr.next();
 
+        this.numProcessedWords++;
+
         if (word == null) {
           continue;
         }
@@ -215,7 +277,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
         }
 
         Word nextWord = wordItr.hasNext() ? wordItr.next() : null;
-        dehyphenatedWords.add(dehyphenate(word, nextWord));
+        if (nextWord != null) {
+          dehyphenatedWords.add(dehyphenate(word, nextWord));
+          this.numProcessedWords++;
+        } else {
+          dehyphenatedWords.add(word);
+        }
       }
 
       paragraph.setWords(dehyphenatedWords);
@@ -248,9 +315,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
     if (isHyphenMandatory(word1, word2)) {
       mergedChars.addAll(chars1);
+      this.numCompoundWords++;
     } else {
       mergedChars.addAll(chars1.subList(0, chars1.size() - 1));
+      this.numNormalWords++;
     }
+    this.numDehyphenatedWords++;
 
     mergedChars.addAll(chars2);
     word1.setCharacters(chars2);
@@ -278,13 +348,14 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     String word1Str = this.wordNormalizer.normalize(word1);
     String word2Str = this.wordNormalizer.normalize(word2);
 
+    // TODO: Use the word normalizer.
     String prefix = word1Str.replaceAll("[-]$", "");
     String withHyphen = word1Str + word2Str;
     String withoutHyphen = prefix + word2Str;
 
-    int singleWordFreq = this.singleWords.getFrequency(withoutHyphen);
-    int compoundWordFreq = this.compoundWords.getFrequency(withHyphen);
-    int compoundWordPrefixFreq = this.compoundWordPrefixes.getFrequency(prefix);
+    int singleWordFreq = this.normalWordsIndex.getFrequency(withoutHyphen);
+    int compoundWordFreq = this.compoundWordsIndex.getFrequency(withHyphen);
+    int compoundWordPrefixFreq = this.prefixesIndex.getFrequency(prefix);
 
     if (compoundWordFreq != singleWordFreq) {
       return compoundWordFreq > singleWordFreq;

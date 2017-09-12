@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
@@ -16,6 +18,7 @@ import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.CharacterList;
 import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link MergeDiacriticsPipe}.
@@ -23,6 +26,12 @@ import pdfact.core.util.list.CharacterList.CharacterListFactory;
  * @author Claudius Korzen
  */
 public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
+  /**
+   * The logger.
+   */
+  @InjectLogger
+  protected static Logger log;
+
   /**
    * The factory to create instances of {@link CharacterList}.
    */
@@ -32,6 +41,16 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
    * The factory to create instances of {@link RectangleFactory}.
    */
   protected RectangleFactory rectangleFactory;
+
+  /**
+   * The number of processed characters.
+   */
+  protected int numProcessedCharacters;
+
+  /**
+   * The number of merged characters.
+   */
+  protected int numMergedDiacritics;
 
   /**
    * Creates a new pipe that merges diacritics.
@@ -53,7 +72,16 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+
+    log.debug("Process: Merging the diacritics.");
     mergeDiacritics(pdf);
+
+    log.debug("Merging the diacritics done.");
+    log.debug("# processed characters: " + this.numProcessedCharacters);
+    log.debug("# merged diacritics: " + this.numMergedDiacritics);
+
+    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -82,9 +110,11 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
               // Don't proceed if the character in question is not a diacritic.
               if (isDiacritic(character)) {
                 mergeDiacritic(prev, character, next);
+                this.numMergedDiacritics++;
               } else {
                 after.add(character);
               }
+              this.numProcessedCharacters++;
             }
             page.setCharacters(after);
           }

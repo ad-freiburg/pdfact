@@ -1,5 +1,8 @@
 package pdfact.core.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -10,27 +13,27 @@ import com.google.inject.assistedinject.AssistedInject;
  */
 public class PlainPoint extends Point {
   /**
-   * The x value.
+   * The x-coordinate of this point.
    */
   protected float x;
 
   /**
-   * The y value.
+   * The y-coordinate of this point.
    */
   protected float y;
 
   /**
    * The bounding box.
    */
-  protected Rectangle boundingBox;
+  protected Rectangle rectangle;
 
   /**
-   * Flag to indicate, that the bounding box needs an update.
+   * Flag to indicate whether the bounding box needs an update.
    */
-  protected boolean isBoundingBoxOutdated;
+  protected boolean isRectangleOutdated;
 
   /**
-   * Creates a new point (0, 0).
+   * Creates a new point with coordinates (0, 0).
    */
   @AssistedInject
   public PlainPoint() {
@@ -38,22 +41,23 @@ public class PlainPoint extends Point {
   }
 
   /**
-   * Creates a new point (x, y).
+   * Creates a new point with coordinates (x, y).
    * 
    * @param x
-   *        The x value.
+   *        The x-coordinate.
    * @param y
-   *        The y value.
+   *        The y-coordinate.
    */
   @AssistedInject
   public PlainPoint(@Assisted("x") float x, @Assisted("y") float y) {
     setX(x);
     setY(y);
-    this.boundingBox = new PlainRectangle(x, y, x, y);
+    // TODO: Use Guice here.
+    this.rectangle = new PlainRectangle(x, y, x, y);
   }
 
   /**
-   * Creates a new point (x,y).
+   * Creates a new point with coordinates (x, y).
    * 
    * @param x
    *        The x value.
@@ -65,6 +69,8 @@ public class PlainPoint extends Point {
     this((float) x, (float) y);
   }
 
+  // ==========================================================================
+
   @Override
   public float getX() {
     return this.x;
@@ -73,8 +79,10 @@ public class PlainPoint extends Point {
   @Override
   public void setX(float x) {
     this.x = x;
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public float getY() {
@@ -84,43 +92,57 @@ public class PlainPoint extends Point {
   @Override
   public void setY(float y) {
     this.y = y;
-    this.isBoundingBoxOutdated = true;
+    this.isRectangleOutdated = true;
   }
+
+  // ==========================================================================
 
   @Override
   public Rectangle getRectangle() {
-    if (this.isBoundingBoxOutdated) {
-      this.boundingBox.setMinX(getX());
-      this.boundingBox.setMinY(getY());
-      this.boundingBox.setMaxX(getX());
-      this.boundingBox.setMaxY(getY());
-      this.isBoundingBoxOutdated = false;
+    if (this.isRectangleOutdated) {
+      this.rectangle.setMinX(getX());
+      this.rectangle.setMinY(getY());
+      this.rectangle.setMaxX(getX());
+      this.rectangle.setMaxY(getY());
+      this.isRectangleOutdated = false;
     }
-    return this.boundingBox;
+    return this.rectangle;
   }
 
   @Override
   public void setRectangle(Rectangle boundingBox) {
-    this.boundingBox = boundingBox;
-    this.isBoundingBoxOutdated = false;
+    this.rectangle = boundingBox;
+    this.isRectangleOutdated = false;
   }
+
+  // ==========================================================================
+
+  @Override
+  public String toString() {
+    return "Point(" + getX() + "," + getY() + ")";
+  }
+
+  // ==========================================================================
 
   @Override
   public boolean equals(Object other) {
     if (other instanceof Point) {
       Point otherPoint = (Point) other;
-      return getX() == otherPoint.getX() && getY() == otherPoint.getY();
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getX(), otherPoint.getX());
+      builder.append(getY(), otherPoint.getY());
+
+      return builder.isEquals();
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Float.floatToIntBits(getX() + 2 * getY());
-  }
-
-  @Override
-  public String toString() {
-    return "PlainPoint(" + getX() + "," + getY() + ")";
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getX());
+    builder.append(getY());
+    return builder.hashCode();
   }
 }

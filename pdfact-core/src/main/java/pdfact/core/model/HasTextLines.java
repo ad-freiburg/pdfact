@@ -10,38 +10,38 @@ import pdfact.core.util.list.TextLineList;
 public interface HasTextLines extends HasTextLineStatistic,
     HasCharacterStatistic {
   /**
-   * Returns the text lines of the element.
+   * Returns the text lines of this element.
    * 
-   * @return The text lines.
+   * @return The text lines of this element.
    */
   TextLineList getTextLines();
 
   /**
-   * Returns the first text line of the element.
+   * Returns the first text line of this element.
    * 
-   * @return The first text line.
+   * @return The first text line or null if there are no text lines.
    */
   TextLine getFirstTextLine();
 
   /**
-   * Returns the last text line of the element.
+   * Returns the last text line of this element.
    * 
-   * @return The last text line.
+   * @return The last text line or null if there are no text lines.
    */
   TextLine getLastTextLine();
 
   // ==========================================================================
 
   /**
-   * Sets the text lines of the element.
+   * Sets the text lines of this element.
    * 
    * @param lines
-   *        The text lines to set.
+   *        The text lines of this element.
    */
   void setTextLines(TextLineList lines);
 
   /**
-   * Adds the given text lines to the element.
+   * Adds the given text lines to this element.
    * 
    * @param lines
    *        The text lines to add.
@@ -49,7 +49,7 @@ public interface HasTextLines extends HasTextLineStatistic,
   void addTextLines(TextLineList lines);
 
   /**
-   * Adds a text line to the element.
+   * Adds the given text line to this element.
    * 
    * @param line
    *        The text line to add.
