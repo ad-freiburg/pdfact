@@ -70,8 +70,6 @@ public class PdfBoxAFMUtils {
    */
   protected static Map<String, PdfBoxFontMetricsWrapper> readAdditionalAFMFiles(
       String path) {
-//     log.debug("Reading additional AFM files from path '" + path + "'.");
-
     Map<String, PdfBoxFontMetricsWrapper> result = new HashMap<>();
     try {
       Map<String, InputStream> files = PdfActUtils.readDirectory(path);
@@ -95,10 +93,6 @@ public class PdfBoxAFMUtils {
     } catch (IOException e) {
       // log.warn("An error occurred while reading additional AFM files.", e);
     }
-
-    // log.debug("Reading additional AFM files from path done.");
-    // log.debug("# read additional AFM files: " + result.size());
-
     return result;
   }
 
