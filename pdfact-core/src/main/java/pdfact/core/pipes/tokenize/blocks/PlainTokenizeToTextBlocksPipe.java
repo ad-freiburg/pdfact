@@ -1,6 +1,5 @@
 package pdfact.core.pipes.tokenize.blocks;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -15,16 +14,17 @@ import pdfact.core.model.Line;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
+import pdfact.core.model.Position.PositionFactory;
 import pdfact.core.model.Rectangle;
+import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.model.TextBlock;
+import pdfact.core.model.TextBlock.TextBlockFactory;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.TextLineStatistic;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
-import pdfact.core.model.TextBlock.TextBlockFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.list.TextLineList;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
@@ -40,6 +40,11 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    */
   @InjectLogger
   protected static Logger log;
+
+  /**
+   * The factory to create lists of text blocks.
+   */
+  protected ElementListFactory<TextBlock> textBlockListFactory;
 
   /**
    * The factory to create instances of {@link TextBlock}.
@@ -79,6 +84,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * The default constructor.
    * 
+   * @param textBlockListFactory
+   *        The factory to create lists of text blocks.
    * @param textBlockFactory
    *        The factory to create instances of {@link TextBlock}.
    * @param rectangleFactory
@@ -92,11 +99,13 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    */
   @Inject
   public PlainTokenizeToTextBlocksPipe(
+      ElementListFactory<TextBlock> textBlockListFactory,
       TextBlockFactory textBlockFactory,
       RectangleFactory rectangleFactory,
       PositionFactory positionFactory,
       CharacterStatistician characterStatistician,
       TextLineStatistician textLineStatistician) {
+    this.textBlockListFactory = textBlockListFactory;
     this.textBlockFactory = textBlockFactory;
     this.rectangleFactory = rectangleFactory;
     this.positionFactory = positionFactory;
@@ -167,12 +176,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected List<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page)
-      throws PdfActException {
-    List<TextBlock> textBlocks = new ArrayList<>();
+  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf,
+      Page page) throws PdfActException {
+    ElementList<TextBlock> textBlocks = this.textBlockListFactory.create();
     TextBlock textBlock = this.textBlockFactory.create();
 
-    TextLineList lines = page.getTextLines();
+    ElementList<TextLine> lines = page.getTextLines();
     for (int i = 0; i < lines.size(); i++) {
       TextLine prev = i > 0 ? lines.get(i - 1) : null;
       TextLine line = lines.get(i);
@@ -245,7 +254,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @return The position for the given text block.
    */
   protected Position computePosition(Page page, TextBlock block) {
-    TextLineList textLines = block.getTextLines();
+    ElementList<TextLine> textLines = block.getTextLines();
     Rectangle rect = this.rectangleFactory.fromHasPositionElements(textLines);
     return this.positionFactory.create(page, rect);
   }
@@ -359,7 +368,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       return false;
     }
 
-    TextLineList lines = block.getTextLines();
+    ElementList<TextLine> lines = block.getTextLines();
     Rectangle blockRect = this.rectangleFactory.fromHasPositionElements(lines);
     Rectangle lineRect = line.getPosition().getRectangle();
     if (blockRect == null || lineRect == null) {

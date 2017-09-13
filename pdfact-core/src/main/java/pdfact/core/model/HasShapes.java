@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import java.util.List;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have shapes (like
@@ -14,7 +14,7 @@ public interface HasShapes {
    * 
    * @return The shapes of this element.
    */
-  List<Shape> getShapes();
+  ElementList<Shape> getShapes();
 
   /**
    * Returns the first shape of this element.
@@ -38,7 +38,7 @@ public interface HasShapes {
    * @param shapes
    *        The shapes of this element.
    */
-  void setShapes(List<Shape> shapes);
+  void setShapes(ElementList<Shape> shapes);
 
   /**
    * Adds the given shapes to this element.
@@ -46,7 +46,7 @@ public interface HasShapes {
    * @param shapes
    *        The shapes to add.
    */
-  void addShapes(List<Shape> shapes);
+  void addShapes(ElementList<Shape> shapes);
 
   /**
    * Adds the given shape to this element.

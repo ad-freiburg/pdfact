@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
+import pdfact.core.model.Character;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
@@ -22,9 +23,8 @@ import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.comparator.MinXComparator;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.WordList;
-import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
@@ -43,9 +43,9 @@ public class XYCutTokenizeToWordsPipe extends XYCut
   protected static Logger log;
 
   /**
-   * The factory to create instances of {@link WordList}.
+   * The factory to create lists of words.
    */
-  protected WordListFactory wordListFactory;
+  protected ElementListFactory<Word> wordListFactory;
 
   /**
    * The factory to create instances of {@link Word}.
@@ -81,7 +81,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    * Creates a new word tokenizer.
    * 
    * @param wordListFactory
-   *        The factory to create instances of {@link WordList}.
+   *        The factory to create lists of words.
    * @param wordFactory
    *        The factory to create instances of {@link Word}.
    * @param characterStatistician
@@ -93,7 +93,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    */
   @Inject
   public XYCutTokenizeToWordsPipe(
-      WordListFactory wordListFactory,
+      ElementListFactory<Word> wordListFactory,
       WordFactory wordFactory,
       PositionFactory positionFactory,
       CharacterStatistician characterStatistician,
@@ -141,7 +141,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
 
     for (Page page : pdf.getPages()) {
       for (TextLine line : page.getTextLines()) {
-        WordList words = tokenizeToWords(pdf, page, line);
+        ElementList<Word> words = tokenizeToWords(pdf, page, line);
         line.setWords(words);
         line.setText(PdfActUtils.join(words, " "));
 
@@ -166,13 +166,14 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  public WordList tokenizeToWords(PdfDocument pdf, Page page, TextLine line)
-      throws PdfActException {
-    WordList result = this.wordListFactory.create();
+  public ElementList<Word> tokenizeToWords(PdfDocument pdf, Page page,
+      TextLine line) throws PdfActException {
+    ElementList<Word> result = this.wordListFactory.create();
 
-    List<CharacterList> charLists = cut(pdf, page, line.getCharacters());
+    ElementList<Character> characters = line.getCharacters();
+    List<ElementList<Character>> charLists = cut(pdf, page, characters);
     Word word = null;
-    for (CharacterList charList : charLists) {
+    for (ElementList<Character> charList : charLists) {
       word = this.wordFactory.create();
       word.setCharacters(charList);
       word.setText(computeText(word));
@@ -193,12 +194,12 @@ public class XYCutTokenizeToWordsPipe extends XYCut
 
   @Override
   public float assessVerticalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
-    CharacterList left = halves.get(0);
+      List<ElementList<Character>> halves) {
+    ElementList<Character> left = halves.get(0);
     CharacterStatistic leftStats = this.charStatistician.compute(left);
     float leftMaxX = leftStats.getLargestMaxX();
 
-    CharacterList right = halves.get(1);
+    ElementList<Character> right = halves.get(1);
     CharacterStatistic rightStats = this.charStatistician.compute(right);
     float rightMinX = rightStats.getSmallestMinX();
 
@@ -213,7 +214,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
 
   @Override
   public float assessHorizontalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
+      List<ElementList<Character>> halves) {
     return -1;
   }
 
@@ -241,7 +242,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    */
   protected List<Position> computePositions(Page page, Word word) {
     List<Position> positions = new ArrayList<>();
-    CharacterList characters = word.getCharacters();
+    ElementList<Character> characters = word.getCharacters();
     Rectangle rect = this.rectangleFactory.fromHasPositionElements(characters);
     Position position = this.positionFactory.create(page, rect);
     positions.add(position);
@@ -272,7 +273,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
       return false;
     }
 
-    CharacterList characters = word.getCharacters();
+    ElementList<Character> characters = word.getCharacters();
     if (characters == null || characters.size() < 2) {
       return false;
     }

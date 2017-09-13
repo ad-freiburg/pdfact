@@ -6,18 +6,18 @@ import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.CharacterStatistic.CharacterStatisticFactory;
 import pdfact.core.model.Color;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.HasCharacterStatistic;
 import pdfact.core.model.HasCharacters;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.CharacterStatistic.CharacterStatisticFactory;
 import pdfact.core.util.counter.FloatCounter;
-import pdfact.core.util.counter.ObjectCounter;
 import pdfact.core.util.counter.FloatCounter.FloatCounterFactory;
+import pdfact.core.util.counter.ObjectCounter;
 import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
-import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * A plain implementation of {@link CharacterStatistician}.
@@ -77,7 +77,7 @@ public class PlainCharacterStatistician implements CharacterStatistician {
   }
 
   @Override
-  public CharacterStatistic compute(CharacterList characters) {
+  public CharacterStatistic compute(ElementList<Character> characters) {
     // Create a new statistic object.
     CharacterStatistic statistic = this.charStatisticFactory.create();
 

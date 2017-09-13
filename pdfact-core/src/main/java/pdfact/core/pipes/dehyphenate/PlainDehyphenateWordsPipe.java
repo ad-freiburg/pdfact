@@ -12,6 +12,7 @@ import com.google.inject.Inject;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
+import pdfact.core.model.Character;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Word;
@@ -19,10 +20,8 @@ import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.counter.ObjectCounter;
 import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
-import pdfact.core.util.list.WordList;
-import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.normalize.WordNormalizer;
 import pdfact.core.util.normalize.WordNormalizer.WordNormalizerFactory;
@@ -40,14 +39,14 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   protected static Logger log;
 
   /**
-   * The factory to create instances of {@link CharacterList}.
+   * The factory to create lists of characters.
    */
-  protected CharacterListFactory characterListFactory;
+  protected ElementListFactory<Character> characterListFactory;
 
   /**
-   * The factory to create instances of {@link WordList}.
+   * The factory to create lists of words.
    */
-  protected WordListFactory wordListFactory;
+  protected ElementListFactory<Word> wordListFactory;
 
   /**
    * The factory to create instances of {@link WordNormalizer}.
@@ -98,9 +97,9 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    * Creates a new pipe that dehyphenates words.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterListFactory}.
+   *        The factory to create lists of characters.
    * @param wordListFactory
-   *        The factory to create instances of {@link WordList}.
+   *        The factory to create lists of words.
    * @param wordNormalizerFactory
    *        The factory to create instances of {@link WordNormalizer}.
    * @param objectCounterFactory
@@ -108,8 +107,8 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    */
   @Inject
   public PlainDehyphenateWordsPipe(
-      CharacterListFactory characterListFactory,
-      WordListFactory wordListFactory,
+      ElementListFactory<Character> characterListFactory,
+      ElementListFactory<Word> wordListFactory,
       WordNormalizerFactory wordNormalizerFactory,
       ObjectCounterFactory<String> objectCounterFactory) {
     this.characterListFactory = characterListFactory;
@@ -254,13 +253,13 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
         continue;
       }
 
-      WordList words = paragraph.getWords();
+      ElementList<Word> words = paragraph.getWords();
       if (words == null) {
         continue;
       }
 
       Iterator<Word> wordItr = words.iterator();
-      WordList dehyphenatedWords = this.wordListFactory.create(words.size());
+      ElementList<Word> dehyphWords = this.wordListFactory.create(words.size());
 
       while (wordItr.hasNext()) {
         Word word = wordItr.next();
@@ -272,21 +271,21 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
         }
 
         if (!word.isHyphenated()) {
-          dehyphenatedWords.add(word);
+          dehyphWords.add(word);
           continue;
         }
 
         Word nextWord = wordItr.hasNext() ? wordItr.next() : null;
         if (nextWord != null) {
-          dehyphenatedWords.add(dehyphenate(word, nextWord));
+          dehyphWords.add(dehyphenate(word, nextWord));
           this.numProcessedWords++;
         } else {
-          dehyphenatedWords.add(word);
+          dehyphWords.add(word);
         }
       }
 
-      paragraph.setWords(dehyphenatedWords);
-      paragraph.setText(PdfActUtils.join(dehyphenatedWords, " "));
+      paragraph.setWords(dehyphWords);
+      paragraph.setText(PdfActUtils.join(dehyphWords, " "));
     }
   }
 
@@ -309,9 +308,9 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
       return word1;
     }
 
-    CharacterList chars1 = word1.getCharacters();
-    CharacterList chars2 = word2.getCharacters();
-    CharacterList mergedChars = this.characterListFactory.create();
+    ElementList<Character> chars1 = word1.getCharacters();
+    ElementList<Character> chars2 = word2.getCharacters();
+    ElementList<Character> mergedChars = this.characterListFactory.create();
 
     if (isHyphenMandatory(word1, word2)) {
       mergedChars.addAll(chars1);

@@ -5,8 +5,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.core.util.list.TextLineList;
-import pdfact.core.util.list.TextLineList.TextLineListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 
 /**
  * A plain implementation of {@link TextBlock}.
@@ -17,7 +17,7 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   /**
    * The text lines of this text block.
    */
-  protected TextLineList textLines;
+  protected ElementList<TextLine> textLines;
 
   /**
    * The text of this text block.
@@ -53,17 +53,17 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
    * Creates a new text block.
    * 
    * @param textLineListFactory
-   *        The factory to create instances of {@link TextLineList}.
+   *        The factory to create lists of text lines.
    */
   @AssistedInject
-  public PlainTextBlock(TextLineListFactory textLineListFactory) {
+  public PlainTextBlock(ElementListFactory<TextLine> textLineListFactory) {
     this.textLines = textLineListFactory.create();
   }
 
   // ==========================================================================
 
   @Override
-  public TextLineList getTextLines() {
+  public ElementList<TextLine> getTextLines() {
     return this.textLines;
   }
 
@@ -84,12 +84,12 @@ public class PlainTextBlock extends PlainElement implements TextBlock {
   }
 
   @Override
-  public void setTextLines(TextLineList textLines) {
+  public void setTextLines(ElementList<TextLine> textLines) {
     this.textLines = textLines;
   }
 
   @Override
-  public void addTextLines(TextLineList textLines) {
+  public void addTextLines(ElementList<TextLine> textLines) {
     this.textLines.addAll(textLines);
   }
 

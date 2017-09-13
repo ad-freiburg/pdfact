@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.google.inject.Inject;
 
+import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
@@ -16,8 +17,8 @@ import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.statistician.CharacterStatistician;
 
 /**
@@ -27,9 +28,9 @@ import pdfact.core.util.statistician.CharacterStatistician;
  */
 public class HeadingModule implements PdfTextSemanticizerModule {
   /**
-   * The factory to create instance of {@link CharacterListFactory}.
+   * The factory to create lists of characters.
    */
-  protected CharacterListFactory charListFactory;
+  protected ElementListFactory<Character> charListFactory;
 
   /**
    * The character statistician.
@@ -103,12 +104,12 @@ public class HeadingModule implements PdfTextSemanticizerModule {
    * Creates a new HeadingModule.
    * 
    * @param charListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
    * @param charStatistician
    *        The character statistician.
    */
   @Inject
-  public HeadingModule(CharacterListFactory charListFactory,
+  public HeadingModule(ElementListFactory<Character> charListFactory,
       CharacterStatistician charStatistician) {
     this.charListFactory = charListFactory;
     this.charStatistician = charStatistician;
@@ -188,7 +189,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
     }
 
     // The characters of all known section headings.
-    CharacterList headingChars = this.charListFactory.create();
+    ElementList<Character> headingChars = this.charListFactory.create();
 
     for (Page page : pdf.getPages()) {
       for (TextBlock block : page.getTextBlocks()) {

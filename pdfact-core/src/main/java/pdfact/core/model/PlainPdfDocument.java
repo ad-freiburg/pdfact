@@ -12,6 +12,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
+
 /**
  * A plain implementation of {@link PdfDocument}.
  * 
@@ -31,7 +34,7 @@ public class PlainPdfDocument implements PdfDocument {
   /**
    * The paragraphs in this PDF document.
    */
-  protected List<Paragraph> paragraphs;
+  protected ElementList<Paragraph> paragraphs;
 
   /**
    * The statistics about all characters in this PDF document.
@@ -46,35 +49,44 @@ public class PlainPdfDocument implements PdfDocument {
   /**
    * Creates a new PDF document.
    * 
+   * @param paragraphListFactory
+   *        The factory to create lists of paragraphs.
    * @param path
    *        The path to the underlying PDF file.
    */
   @AssistedInject
-  public PlainPdfDocument(@Assisted String path) {
-    this(Paths.get(path));
+  public PlainPdfDocument(ElementListFactory<Paragraph> paragraphListFactory,
+      @Assisted String path) {
+    this(paragraphListFactory, Paths.get(path));
   }
 
   /**
    * Creates a new PDF document.
    * 
+   * @param paragraphListFactory
+   *        The factory to create lists of paragraphs.
    * @param path
    *        The path to the underlying PDF file.
    */
   @AssistedInject
-  public PlainPdfDocument(@Assisted File path) {
-    this(path.toPath());
+  public PlainPdfDocument(ElementListFactory<Paragraph> paragraphListFactory,
+      @Assisted File path) {
+    this(paragraphListFactory, path.toPath());
   }
 
   /**
    * Creates a new PDF document.
-   *
+   * 
+   * @param paragraphListFactory
+   *        The factory to create lists of paragraphs.
    * @param path
    *        The path to the underlying PDF file.
    */
   @AssistedInject
-  public PlainPdfDocument(@Assisted Path path) {
+  public PlainPdfDocument(ElementListFactory<Paragraph> paragraphListFactory,
+      @Assisted Path path) {
     this.pages = new ArrayList<>();
-    this.paragraphs = new ArrayList<>();
+    this.paragraphs = paragraphListFactory.create();
     this.path = path;
   }
 
@@ -138,7 +150,7 @@ public class PlainPdfDocument implements PdfDocument {
   // ==========================================================================
 
   @Override
-  public List<Paragraph> getParagraphs() {
+  public ElementList<Paragraph> getParagraphs() {
     return this.paragraphs;
   }
 
@@ -159,12 +171,12 @@ public class PlainPdfDocument implements PdfDocument {
   }
 
   @Override
-  public void setParagraphs(List<Paragraph> paragraphs) {
+  public void setParagraphs(ElementList<Paragraph> paragraphs) {
     this.paragraphs = paragraphs;
   }
 
   @Override
-  public void addParagraphs(List<Paragraph> paragraphs) {
+  public void addParagraphs(ElementList<Paragraph> paragraphs) {
     this.paragraphs.addAll(paragraphs);
   }
 

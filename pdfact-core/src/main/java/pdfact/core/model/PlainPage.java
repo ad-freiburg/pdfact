@@ -1,18 +1,13 @@
 package pdfact.core.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.TextLineList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
-import pdfact.core.util.list.TextLineList.TextLineListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 
 /**
  * A plain implementation of {@link Page}.
@@ -23,32 +18,32 @@ public class PlainPage implements Page {
   /**
    * The characters of this page.
    */
-  protected CharacterList characters;
+  protected ElementList<Character> characters;
 
   /**
    * The figures of this page.
    */
-  protected List<Figure> figures;
+  protected ElementList<Figure> figures;
 
   /**
    * The shapes of this page.
    */
-  protected List<Shape> shapes;
+  protected ElementList<Shape> shapes;
 
   /**
    * The text areas of this page.
    */
-  protected List<TextArea> textAreas;
+  protected ElementList<TextArea> textAreas;
 
   /**
    * The text lines of this page.
    */
-  protected TextLineList textLines;
+  protected ElementList<TextLine> textLines;
 
   /**
    * The text blocks of this page.
    */
-  protected List<TextBlock> textBlocks;
+  protected ElementList<TextBlock> textBlocks;
 
   /**
    * The number of this page in the PDF document.
@@ -69,68 +64,95 @@ public class PlainPage implements Page {
    * Creates a new PDF page.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
+   * @param figureListFactory
+   *        The factory to create lists of figures.
+   * @param shapeListFactory
+   *        The factory to create lists of shapes.
+   * @param textAreaListFactory
+   *        The factory to create lists of text areas.
    * @param textLineListFactory
-   *        The factory to create instances of {@link TextLineList}.
+   *        The factory to create lists of text lines.
+   * @param textBlockListFactory
+   *        The factory to create lists of text blocks.
    */
   @AssistedInject
-  public PlainPage(CharacterListFactory characterListFactory,
-      TextLineListFactory textLineListFactory) {
-    this(characterListFactory, textLineListFactory, 0);
+  public PlainPage(
+      ElementListFactory<Character> characterListFactory,
+      ElementListFactory<Figure> figureListFactory,
+      ElementListFactory<Shape> shapeListFactory,
+      ElementListFactory<TextArea> textAreaListFactory,
+      ElementListFactory<TextLine> textLineListFactory,
+      ElementListFactory<TextBlock> textBlockListFactory) {
+    this(characterListFactory,
+        figureListFactory,
+        shapeListFactory,
+        textAreaListFactory,
+        textLineListFactory,
+        textBlockListFactory,
+        0);
   }
 
   /**
    * Creates a new PDF page.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
+   * @param figureListFactory
+   *        The factory to create lists of figures.
+   * @param shapeListFactory
+   *        The factory to create lists of shapes.
+   * @param textAreaListFactory
+   *        The factory to create lists of text areas.
    * @param textLineListFactory
-   *        The factory to create instances of {@link TextLineList}.
+   *        The factory to create lists of text lines.
+   * @param textBlockListFactory
+   *        The factory to create lists of text blocks.
    * @param pageNumber
    *        The number of this page in the PDF document.
    */
   @AssistedInject
-  public PlainPage(CharacterListFactory characterListFactory,
-      TextLineListFactory textLineListFactory, @Assisted int pageNumber) {
+  public PlainPage(
+      ElementListFactory<Character> characterListFactory,
+      ElementListFactory<Figure> figureListFactory,
+      ElementListFactory<Shape> shapeListFactory,
+      ElementListFactory<TextArea> textAreaListFactory,
+      ElementListFactory<TextLine> textLineListFactory,
+      ElementListFactory<TextBlock> textBlockListFactory,
+      @Assisted int pageNumber) {
     this.characters = characterListFactory.create();
-    this.figures = new ArrayList<>();
-    this.shapes = new ArrayList<>();
-    this.textAreas = new ArrayList<>();
+    this.figures = figureListFactory.create();
+    this.shapes = shapeListFactory.create();
+    this.textAreas = textAreaListFactory.create();
     this.textLines = textLineListFactory.create();
-    this.textBlocks = new ArrayList<>();
+    this.textBlocks = textBlockListFactory.create();
     this.pageNumber = pageNumber;
   }
 
   // ==========================================================================
 
   @Override
-  public CharacterList getCharacters() {
+  public ElementList<Character> getCharacters() {
     return this.characters;
   }
 
   @Override
   public Character getFirstCharacter() {
-    if (this.characters == null || this.characters.isEmpty()) {
-      return null;
-    }
-    return this.characters.get(0);
+    return this.characters.getFirstElement();
   }
 
   @Override
   public Character getLastCharacter() {
-    if (this.characters == null || this.characters.isEmpty()) {
-      return null;
-    }
-    return this.characters.get(this.characters.size() - 1);
+    return this.characters.getLastElement();
   }
 
   @Override
-  public void setCharacters(CharacterList characters) {
+  public void setCharacters(ElementList<Character> characters) {
     this.characters = characters;
   }
 
   @Override
-  public void addCharacters(CharacterList characters) {
+  public void addCharacters(ElementList<Character> characters) {
     this.characters.addAll(characters);
   }
 
@@ -142,45 +164,27 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public CharacterStatistic getCharacterStatistic() {
-    return this.characterStatistic;
-  }
-
-  @Override
-  public void setCharacterStatistic(CharacterStatistic statistic) {
-    this.characterStatistic = statistic;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public List<Figure> getFigures() {
+  public ElementList<Figure> getFigures() {
     return this.figures;
   }
 
   @Override
   public Figure getFirstFigure() {
-    if (this.figures == null || this.figures.isEmpty()) {
-      return null;
-    }
-    return this.figures.get(0);
+    return this.figures.getFirstElement();
   }
 
   @Override
   public Figure getLastFigure() {
-    if (this.figures == null || this.figures.isEmpty()) {
-      return null;
-    }
-    return this.figures.get(this.figures.size() - 1);
+    return this.figures.getLastElement();
   }
 
   @Override
-  public void setFigures(List<Figure> figures) {
+  public void setFigures(ElementList<Figure> figures) {
     this.figures = figures;
   }
 
   @Override
-  public void addFigures(List<Figure> figures) {
+  public void addFigures(ElementList<Figure> figures) {
     this.figures.addAll(figures);
   }
 
@@ -192,33 +196,27 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public List<Shape> getShapes() {
+  public ElementList<Shape> getShapes() {
     return this.shapes;
   }
 
   @Override
   public Shape getFirstShape() {
-    if (this.shapes == null || this.shapes.isEmpty()) {
-      return null;
-    }
-    return this.shapes.get(0);
+    return this.shapes.getFirstElement();
   }
 
   @Override
   public Shape getLastShape() {
-    if (this.shapes == null || this.shapes.isEmpty()) {
-      return null;
-    }
-    return this.shapes.get(this.shapes.size() - 1);
+    return this.shapes.getLastElement();
   }
 
   @Override
-  public void setShapes(List<Shape> shapes) {
+  public void setShapes(ElementList<Shape> shapes) {
     this.shapes = shapes;
   }
 
   @Override
-  public void addShapes(List<Shape> shapes) {
+  public void addShapes(ElementList<Shape> shapes) {
     this.shapes.addAll(shapes);
   }
 
@@ -230,33 +228,27 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public List<TextArea> getTextAreas() {
+  public ElementList<TextArea> getTextAreas() {
     return this.textAreas;
   }
 
   @Override
   public TextArea getFirstTextArea() {
-    if (this.textAreas == null || this.textAreas.isEmpty()) {
-      return null;
-    }
-    return this.textAreas.get(0);
+    return this.textAreas.getFirstElement();
   }
 
   @Override
   public TextArea getLastTextArea() {
-    if (this.textAreas == null || this.textAreas.isEmpty()) {
-      return null;
-    }
-    return this.textAreas.get(this.textAreas.size() - 1);
+    return this.textAreas.getLastElement();
   }
 
   @Override
-  public void setTextAreas(List<TextArea> areas) {
+  public void setTextAreas(ElementList<TextArea> areas) {
     this.textAreas = areas;
   }
 
   @Override
-  public void addTextAreas(List<TextArea> areas) {
+  public void addTextAreas(ElementList<TextArea> areas) {
     this.textAreas.addAll(areas);
   }
 
@@ -268,33 +260,27 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public TextLineList getTextLines() {
+  public ElementList<TextLine> getTextLines() {
     return this.textLines;
   }
 
   @Override
   public TextLine getFirstTextLine() {
-    if (this.textLines == null || this.textLines.isEmpty()) {
-      return null;
-    }
-    return this.textLines.get(0);
+    return this.textLines.getFirstElement();
   }
 
   @Override
   public TextLine getLastTextLine() {
-    if (this.textLines == null || this.textLines.isEmpty()) {
-      return null;
-    }
-    return this.textLines.get(this.textLines.size() - 1);
+    return this.textLines.getLastElement();
   }
 
   @Override
-  public void setTextLines(TextLineList textLines) {
+  public void setTextLines(ElementList<TextLine> textLines) {
     this.textLines = textLines;
   }
 
   @Override
-  public void addTextLines(TextLineList textLines) {
+  public void addTextLines(ElementList<TextLine> textLines) {
     this.textLines.addAll(textLines);
   }
 
@@ -306,45 +292,27 @@ public class PlainPage implements Page {
   // ==========================================================================
 
   @Override
-  public TextLineStatistic getTextLineStatistic() {
-    return this.textLineStatistic;
-  }
-
-  @Override
-  public void setTextLineStatistic(TextLineStatistic statistic) {
-    this.textLineStatistic = statistic;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public List<TextBlock> getTextBlocks() {
+  public ElementList<TextBlock> getTextBlocks() {
     return this.textBlocks;
   }
 
   @Override
   public TextBlock getFirstTextBlock() {
-    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
-      return null;
-    }
-    return this.textBlocks.get(0);
+    return this.textBlocks.getFirstElement();
   }
 
   @Override
   public TextBlock getLastTextBlock() {
-    if (this.textBlocks == null || this.textBlocks.isEmpty()) {
-      return null;
-    }
-    return this.textBlocks.get(this.textBlocks.size() - 1);
+    return this.textBlocks.getLastElement();
   }
 
   @Override
-  public void setTextBlocks(List<TextBlock> blocks) {
+  public void setTextBlocks(ElementList<TextBlock> blocks) {
     this.textBlocks = blocks;
   }
 
   @Override
-  public void addTextBlocks(List<TextBlock> blocks) {
+  public void addTextBlocks(ElementList<TextBlock> blocks) {
     this.textBlocks.addAll(blocks);
   }
 
@@ -363,6 +331,30 @@ public class PlainPage implements Page {
   @Override
   public void setPageNumber(int pageNumber) {
     this.pageNumber = pageNumber;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public CharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
+  }
+
+  @Override
+  public void setCharacterStatistic(CharacterStatistic statistic) {
+    this.characterStatistic = statistic;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public TextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
+  }
+
+  @Override
+  public void setTextLineStatistic(TextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
   }
 
   // ==========================================================================

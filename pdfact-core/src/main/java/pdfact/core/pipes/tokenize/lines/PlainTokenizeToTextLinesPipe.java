@@ -10,24 +10,23 @@ import com.google.inject.Inject;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Line;
+import pdfact.core.model.Line.LineFactory;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
+import pdfact.core.model.Position.PositionFactory;
 import pdfact.core.model.Rectangle;
+import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.model.TextArea;
 import pdfact.core.model.TextLine;
-import pdfact.core.model.Line.LineFactory;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.model.TextLine.TextLineFactory;
 import pdfact.core.util.comparator.MinXComparator;
 import pdfact.core.util.counter.FloatCounter;
 import pdfact.core.util.counter.FloatCounter.FloatCounterFactory;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.TextLineList;
-import pdfact.core.util.list.TextLineList.TextLineListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
@@ -47,9 +46,9 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
   protected static Logger log;
 
   /**
-   * The factory to create instances of {@link TextLineList}.
+   * The factory to create lists of text lines.
    */
-  protected TextLineListFactory textLineListFactory;
+  protected ElementListFactory<TextLine> textLineListFactory;
 
   /**
    * The factory to create instances of {@link TextLine}.
@@ -100,7 +99,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    * Creates a new text line tokenizer.
    * 
    * @param textLineListFactory
-   *        The factory to create instances of {@link TextLineList}.
+   *        The factory to create lists of text lines.
    * @param textLineFactory
    *        The factory to create instances of {@link TextLine}.
    * @param positionFactory
@@ -118,7 +117,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    */
   @Inject
   public PlainTokenizeToTextLinesPipe(
-      TextLineListFactory textLineListFactory,
+      ElementListFactory<TextLine> textLineListFactory,
       TextLineFactory textLineFactory,
       PositionFactory positionFactory,
       RectangleFactory rectangleFactory,
@@ -181,7 +180,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
         continue;
       }
 
-      TextLineList textLines = tokenizeToTextLines(pdf, page);
+      ElementList<TextLine> textLines = tokenizeToTextLines(pdf, page);
       page.setTextLineStatistic(this.textLineStatistician.compute(textLines));
       page.setTextLines(textLines);
     }
@@ -201,16 +200,17 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected TextLineList tokenizeToTextLines(PdfDocument pdf, Page page)
-      throws PdfActException {
-    TextLineList result = this.textLineListFactory.create();
+  protected ElementList<TextLine> tokenizeToTextLines(PdfDocument pdf,
+      Page page) throws PdfActException {
+    ElementList<TextLine> result = this.textLineListFactory.create();
 
     for (TextArea area : page.getTextAreas()) {
-      List<CharacterList> charLists = cut(pdf, page, area.getCharacters());
+      ElementList<Character> characters = area.getCharacters();
+      List<ElementList<Character>> charLists = cut(pdf, page, characters);
 
       this.numProcessedTextAreas++;
 
-      for (CharacterList charList : charLists) {
+      for (ElementList<Character> charList : charLists) {
         // Create a PdfTextLine object.
         TextLine textLine = this.textLineFactory.create();
         textLine.setCharacters(charList);
@@ -235,7 +235,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    *        The list of characters to process.
    * @return The computed baseline.
    */
-  protected Line computeBaseline(CharacterList characters) {
+  protected Line computeBaseline(ElementList<Character> characters) {
     Line baseLine = null;
     FloatCounter minYCounter = this.floatCounterFactory.create();
 
@@ -269,7 +269,8 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    *        The characters to process.
    * @return The character statistics for the given text line.
    */
-  protected CharacterStatistic computeCharacterStatistic(CharacterList chars) {
+  protected CharacterStatistic computeCharacterStatistic(
+      ElementList<Character> chars) {
     return this.characterStatistician.compute(chars);
   }
 
@@ -282,7 +283,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
    *        The characters of the text line.
    * @return The position for the given text line.
    */
-  protected Position computePosition(Page page, CharacterList chars) {
+  protected Position computePosition(Page page, ElementList<Character> chars) {
     Rectangle rect = this.rectangleFactory.fromHasPositionElements(chars);
     return this.positionFactory.create(page, rect);
   }
@@ -291,7 +292,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
 
   @Override
   public float assessVerticalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
+      List<ElementList<Character>> halves) {
     return -1;
   }
 
@@ -299,12 +300,12 @@ public class PlainTokenizeToTextLinesPipe extends XYCut
 
   @Override
   public float assessHorizontalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
-    CharacterList upper = halves.get(0);
+      List<ElementList<Character>> halves) {
+    ElementList<Character> upper = halves.get(0);
     CharacterStatistic upperStats = this.characterStatistician.compute(upper);
     float upperMinY = upperStats.getSmallestMinY();
 
-    CharacterList lower = halves.get(1);
+    ElementList<Character> lower = halves.get(1);
     CharacterStatistic lowerStats = this.characterStatistician.compute(lower);
     float lowerMaxY = lowerStats.getLargestMaxY();
 

@@ -7,8 +7,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.core.util.list.WordList;
-import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 
 /**
  * A plain implementation of {@link Paragraph}.
@@ -19,7 +19,7 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   /**
    * The words of this paragraph.
    */
-  protected WordList words;
+  protected ElementList<Word> words;
 
   /**
    * The text of this paragraph.
@@ -50,17 +50,17 @@ public class PlainParagraph extends PlainElement implements Paragraph {
    * Creates a new paragraph.
    * 
    * @param wordListFactory
-   *        The factory to create instances of {@link WordList}.
+   *        The factory to create lists of words.
    */
   @AssistedInject
-  public PlainParagraph(WordListFactory wordListFactory) {
+  public PlainParagraph(ElementListFactory<Word> wordListFactory) {
     this.words = wordListFactory.create();
   }
 
   // ==========================================================================
 
   @Override
-  public WordList getWords() {
+  public ElementList<Word> getWords() {
     return this.words;
   }
 
@@ -81,12 +81,12 @@ public class PlainParagraph extends PlainElement implements Paragraph {
   }
 
   @Override
-  public void setWords(WordList words) {
+  public void setWords(ElementList<Word> words) {
     this.words = words;
   }
 
   @Override
-  public void addWords(WordList words) {
+  public void addWords(ElementList<Word> words) {
     this.words.addAll(words);
   }
 

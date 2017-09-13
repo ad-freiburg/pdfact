@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import pdfact.core.util.list.TextLineList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have text lines.
@@ -14,7 +14,7 @@ public interface HasTextLines extends HasTextLineStatistic,
    * 
    * @return The text lines of this element.
    */
-  TextLineList getTextLines();
+  ElementList<TextLine> getTextLines();
 
   /**
    * Returns the first text line of this element.
@@ -38,7 +38,7 @@ public interface HasTextLines extends HasTextLineStatistic,
    * @param lines
    *        The text lines of this element.
    */
-  void setTextLines(TextLineList lines);
+  void setTextLines(ElementList<TextLine> lines);
 
   /**
    * Adds the given text lines to this element.
@@ -46,7 +46,7 @@ public interface HasTextLines extends HasTextLineStatistic,
    * @param lines
    *        The text lines to add.
    */
-  void addTextLines(TextLineList lines);
+  void addTextLines(ElementList<TextLine> lines);
 
   /**
    * Adds the given text line to this element.

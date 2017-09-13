@@ -2,8 +2,8 @@ package pdfact.core.model;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 
 /**
  * A plain implementation of {@link TextArea}.
@@ -14,7 +14,7 @@ public class PlainTextArea implements TextArea {
   /**
    * The characters of this text area.
    */
-  protected CharacterList characters;
+  protected ElementList<Character> characters;
 
   /**
    * The position of this text area.
@@ -30,17 +30,17 @@ public class PlainTextArea implements TextArea {
    * The default constructor.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
    */
   @AssistedInject
-  public PlainTextArea(CharacterListFactory characterListFactory) {
+  public PlainTextArea(ElementListFactory<Character> characterListFactory) {
     this.characters = characterListFactory.create();
   }
 
   // ==========================================================================
 
   @Override
-  public CharacterList getCharacters() {
+  public ElementList<Character> getCharacters() {
     return this.characters;
   }
 
@@ -61,12 +61,12 @@ public class PlainTextArea implements TextArea {
   }
 
   @Override
-  public void setCharacters(CharacterList characters) {
+  public void setCharacters(ElementList<Character> characters) {
     this.characters = characters;
   }
 
   @Override
-  public void addCharacters(CharacterList characters) {
+  public void addCharacters(ElementList<Character> characters) {
     this.characters.addAll(characters);
   }
 

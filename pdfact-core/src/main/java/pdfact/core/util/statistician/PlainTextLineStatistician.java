@@ -14,12 +14,11 @@ import pdfact.core.model.Line;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.TextLineStatistic;
-import pdfact.core.model.Word;
 import pdfact.core.model.TextLineStatistic.TextLineStatisticFactory;
+import pdfact.core.model.Word;
 import pdfact.core.util.counter.FloatCounter;
 import pdfact.core.util.counter.FloatCounter.FloatCounterFactory;
-import pdfact.core.util.list.TextLineList;
-import pdfact.core.util.list.WordList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * A plain implementation of {@link TextLineStatistician}.
@@ -61,7 +60,7 @@ public class PlainTextLineStatistician implements TextLineStatistician {
   }
 
   @Override
-  public TextLineStatistic compute(TextLineList textLines) {
+  public TextLineStatistic compute(ElementList<TextLine> textLines) {
     // Create new statistic object.
     TextLineStatistic statistic = this.textLineStatisticFactory.create();
 
@@ -89,7 +88,7 @@ public class PlainTextLineStatistician implements TextLineStatistician {
       }
 
       // Compute the whitespace widths in the line.
-      WordList words = line.getWords();
+      ElementList<Word> words = line.getWords();
       if (words != null) {
         for (int j = 1; j < words.size(); j++) {
           Word prevWord = words.get(j - 1);

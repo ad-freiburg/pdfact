@@ -135,15 +135,9 @@ import pdfact.core.util.counter.ObjectCounter;
 import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
 import pdfact.core.util.counter.PlainFloatCounter;
 import pdfact.core.util.counter.PlainObjectCounter;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
-import pdfact.core.util.list.PlainCharacterList;
-import pdfact.core.util.list.PlainTextLineList;
-import pdfact.core.util.list.PlainWordList;
-import pdfact.core.util.list.TextLineList;
-import pdfact.core.util.list.TextLineList.TextLineListFactory;
-import pdfact.core.util.list.WordList;
-import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
+import pdfact.core.util.list.PlainElementList;
 import pdfact.core.util.log.Log4JTypeListener;
 import pdfact.core.util.normalize.PlainWordNormalizer;
 import pdfact.core.util.normalize.WordNormalizer;
@@ -278,9 +272,9 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .build(CharacterFactory.class));
 
     // Install the factory to build a list of text characters.
-    install(new FactoryModuleBuilder()
-        .implement(CharacterList.class, PlainCharacterList.class)
-        .build(CharacterListFactory.class));
+    // install(new FactoryModuleBuilder()
+    // .implement(CharacterList.class, PlainCharacterList.class)
+    // .build(CharacterListFactory.class));
 
     // Install the factory to build a figure.
     install(new FactoryModuleBuilder()
@@ -338,9 +332,9 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .build(TextLineFactory.class));
 
     // Install the factory to build a list of text lines.
-    install(new FactoryModuleBuilder()
-        .implement(TextLineList.class, PlainTextLineList.class)
-        .build(TextLineListFactory.class));
+    // install(new FactoryModuleBuilder()
+    // .implement(TextLineList.class, PlainTextLineList.class)
+    // .build(TextLineListFactory.class));
 
     // Install the factory to build a word.
     install(new FactoryModuleBuilder()
@@ -348,9 +342,9 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .build(WordFactory.class));
 
     // Install the factory to build a list of words.
-    install(new FactoryModuleBuilder()
-        .implement(WordList.class, PlainWordList.class)
-        .build(WordListFactory.class));
+    // install(new FactoryModuleBuilder()
+    // .implement(WordList.class, PlainWordList.class)
+    // .build(WordListFactory.class));
 
     // Install the factory to build a text block (= "paragraph" per page).
     install(new FactoryModuleBuilder()
@@ -400,6 +394,57 @@ public class PdfActCoreGuiceModule extends com.google.inject.AbstractModule {
         .implement(new TypeLiteral<ObjectCounter<FontFace>>() {},
             new TypeLiteral<PlainObjectCounter<FontFace>>() {})
         .build(new TypeLiteral<ObjectCounterFactory<FontFace>>() {}));
+
+    // ========================================================================
+    // Install the factories of element lists.
+
+    // Install the factory to create lists of characters.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<Character>>() {},
+            new TypeLiteral<PlainElementList<Character>>() {})
+        .build(new TypeLiteral<ElementListFactory<Character>>() {}));
+
+    // Install the factory to create lists of figures.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<Figure>>() {},
+            new TypeLiteral<PlainElementList<Figure>>() {})
+        .build(new TypeLiteral<ElementListFactory<Figure>>() {}));
+
+    // Install the factory to create lists of shapes.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<Shape>>() {},
+            new TypeLiteral<PlainElementList<Shape>>() {})
+        .build(new TypeLiteral<ElementListFactory<Shape>>() {}));
+
+    // Install the factory to create lists of words.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<Word>>() {},
+            new TypeLiteral<PlainElementList<Word>>() {})
+        .build(new TypeLiteral<ElementListFactory<Word>>() {}));
+
+    // Install the factory to create lists of text lines.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<TextLine>>() {},
+            new TypeLiteral<PlainElementList<TextLine>>() {})
+        .build(new TypeLiteral<ElementListFactory<TextLine>>() {}));
+
+    // Install the factory to create lists of text areas.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<TextArea>>() {},
+            new TypeLiteral<PlainElementList<TextArea>>() {})
+        .build(new TypeLiteral<ElementListFactory<TextArea>>() {}));
+
+    // Install the factory to create lists of text blocks.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<TextBlock>>() {},
+            new TypeLiteral<PlainElementList<TextBlock>>() {})
+        .build(new TypeLiteral<ElementListFactory<TextBlock>>() {}));
+
+    // Install the factory to create lists of paragraphs.
+    install(new FactoryModuleBuilder()
+        .implement(new TypeLiteral<ElementList<Paragraph>>() {},
+            new TypeLiteral<PlainElementList<Paragraph>>() {})
+        .build(new TypeLiteral<ElementListFactory<Paragraph>>() {}));
 
     // ========================================================================
 

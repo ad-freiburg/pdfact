@@ -13,16 +13,18 @@ import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
+import pdfact.core.model.Paragraph.ParagraphFactory;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
-import pdfact.core.model.Paragraph.ParagraphFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
@@ -38,6 +40,11 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    */
   @InjectLogger
   protected static Logger log;
+
+  /**
+   * The factory to create lists of paragraphs.
+   */
+  protected ElementListFactory<Paragraph> paragraphListFactory;
 
   /**
    * The factory to create instances of {@link Paragraph}.
@@ -68,6 +75,8 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * Creates a new pipe that tokenizes the text blocks of a PDF document into
    * paragraphs.
    * 
+   * @param paragraphListFactory
+   *        The factory to create lists of paragraphs.
    * @param paragraphFactory
    *        The factory to create instances of {@link Paragraph}.
    * @param characterStatistician
@@ -77,9 +86,11 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    */
   @Inject
   public PlainTokenizeToParagraphsPipe(
+      ElementListFactory<Paragraph> paragraphListFactory,
       ParagraphFactory paragraphFactory,
       CharacterStatistician characterStatistician,
       TextLineStatistician textLineStatistician) {
+    this.paragraphListFactory = paragraphListFactory;
     this.paragraphFactory = paragraphFactory;
     this.characterStatistician = characterStatistician;
     this.textLineStatistician = textLineStatistician;
@@ -110,7 +121,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    *        The PDF document to process.
    */
   protected void tokenizeToParagraphs(PdfDocument pdf) {
-    List<Paragraph> paragraphs = new ArrayList<>();
+    ElementList<Paragraph> paragraphs = this.paragraphListFactory.create();
 
     // Segment the PDF document into paragraphs.
     List<List<TextBlock>> segments = segmentIntoParagraphs(pdf);

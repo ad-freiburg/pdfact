@@ -2,10 +2,11 @@ package pdfact.core.util.statistician;
 
 import java.util.List;
 
+import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.HasCharacterStatistic;
 import pdfact.core.model.HasCharacters;
-import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * A class that computes statistics about characters.
@@ -31,7 +32,7 @@ public interface CharacterStatistician {
    * 
    * @return The computed character statistics.
    */
-  CharacterStatistic compute(CharacterList characters);
+  CharacterStatistic compute(ElementList<Character> characters);
 
   /**
    * Combines the given list of character statistics to a single statistic.

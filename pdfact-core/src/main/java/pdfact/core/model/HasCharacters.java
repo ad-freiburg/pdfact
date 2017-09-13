@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that has characters.
@@ -13,7 +13,7 @@ public interface HasCharacters extends HasCharacterStatistic {
    * 
    * @return The characters of this element.
    */
-  CharacterList getCharacters();
+  ElementList<Character> getCharacters();
 
   /**
    * Returns the first character of this element.
@@ -37,7 +37,7 @@ public interface HasCharacters extends HasCharacterStatistic {
    * @param characters
    *        The characters to set.
    */
-  void setCharacters(CharacterList characters);
+  void setCharacters(ElementList<Character> characters);
 
   /**
    * Adds the given characters to this element.
@@ -45,7 +45,7 @@ public interface HasCharacters extends HasCharacterStatistic {
    * @param characters
    *        The characters to add.
    */
-  void addCharacters(CharacterList characters);
+  void addCharacters(ElementList<Character> characters);
 
   /**
    * Adds the given character to this element.

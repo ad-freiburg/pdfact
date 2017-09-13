@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import java.util.List;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have paragraphs.
@@ -14,7 +14,7 @@ public interface HasParagraphs extends HasTextLineStatistic,
    * 
    * @return The paragraphs of this element.
    */
-  List<Paragraph> getParagraphs();
+  ElementList<Paragraph> getParagraphs();
 
   /**
    * Returns the first paragraph of this element.
@@ -38,7 +38,7 @@ public interface HasParagraphs extends HasTextLineStatistic,
    * @param paragraphs
    *        The paragraphs of this element.
    */
-  void setParagraphs(List<Paragraph> paragraphs);
+  void setParagraphs(ElementList<Paragraph> paragraphs);
 
   /**
    * Adds the given paragraphs to this element.
@@ -46,7 +46,7 @@ public interface HasParagraphs extends HasTextLineStatistic,
    * @param paragraphs
    *        The paragraphs to add.
    */
-  void addParagraphs(List<Paragraph> paragraphs);
+  void addParagraphs(ElementList<Paragraph> paragraphs);
 
   /**
    * Adds the given paragraph to this element.

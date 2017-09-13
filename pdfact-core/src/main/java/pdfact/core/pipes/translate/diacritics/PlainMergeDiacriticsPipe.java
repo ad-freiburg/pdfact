@@ -16,8 +16,8 @@ import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 
 /**
@@ -33,9 +33,9 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   protected static Logger log;
 
   /**
-   * The factory to create instances of {@link CharacterList}.
+   * The factory to create lists of characters.
    */
-  protected CharacterListFactory characterListFactory;
+  protected ElementListFactory<Character> characterListFactory;
 
   /**
    * The factory to create instances of {@link RectangleFactory}.
@@ -56,13 +56,14 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
    * Creates a new pipe that merges diacritics.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
    * @param rectangleFactory
    *        The factory to create instances of {@link Rectangle}.
    *
    */
   @Inject
-  public PlainMergeDiacriticsPipe(CharacterListFactory characterListFactory,
+  public PlainMergeDiacriticsPipe(
+      ElementListFactory<Character> characterListFactory,
       RectangleFactory rectangleFactory) {
     this.characterListFactory = characterListFactory;
     this.rectangleFactory = rectangleFactory;
@@ -99,8 +100,9 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       List<Page> pages = pdf.getPages();
       if (pages != null) {
         for (Page page : pages) {
-          CharacterList before = page.getCharacters();
-          CharacterList after = this.characterListFactory.create(before.size());
+          ElementList<Character> before = page.getCharacters();
+          ElementList<Character> after =
+              this.characterListFactory.create(before.size());
           if (before != null) {
             for (int i = 0; i < before.size(); i++) {
               Character prev = i > 0 ? before.get(i - 1) : null;

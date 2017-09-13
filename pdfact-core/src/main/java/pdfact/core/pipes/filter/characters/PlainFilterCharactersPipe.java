@@ -10,8 +10,8 @@ import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 
 /**
@@ -27,9 +27,9 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   protected static Logger log;
 
   /**
-   * The factory to create instances of {@link CharacterList}.
+   * The factory to create lists of characters.
    */
-  protected CharacterListFactory characterListFactory;
+  protected ElementListFactory<Character> characterListFactory;
 
   /**
    * The number of processed characters.
@@ -46,10 +46,11 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
    * not be considered.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of characters.
    */
   @Inject
-  public PlainFilterCharactersPipe(CharacterListFactory characterListFactory) {
+  public PlainFilterCharactersPipe(
+      ElementListFactory<Character> characterListFactory) {
     this.characterListFactory = characterListFactory;
   }
 
@@ -82,9 +83,10 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
     if (pdf != null) {
       List<Page> pages = pdf.getPages();
       for (Page page : pages) {
-        CharacterList before = page.getCharacters();
+        ElementList<Character> before = page.getCharacters();
         // Create a new list of characters which should not be filtered.
-        CharacterList after = this.characterListFactory.create(before.size());
+        ElementList<Character> after =
+            this.characterListFactory.create(before.size());
         for (Character character : before) {
           this.numProcessedCharacters++;
 

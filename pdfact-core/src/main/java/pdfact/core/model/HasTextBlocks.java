@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import java.util.List;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have text blocks.
@@ -14,7 +14,7 @@ public interface HasTextBlocks extends HasTextLineStatistic,
    * 
    * @return The text blocks of this element.
    */
-  List<TextBlock> getTextBlocks();
+  ElementList<TextBlock> getTextBlocks();
 
   /**
    * Returns the first text block of this element.
@@ -38,7 +38,7 @@ public interface HasTextBlocks extends HasTextLineStatistic,
    * @param blocks
    *        The text blocks of this element.
    */
-  void setTextBlocks(List<TextBlock> blocks);
+  void setTextBlocks(ElementList<TextBlock> blocks);
 
   /**
    * Adds the given text blocks to this element.
@@ -46,7 +46,7 @@ public interface HasTextBlocks extends HasTextLineStatistic,
    * @param blocks
    *        The text blocks to add.
    */
-  void addTextBlocks(List<TextBlock> blocks);
+  void addTextBlocks(ElementList<TextBlock> blocks);
 
   /**
    * Adds the given text block to this element.

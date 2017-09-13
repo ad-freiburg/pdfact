@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import pdfact.core.util.list.WordList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have words.
@@ -13,7 +13,7 @@ public interface HasWords extends HasCharacterStatistic {
    * 
    * @return The words of this element.
    */
-  WordList getWords();
+  ElementList<Word> getWords();
 
   /**
    * Returns the first word of this element.
@@ -37,7 +37,7 @@ public interface HasWords extends HasCharacterStatistic {
    * @param words
    *        The words of this element.
    */
-  void setWords(WordList words);
+  void setWords(ElementList<Word> words);
 
   /**
    * Adds the given words to this element.
@@ -45,7 +45,7 @@ public interface HasWords extends HasCharacterStatistic {
    * @param words
    *        The words to add.
    */
-  void addWords(WordList words);
+  void addWords(ElementList<Word> words);
 
   /**
    * Adds the given word to this element.

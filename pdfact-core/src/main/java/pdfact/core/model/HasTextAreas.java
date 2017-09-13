@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import java.util.List;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have text areas.
@@ -13,7 +13,7 @@ public interface HasTextAreas extends HasCharacterStatistic {
    * 
    * @return The text areas of this element.
    */
-  List<TextArea> getTextAreas();
+  ElementList<TextArea> getTextAreas();
 
   /**
    * Returns the first text area of this element.
@@ -37,7 +37,7 @@ public interface HasTextAreas extends HasCharacterStatistic {
    * @param areas
    *        The text areas of this element.
    */
-  void setTextAreas(List<TextArea> areas);
+  void setTextAreas(ElementList<TextArea> areas);
 
   /**
    * Adds the given text areas to this element.
@@ -45,7 +45,7 @@ public interface HasTextAreas extends HasCharacterStatistic {
    * @param areas
    *        The text areas to add.
    */
-  void addTextAreas(List<TextArea> areas);
+  void addTextAreas(ElementList<TextArea> areas);
 
   /**
    * Adds the given text area to this element.

@@ -16,6 +16,22 @@ import pdfact.core.model.Element;
  */
 public interface ElementList<T extends Element> extends List<T> {
   /**
+   * Returns the first element in this list.
+   * 
+   * @return The first element in this list or null if this list is empty.
+   */
+  T getFirstElement();
+
+  /**
+   * Returns the last element in this list.
+   * 
+   * @return The last element in this list or null if this list is empty.
+   */
+  T getLastElement();
+
+  // ==========================================================================
+
+  /**
    * Swaps the elements at index i and j.
    * 
    * @param i
@@ -24,6 +40,8 @@ public interface ElementList<T extends Element> extends List<T> {
    *        The index of the second element to swap.
    */
   void swap(int i, int j);
+
+  // ==========================================================================
 
   /**
    * Splits this list at the given index into two halves. Both halves are views
@@ -35,7 +53,7 @@ public interface ElementList<T extends Element> extends List<T> {
    *        The index where to split this list.
    * @return A list of length 2, containing the two resulting views.
    */
-  List<? extends ElementList<T>> cut(int splitIndex);
+  List<ElementList<T>> cut(int splitIndex);
 
   // ==========================================================================
 
@@ -47,7 +65,7 @@ public interface ElementList<T extends Element> extends List<T> {
    * 
    * @author Claudius Korzen
    */
-  public interface PdfElementListFactory<T extends Element> {
+  public interface ElementListFactory<T extends Element> {
     /**
      * Creates a new instance of {@link ElementList}.
      * 

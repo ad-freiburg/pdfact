@@ -4,8 +4,9 @@ import java.util.List;
 
 import pdfact.core.model.HasTextLineStatistic;
 import pdfact.core.model.HasTextLines;
+import pdfact.core.model.TextLine;
 import pdfact.core.model.TextLineStatistic;
-import pdfact.core.util.list.TextLineList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * A class that computes statistics about text line.
@@ -31,7 +32,7 @@ public interface TextLineStatistician {
    * 
    * @return The computed text line statistics.
    */
-  TextLineStatistic compute(TextLineList textLines);
+  TextLineStatistic compute(ElementList<TextLine> textLines);
 
   /**
    * Combines the given list of text line statistics to a single statistic.

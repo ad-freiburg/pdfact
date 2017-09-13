@@ -1,14 +1,17 @@
 package pdfact.core.pipes.filter.figures;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import com.google.inject.Inject;
 
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 
 /**
@@ -24,6 +27,11 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
   protected static Logger log;
 
   /**
+   * The factory to create lists of figures.
+   */
+  protected ElementListFactory<Figure> figureListFactory;
+
+  /**
    * The number of processed figures.
    */
   protected int numProcessedFigures;
@@ -32,6 +40,18 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
    * The number of filtered figures.
    */
   protected int numFilteredFigures;
+
+  /**
+   * Creates a pipe that filters those figures of a PDF document that should not
+   * be considered.
+   * 
+   * @param figureListFactory
+   *        The factory to create lists of figures.
+   */
+  @Inject
+  public PlainFilterFiguresPipe(ElementListFactory<Figure> figureListFactory) {
+    this.figureListFactory = figureListFactory;
+  }
 
   // ==========================================================================
 
@@ -62,9 +82,10 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
     if (pdf != null) {
       List<Page> pages = pdf.getPages();
       for (Page page : pages) {
-        List<Figure> before = page.getFigures();
+        ElementList<Figure> before = page.getFigures();
         // Create a new list of figures which should not be filtered.
-        List<Figure> after = new ArrayList<>(before.size());
+        ElementList<Figure> after =
+            this.figureListFactory.create(before.size());
         for (Figure figure : before) {
           this.numProcessedFigures++;
 

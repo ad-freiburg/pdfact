@@ -26,9 +26,7 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
   /**
    * The underlying list.
    */
-  protected ArrayList<T> list;
-
-  // ==========================================================================
+  protected final ArrayList<T> list;
 
   /**
    * Creates an empty list.
@@ -183,6 +181,24 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
   // ==========================================================================
 
   @Override
+  public T getFirstElement() {
+    if (isEmpty()) {
+      return null;
+    }
+    return get(0);
+  }
+
+  @Override
+  public T getLastElement() {
+    if (isEmpty()) {
+      return null;
+    }
+    return get(size() - 1);
+  }
+
+  // ==========================================================================
+
+  @Override
   public void swap(int i, int j) {
     T first = this.list.get(i);
     T second = this.list.get(j);
@@ -196,7 +212,7 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
   }
 
   @Override
-  public List<? extends ElementList<T>> cut(int index) {
+  public List<ElementList<T>> cut(int index) {
     ElementListView<T> left = new ElementListView<>(this, 0, index);
     ElementListView<T> right = new ElementListView<>(this, index, this.size());
     return Arrays.asList(left, right);
@@ -483,6 +499,24 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
     // ========================================================================
 
     @Override
+    public S getFirstElement() {
+      if (isEmpty()) {
+        return null;
+      }
+      return get(0);
+    }
+
+    @Override
+    public S getLastElement() {
+      if (isEmpty()) {
+        return null;
+      }
+      return get(size() - 1);
+    }
+
+    // ========================================================================
+
+    @Override
     public void swap(int i, int j) {
       this.parent.swap(this.from + i, this.from + j);
     }
@@ -493,7 +527,7 @@ public class PlainElementList<T extends Element> implements ElementList<T> {
     }
 
     @Override
-    public List<? extends ElementList<S>> cut(int index) {
+    public List<ElementList<S>> cut(int index) {
       // Create new views.
       int left = this.from;
       int cut = this.from + index;

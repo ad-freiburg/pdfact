@@ -5,10 +5,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.inject.assistedinject.AssistedInject;
 
-import pdfact.core.util.list.CharacterList;
-import pdfact.core.util.list.WordList;
-import pdfact.core.util.list.CharacterList.CharacterListFactory;
-import pdfact.core.util.list.WordList.WordListFactory;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 
 /**
  * A plain implementation of {@link TextLine}.
@@ -19,12 +17,12 @@ public class PlainTextLine extends PlainElement implements TextLine {
   /**
    * The characters of this text line.
    */
-  protected CharacterList characters;
+  protected ElementList<Character> characters;
 
   /**
    * The words of this text line.
    */
-  protected WordList words;
+  protected ElementList<Word> words;
 
   /**
    * The text of this text line.
@@ -52,13 +50,14 @@ public class PlainTextLine extends PlainElement implements TextLine {
    * Creates a new text line.
    * 
    * @param characterListFactory
-   *        The factory to create instances of {@link CharacterList}.
+   *        The factory to create lists of words.
    * @param wordListFactory
-   *        The factory to create instances of {@link WordList}.
+   *        The factory to create lists of words.
    */
   @AssistedInject
-  public PlainTextLine(CharacterListFactory characterListFactory,
-      WordListFactory wordListFactory) {
+  public PlainTextLine(
+      ElementListFactory<Character> characterListFactory,
+      ElementListFactory<Word> wordListFactory) {
     this.characters = characterListFactory.create();
     this.words = wordListFactory.create();
   }
@@ -66,7 +65,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   // ==========================================================================
 
   @Override
-  public CharacterList getCharacters() {
+  public ElementList<Character> getCharacters() {
     return this.characters;
   }
 
@@ -87,12 +86,12 @@ public class PlainTextLine extends PlainElement implements TextLine {
   }
 
   @Override
-  public void setCharacters(CharacterList characters) {
+  public void setCharacters(ElementList<Character> characters) {
     this.characters = characters;
   }
 
   @Override
-  public void addCharacters(CharacterList characters) {
+  public void addCharacters(ElementList<Character> characters) {
     this.characters.addAll(characters);
   }
 
@@ -104,7 +103,7 @@ public class PlainTextLine extends PlainElement implements TextLine {
   // ==========================================================================
 
   @Override
-  public WordList getWords() {
+  public ElementList<Word> getWords() {
     return this.words;
   }
 
@@ -125,12 +124,12 @@ public class PlainTextLine extends PlainElement implements TextLine {
   }
 
   @Override
-  public void setWords(WordList words) {
+  public void setWords(ElementList<Word> words) {
     this.words = words;
   }
 
   @Override
-  public void addWords(WordList words) {
+  public void addWords(ElementList<Word> words) {
     this.words.addAll(words);
   }
 

@@ -10,7 +10,7 @@ import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.comparator.MaxYComparator;
 import pdfact.core.util.comparator.MinXComparator;
-import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.list.ElementList;
 
 /**
  * A class that cuts a list of characters horizontally and vertically into
@@ -31,9 +31,9 @@ public abstract class XYCut {
    * 
    * @return The list of resulting blocks.
    */
-  public List<CharacterList> cut(PdfDocument pdf, Page page,
-      CharacterList characters) {
-    List<CharacterList> target = new ArrayList<>();
+  public List<ElementList<Character>> cut(PdfDocument pdf, Page page,
+      ElementList<Character> characters) {
+    List<ElementList<Character>> target = new ArrayList<>();
     cut(pdf, page, characters, target);
     return target;
   }
@@ -51,24 +51,24 @@ public abstract class XYCut {
    * @param target
    *        The list of blocks to fill.
    */
-  protected void cut(PdfDocument pdf, Page page, CharacterList origin,
-      List<CharacterList> target) {
+  protected void cut(PdfDocument pdf, Page page, ElementList<Character> origin,
+      List<ElementList<Character>> target) {
     // Cut the characters vertically (x-cut).
-    List<CharacterList> xBlocks = xCut(pdf, page, origin);
+    List<ElementList<Character>> xBlocks = xCut(pdf, page, origin);
 
-    for (CharacterList xBlock : xBlocks) {
+    for (ElementList<Character> xBlock : xBlocks) {
       // Cut the characters horizontally (y-cut).
-      List<CharacterList> yBlocks = yCut(pdf, page, xBlock);
+      List<ElementList<Character>> yBlocks = yCut(pdf, page, xBlock);
       if (xBlocks.size() == 1 && yBlocks.size() == 1) {
         // Both cuts results in a single blocks. So, the characters could *not*
         // be cut. Pack them and add them to the result list.
-        CharacterList block = yBlocks.get(0);
+        ElementList<Character> block = yBlocks.get(0);
         if (block != null && !block.isEmpty()) {
           target.add(block);
         }
       } else {
         // The characters could be cut. Cut the resulted blocks recursively.
-        for (CharacterList yBlock : yBlocks) {
+        for (ElementList<Character> yBlock : yBlocks) {
           cut(pdf, page, yBlock, target);
         }
       }
@@ -92,8 +92,8 @@ public abstract class XYCut {
    *         list consists only of a single list, which is the original list of
    *         characters.
    */
-  protected List<CharacterList> xCut(PdfDocument pdf, Page page,
-      CharacterList chars) {
+  protected List<ElementList<Character>> xCut(PdfDocument pdf, Page page,
+      ElementList<Character> chars) {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
       Collections.sort(chars, new MinXComparator());
@@ -109,7 +109,7 @@ public abstract class XYCut {
         Character character = chars.get(index);
 
         if (character.getPosition().getRectangle().getMinX() > currentPos) {
-          List<CharacterList> halves = chars.cut(index);
+          List<ElementList<Character>> halves = chars.cut(index);
           // Find the position of the "best" cut.
           while (index < chars.size()) {
             // The score of the current cut.
@@ -153,8 +153,8 @@ public abstract class XYCut {
    *         be cut, the list consists only of a single set, representing a copy
    *         of the original set of characters.
    */
-  protected List<CharacterList> yCut(PdfDocument pdf, Page page,
-      CharacterList chars) {
+  protected List<ElementList<Character>> yCut(PdfDocument pdf, Page page,
+      ElementList<Character> chars) {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
       Collections.sort(chars, Collections.reverseOrder(new MaxYComparator()));
@@ -170,7 +170,7 @@ public abstract class XYCut {
         Character character = chars.get(index);
 
         if (character.getPosition().getRectangle().getMaxY() < currentPos) {
-          List<CharacterList> halves = chars.cut(index);
+          List<ElementList<Character>> halves = chars.cut(index);
           // Find the position of the "best" cut.
           while (index < chars.size()) {
             float cutScore = assessHorizontalCut(pdf, page, halves);
@@ -212,7 +212,7 @@ public abstract class XYCut {
    * @return A score that assesses the given cut.
    */
   public abstract float assessVerticalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves);
+      List<ElementList<Character>> halves);
 
   /**
    * Assesses the given horizontal cut. Returns a positive score, if the cut is
@@ -228,7 +228,7 @@ public abstract class XYCut {
    * @return A score that assesses the given cut.
    */
   public abstract float assessHorizontalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves);
+      List<ElementList<Character>> halves);
 
   // /**
   // * Packs the given characters into the target type.
@@ -240,5 +240,5 @@ public abstract class XYCut {
   // *
   // * @return An object of given target type.
   // */
-  // public abstract T pack(PdfPage page, PdfCharacterList characters);
+  // public abstract T pack(PdfPage page, PdfElementList<Character> characters);
 }

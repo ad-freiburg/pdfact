@@ -1,6 +1,5 @@
 package pdfact.core.pipes.tokenize.areas;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,14 +13,15 @@ import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
-import pdfact.core.model.Rectangle;
-import pdfact.core.model.TextArea;
 import pdfact.core.model.Position.PositionFactory;
+import pdfact.core.model.Rectangle;
 import pdfact.core.model.Rectangle.RectangleFactory;
+import pdfact.core.model.TextArea;
 import pdfact.core.model.TextArea.TextAreaFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.list.CharacterList;
+import pdfact.core.util.list.ElementList;
+import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
@@ -38,6 +38,11 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    */
   @InjectLogger
   protected static Logger log;
+
+  /**
+   * The factory to create lists of text areas.
+   */
+  protected ElementListFactory<TextArea> textAreaListFactory;
 
   /**
    * The factory to create instances of {@link TextArea}.
@@ -73,6 +78,8 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    * Creates a new pipe that tokenizes the pages of a PDF document into text
    * areas.
    * 
+   * @param textAreaListFactory
+   *        The factory to create lists of text areas.
    * @param textAreaFactory
    *        The factory to create instances of {@link TextArea}.
    * @param positionFactory
@@ -84,10 +91,12 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    */
   @Inject
   public XYCutTokenizeToTextAreasPipe(
+      ElementListFactory<TextArea> textAreaListFactory,
       TextAreaFactory textAreaFactory,
       PositionFactory positionFactory,
       RectangleFactory rectangleFactory,
       CharacterStatistician characterStatistician) {
+    this.textAreaListFactory = textAreaListFactory;
     this.textAreaFactory = textAreaFactory;
     this.positionFactory = positionFactory;
     this.rectangleFactory = rectangleFactory;
@@ -139,7 +148,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
 
       this.numProcessedPages++;
 
-      List<TextArea> textAreas = tokenizeToTextAreas(pdf, page);
+      ElementList<TextArea> textAreas = tokenizeToTextAreas(pdf, page);
 
       page.setTextAreas(textAreas);
       this.numTokenizedTextAreas += textAreas.size();
@@ -159,13 +168,14 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected List<TextArea> tokenizeToTextAreas(PdfDocument pdf, Page page)
-      throws PdfActException {
-    List<TextArea> result = new ArrayList<>();
+  protected ElementList<TextArea> tokenizeToTextAreas(PdfDocument pdf,
+      Page page) throws PdfActException {
+    ElementList<TextArea> result = this.textAreaListFactory.create();
 
-    List<CharacterList> areaCharsList = cut(pdf, page, page.getCharacters());
+    ElementList<Character> characters = page.getCharacters();
+    List<ElementList<Character>> areaCharsList = cut(pdf, page, characters);
     if (areaCharsList != null) {
-      for (CharacterList areaChars : areaCharsList) {
+      for (ElementList<Character> areaChars : areaCharsList) {
         TextArea area = this.textAreaFactory.create();
         area.setCharacters(areaChars);
         area.setPosition(computePosition(pdf, page, area));
@@ -190,7 +200,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    * @return The computed position.
    */
   protected Position computePosition(PdfDocument pdf, Page page, TextArea a) {
-    CharacterList characters = a.getCharacters();
+    ElementList<Character> characters = a.getCharacters();
     Rectangle r = this.rectangleFactory.fromHasPositionElements(characters);
     return this.positionFactory.create(page, r);
   }
@@ -216,13 +226,13 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
 
   @Override
   public float assessVerticalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
+      List<ElementList<Character>> halves) {
     // Compute the statistics for the characters in the left half.
-    CharacterList left = halves.get(0);
+    ElementList<Character> left = halves.get(0);
     CharacterStatistic leftStats = this.characterStatistician.compute(left);
 
     // Compute the statistics for the characters in the right half.
-    CharacterList right = halves.get(1);
+    ElementList<Character> right = halves.get(1);
     CharacterStatistic rightStats = this.characterStatistician.compute(right);
 
     // Compute the (fictive) lane between the left and right half.
@@ -252,13 +262,13 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
 
   @Override
   public float assessHorizontalCut(PdfDocument pdf, Page page,
-      List<CharacterList> halves) {
+      List<ElementList<Character>> halves) {
     // Compute the statistics for the characters in the upper half.
-    CharacterList upper = halves.get(0);
+    ElementList<Character> upper = halves.get(0);
     CharacterStatistic upperStats = this.characterStatistician.compute(upper);
 
     // Compute the statistics for the characters in the lower half.
-    CharacterList lower = halves.get(1);
+    ElementList<Character> lower = halves.get(1);
     CharacterStatistic lowerStats = this.characterStatistician.compute(lower);
 
     // Compute the (fictive) lane between the lower and upper half.
@@ -301,8 +311,8 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    *        The statistics about the characters in the right half.
    * @return True if there is such a character pair, false otherwise.
    */
-  protected boolean separatesConsecutiveCharacters(CharacterList left,
-      CharacterStatistic leftStats, CharacterList right,
+  protected boolean separatesConsecutiveCharacters(ElementList<Character> left,
+      CharacterStatistic leftStats, ElementList<Character> right,
       CharacterStatistic rightStats) {
     float largestMaxX = leftStats.getLargestMaxX();
     Set<Character> leftChars = new HashSet<>();

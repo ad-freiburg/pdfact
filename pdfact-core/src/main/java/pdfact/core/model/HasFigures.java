@@ -1,6 +1,6 @@
 package pdfact.core.model;
 
-import java.util.List;
+import pdfact.core.util.list.ElementList;
 
 /**
  * An interface that is implemented by PDF elements that have figures.
@@ -13,7 +13,7 @@ public interface HasFigures {
    * 
    * @return The figures.
    */
-  List<Figure> getFigures();
+  ElementList<Figure> getFigures();
 
   /**
    * Returns the first figure of this element.
@@ -37,7 +37,7 @@ public interface HasFigures {
    * @param figures
    *        The figures of this element.
    */
-  void setFigures(List<Figure> figures);
+  void setFigures(ElementList<Figure> figures);
 
   /**
    * Adds the given figures to this element.
@@ -45,7 +45,7 @@ public interface HasFigures {
    * @param figures
    *        The figures to add.
    */
-  void addFigures(List<Figure> figures);
+  void addFigures(ElementList<Figure> figures);
 
   /**
    * Adds the given figure to this element.
