@@ -41,6 +41,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
    */
   protected int numSplitLigatures;
 
+  // TODO: Move it to character lexicon.
   static {
     // Fill the ligatures.
     LIGATURES = new HashMap<String, String>();

@@ -128,7 +128,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * Chooses the belonging base character (either the given character to the
    * left or the given character to the right of the diacritic) and merges the
-   * givern diacritic with this base character.
+   * given diacritic with this base character.
    * 
    * @param prev
    *        The character to the left of the diacritic.
@@ -288,6 +288,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
    */
   static final Map<Integer, String> COMBINING_DIACRITICS;
 
+  // TODO: Move it to character lexicon.
   static {
     COMBINING_DIACRITICS = new HashMap<Integer, String>(31);
     COMBINING_DIACRITICS.put(0x0060, "\u0300");

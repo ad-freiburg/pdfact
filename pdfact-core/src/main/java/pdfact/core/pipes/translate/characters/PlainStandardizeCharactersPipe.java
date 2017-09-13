@@ -41,6 +41,7 @@ public class PlainStandardizeCharactersPipe
    */
   protected int numStandardizedCharacters;
 
+  // TODO: Move this to character lexicon.
   static {
     CHARACTER_SYNONYMS = new HashMap<String, String>();
     CHARACTER_SYNONYMS.put("\u2018", "'"); // ‘
