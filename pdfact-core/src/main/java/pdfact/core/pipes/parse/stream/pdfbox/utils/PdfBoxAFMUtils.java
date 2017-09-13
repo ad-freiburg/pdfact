@@ -32,11 +32,13 @@ public class PdfBoxAFMUtils {
   /**
    * The additional glyphs.
    */
-  protected static final Map<String, PdfBoxFontMetricsWrapper> ADDITIONAL_AFM;
+  protected static final Map<String, PdfBoxFontMetricsWrapper> ADDITIONAL_AFM =
+      new HashMap<>();
 
-  static {
-    ADDITIONAL_AFM = readAdditionalAFMFiles("afm/");
-  }
+  // TODO
+  // static {
+  // ADDITIONAL_AFM = readAdditionalAFMFiles("afm/");
+  // }
 
   /**
    * Returns the CharMetric for the glyph given by glyphName.
@@ -70,6 +72,8 @@ public class PdfBoxAFMUtils {
    */
   protected static Map<String, PdfBoxFontMetricsWrapper> readAdditionalAFMFiles(
       String path) {
+    log.debug("Reading additional AFM files from path '" + path + "'.");
+
     Map<String, PdfBoxFontMetricsWrapper> result = new HashMap<>();
     try {
       Map<String, InputStream> files = PdfActUtils.readDirectory(path);
@@ -91,8 +95,12 @@ public class PdfBoxAFMUtils {
         }
       }
     } catch (IOException e) {
-      // log.warn("An error occurred while reading additional AFM files.", e);
+      log.warn("An error occurred while reading additional AFM files.", e);
     }
+
+    log.debug("Reading additional AFM files from path done.");
+    log.debug("# read additional AFM files: " + result.size());
+
     return result;
   }
 

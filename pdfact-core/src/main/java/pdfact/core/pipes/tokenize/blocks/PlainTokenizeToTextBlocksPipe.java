@@ -190,6 +190,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       this.numProcessedTextLines++;
 
       if (introducesNewTextBlock(pdf, page, textBlock, prev, line, next)) {
+        System.out.println(line);
         if (!textBlock.getTextLines().isEmpty()) {
           textBlocks.add(textBlock);
         }
@@ -545,14 +546,22 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // If the font of the previous line and the font of the current line are
     // not from the same base, the line has a special font face.
     CharacterStatistic prevLineCharStats = prevLine.getCharacterStatistic();
-    FontFace prevLineFontFace = prevLineCharStats.getMostCommonFontFace();
-    Font prevLineFont = prevLineFontFace.getFont();
-    float prevLineFontsize = prevLineFontFace.getFontSize();
-
     CharacterStatistic lineCharStats = line.getCharacterStatistic();
+    if (prevLineCharStats == null || lineCharStats == null) {
+      return false;
+    }
+
+    FontFace prevLineFontFace = prevLineCharStats.getMostCommonFontFace();
     FontFace lineFontFace = lineCharStats.getMostCommonFontFace();
+    if (prevLineFontFace == null || lineFontFace == null) {
+      return false;
+    }
+
+    Font prevLineFont = prevLineFontFace.getFont();
     Font lineFont = lineFontFace.getFont();
-    float lineFontsize = lineFontFace.getFontSize();
+    if (prevLineFont == null || lineFont == null) {
+      return false;
+    }
 
     String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
     String lineFontFamilyName = lineFont.getFontFamilyName();
@@ -563,10 +572,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     if (prevLineFontFamilyName != null && lineFontFamilyName == null) {
       return true;
     }
-    if (!prevLineFontFamilyName.equals(lineFontFamilyName)) {
+    if (prevLineFontFamilyName != null
+        && !prevLineFontFamilyName.equals(lineFontFamilyName)) {
       return true;
     }
 
+    float prevLineFontsize = prevLineFontFace.getFontSize();
+    float lineFontsize = lineFontFace.getFontSize();
+    
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
     if (prevLineFontsize != lineFontsize) {

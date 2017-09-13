@@ -309,10 +309,12 @@ public class ShowText extends OperatorProcessor {
     // TODO: Verify, that this is a correct observation.
     PDGraphicsState graphicsState = this.engine.getGraphicsState();
     float fontSize = graphicsState.getTextState().getFontSize();
-    float scaleFactorX = trm.getScalingFactorX();
-    if (fontSize != scaleFactorX) {
-      fontSize *= scaleFactorX;
-    }
+//    float scaleFactorX = trm.getScalingFactorX();
+    
+    // TODO: Check if this approach is correct
+//    if (fontSize != scaleFactorX) {
+//      fontSize *= scaleFactorX;
+//    }
 
     // Use our additional glyph list for Unicode mapping
     GlyphList additionalGlyphs = this.glyphUtils.getAdditionalGlyphs();
