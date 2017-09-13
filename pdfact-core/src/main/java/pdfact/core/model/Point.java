@@ -3,17 +3,17 @@ package pdfact.core.model;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * A single, 2-dim point.
+ * A single, two-dimensional point.
  * 
  * @author Claudius Korzen.
  */
-public abstract class Point extends PlainGeometric {
+public interface Point {
   /**
    * Returns the x-coordinate of this point.
    * 
    * @return The x-coordinate of this point.
    */
-  public abstract float getX();
+  float getX();
 
   /**
    * Sets the x-coordinate of this point.
@@ -21,7 +21,7 @@ public abstract class Point extends PlainGeometric {
    * @param x
    *        The x-coordinate of this point.
    */
-  public abstract void setX(float x);
+  void setX(float x);
 
   // ==========================================================================
 
@@ -30,7 +30,7 @@ public abstract class Point extends PlainGeometric {
    * 
    * @return The y-coordinate of this point.
    */
-  public abstract float getY();
+  float getY();
 
   /**
    * Sets the y-coordinate of this point.
@@ -38,7 +38,7 @@ public abstract class Point extends PlainGeometric {
    * @param y
    *        The y-coordinate of this point.
    */
-  public abstract void setY(float y);
+  void setY(float y);
 
   // ==========================================================================
 

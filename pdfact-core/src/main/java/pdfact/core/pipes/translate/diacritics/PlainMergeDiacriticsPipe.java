@@ -158,7 +158,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       Position prevPosition = prev.getPosition();
       if (prevPosition != null) {
         Rectangle prevRect = prevPosition.getRectangle();
-        prevOverlap = diacriticRect.computeHorizontalOverlapLength(prevRect);
+        prevOverlap = diacriticRect.getHorizontalOverlapLength(prevRect);
       }
     }
 
@@ -168,7 +168,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       Position nextPosition = next.getPosition();
       if (nextPosition != null) {
         Rectangle nextRect = nextPosition.getRectangle();
-        nextOverlap = diacriticRect.computeHorizontalOverlapLength(nextRect);
+        nextOverlap = diacriticRect.getHorizontalOverlapLength(nextRect);
       }
     }
 

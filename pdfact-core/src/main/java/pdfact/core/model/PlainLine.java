@@ -6,12 +6,14 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
+import pdfact.core.model.Point.PointFactory;
+
 /**
  * A plain implementation of {@link Line}.
  * 
  * @author Claudius Korzen
  */
-public class PlainLine extends Line {
+public class PlainLine implements Line {
   /**
    * The start point of this line.
    */
@@ -23,21 +25,14 @@ public class PlainLine extends Line {
   protected Point endPoint;
 
   /**
-   * The bounding box of this line.
-   */
-  protected Rectangle rectangle;
-
-  /**
-   * Flag to indicate, whether the bounding box needs an update.
-   */
-  protected boolean isRectangleOutdated;
-
-  /**
    * Creates a new line with start point (0,0) and end point (0,0).
+   * 
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    */
   @AssistedInject
-  public PlainLine() {
-    this(0, 0, 0, 0);
+  public PlainLine(PointFactory pointFactory) {
+    this(0, 0, 0, 0, pointFactory);
   }
 
   /**
@@ -52,15 +47,17 @@ public class PlainLine extends Line {
    *        The x-coordinate of the end point.
    * @param endY
    *        The y-coordinate of the end point.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    */
   @AssistedInject
   public PlainLine(
       @Assisted("startX") float startX,
       @Assisted("startY") float startY,
       @Assisted("endX") float endX,
-      @Assisted("endY") float endY) {
-    // TODO: Use Guice here.
-    this(new PlainPoint(startX, startY), new PlainPoint(endX, endY));
+      @Assisted("endY") float endY,
+      PointFactory pointFactory) {
+    this(pointFactory.create(startX, startY), pointFactory.create(endX, endY));
   }
 
   /**
@@ -78,9 +75,6 @@ public class PlainLine extends Line {
       @Assisted("end") Point endPoint) {
     this.startPoint = startPoint;
     this.endPoint = endPoint;
-    // TODO: Use Guice here.
-    this.rectangle = new PlainRectangle();
-    this.isRectangleOutdated = true;
   }
 
   // ==========================================================================
@@ -105,7 +99,6 @@ public class PlainLine extends Line {
   @Override
   public void setStartX(float x) {
     this.startPoint.setX(x);
-    this.isRectangleOutdated = true;
   }
 
   // ==========================================================================
@@ -118,7 +111,6 @@ public class PlainLine extends Line {
   @Override
   public void setStartY(float y) {
     this.startPoint.setY(y);
-    this.isRectangleOutdated = true;
   }
 
   // ==========================================================================
@@ -143,7 +135,6 @@ public class PlainLine extends Line {
   @Override
   public void setEndX(float x) {
     this.endPoint.setX(x);
-    this.isRectangleOutdated = true;
   }
 
   // ==========================================================================
@@ -156,27 +147,6 @@ public class PlainLine extends Line {
   @Override
   public void setEndY(float y) {
     this.endPoint.setY(y);
-    this.isRectangleOutdated = true;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public Rectangle getRectangle() {
-    if (this.isRectangleOutdated) {
-      this.rectangle.setMinX(getStartX());
-      this.rectangle.setMinY(getStartY());
-      this.rectangle.setMaxX(getEndX());
-      this.rectangle.setMaxY(getEndY());
-      this.isRectangleOutdated = false;
-    }
-    return this.rectangle;
-  }
-
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    this.rectangle = boundingBox;
-    this.isRectangleOutdated = false;
   }
 
   // ==========================================================================

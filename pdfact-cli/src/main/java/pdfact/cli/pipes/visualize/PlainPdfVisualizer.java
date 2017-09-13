@@ -508,7 +508,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       if (page != null && rect != null) {
         int pageNum = page.getPageNumber();
         try {
-          drawer.drawBoundingBox(rect, pageNum, color, null, 1f);
+          drawer.drawRectangle(rect, pageNum, color, null, 1f);
 
           // Draw the semantic role, if there is any.
           if (element instanceof HasSemanticRole) {

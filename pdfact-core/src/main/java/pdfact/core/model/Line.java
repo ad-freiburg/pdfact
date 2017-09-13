@@ -7,13 +7,13 @@ import com.google.inject.assistedinject.Assisted;
  * 
  * @author Claudius Korzen.
  */
-public abstract class Line extends PlainGeometric {
+public interface Line {
   /**
    * Returns the start point of this line.
    * 
    * @return The start point of this line.
    */
-  public abstract Point getStartPoint();
+  Point getStartPoint();
 
   /**
    * Sets the start point of this line.
@@ -21,7 +21,7 @@ public abstract class Line extends PlainGeometric {
    * @param start
    *        The start point of this line.
    */
-  public abstract void setStartPoint(Point start);
+  void setStartPoint(Point start);
 
   // ==========================================================================
 
@@ -30,7 +30,7 @@ public abstract class Line extends PlainGeometric {
    * 
    * @return The x-coordinate of the start point.
    */
-  public abstract float getStartX();
+  float getStartX();
 
   /**
    * Sets the x-coordinate of the start point.
@@ -38,7 +38,7 @@ public abstract class Line extends PlainGeometric {
    * @param x
    *        The x-coordinate of the start point.
    */
-  public abstract void setStartX(float x);
+  void setStartX(float x);
 
   // ==========================================================================
 
@@ -47,7 +47,7 @@ public abstract class Line extends PlainGeometric {
    * 
    * @return The y-coordinate of the start point.
    */
-  public abstract float getStartY();
+  float getStartY();
 
   /**
    * Sets the y-coordinate of the start point.
@@ -55,7 +55,7 @@ public abstract class Line extends PlainGeometric {
    * @param y
    *        The y-coordinate of the start point.
    */
-  public abstract void setStartY(float y);
+  void setStartY(float y);
 
   // ==========================================================================
 
@@ -64,7 +64,7 @@ public abstract class Line extends PlainGeometric {
    * 
    * @return The end point of this line.
    */
-  public abstract Point getEndPoint();
+  Point getEndPoint();
 
   /**
    * Sets the end point of this line.
@@ -72,7 +72,7 @@ public abstract class Line extends PlainGeometric {
    * @param end
    *        The end point of this line.
    */
-  public abstract void setEndPoint(Point end);
+  void setEndPoint(Point end);
 
   // ==========================================================================
 
@@ -81,7 +81,7 @@ public abstract class Line extends PlainGeometric {
    * 
    * @return The x-coordinate of the end point.
    */
-  public abstract float getEndX();
+  float getEndX();
 
   /**
    * Sets the x-coordinate of the end point.
@@ -89,7 +89,7 @@ public abstract class Line extends PlainGeometric {
    * @param x
    *        The x-coordinate of the end point.
    */
-  public abstract void setEndX(float x);
+  void setEndX(float x);
 
   // ==========================================================================
 
@@ -98,7 +98,7 @@ public abstract class Line extends PlainGeometric {
    * 
    * @return The y-coordinate of the end point.
    */
-  public abstract float getEndY();
+  float getEndY();
 
   /**
    * Sets the y-coordinate of the end point.
@@ -106,7 +106,7 @@ public abstract class Line extends PlainGeometric {
    * @param y
    *        The y-coordinate of the end point.
    */
-  public abstract void setEndY(float y);
+  void setEndY(float y);
 
   // ==========================================================================
 
@@ -133,7 +133,8 @@ public abstract class Line extends PlainGeometric {
      * 
      * @return A new instance of {@link Line}.
      */
-    Line create(@Assisted("start") Point startPoint,
+    Line create(
+        @Assisted("start") Point startPoint,
         @Assisted("end") Point endPoint);
 
     /**

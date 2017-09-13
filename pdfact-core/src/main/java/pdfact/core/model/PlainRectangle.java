@@ -1,7 +1,5 @@
 package pdfact.core.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -11,68 +9,102 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.core.model.PdfDocument.PdfDocumentFactory;
+import pdfact.core.model.Point.PointFactory;
 
 /**
  * A plain implementation of {@link Rectangle}.
  * 
  * @author Claudius Korzen
  */
-public class PlainRectangle extends Rectangle {
+public class PlainRectangle implements Rectangle {
   /**
-   * The x-coordinate of the lower left point of the rectangle.
+   * The factory to create instances of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
+
+  /**
+   * The factory to create instances of {@link Point}.
+   */
+  protected PointFactory pointFactory;
+
+  /**
+   * The x-coordinate of the lower left point of this rectangle.
    */
   protected float minX = Float.MAX_VALUE;
 
   /**
-   * The y-coordinate of the lower left point of the rectangle.
+   * The y-coordinate of the lower left point of this rectangle.
    */
   protected float minY = Float.MAX_VALUE;
 
   /**
-   * The x-coordinate of the upper right point of the rectangle.
+   * The x-coordinate of the upper right point of this rectangle.
    */
   protected float maxX = -Float.MAX_VALUE;
 
   /**
-   * The y-coordinate of the upper right point of the rectangle.
+   * The y-coordinate of the upper right point of this rectangle.
    */
   protected float maxY = -Float.MAX_VALUE;
 
   /**
    * Creates a new rectangle with the lower left point (0, 0) and the upper
    * right point (0, 0).
+   * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    */
   @AssistedInject
-  public PlainRectangle() {
-    this(0, 0, 0, 0);
+  public PlainRectangle(RectangleFactory rectangleFactory,
+      PointFactory pointFactory) {
+    this(rectangleFactory, pointFactory, 0, 0, 0, 0);
   }
 
   /**
    * Creates a copy of the given rectangle.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param rect
    *        The rectangle to copy.
    */
   @AssistedInject
-  public PlainRectangle(@Assisted Rectangle rect) {
-    this(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY());
+  public PlainRectangle(RectangleFactory rectangleFactory,
+      PointFactory pointFactory, @Assisted Rectangle rect) {
+    this(rectangleFactory, pointFactory, rect.getMinX(), rect.getMinY(),
+        rect.getMaxX(), rect.getMaxY());
   }
 
   /**
    * Creates a copy of the given rectangle.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param rect
    *        The rectangle to copy.
    */
   @AssistedInject
-  public PlainRectangle(@Assisted java.awt.Rectangle rect) {
-    this(rect.getMinX(), rect.getMinY(), rect.getMaxX(), rect.getMaxY());
+  public PlainRectangle(RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
+      @Assisted java.awt.Rectangle rect) {
+    this(rectangleFactory, pointFactory, rect.getMinX(), rect.getMinY(),
+        rect.getMaxX(), rect.getMaxY());
   }
 
   /**
-   * Creates a new rectangle with the given lower left point and the given upper
-   * right point.
+   * Creates a new rectangle that is spanned by the given lower left point and
+   * the given upper right point.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param ll
    *        The lower left point.
    * @param ur
@@ -80,51 +112,69 @@ public class PlainRectangle extends Rectangle {
    */
   @AssistedInject
   public PlainRectangle(
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
       @Assisted("lowerLeft") Point ll,
       @Assisted("upperRight") Point ur) {
-    this(ll.getX(), ll.getY(), ur.getX(), ur.getY());
+    this(rectangleFactory, pointFactory, ll.getX(), ll.getY(), ur.getX(),
+        ur.getY());
   }
 
   /**
    * Creates a new rectangle with the given coordinates.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param minX
-   *        The x-coordinate of the lower left point of the rectangle.
+   *        The x-coordinate of the lower left point of this rectangle.
    * @param minY
-   *        The y-coordinate of the lower left point of the rectangle.
+   *        The y-coordinate of the lower left point of this rectangle.
    * @param maxX
-   *        The x-coordinate of the upper right point of the rectangle.
+   *        The x-coordinate of the upper right point of this rectangle.
    * @param maxY
-   *        The y-coordinate of the upper right point of the rectangle.
+   *        The y-coordinate of the upper right point of this rectangle.
    */
   @AssistedInject
   public PlainRectangle(
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
       @Assisted("minX") double minX,
       @Assisted("minY") double minY,
       @Assisted("maxX") double maxX,
       @Assisted("maxY") double maxY) {
-    this((float) minX, (float) minY, (float) maxX, (float) maxY);
+    this(rectangleFactory, pointFactory, (float) minX, (float) minY,
+        (float) maxX, (float) maxY);
   }
 
   /**
    * Creates a new rectangle with the lower left point (minX, minY) and the
    * upper right (maxX, maxY).
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param minX
-   *        The minimum x-coordinate.
+   *        The x-coordinate of the lower left point of this rectangle.
    * @param minY
-   *        The minimum y-coordinate.
+   *        The y-coordinate of the lower left point of this rectangle.
    * @param maxX
-   *        The maximum x-coordinate.
+   *        The x-coordinate of the upper right point of this rectangle.
    * @param maxY
-   *        The maximum y-coordinate.
+   *        The y-coordinate of the upper right point of this rectangle.
    */
   @AssistedInject
   public PlainRectangle(
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
       @Assisted("minX") float minX,
       @Assisted("minY") float minY,
       @Assisted("maxX") float maxX,
       @Assisted("maxY") float maxY) {
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
     setMinX(minX);
     setMinY(minY);
     setMaxX(maxX);
@@ -134,11 +184,20 @@ public class PlainRectangle extends Rectangle {
   /**
    * Creates a new rectangle from the union of the given rectangles.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param rectangles
    *        The rectangles to process.
    */
   @AssistedInject
-  public PlainRectangle(@Assisted Rectangle... rectangles) {
+  public PlainRectangle(
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
+      @Assisted Rectangle... rectangles) {
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
     for (Rectangle rect : rectangles) {
       if (rect.getMinX() < getMinX()) {
         setMinX(rect.getMinX());
@@ -162,12 +221,20 @@ public class PlainRectangle extends Rectangle {
    * Creates a new rectangle that represents the bounding box around the given
    * elements that have a single position.
    * 
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param elements
    *        The elements to process.
    */
   @AssistedInject
   public PlainRectangle(
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
       @Assisted("hasPosition") Iterable<? extends HasPosition> elements) {
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
     for (HasPosition element : elements) {
       Rectangle rectangle = element.getPosition().getRectangle();
       if (rectangle.getMinX() < getMinX()) {
@@ -194,6 +261,10 @@ public class PlainRectangle extends Rectangle {
    * 
    * @param xxx
    *        Only there to get a constructor with unique erasure.
+   * @param rectangleFactory
+   *        The factory to create instances of {@link Rectangle}.
+   * @param pointFactory
+   *        The factory to create instances of {@link Point}.
    * @param elements
    *        The elements to process.
    */
@@ -201,8 +272,13 @@ public class PlainRectangle extends Rectangle {
   // TODO: PdfDocumentFactory is only injected to get an constructor with
   // another erasure than the previous constructor. Find out how to deal with
   // constructors with same erasure correctly.
-  public PlainRectangle(PdfDocumentFactory xxx,
+  public PlainRectangle(
+      PdfDocumentFactory xxx,
+      RectangleFactory rectangleFactory,
+      PointFactory pointFactory,
       @Assisted("hasPositions") Iterable<? extends HasPositions> elements) {
+    this.rectangleFactory = rectangleFactory;
+    this.pointFactory = pointFactory;
     for (HasPositions element : elements) {
       List<Position> positions = element.getPositions();
       for (Position position : positions) {
@@ -224,165 +300,6 @@ public class PlainRectangle extends Rectangle {
         }
       }
     }
-  }
-
-  // ==========================================================================
-
-  /**
-   * Creates a new rectangle from the two given points. The points need not to
-   * be in any special order.
-   *
-   * @param point1
-   *        The first point.
-   * @param point2
-   *        The second point.
-   * 
-   * @return A rectangle that is spanned by point1 and point2.
-   */
-  public static Rectangle from2Points(Point point1, Point point2) {
-    float x1 = point1.getX();
-    float y1 = point1.getY();
-    float x2 = point2.getX();
-    float y2 = point2.getY();
-
-    float minX = Math.min(x1, x2);
-    float minY = Math.min(y1, y2);
-    float maxX = Math.max(x1, x2);
-    float maxY = Math.max(y1, y2);
-
-    // TODO: Use Guice here.
-    return new PlainRectangle(minX, minY, maxX, maxY);
-  }
-
-  /**
-   * Creates a new rectangle from the four given points. The points need not to
-   * be in any special order.
-   *
-   * @param point1
-   *        The first point.
-   * @param point2
-   *        The second point.
-   * @param point3
-   *        The third point.
-   * @param point4
-   *        The fourth point.
-   * 
-   * @return A rectangle that is spanned by point1, point2, point3 and point4.
-   */
-  public static Rectangle from4Points(Point point1, Point point2,
-      Point point3, Point point4) {
-    float x1 = point1.getX();
-    float y1 = point1.getY();
-    float x2 = point2.getX();
-    float y2 = point2.getY();
-    float x3 = point3.getX();
-    float y3 = point3.getY();
-    float x4 = point4.getX();
-    float y4 = point4.getY();
-
-    float minX = Math.min(Math.min(x1, x2), Math.min(x3, x4));
-    float minY = Math.min(Math.min(y1, y2), Math.min(y3, y4));
-    float maxX = Math.max(Math.max(x1, x2), Math.max(x3, x4));
-    float maxY = Math.max(Math.max(y1, y2), Math.max(y3, y4));
-
-    // TODO: Use Guice here.
-    return new PlainRectangle(minX, minY, maxX, maxY);
-  }
-
-  // ==========================================================================
-
-  /**
-   * Creates a new rectangle from the union of the two given elements that have
-   * a rectangle.
-   * 
-   * @param hb1
-   *        The first element that has a rectangle.
-   * @param hb2
-   *        The second element that has a rectangle.
-   * 
-   * @return A rectangle that represents the union of the two rectangles.
-   */
-  public static Rectangle fromUnion(HasPosition hb1, HasPosition hb2) {
-    Rectangle rect1 = hb1.getPosition().getRectangle();
-    Rectangle rect2 = hb2.getPosition().getRectangle();
-
-    float minX = Math.min(rect1.getMinX(), rect2.getMinX());
-    float maxX = Math.max(rect1.getMaxX(), rect2.getMaxX());
-    float minY = Math.min(rect1.getMinY(), rect2.getMinY());
-    float maxY = Math.max(rect1.getMaxY(), rect2.getMaxY());
-
-    // TODO: Use Guice here.
-    return new PlainRectangle(minX, minY, maxX, maxY);
-  }
-
-  // ==========================================================================
-
-  /**
-   * Creates a new rectangle from the bounding box around all given elements.
-   * 
-   * @param elements
-   *        The elements to process.
-   * 
-   * @return The bounding box.
-   */
-  public static Rectangle fromBoundingBoxOf(HasPosition... elements) {
-    return fromBoundingBoxOf(new ArrayList<>(Arrays.asList(elements)));
-  }
-
-  /**
-   * Creates a new rectangle from the bounding box around all given elements.
-   * 
-   * @param elements
-   *        The elements to process.
-   * 
-   * @return The bounding box.
-   */
-  public static Rectangle fromBoundingBoxOf(
-      Iterable<? extends HasPosition> elements) {
-    if (elements == null) {
-      return null;
-    }
-
-    float minX = Float.MAX_VALUE;
-    float minY = Float.MAX_VALUE;
-    float maxX = -Float.MAX_VALUE;
-    float maxY = -Float.MAX_VALUE;
-
-    for (HasPosition object : elements) {
-      Rectangle rectangle = object.getPosition().getRectangle();
-      if (rectangle.getMinX() < minX) {
-        minX = rectangle.getMinX();
-      }
-
-      if (rectangle.getMinY() < minY) {
-        minY = rectangle.getMinY();
-      }
-
-      if (rectangle.getMaxX() > maxX) {
-        maxX = rectangle.getMaxX();
-      }
-
-      if (rectangle.getMaxY() > maxY) {
-        maxY = rectangle.getMaxY();
-      }
-    }
-    // TODO: Use Guice here.
-    return new PlainRectangle(minX, minY, maxX, maxY);
-  }
-
-  // ==========================================================================
-
-  @Override
-  public Rectangle getRectangle() {
-    return this;
-  }
-
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    setMinX(boundingBox.getMinX());
-    setMinY(boundingBox.getMinY());
-    setMaxX(boundingBox.getMaxX());
-    setMaxY(boundingBox.getMaxY());
   }
 
   // ==========================================================================
@@ -437,55 +354,51 @@ public class PlainRectangle extends Rectangle {
 
   @Override
   public Point getLowerLeft() {
-    // TODO: Use Guice here.
-    return new PlainPoint(this.minX, this.minY);
-  }
-
-  @Override
-  public Point getUpperLeft() {
-    // TODO: Use Guice here.
-    return new PlainPoint(this.minX, this.maxY);
+    return this.pointFactory.create(this.minX, this.minY);
   }
 
   @Override
   public Point getLowerRight() {
-    // TODO: Use Guice here.
-    return new PlainPoint(this.maxX, this.minY);
+    return this.pointFactory.create(this.maxX, this.minY);
+  }
+  
+  @Override
+  public Point getUpperLeft() {
+    return this.pointFactory.create(this.minX, this.maxY);
   }
 
   @Override
   public Point getUpperRight() {
-    // TODO: Use Guice here.
-    return new PlainPoint(this.maxX, this.maxY);
+    return this.pointFactory.create(this.maxX, this.maxY);
   }
 
   // ==========================================================================
 
   @Override
   public Point getMidpoint() {
-    return new PlainPoint(getXMidpoint(), getYMidpoint());
+    return this.pointFactory.create(getXMidpoint(), getYMidpoint());
   }
 
   @Override
   public float getXMidpoint() {
-    return this.minX + (getWidth() / 2f);
+    return getMinX() + (getWidth() / 2f);
   }
 
   @Override
   public float getYMidpoint() {
-    return this.minY + (getHeight() / 2f);
+    return getMinY() + (getHeight() / 2f);
   }
 
   // ==========================================================================
 
   @Override
   public float getWidth() {
-    return this.maxX - this.minX;
+    return getMaxX() - getMinX();
   }
 
   @Override
   public float getHeight() {
-    return this.maxY - this.minY;
+    return getMaxY() - getMinY();
   }
 
   // ==========================================================================
@@ -498,36 +411,40 @@ public class PlainRectangle extends Rectangle {
   // ==========================================================================
 
   @Override
-  public float getOverlapRatio(PlainGeometric geom) {
-    return computeOverlapArea(geom) / getArea();
-  }
-
-  // ==========================================================================
-
-  @Override
-  public void extend(HasPosition rect) {
-    setMinX(Math.min(getMinX(), rect.getPosition().getRectangle().getMinX()));
-    setMaxX(Math.max(getMaxX(), rect.getPosition().getRectangle().getMaxX()));
-    setMinY(Math.min(getMinY(), rect.getPosition().getRectangle().getMinY()));
-    setMaxY(Math.max(getMaxY(), rect.getPosition().getRectangle().getMaxY()));
+  public void extend(Rectangle rect) {
+    if (rect == null) {
+      return;
+    }
+    setMinX(Math.min(getMinX(), rect.getMinX()));
+    setMaxX(Math.max(getMaxX(), rect.getMaxX()));
+    setMinY(Math.min(getMinY(), rect.getMinY()));
+    setMaxY(Math.max(getMaxY(), rect.getMaxY()));
   }
 
   @Override
-  public Rectangle union(HasRectangle rect) {
-    float minX = Math.min(getMinX(), rect.getRectangle().getMinX());
-    float maxX = Math.max(getMaxX(), rect.getRectangle().getMaxX());
-    float minY = Math.min(getMinY(), rect.getRectangle().getMinY());
-    float maxY = Math.max(getMaxY(), rect.getRectangle().getMaxY());
+  public Rectangle union(Rectangle rect) {
+    if (rect == null) {
+      return null;
+    }
+    
+    float minX = Math.min(getMinX(), rect.getMinX());
+    float maxX = Math.max(getMaxX(), rect.getMaxX());
+    float minY = Math.min(getMinY(), rect.getMinY());
+    float maxY = Math.max(getMaxY(), rect.getMaxY());
 
-    return new PlainRectangle(minX, minY, maxX, maxY);
+    return this.rectangleFactory.create(minX, minY, maxX, maxY);
   }
 
   @Override
-  public Rectangle intersection(HasRectangle rect) {
-    float maxMinX = Math.max(getMinX(), rect.getRectangle().getMinX());
-    float minMaxX = Math.min(getMaxX(), rect.getRectangle().getMaxX());
-    float maxMinY = Math.max(getMinY(), rect.getRectangle().getMinY());
-    float minMaxY = Math.min(getMaxY(), rect.getRectangle().getMaxY());
+  public Rectangle intersection(Rectangle rect) {
+    if (rect == null) {
+      return null;
+    }
+    
+    float maxMinX = Math.max(getMinX(), rect.getMinX());
+    float minMaxX = Math.min(getMaxX(), rect.getMaxX());
+    float maxMinY = Math.max(getMinY(), rect.getMinY());
+    float minMaxY = Math.min(getMaxY(), rect.getMaxY());
 
     if (minMaxX <= maxMinX) {
       return null;
@@ -537,7 +454,89 @@ public class PlainRectangle extends Rectangle {
       return null;
     }
 
-    return new PlainRectangle(maxMinX, maxMinY, minMaxX, minMaxY);
+    return this.rectangleFactory.create(maxMinX, maxMinY, minMaxX, minMaxY);
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean contains(Rectangle rect) {
+    if (rect == null) {
+      return false;
+    }
+    if (rect.getMinX() < getMinX()) {
+      return false;
+    }
+    if (rect.getMaxX() > getMaxX()) {
+      return false;
+    }
+    if (rect.getMinY() < getMinY()) {
+      return false;
+    }
+    if (rect.getMaxY() > getMaxY()) {
+      return false;
+    }
+    return true;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean overlaps(Rectangle rect) {
+    if (rect == null) {
+      return false;
+    }
+    return overlapsHorizontally(rect) && overlapsVertically(rect);
+  }
+
+  @Override
+  public float getOverlapRatio(Rectangle rect) {
+    if (getArea() <= 0) {
+      return 0;
+    }
+    float horizontalOverlapLength = getHorizontalOverlapLength(rect);
+    float verticalOverlapLength = getVerticalOverlapLength(rect);
+    return (horizontalOverlapLength * verticalOverlapLength) / getArea();
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean overlapsHorizontally(Rectangle rect) {
+    if (rect == null) {
+      return false;
+    }
+    return getMaxX() >= rect.getMinX() && getMinX() <= rect.getMaxX();
+  }
+
+  @Override
+  public float getHorizontalOverlapLength(Rectangle rect) {
+    if (rect != null) {
+      float minMaxX = Math.min(getMaxX(), rect.getMaxX());
+      float maxMinX = Math.max(getMinX(), rect.getMinX());
+      return Math.max(0, minMaxX - maxMinX);
+    }
+    return 0;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public boolean overlapsVertically(Rectangle rect) {
+    if (rect == null) {
+      return false;
+    }
+    return getMinY() <= rect.getMaxY() && getMaxY() >= rect.getMinY();
+  }
+
+  @Override
+  public float getVerticalOverlapLength(Rectangle rect) {
+    if (rect != null) {
+      float minMaxY = Math.min(getMaxY(), rect.getMaxY());
+      float maxMinY = Math.max(getMinY(), rect.getMinY());
+      return Math.max(0, minMaxY - maxMinY);
+    }
+    return 0;
   }
 
   // ==========================================================================

@@ -11,7 +11,7 @@ import com.google.inject.assistedinject.AssistedInject;
  * 
  * @author Claudius Korzen
  */
-public class PlainPoint extends Point {
+public class PlainPoint implements Point {
   /**
    * The x-coordinate of this point.
    */
@@ -21,17 +21,7 @@ public class PlainPoint extends Point {
    * The y-coordinate of this point.
    */
   protected float y;
-
-  /**
-   * The bounding box.
-   */
-  protected Rectangle rectangle;
-
-  /**
-   * Flag to indicate whether the bounding box needs an update.
-   */
-  protected boolean isRectangleOutdated;
-
+  
   /**
    * Creates a new point with coordinates (0, 0).
    */
@@ -52,17 +42,15 @@ public class PlainPoint extends Point {
   public PlainPoint(@Assisted("x") float x, @Assisted("y") float y) {
     setX(x);
     setY(y);
-    // TODO: Use Guice here.
-    this.rectangle = new PlainRectangle(x, y, x, y);
   }
 
   /**
    * Creates a new point with coordinates (x, y).
    * 
    * @param x
-   *        The x value.
+   *        The x-coordinate.
    * @param y
-   *        The y value.
+   *        The y-coordinate.
    */
   @AssistedInject
   public PlainPoint(@Assisted("x") double x, @Assisted("y") double y) {
@@ -79,7 +67,6 @@ public class PlainPoint extends Point {
   @Override
   public void setX(float x) {
     this.x = x;
-    this.isRectangleOutdated = true;
   }
 
   // ==========================================================================
@@ -92,27 +79,6 @@ public class PlainPoint extends Point {
   @Override
   public void setY(float y) {
     this.y = y;
-    this.isRectangleOutdated = true;
-  }
-
-  // ==========================================================================
-
-  @Override
-  public Rectangle getRectangle() {
-    if (this.isRectangleOutdated) {
-      this.rectangle.setMinX(getX());
-      this.rectangle.setMinY(getY());
-      this.rectangle.setMaxX(getX());
-      this.rectangle.setMaxY(getY());
-      this.isRectangleOutdated = false;
-    }
-    return this.rectangle;
-  }
-
-  @Override
-  public void setRectangle(Rectangle boundingBox) {
-    this.rectangle = boundingBox;
-    this.isRectangleOutdated = false;
   }
 
   // ==========================================================================
