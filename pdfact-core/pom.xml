@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <project.dirs.root>${project.parent.basedir}</project.dirs.root>
+    <project.dirs.root>${project.basedir}/..</project.dirs.root>
   </properties>
 
   <dependencies>
