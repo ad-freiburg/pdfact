@@ -1,6 +1,5 @@
 package pdfact.core.pipes.parse.stream.pdfbox.convert;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -151,7 +150,7 @@ public class PDColorConverter {
 
     try {
       return colorSpace.toRGB(color.getComponents());
-    } catch (IOException e) {
+    } catch (Exception e) {
       // TODO: Handle the exception.
       return null;
     }

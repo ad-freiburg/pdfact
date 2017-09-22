@@ -14,10 +14,6 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
-  <properties>
-    <project.dirs.root>${project.basedir}/..</project.dirs.root>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>

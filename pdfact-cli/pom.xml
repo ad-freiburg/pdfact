@@ -13,12 +13,6 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
-  <properties>
-    <project.dirs.root>${project.basedir}/..</project.dirs.root>
-    <project.files.scriptTemplateSource>src/main/resources/cli_script_template</project.files.scriptTemplateSource>
-    <project.files.scriptTemplateTarget>${project.dirs.root}/pdfact</project.files.scriptTemplateTarget>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>pdfact</groupId>
@@ -61,7 +55,7 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-              <outputDirectory>${project.dirs.bin}</outputDirectory>
+              <outputDirectory>../bin</outputDirectory>
               <finalName>${project.basename}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <attach>false</attach>
@@ -75,6 +69,7 @@
       of calling "java -jar foo.jar..."). -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -83,17 +78,16 @@
             </goals>
             <configuration>
               <target>
-                <echo>${project.files.scriptTemplateTarget}</echo>
                 <!-- Copy the script template. -->
-                <copy file="${project.files.scriptTemplateSource}" 
-                      tofile="${project.files.scriptTemplateTarget}"
+                <copy file="src/main/resources/cli_script_template" 
+                      tofile="../pdfact"
                       overwrite="true" />
                 <!-- Insert the JAR file path into the script. -->
-                <replace file="${project.files.scriptTemplateTarget}" 
+                <replace file="../pdfact" 
                          token="{JAR}" 
                          value="${project.dirs.bin}/${project.basename}.jar"/>
                 <!-- Make the script executable. -->
-                <chmod file="${project.files.scriptTemplateTarget}" perm="755"/>
+                <chmod file="../pdfact" perm="755"/>
               </target>
             </configuration>
           </execution>

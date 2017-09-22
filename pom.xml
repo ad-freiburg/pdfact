@@ -11,10 +11,8 @@
 
   <properties>
     <project.basename>pdfact</project.basename>
-    
-    <project.dirs.root>${project.basedir}</project.dirs.root>
-    <project.dirs.bin>${project.dirs.root}/bin</project.dirs.bin>
-    <project.dirs.resources>${project.dirs.root}/resources</project.dirs.resources>
+    <project.dirs.bin>./bin</project.dirs.bin>
+    <project.dirs.resources>./resources</project.dirs.resources>
 
     <project.files.checkstyle>${project.dirs.resources}/checkstyle_config.xml</project.files.checkstyle>
 
@@ -115,5 +113,5 @@
         <version>2.3</version>
       </plugin>
     </plugins>
-  </reporting> 
+  </reporting>
 </project>
