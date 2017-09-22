@@ -40,7 +40,7 @@ public class PlainTextLineStatistic implements TextLineStatistic {
   @Override
   public float getMostCommonLinePitch(FontFace fontFace) {
     FloatCounter freqs = this.linePitchFrequenciesPerFontFace.get(fontFace);
-    return freqs != null ? freqs.getMostCommonFloat() : null;
+    return freqs != null ? freqs.getMostCommonFloat() : Float.NaN;
   }
 
   // ==========================================================================

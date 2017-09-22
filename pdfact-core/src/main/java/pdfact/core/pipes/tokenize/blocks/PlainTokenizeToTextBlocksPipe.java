@@ -190,7 +190,6 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       this.numProcessedTextLines++;
 
       if (introducesNewTextBlock(pdf, page, textBlock, prev, line, next)) {
-        System.out.println(line);
         if (!textBlock.getTextLines().isEmpty()) {
           textBlocks.add(textBlock);
         }
