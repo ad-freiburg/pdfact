@@ -33,19 +33,13 @@ Positional Arguments:
 
 Optional Arguments:
 
-    -h, --help             show this help message and exit
-    --format <format>      Defines the format in which the text output should be written. Choose from: [txt, xml, json].
-    --unit <unit>          Defines the text unit to extract. Choose from:[txt, xml, json].
+    -h, --help           show this help message and exit
+    --format <format>    Defines the format in which the text output should be written. Choose from: [txt, xml, json].
+    --unit <unit>        Defines the text unit to extract. Choose from:[txt, xml, json].
     --role [<role> [<role> ...]]
-                         Defines one or more semantic role(s)  in  order  to  filter  the  chosen  text  units  in the text output (and
-                         visualization if the --visualize option is given) by  those  roles.  If  not specified, all text units will be
-                         included, regardless of their  semantic  roles.  Choose  from:  [figure,  appendix, keywords, heading, footer,
-                         acknowledgments, caption, toc, abstract, footnote, body, itemize-item, title, reference, affiliation, general-
-                         terms, formula, header, categories, table, authors]
-    --visualize <path>     Defines a path to a file where pdfact should  write  a  visualization  of  the text output (that is a PDF file
-                         where the chosen elements are  surrounded  by  bounding  boxes).  If  not  specified, no visualization will be
-                         created.
-    --debug [<level>]      Defines the verbosity of debug messages.  The  level  defines  the  minimum  level  of severity required for a
+                         Defines one or more semantic role(s)  in  order  to  filter  the  chosen  text  units  in the text output (and visualization if the --visualize option is given) by  those  roles.  If  not specified, all text units will be included, regardless of their  semantic  roles.  Choose  from:  [figure,  appendix, keywords, heading, footer, acknowledgments, caption, toc, abstract, footnote, body, itemize-item, title, reference, affiliation, general-terms, formula, header, categories, table, authors]
+    --visualize <path>   Defines a path to a file where pdfact should  write  a  visualization  of  the text output (that is a PDF file where the chosen elements are  surrounded  by  bounding  boxes).  If  not  specified, no visualization will be created.
+    --debug [<level>]    Defines the verbosity of debug messages.  The  level  defines  the  minimum  level  of severity required for a
                          message to be logged. Choose from:
                           4 ERROR
                           3 WARN
@@ -56,12 +50,11 @@ Optional Arguments:
 
 #### Example
 
-If you wish to extract the words and text lines from a PDF file "foo.pdf", to
-have the result in an XML file and to create a visualization of the extracted
-features (a pdf where the extracted words and text lines are
-higlighted in different colors), use this command:
+If you wish to extract the words of the body text from a PDF file "foo.pdf", to
+have the result in XML format and to create a visualization of the extracted
+words to foo-visualized.pdf, use this command:
 
-    java -jar target/pdf-cli-*-jar-with-dependencies.jar --feature words --feature lines --format xml --visualize foo.pdf
+    ./pdfact --unit words --format xml --role body --visualize ./foo-visualized.pdf foo.pdf
 
 
 ... to be continued ...
