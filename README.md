@@ -33,19 +33,22 @@ Positional Arguments:
 
 Optional Arguments:
 
-    -h, --help           show this help message and exit
-    --format <format>    Defines the format in which the text output should be written. Choose from: [txt, xml, json].
-    --unit <unit>        Defines the text unit to extract. Choose from:[txt, xml, json].
+    -h, --help             show this help message and exit
+    --format <format>      Defines the format in which the text output should be written. Choose from: [txt, xml, json].
+    --unit <unit>          Defines the text unit to extract. Choose from:[characters, blocks, words, areas, paragraphs, lines].
     --role [<role> [<role> ...]]
-                         Defines one or more semantic role(s)  in  order  to  filter  the  chosen  text  units  in the text output (and visualization if the --visualize option is given) by  those  roles.  If  not specified, all text units will be included, regardless of their  semantic  roles.  Choose  from:  [figure,  appendix, keywords, heading, footer, acknowledgments, caption, toc, abstract, footnote, body, itemize-item, title, reference, affiliation, general-terms, formula, header, categories, table, authors]
-    --visualize <path>   Defines a path to a file where pdfact should  write  a  visualization  of  the text output (that is a PDF file where the chosen elements are  surrounded  by  bounding  boxes).  If  not  specified, no visualization will be created.
-    --debug [<level>]    Defines the verbosity of debug messages.  The  level  defines  the  minimum  level  of severity required for a
-                         message to be logged. Choose from:
-                          4 ERROR
-                          3 WARN
-                          2 INFO
-                          1 DEBUG
-                          0 OFF
+                           Defines one or more semantic role(s) in order to filter the chosen  text  units  in  the  text output (and visualization if the --visualize option is given) by
+                           those roles. If not specified, all text units will be included, regardless  of their semantic roles. Choose from: [figure, appendix, keywords, heading, footer,
+                           acknowledgments, caption, toc, abstract, footnote,  body,  itemize-item,  title,  reference,  affiliation,  general-terms,  formula, header, categories, table,
+                           authors]
+    --visualize <path>     Defines a path to a file where pdfact should write a visualization of the text  output (that is a PDF file where the chosen elements are surrounded by bounding
+                           boxes). If not specified, no visualization will be created.
+    --debug [<level>]      Defines the verbosity of debug messages. The level defines the minimum level of severity required for a message to be logged. Choose from: 
+                            4 ERROR
+                            3 WARN
+                            2 INFO
+                            1 DEBUG
+                            0 OFF
 
 
 #### Example
