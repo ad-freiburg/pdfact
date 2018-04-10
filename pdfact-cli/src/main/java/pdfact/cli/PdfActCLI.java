@@ -291,7 +291,7 @@ public class PdfActCLI {
           .required(false)
           .metavar("<unit>")
           .help("Defines the text unit to extract. "
-              + "Choose from:" + formatChoices + ".");
+              + "Choose from:" + textUnitChoices + ".");
 
       // Add an argument to define the semantic role(s) filters.
       Set<String> semanticRolesChoices = SemanticRole.getNames();
