@@ -1,6 +1,6 @@
 package pdfact.core.pipes.parse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.assistedinject.AssistedInject;
 

@@ -18,11 +18,9 @@ import net.sourceforge.argparse4j.internal.HelpScreenException;
 import pdfact.cli.guice.PdfActCliGuiceModule;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
-import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
 import pdfact.core.model.LogLevel;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.PdfDocument.PdfDocumentFactory;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
@@ -30,7 +28,7 @@ import pdfact.core.util.log.Log4JTypeListener;
 
 /**
  * The main class for the command line interface of PdfAct.
- * 
+ *
  * @author Claudius Korzen
  */
 public class PdfActCLI {
@@ -57,9 +55,9 @@ public class PdfActCLI {
 
   /**
    * Starts the command line interface of PdfAct.
-   * 
+   *
    * @param args
-   *        The command line arguments.
+   *     The command line arguments.
    */
   protected void run(String[] args) {
     int statusCode = 0;
@@ -69,51 +67,47 @@ public class PdfActCLI {
     // Create the command line argument parser.
     PdfActCommandLineParser parser = new PdfActCommandLineParser();
 
-    // Create a service pipe.
-    PdfActServicePipe service = this.serviceFactory.create();
+    // Create an instance of PdfAct.
+    PdfAct pdfAct = new PdfAct();
 
     try {
       // Parse the command line arguments.
       parser.parseArgs(args);
 
-      // Create the PDF document from the given path.
-      PdfDocument pdf = this.pdfDocumentFactory.create(parser.getPdfPath());
-
       // Pass the log level.
-      int logLevel = parser.getLogLevel();
-      Log4JTypeListener.setLogLevel(LogLevel.getLogLevel(logLevel));
+      pdfAct.setLogLevel(LogLevel.getLogLevel(parser.getLogLevel()));
 
       // Pass the serialization format if there is any.
       if (parser.hasSerializationFormat()) {
         String format = parser.getSerializeFormat();
-        service.setSerializationFormat(SerializeFormat.fromString(format));
+        pdfAct.setSerializationFormat(SerializeFormat.fromString(format));
       }
 
       // Pass the target of the serialization.
       if (parser.hasSerializationPath()) {
-        service.setSerializationPath(Paths.get(parser.getSerializationPath()));
+        pdfAct.setSerializationPath(Paths.get(parser.getSerializationPath()));
       } else {
-        service.setSerializationStream(System.out);
+        pdfAct.setSerializationStream(System.out);
       }
 
       // Pass the target of the visualization.
       if (parser.hasVisualizationPath()) {
-        service.setVisualizationPath(Paths.get(parser.getVisualizationPath()));
+        pdfAct.setVisualizationPath(Paths.get(parser.getVisualizationPath()));
       }
 
       // Pass the chosen text unit.
       if (parser.hasTextUnit()) {
-        service.setTextUnit(TextUnit.fromString(parser.getTextUnit()));
+        pdfAct.setTextUnit(TextUnit.fromString(parser.getTextUnit()));
       }
 
       // Pass the semantic roles filter for serialization & visualization.
       if (parser.hasSemanticRolesFilters()) {
         List<String> roles = parser.getSemanticRolesFilters();
-        service.setSemanticRolesFilters(SemanticRole.fromStrings(roles));
+        pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
       }
 
       // Run PdfAct.
-      service.execute(pdf);
+      pdfAct.parse(parser.getPdfPath());
     } catch (PdfActException e) {
       statusCode = e.getExitCode();
       errorMessage = e.getMessage();
@@ -136,9 +130,9 @@ public class PdfActCLI {
 
   /**
    * The main method that runs the command line interface.
-   * 
+   *
    * @param args
-   *        The command line arguments.
+   *     The command line arguments.
    */
   public static void main(String[] args) {
     new PdfActCLI().run(args);
@@ -262,16 +256,15 @@ public class PdfActCLI {
           .dest(PDF_PATH)
           .required(true)
           .metavar("<pdf-path>")
-          .help("Defines the path to the PDF file to process.");
+          .help("The path to the PDF file to process.");
 
       // Add an argument to define the target path for the serialization.
       this.parser.addArgument(SERIALIZE_PATH)
           .dest(SERIALIZE_PATH)
           .nargs("?")
           .metavar("<output-file>")
-          .help("Defines the path to the file where pdfact should write the "
-              + "text output. If not specified, the output will be written "
-              + "to stdout.");
+          .help("The path to the file where Pdfact should write the output. "
+              + "If not specified, the output will be written to stdout.");
 
       // Add an argument to define the serialization format.
       Set<String> formatChoices = SerializeFormat.getNames();
@@ -280,8 +273,8 @@ public class PdfActCLI {
           .required(false)
           .choices(formatChoices)
           .metavar("<format>")
-          .help("Defines the format in which the text output should be "
-              + "written. Choose from: " + formatChoices + ".");
+          .help("The format in which the output should be written. "
+              + "Choose from: " + formatChoices + ".");
 
       // Add an argument to define the text unit to extract.
       Set<String> textUnitChoices = TextUnit.getPluralNames();
@@ -290,8 +283,8 @@ public class PdfActCLI {
           .choices(textUnitChoices)
           .required(false)
           .metavar("<unit>")
-          .help("Defines the text unit to extract. "
-              + "Choose from:" + textUnitChoices + ".");
+          .help("The text unit to extract. "
+              + "Choose from: " + textUnitChoices + ".");
 
       // Add an argument to define the semantic role(s) filters.
       Set<String> semanticRolesChoices = SemanticRole.getNames();
@@ -301,22 +294,21 @@ public class PdfActCLI {
           .choices(semanticRolesChoices)
           .required(false)
           .metavar("<role>", "<role>")
-          .help("Defines one or more semantic role(s) in order to filter the "
-              + "chosen text units in the text output (and "
-              + "visualization if the --" + VISUALIZATION_PATH + " "
-              + "option is given) by those roles. If not specified, all "
-              + "text units will be included, regardless of their semantic "
-              + "roles. Choose from: " + semanticRolesChoices);
+          .help("The semantic role(s) of the text units to extract (and to "
+              + "visualize, if the --" + VISUALIZATION_PATH + " option is "
+              + "given). If not specified, all text units will be extracted, "
+              + "regardless of their semantic roles. Choose from: " 
+              + semanticRolesChoices);
 
       // Add an argument to define the target path for the visualization.
       this.parser.addArgument("--" + VISUALIZATION_PATH)
           .dest(VISUALIZATION_PATH)
           .required(false)
           .metavar("<path>")
-          .help("Defines a path to a file where pdfact should write a "
-              + "visualization of the text output (that is a PDF file where "
-              + "the chosen elements are surrounded by bounding boxes). If "
-              + "not specified, no visualization will be created.");
+          .help("The path to the file where Pdfact should write a "
+              + "visualization of the extracted text (that is: a PDF file "
+              + "where the extracted text units are surrounded by bounding "
+              + "boxes). If not specified, no visualization will be created.");
 
       // Add an argument to define the log level.
       StringBuilder choiceStr = new StringBuilder();
@@ -331,7 +323,7 @@ public class PdfActCLI {
           .type(Integer.class)
           .setDefault(Log4JTypeListener.getLogLevel().getIntLevel())
           .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
-          .help("Defines the verbosity of debug messages. The level defines "
+          .help("The verbosity of the log messages. The level defines "
               + "the minimum level of severity required for a message to be "
               + "logged. Choose from: \n" + choiceStr.toString());
     }
@@ -340,10 +332,10 @@ public class PdfActCLI {
      * Parses the given command line arguments.
      *
      * @param args
-     *        The command line arguments to parse.
+     *     The command line arguments to parse.
      *
      * @throws PdfActException
-     *         If parsing the command line arguments fails.
+     *     If parsing the command line arguments fails.
      */
     public void parseArgs(String[] args) throws PdfActException {
       try {
@@ -403,7 +395,7 @@ public class PdfActCLI {
      * otherwise.
      *
      * @return True, if a target path for the serialization is given; false
-     *         otherwise.
+     *     otherwise.
      */
     public boolean hasSerializationPath() {
       return this.serializePath != null;
@@ -464,7 +456,7 @@ public class PdfActCLI {
      * Returns true, if there is a text unit given.
      *
      * @return True, if there is a text unit given.
-     *         False otherwise.
+     *     False otherwise.
      */
     public boolean hasTextUnit() {
       return this.textUnit != null;
@@ -485,7 +477,7 @@ public class PdfActCLI {
      * Returns true, if there is at least one semantic role filter given.
      *
      * @return True, if there is at least one semantic role filter given; False
-     *         otherwise.
+     *     otherwise.
      */
     public boolean hasSemanticRolesFilters() {
       return this.semanticRolesFilters != null;
@@ -526,7 +518,7 @@ public class PdfActCLI {
      * Creates a new StoreDefaultArgumentAction.
      *
      * @param defaultValue
-     *        The default value to store if the argument value is null.
+     *     The default value to store if the argument value is null.
      */
     public StoreDefaultArgumentAction(Object defaultValue) {
       this.defaultValue = defaultValue;

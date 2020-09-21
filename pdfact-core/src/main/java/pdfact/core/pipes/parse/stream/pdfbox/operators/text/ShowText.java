@@ -13,7 +13,7 @@ import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.cff.Type1CharString;
 import org.apache.fontbox.type1.Type1Font;
 import org.apache.fontbox.util.BoundingBox;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSString;

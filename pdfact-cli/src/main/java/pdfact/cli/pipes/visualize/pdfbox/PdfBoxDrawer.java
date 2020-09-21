@@ -248,12 +248,12 @@ public class PdfBoxDrawer implements PdfDrawer {
 
     // If width and/or height is 0, the lines are not visible. Set minimum
     // values for both values.
-    if (minX == maxX) {
-      maxX += thickness;
-    }
-    if (minY == maxY) {
-      maxY += thickness;
-    }
+//    if (minX == maxX) {
+//      maxX += thickness;
+//    }
+//    if (minY == maxY) {
+//      maxY += thickness;
+//    }
 
     stream.setStrokingColor(color);
     stream.setLineWidth(thickness);
@@ -327,7 +327,7 @@ public class PdfBoxDrawer implements PdfDrawer {
 
     if (nonStrokingColor != null) {
       PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
-      graphicsState.setNonStrokingAlphaConstant(0.5f);
+      // graphicsState.setNonStrokingAlphaConstant(0.5f);
       stream.setGraphicsStateParameters(graphicsState);
 
       stream.setNonStrokingColor(nonStrokingColor);

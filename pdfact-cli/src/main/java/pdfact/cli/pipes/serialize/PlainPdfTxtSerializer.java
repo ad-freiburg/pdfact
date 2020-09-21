@@ -3,6 +3,7 @@ package pdfact.cli.pipes.serialize;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -11,11 +12,15 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.cli.model.TextUnit;
 import pdfact.core.model.Character;
+import pdfact.core.model.Color;
 import pdfact.core.model.Element;
+import pdfact.core.model.HasColor;
+import pdfact.core.model.HasPosition;
 import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.HasText;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
@@ -87,8 +92,9 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
       if (elementsLines != null) {
         lines.addAll(elementsLines);
       }
+      lines.add("");
 
-      result = PdfActUtils.join(elementsLines, TYPES_DELIMITER);
+      result = PdfActUtils.join(lines, TYPES_DELIMITER);
     }
 
     return result.getBytes(DEFAULT_ENCODING);
@@ -263,7 +269,15 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
       HasText hasText = (HasText) element;
       String text = hasText.getText();
 
-      result.add(text);
+      if (element instanceof HasPosition && element instanceof  HasColor) {
+        HasPosition hasPosition = (HasPosition) element;
+        HasColor hasColor = (HasColor) element;
+        Rectangle rect = hasPosition.getPosition().getRectangle();
+        Color color = hasColor.getColor();
+        result.add(text + " " + rect + " " + Arrays.toString(color.getRGB()));
+      } else {
+        result.add(text);
+      }
     }
 
     return result;

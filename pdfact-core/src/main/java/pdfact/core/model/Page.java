@@ -25,6 +25,40 @@ public interface Page extends HasCharacters, HasFigures, HasShapes,
   // ==========================================================================
 
   /**
+   * Returns the height of this page.
+   *
+   * @return The height of this page.
+   */
+  float getHeight();
+
+  /**
+   * Sets the height of this page.
+   *
+   * @param height
+   *        The height of this page.
+   */
+  void setHeight(float height);
+
+  // ==========================================================================
+
+  /**
+   * Returns the width of this page.
+   *
+   * @return The width of this page.
+   */
+  float getWidth();
+
+  /**
+   * Sets the width of this page.
+   *
+   * @param width
+   *        The width of this page.
+   */
+  void setWidth(float width);
+
+  // ==========================================================================
+
+  /**
    * The factory to creates instances of {@link Page}.
    * 
    * @author Claudius Korzen

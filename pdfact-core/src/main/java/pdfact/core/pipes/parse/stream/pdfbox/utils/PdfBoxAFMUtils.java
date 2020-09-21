@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import org.apache.fontbox.afm.AFMParser;
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.afm.FontMetrics;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import pdfact.core.util.PdfActUtils;

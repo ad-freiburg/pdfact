@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -18,6 +18,7 @@ import org.apache.pdfbox.pdfparser.PDFStreamParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType3CharProc;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
@@ -228,6 +229,17 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     this.isType3Stream = false;
 
     Page pdfPage = this.pageFactory.create(pageNum);
+    PDRectangle rect = page.getMediaBox();
+    if (rect == null) {
+      rect = page.getCropBox();
+    }
+    if (rect == null) {
+      rect = page.getTrimBox();
+    }
+    if (rect != null) {
+      pdfPage.setHeight(rect.getHeight());
+      pdfPage.setWidth(rect.getWidth());
+    }
 
     handlePdfPageStart(pdf, pdfPage);
     processStream(pdf, pdfPage, page);

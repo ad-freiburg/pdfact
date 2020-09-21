@@ -21,7 +21,6 @@ import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.PdfDocument;
-import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
@@ -30,6 +29,7 @@ import pdfact.core.model.TextArea;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
+import pdfact.core.model.Rectangle.RectangleFactory;
 
 /**
  * A plain implementation of {@link PdfVisualizer}.
@@ -41,6 +41,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * The factory to create instance of {@link PdfDrawer}.
    */
   protected PdfDrawerFactory pdfDrawerFactory;
+
+  /**
+   * The factory to create instance of {@link Rectangle}.
+   */
+  protected RectangleFactory rectangleFactory;
 
   /**
    * The text unit.
@@ -62,8 +67,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *        The factory to create instances of {@link PdfDrawer}.
    */
   @AssistedInject
-  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory) {
+  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, RectangleFactory rectangleFactory) {
     this.pdfDrawerFactory = pdfDrawerFactory;
+    this.rectangleFactory = rectangleFactory;
   }
 
   /**
@@ -77,10 +83,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    *        The semantic roles filter.
    */
   @AssistedInject
-  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory,
+  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, RectangleFactory rectangleFactory,
       @Assisted TextUnit textUnit,
       @Assisted Set<SemanticRole> rolesFilter) {
-    this(pdfDrawerFactory);
+    this(pdfDrawerFactory, rectangleFactory);
     this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
@@ -154,6 +160,16 @@ public class PlainPdfVisualizer implements PdfVisualizer {
         }
       }
     }
+
+    // try {
+    //   System.out.println("Visualize");
+    //   Rectangle rect = this.rectangleFactory.create(323.2,881.3,328.7,886.8);    
+    //   drawer.drawRectangle(rect, 1, Color.BLUE, Color.BLUE);
+    //   rect = this.rectangleFactory.create(323.2, 600, 328.7, 610);    
+    //   drawer.drawRectangle(rect, 1, Color.BLUE, Color.BLUE);
+    // } catch (Exception e) {
+    //   System.out.println("ERROR");
+    // }
   }
 
   /**
@@ -289,7 +305,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    */
   protected void visualizeWord(Word word, PdfDrawer drawer)
       throws PdfActVisualizeException {
-    visualizePdfElement(word, drawer, Color.MAGENTA);
+    visualizePdfElement(word, drawer, Color.BLUE);
   }
 
   // ==========================================================================
@@ -369,7 +385,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    */
   protected void visualizeParagraph(Paragraph paragraph, PdfDrawer drawer)
       throws PdfActVisualizeException {
-    visualizePdfElement(paragraph, drawer, Color.RED);
+    visualizePdfElement(paragraph, drawer, Color.BLUE);
   }
 
   // ==========================================================================
@@ -515,11 +531,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
             HasSemanticRole hasSemanticRole = (HasSemanticRole) element;
             SemanticRole role = hasSemanticRole.getSemanticRole();
 
-            if (role != null) {
-              String roleStr = role.getName();
-              Point pos = rect.getUpperLeft();
-              drawer.drawText(roleStr, pageNum, pos, color, 8f);
-            }
+//            if (role != null) {
+//              String roleStr = role.getName();
+//              Point pos = rect.getUpperLeft();
+//              drawer.drawText(roleStr, pageNum, pos, color, 8f);
+//            }
           }
         } catch (IOException e) {
           throw new PdfActVisualizeException(

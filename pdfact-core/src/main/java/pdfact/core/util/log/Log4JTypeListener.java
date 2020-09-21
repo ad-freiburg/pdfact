@@ -5,7 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
@@ -42,20 +44,22 @@ public class Log4JTypeListener implements TypeListener {
             && field.isAnnotationPresent(InjectLogger.class)) {
           if (Modifier.isStatic(field.getModifiers())) {
             field.setAccessible(true);
-            Logger logger = Logger.getLogger(field.getDeclaringClass());
+            Logger l = LogManager.getLogger(field.getDeclaringClass().getName());
             try {
-              field.set(null, logger);
+              field.set(null, l);
             } catch (Exception e) {
               throw new RuntimeException(e);
             }
-            logger.setLevel(logLevel.getLog4jEquivalent());
-            loggers.add(logger);
+            Configurator.setLevel(l.getName(), logLevel.getLog4jEquivalent());
+            // logger.setLevel(logLevel.getLog4jEquivalent());
+            loggers.add(l);
           } else {
             Log4JMembersInjector<T> inj = new Log4JMembersInjector<T>(field);
             encounter.register(inj);
-            Logger logger = inj.getLogger();
-            logger.setLevel(logLevel.getLog4jEquivalent());
-            loggers.add(logger);
+            Logger l = inj.getLogger();
+            Configurator.setLevel(l.getName(), logLevel.getLog4jEquivalent());
+            // logger.setLevel(logLevel.getLog4jEquivalent());
+            loggers.add(l);
           }
         }
       }
@@ -76,7 +80,7 @@ public class Log4JTypeListener implements TypeListener {
       logLevel = level;
       // Set the log level for all loggers already registered.
       for (Logger logger : loggers) {
-        logger.setLevel(level.getLog4jEquivalent());
+        Configurator.setLevel(logger.getName(), logLevel.getLog4jEquivalent());
       }
     }
   }

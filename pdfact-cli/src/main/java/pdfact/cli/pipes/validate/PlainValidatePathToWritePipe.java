@@ -3,7 +3,7 @@ package pdfact.cli.pipes.validate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;

@@ -2,7 +2,7 @@ package pdfact.core.pipes.filter.characters;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 
@@ -128,10 +128,10 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
     }
 
     // Ignore the the character, if its text is empty.
-    String text = character.getText();
-    if (text == null || text.trim().isEmpty()) {
-      return true;
-    }
+//    String text = character.getText();
+//    if (text == null || text.trim().isEmpty()) {
+//      return true;
+//    }
     return false;
   }
 }

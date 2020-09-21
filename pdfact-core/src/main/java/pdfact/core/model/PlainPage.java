@@ -51,6 +51,16 @@ public class PlainPage implements Page {
   protected int pageNumber;
 
   /**
+   * The width of this page in the PDF document.
+   */
+  protected float width;
+
+  /**
+   * The height of this page in the PDF document.
+   */
+  protected float height;
+
+  /**
    * The statistic about the characters of this page.
    */
   protected CharacterStatistic characterStatistic;
@@ -331,6 +341,30 @@ public class PlainPage implements Page {
   @Override
   public void setPageNumber(int pageNumber) {
     this.pageNumber = pageNumber;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getWidth() {
+    return this.width;
+  }
+
+  @Override
+  public void setWidth(float width) {
+    this.width = width;
+  }
+
+  // ==========================================================================
+
+  @Override
+  public float getHeight() {
+    return this.height;
+  }
+
+  @Override
+  public void setHeight(float height) {
+    this.height = height;
   }
 
   // ==========================================================================

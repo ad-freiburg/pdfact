@@ -3,7 +3,7 @@ package pdfact.core.pipes.parse.stream.pdfbox.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
 
 import pdfact.core.util.log.InjectLogger;

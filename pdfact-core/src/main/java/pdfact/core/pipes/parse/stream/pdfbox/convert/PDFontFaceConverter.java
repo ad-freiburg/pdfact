@@ -3,7 +3,7 @@ package pdfact.core.pipes.parse.stream.pdfbox.convert;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 

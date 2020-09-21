@@ -2,7 +2,7 @@ package pdfact.core.pipes.semanticize;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 

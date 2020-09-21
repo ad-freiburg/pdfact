@@ -45,6 +45,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.text.BeginText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.EndText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveTextSetLeading;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLine;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLineAndShowText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLineAndShowTextWithSpacing;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetCharacterSpacing;
@@ -95,7 +96,7 @@ public class PdfBoxOperatorProcessorGuiceModule extends AbstractModule {
     binder.addBinding().to(MoveToNextLineAndShowTextWithSpacing.class); // "
     binder.addBinding().to(SetCharacterSpacing.class); // Tc
     binder.addBinding().to(SetFontAndSize.class); // Tf
-    binder.addBinding().to(MoveToNextLineAndShowText.class); // T*
+    binder.addBinding().to(MoveToNextLine.class); // T*
     binder.addBinding().to(SetTextHorizontalScaling.class); // Tz
     binder.addBinding().to(SetTextLeading.class); // TL
     binder.addBinding().to(SetTextMatrix.class); // Tm

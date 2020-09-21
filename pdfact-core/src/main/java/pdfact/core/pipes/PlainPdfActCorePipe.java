@@ -1,6 +1,6 @@
 package pdfact.core.pipes;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 
@@ -216,13 +216,13 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     // Extract the characters, shapes and figures.
     pipeline.addPipe(this.parsePdfPipeFactory.create());
     // Merge the diacritics.
-    pipeline.addPipe(this.mergeDiacriticsPipeFactory.create());
+//    pipeline.addPipe(this.mergeDiacriticsPipeFactory.create());
     // Split the ligatures.
-    pipeline.addPipe(this.splitLigaturesPipeFactory.create());
+//    pipeline.addPipe(this.splitLigaturesPipeFactory.create());
     // Standardize characters.
-    pipeline.addPipe(this.standardizeCharactersPipeFactory.create());
+//    pipeline.addPipe(this.standardizeCharactersPipeFactory.create());
     // Filter the characters.
-    pipeline.addPipe(this.filterCharactersPipeFactory.create());
+//    pipeline.addPipe(this.filterCharactersPipeFactory.create());
     // Filter the figures.
     pipeline.addPipe(this.filterFiguresPipeFactory.create());
     // Filter the shapes.

@@ -6,7 +6,7 @@ import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import com.google.inject.Inject;
 

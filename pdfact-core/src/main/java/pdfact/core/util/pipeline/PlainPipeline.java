@@ -31,7 +31,6 @@ public class PlainPipeline implements Pipeline {
 
   @Override
   public PdfDocument process(PdfDocument pdf) throws PdfActException {
-    System.out.println(pdf.getFile());
     PdfDocument processed = pdf;
     for (Pipe pipe : this.pipes) {
       processed = pipe.execute(processed);
