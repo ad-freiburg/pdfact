@@ -1,7 +1,15 @@
-#!/bin/sh
-java="java"
+#!/bin/bash
+
+# The path to java.
+JAVA="java"
 if test -n "$JAVA_HOME"; then
-    java="$JAVA_HOME/bin/java"
+    JAVA="$JAVA_HOME/bin/java"
 fi
-exec "$java" -jar ./bin/pdfact.jar "$@"
-exit 1 
+
+# The full path of this script.
+THIS=`readlink -f "${BASH_SOURCE[0]}" 2> /dev/null || echo $0`
+# The directory where this script resides.
+DIR=`dirname "${THIS}"`
+
+exec "$JAVA" -jar "$DIR/bin/pdfact.jar" "$@"
+exit 0 
