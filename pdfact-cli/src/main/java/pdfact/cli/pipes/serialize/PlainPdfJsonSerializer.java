@@ -483,10 +483,10 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
         // If we pass primitive floats here, the values would be casted to
         // double values (yielding in inaccurate numbers). So transform the
         // values to Float objects.
-        positionJson.put(MIN_X, new Float(rect.getMinX()));
-        positionJson.put(MIN_Y, new Float(rect.getMinY()));
-        positionJson.put(MAX_X, new Float(rect.getMaxX()));
-        positionJson.put(MAX_Y, new Float(rect.getMaxY()));
+        positionJson.put(MIN_X, Float.valueOf(rect.getMinX()));
+        positionJson.put(MIN_Y, Float.valueOf(rect.getMinY()));
+        positionJson.put(MAX_X, Float.valueOf(rect.getMaxX()));
+        positionJson.put(MAX_Y, Float.valueOf(rect.getMaxY()));
       }
     }
     return positionJson;

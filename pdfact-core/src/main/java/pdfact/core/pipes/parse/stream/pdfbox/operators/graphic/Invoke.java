@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSName;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
@@ -146,7 +145,6 @@ public class Invoke extends OperatorProcessor {
         this.engine.getGraphicsState().getCurrentTransformationMatrix().concatenate(matrix);
       }
 
-      PDRectangle rectangle = form.getBBox();
       float formWidth = form.getBBox().getWidth();
       float formHeight = form.getBBox().getHeight();
 

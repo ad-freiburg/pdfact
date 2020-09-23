@@ -3,10 +3,6 @@ package pdfact.cli;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
-
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -153,9 +149,6 @@ public class PdfAct {
     if (this.semanticRoles != null) {
       service.setSemanticRolesFilters(this.semanticRoles);
     }
-
-    // Configurator.setLevel("class org.apache.pdfbox.pdmodel.font.PDSimpleFont", Level.OFF);
-    // Configurator.setLevel("org.apache.pdfbox.pdmodel.font.PDSimpleFont", Level.OFF);
 
     // Run PdfAct.
     service.execute(pdf);

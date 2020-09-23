@@ -527,16 +527,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
           drawer.drawRectangle(rect, pageNum, color, null, 1f);
 
           // Draw the semantic role, if there is any.
-          if (element instanceof HasSemanticRole) {
-            HasSemanticRole hasSemanticRole = (HasSemanticRole) element;
-            SemanticRole role = hasSemanticRole.getSemanticRole();
+//           if (element instanceof HasSemanticRole) {
+//             HasSemanticRole hasSemanticRole = (HasSemanticRole) element;
 
-//            if (role != null) {
-//              String roleStr = role.getName();
-//              Point pos = rect.getUpperLeft();
-//              drawer.drawText(roleStr, pageNum, pos, color, 8f);
-//            }
-          }
+// //            if (role != null) {
+// //              String roleStr = role.getName();
+// //              Point pos = rect.getUpperLeft();
+// //              drawer.drawText(roleStr, pageNum, pos, color, 8f);
+// //            }
+//           }
         } catch (IOException e) {
           throw new PdfActVisualizeException(
               "Couldn't visualize the PDF document", e);

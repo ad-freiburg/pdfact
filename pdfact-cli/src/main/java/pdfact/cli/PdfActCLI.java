@@ -10,11 +10,11 @@ import com.google.inject.Injector;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
+import net.sourceforge.argparse4j.helper.HelpScreenException;
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.internal.HelpScreenException;
 import pdfact.cli.guice.PdfActCliGuiceModule;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
@@ -248,45 +248,62 @@ public class PdfActCLI {
      * Creates a new command line argument parser.
      */
     public PdfActCommandLineParser() {
-      this.parser = ArgumentParsers.newArgumentParser("pdfact");
-      this.parser.description("pdfact extracts text from PDF files.");
+      this.parser = ArgumentParsers.newFor("pdfact")
+        .terminalWidthDetection(false)
+        .defaultFormatWidth(100)
+        .build();
+      this.parser.description("Pdfact is a tool for extracting the text and "
+        + "structure from PDF files.");
 
-      // Add an argument to define the path to the PDF file to process.
+      // Add an argument to define the path to the PDF file to be processed.
       this.parser.addArgument(PDF_PATH)
           .dest(PDF_PATH)
           .required(true)
-          .metavar("<pdf-path>")
-          .help("The path to the PDF file to process.");
+          .metavar("<pdf-file>")
+          .help("The path to the PDF file to be processed.");
 
-      // Add an argument to define the target path for the serialization.
+      // Add an argument to define the target path to the output file.
       this.parser.addArgument(SERIALIZE_PATH)
           .dest(SERIALIZE_PATH)
           .nargs("?")
           .metavar("<output-file>")
-          .help("The path to the file where Pdfact should write the output. "
-              + "If not specified, the output will be written to stdout.");
-
-      // Add an argument to define the serialization format.
+          .help("The path to the file to which the extraction output should be "
+              + "written.\nIf not specified, the output will be written to "
+              + "stdout.");
+              
+      // Add an argument to define the output format.
       Set<String> formatChoices = SerializeFormat.getNames();
       this.parser.addArgument("--" + SERIALIZE_FORMAT)
           .dest(SERIALIZE_FORMAT)
           .required(false)
           .choices(formatChoices)
           .metavar("<format>")
-          .help("The format in which the output should be written. "
-              + "Choose from: " + formatChoices + ".");
+          .help("The output format. Available options: " + formatChoices + ".\n"
+              + "If the format is \"txt\", the output will contain the text "
+              + "matching the specified --" + TEXT_UNIT + " and --" 
+              + SEMANTIC_ROLES_FILTER + " options in plain text format (in the "
+              + "format: one text element per line). If the format is \"xml\" "
+              + "or \"json\", the output will also contain layout information "
+              + "for each text element, e.g., the positions in the PDF file.");
 
       // Add an argument to define the text unit to extract.
-      Set<String> textUnitChoices = TextUnit.getPluralNames();
+      Set<String> unitChoices = TextUnit.getPluralNames();
       this.parser.addArgument("--" + TEXT_UNIT)
           .dest(TEXT_UNIT)
-          .choices(textUnitChoices)
+          .choices(unitChoices)
           .required(false)
           .metavar("<unit>")
-          .help("The text unit to extract. "
-              + "Choose from: " + textUnitChoices + ".");
+          .help("The granularity in which the extracted text (and the layout "
+              + "information, if the chosen output format is dedicated to "
+              + "provide such information) should be broken down in the "
+              + "output. Available options: " + unitChoices + ".\n"
+              + "For example, when the script is called with the option "
+              + "\"--" + TEXT_UNIT + " words\", the output will be broken down "
+              + "by words, that is: the text (and layout information) will be "
+              + "provided word-wise.");
+              
 
-      // Add an argument to define the semantic role(s) filters.
+      // Add an argument to define the semantic role(s).
       Set<String> semanticRolesChoices = SemanticRole.getNames();
       this.parser.addArgument("--" + SEMANTIC_ROLES_FILTER)
           .dest(SEMANTIC_ROLES_FILTER)
@@ -294,27 +311,36 @@ public class PdfActCLI {
           .choices(semanticRolesChoices)
           .required(false)
           .metavar("<role>", "<role>")
-          .help("The semantic role(s) of the text units to extract (and to "
-              + "visualize, if the --" + VISUALIZATION_PATH + " option is "
-              + "given). If not specified, all text units will be extracted, "
-              + "regardless of their semantic roles. Choose from: " 
-              + semanticRolesChoices);
+          .help("The semantic role(s) of the text elements to be extracted. "
+              + "Available options: " + semanticRolesChoices + ".\n"
+              + "For example, if the script is called with the option \"--" 
+              + SEMANTIC_ROLES_FILTER + " headings\", the output will only "
+              + "contain the text (and optionally, the layout information) of "
+              + "the text belonging to a heading. If not specified, all text "
+              + "will be extracted, regardless of the semantic roles.");
 
       // Add an argument to define the target path for the visualization.
       this.parser.addArgument("--" + VISUALIZATION_PATH)
           .dest(VISUALIZATION_PATH)
           .required(false)
           .metavar("<path>")
-          .help("The path to the file where Pdfact should write a "
-              + "visualization of the extracted text (that is: a PDF file "
-              + "where the extracted text units are surrounded by bounding "
-              + "boxes). If not specified, no visualization will be created.");
+          .help("The path to the file to which a visualization of the "
+              + "extracted text (that is: the original PDF file enriched "
+              + "which bounding boxes around the extracted text elements) "
+              + "should be written to. If not specified, no such "
+              + "visualization will be created.");
 
       // Add an argument to define the log level.
       StringBuilder choiceStr = new StringBuilder();
+      int i = 0;
+      choiceStr.append("[");
       for (LogLevel level : LogLevel.getLogLevels()) {
-        choiceStr.append(" " + level.getIntLevel() + " " + level + "\n");
+        choiceStr.append(level.getIntLevel() + " (= " + level + ")");
+        choiceStr.append(i < LogLevel.getLogLevels().size() - 1 ? ", " : "");
+        i++;
       }
+      choiceStr.append("]");
+
       LogLevel debugLevel = LogLevel.DEBUG;
       this.parser.addArgument("--" + LOG_LEVEL)
           .dest(LOG_LEVEL)
@@ -323,9 +349,10 @@ public class PdfActCLI {
           .type(Integer.class)
           .setDefault(Log4JTypeListener.getLogLevel().getIntLevel())
           .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
-          .help("The verbosity of the log messages. The level defines "
-              + "the minimum level of severity required for a message to be "
-              + "logged. Choose from: \n" + choiceStr.toString());
+          .help("The verbosity of the log messages. Available options:  "
+              + choiceStr.toString() + ".\n"
+              + "The level defines the minimum level of severity required for "
+              + "a message to be logged.");
     }
 
     /**

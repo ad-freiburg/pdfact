@@ -457,7 +457,6 @@ public class DFGPdfVisualizer {
   protected void createBlockBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer)
       throws IOException {
     Color highColor = Color.BLUE;
-    float highThickness = 1f;
 
     Color color = Color.LIGHT_GRAY;
     float thickness = 0.1f;
@@ -511,7 +510,6 @@ public class DFGPdfVisualizer {
 
     Page page = pdf.getPages().get(0);
 
-    int i = 0;
     for (TextBlock block : page.getTextBlocks()) {
       Rectangle rect = block.getPosition().getRectangle();
       int pageNum = block.getPosition().getPageNumber();
@@ -645,7 +643,6 @@ public class DFGPdfVisualizer {
     float highThickness = 1f;
 
     Color color = Color.LIGHT_GRAY;
-    float thickness = 0.1f;
     float fontsize = 10;
 
     Page page = pdf.getPages().get(2);
@@ -795,8 +792,6 @@ public class DFGPdfVisualizer {
       drawer.drawRectangle(rect, character.getPosition().getPageNumber(), Color.GRAY, null, 0.1f);
     }
 
-    TextLine prevLine = null;
-    float prevY = 0;
     for (TextLine line : firstPage.getTextLines()) {
       System.out.println(line.getText());
       System.out.println(line.getPosition().getRectangle());

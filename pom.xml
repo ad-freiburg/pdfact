@@ -86,7 +86,7 @@
     <dependency>
       <groupId>com.github.google</groupId>
       <artifactId>guice</artifactId>
-      <version>85e30be</version>
+      <version>fae2e28</version>
     </dependency>
   </dependencies>
 

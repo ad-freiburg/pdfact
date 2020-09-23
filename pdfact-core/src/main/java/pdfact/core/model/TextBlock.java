@@ -8,7 +8,7 @@ package pdfact.core.model;
  * @author Claudius Korzen
  */
 public interface TextBlock extends Element, HasTextLines, HasText, HasPosition,
-    HasSemanticRole, HasTextLineStatistic {
+    HasSemanticRole {
   /**
    * The factory to create instances of {@link TextBlock}.
    * 
