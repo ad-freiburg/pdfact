@@ -128,6 +128,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
    */
   protected void splitLigature(Character character) {
     if (isLigature(character)) {
+      System.out.println(character.getText() + " " + getResolvedLigatureText(character));
       character.setText(getResolvedLigatureText(character));
       this.numSplitLigatures++;
     }

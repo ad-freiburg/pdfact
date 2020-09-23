@@ -136,7 +136,7 @@ public class PdfActExtractionTestACL2004 {
     
     List<Word> words53 = pdf.getFirstPage().getTextLines().get(53).getWords();
     Assert.assertEquals("success,", words53.get(1).getText());
-    Assert.assertEquals("difﬁculty", words53.get(6).getText());
+    Assert.assertEquals("difficulty", words53.get(6).getText());
   }
 
   /**
@@ -159,7 +159,7 @@ public class PdfActExtractionTestACL2004 {
        + "engines, such as CiteSeer, for both literature search and hiring "
        + "decisions, the accuracy of such systems is of paramount importance. "
        + "This paper employs Conditional Random Fields (CRFs) for the task of "
-       + "extracting various common ﬁelds from the headers and citation of "
+       + "extracting various common fields from the headers and citation of "
        + "research papers. The basic theory of CRFs is becoming "
        + "well-understood, but best-practices for applying them to real-world "
        + "data requires additional exploration. This paper makes an empirical "
@@ -177,19 +177,19 @@ public class PdfActExtractionTestACL2004 {
       + "researchers tremendous power and convenience in their research. They "
       + "are also becoming increasingly used for recruiting and hiring "
       + "decisions. Thus the information quality of such systems is of "
-      + "signiﬁcant importance. This quality critically depends on an "
+      + "significant importance. This quality critically depends on an "
       + "information extraction component that extracts meta-data, such as "
       + "title, author, institution, etc, from paper headers and references, "
       + "because these meta-data are further used in many component "
-      + "applications such as ﬁeld-based search, author analysis, and citation "
-      + "analysis.", p9.getText());
+      + "applications such as field-based search, author analysis, and "
+      + "citation analysis.", p9.getText());
    
     Paragraph p11 = paragraphs.get(11);
     Assert.assertEquals("In this paper, we present results on this research "
      + "paper meta-data extraction task using a Conditional Random Field "
      + "(Lafferty et al., 2001), and explore several practical issues in "
      + "applying CRFs to information extraction in general. The CRF approach "
-     + "draws together the advantages of both ﬁnite state HMM and "
+     + "draws together the advantages of both finite state HMM and "
      + "discriminative SVM techniques by allowing use of arbitrary, dependent "
      + "features and joint inference over entire sequences.", p11.getText());
 
@@ -204,7 +204,7 @@ public class PdfActExtractionTestACL2004 {
       + "Rosenfeld, 2000), exponential (Goodman, 2003), and hyperbolic-L1 "
       + "(Pinto et al., 2003) priors; (2) exploration of various families of "
       + "features, including text, lexicons, and layout, as well as proposing "
-      + "a method for the beneﬁcial use of zero-count features without "
+      + "a method for the beneficial use of zero-count features without "
       + "incurring large memory penalties.", p12.getText());
   }
 
