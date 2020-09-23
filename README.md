@@ -2,7 +2,7 @@
 
 **Disclaimer**: This project is in an early alpha state and is still under development. So expect bugs and use it on your own risk :-)
 
-## How to use
+## Getting started
 
 ### Checkout
 
@@ -14,41 +14,57 @@ Checkout the project via
 
 Build the project:
 
+    cd pdfact
     mvn install
 
-### Extracting the structure from PDF files
+### Extracting the text and structure from PDF files
 
-Extract structure from PDF files:
+Extract the text and structure from PDF files with:
 
-    ./pdfact [options] <pdf> [<output>]
+    ./pdfact [options] <pdf-file> [<output-file>]
 
 This will parse the given PDF file and outputs the extraction results to
-*output*, if *output* is given. Otherwise the result will be printed to stdout.
+`output-file`, if `output-file` is specified. Otherwise the result will be printed to `stdout`.
 
 Positional Arguments:
 
-    <pdf-path>           Defines the path to the PDF file to process.
-    <output-file>        Defines the path to the file where pdfact should write  the  text output. If not specified, the output will be
-                         written to stdout.
+    <pdf-file>           The path to the PDF file to be processed.
+    <output-file>        The path to the file to which the extraction output should be written.
+                         If not specified, the output will be written to stdout.
 
 Optional Arguments:
 
-    -h, --help             show this help message and exit
-    --format <format>      Defines the format in which the text output should be written. Choose from: [txt, xml, json].
-    --unit <unit>          Defines the text unit to extract. Choose from:[characters, blocks, words, areas, paragraphs, lines].
+    -h, --help           show this help message and exit
+    --format <format>    The output format. Available options: [txt, xml, json].
+                         If the format is "txt", the output will contain the text matching the
+                         specified --unit and --role options in plain text format (in the format:
+                         one text element per line). If the format is "xml" or "json", the output
+                         will also contain layout information for each text element, e.g., the
+                         positions in the PDF file.
+    --unit <unit>        The granularity in which the extracted text (and the layout information,
+                         if the chosen output format is dedicated to provide such information)
+                         should be broken down in the output. Available options: [characters,
+                         blocks, words, areas, paragraphs, lines].
+                         For example, when the script is called with the option "--unit words",
+                         the output will be broken down by words, that is: the text (and layout
+                         information) will be provided word-wise.
     --role [<role> [<role> ...]]
-                           Defines one or more semantic role(s) in order to filter the chosen  text  units  in  the  text output (and visualization if the --visualize option is given) by
-                           those roles. If not specified, all text units will be included, regardless  of their semantic roles. Choose from: [figure, appendix, keywords, heading, footer,
-                           acknowledgments, caption, toc, abstract, footnote,  body,  itemize-item,  title,  reference,  affiliation,  general-terms,  formula, header, categories, table,
-                           authors]
-    --visualize <path>     Defines a path to a file where pdfact should write a visualization of the text  output (that is a PDF file where the chosen elements are surrounded by bounding
-                           boxes). If not specified, no visualization will be created.
-    --debug [<level>]      Defines the verbosity of debug messages. The level defines the minimum level of severity required for a message to be logged. Choose from: 
-                            4 ERROR
-                            3 WARN
-                            2 INFO
-                            1 DEBUG
-                            0 OFF
+                         The semantic role(s) of the text elements to be extracted. Available
+                         options: [figure, appendix, keywords, heading, footer, acknowledgments,
+                         caption, toc, abstract, footnote, body, itemize-item, title, reference,
+                         affiliation, general-terms, formula, header, categories, table, authors].
+                         For example, if the script is called with the option "--role headings",
+                         the output will only contain the text (and optionally, the layout
+                         information) of the text belonging to a heading. If not specified, all
+                         text will be extracted, regardless of the semantic roles.
+    --visualize <path>   The path to the file to which a visualization of the extracted text (that
+                         is: the original PDF file enriched which bounding boxes around the
+                         extracted text elements) should be written to. If not specified, no such
+                         visualization will be created.
+    --debug [<level>]    The verbosity of the log messages. Available options: [4 (= ERROR), 3 (=
+                         WARN), 2 (= INFO), 1 (= DEBUG), 0 (= OFF)].
+                         The level defines the minimum level of severity required for a message to
+                         be logged.
 
 
 #### Example
