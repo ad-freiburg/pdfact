@@ -1,24 +1,58 @@
 package pdfact.core.model;
 
-// TODO: Add some more properties to a figure.
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * A figure in a PDF document.
+ * A figure of a document.
  * 
  * @author Claudius Korzen
  */
-public interface Figure extends Element, HasPosition {
+public class Figure extends Element implements HasPosition {
   /**
-   * The factory to create instances of {@link Figure}.
-   * 
-   * @author Claudius Korzen
+   * The position of this figure.
    */
-  public interface FigureFactory {
-    /**
-     * Creates a new instance of {@link Figure}.
-     * 
-     * @return A new instance of {@link Figure}.
-     */
-    Figure create();
+  protected Position position;
+
+  // ==============================================================================================
+
+  @Override
+  public Position getPosition() {
+    return this.position;
   }
+
+  @Override
+  public void setPosition(Position position) {
+    this.position = position;
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public String toString() {
+    return "Figure(pos: " + getPosition() + ")";
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Figure) {
+      Figure otherFigure = (Figure) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPosition(), otherFigure.getPosition());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPosition());
+    return builder.hashCode();
+  }
+
 }

@@ -27,20 +27,6 @@
     </license>
   </licenses>
 
-  <repositories>
-    <!-- 
-      Issue #4 causes some warnings to be displayed. To fix the issue, we
-      need a version of Google Guice which is not offically released yet, but 
-      which is available in their Github repository. The following repository is
-      needed to be able to use this version from Github as a dependency, see
-      https://stackoverflow.com/questions/20161602/loading-maven-dependencies-from-github
-    -->
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <modules>
     <module>pdfact-core</module>
     <module>pdfact-cli</module>
@@ -82,11 +68,6 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.google</groupId>
-      <artifactId>guice</artifactId>
-      <version>fae2e28</version>
     </dependency>
   </dependencies>
 

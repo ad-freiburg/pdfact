@@ -2,121 +2,258 @@ package pdfact.core.model;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import pdfact.core.util.list.ElementList;
+
 /**
- * A PDF document.
+ * A document.
  * 
  * @author Claudius Korzen
  */
-public interface PdfDocument extends HasParagraphs {
+public class PdfDocument implements HasParagraphs {
   /**
-   * Returns the path to the underlying PDF file.
-   * 
-   * @return The path to the underlying PDF file.
+   * The path to the underlying file.
    */
-  File getFile();
+  protected Path path;
 
   /**
-   * Sets the path to the underlying PDF file.
-   * 
-   * @param file
-   *        The path to the underlying PDF file.
+   * The pages of this document.
    */
-  void setFile(File file);
-
-  // ==========================================================================
+  protected List<Page> pages;
 
   /**
-   * Returns the path to the underlying PDF file.
-   * 
-   * @return The path to the underlying PDF file.
+   * The paragraphs in this document.
    */
-  Path getPath();
+  protected ElementList<Paragraph> paragraphs;
 
   /**
-   * Sets the path to the underlying PDF file.
-   * 
-   * @param path
-   *        The path to the underlying PDF file.
+   * The statistics about all characters in this document.
    */
-  void setPath(Path path);
-
-  // ==========================================================================
+  protected CharacterStatistic characterStatistic;
 
   /**
-   * Returns the pages of this PDF document.
-   * 
-   * @return The pages of this PDF document.
+   * The statistics about all text lines in this document.
    */
-  List<Page> getPages();
+  protected TextLineStatistic textLineStatistic;
+
+  // ==============================================================================================
 
   /**
-   * Returns the first page of this PDF document.
+   * Creates a new document.
    * 
-   * @return The first page of this PDF document or null if there are no pages.
+   * @param path The path to the underlying file.
    */
-  Page getFirstPage();
+  public PdfDocument(String path) {
+    this(Paths.get(path));
+  }
 
   /**
-   * Returns the last page of this PDF document.
+   * Creates a new document.
    * 
-   * @return The last page of this PDF document or null if there are no pages.
+   * @param path The path to the underlying file.
    */
-  Page getLastPage();
+  public PdfDocument(File path) {
+    this(path.toPath());
+  }
 
   /**
-   * Sets the pages of this PDF document.
+   * Creates a new document.
    * 
-   * @param pages
-   *        The pages to set.
+   * @param path The path to the underlying file.
    */
-  void setPages(List<Page> pages);
+  public PdfDocument(Path path) {
+    this.pages = new ArrayList<>();
+    this.paragraphs = new ElementList<>();
+    this.path = path;
+  }
+
+  // ==============================================================================================
 
   /**
-   * Adds the given page to this PDF document.
+   * Returns the path to the underlying file.
    * 
-   * @param page
-   *        The page to add.
+   * @return The path to the underlying file.
    */
-  void addPage(Page page);
-
-  // ==========================================================================
+  public File getFile() {
+    return this.path != null ? this.path.toFile() : null;
+  }
 
   /**
-   * The factory to create instances of {@link PdfDocument}.
+   * Sets the path to the underlying file.
    * 
-   * @author Claudius Korzen
+   * @param file The path to the underlying file.
    */
-  public interface PdfDocumentFactory {
-    /**
-     * Creates a new instance of {@link PdfDocument}.
-     * 
-     * @param path
-     *        The path to the underlying PDF file.
-     * 
-     * @return A new instance of {@link PdfDocument}.
-     */
-    PdfDocument create(String path);
+  public void setFile(File file) {
+    this.path = file != null ? file.toPath() : null;
+  }
 
-    /**
-     * Creates a new instance of {@link PdfDocument}.
-     * 
-     * @param path
-     *        The path to the underlying PDF file.
-     * 
-     * @return A new instance of {@link PdfDocument}.
-     */
-    PdfDocument create(File path);
+  // ==============================================================================================
 
-    /**
-     * Creates a new instance of {@link PdfDocument}.
-     * 
-     * @param path
-     *        The path to the underlying PDF file.
-     * 
-     * @return A new instance of {@link PdfDocument}.
-     */
-    PdfDocument create(Path path);
+  /**
+   * Returns the path to the underlying file.
+   * 
+   * @return The path to the underlying file.
+   */
+  public Path getPath() {
+    return this.path;
+  }
+
+  /**
+   * Sets the path to the underlying file.
+   * 
+   * @param path The path to the underlying file.
+   */
+  public void setPath(Path path) {
+    this.path = path;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the pages of this document.
+   * 
+   * @return The pages of this document.
+   */
+  public List<Page> getPages() {
+    return this.pages;
+  }
+
+  /**
+   * Returns the first page of this document.
+   * 
+   * @return The first page of this document or null if there are no pages.
+   */
+  public Page getFirstPage() {
+    if (this.pages == null || this.pages.isEmpty()) {
+      return null;
+    }
+    return this.pages.get(0);
+  }
+
+  /**
+   * Returns the last page of this document.
+   * 
+   * @return The last page of this document or null if there are no pages.
+   */
+  public Page getLastPage() {
+    if (this.pages == null || this.pages.isEmpty()) {
+      return null;
+    }
+    return this.pages.get(this.pages.size() - 1);
+  }
+
+  /**
+   * Sets the pages of this document.
+   * 
+   * @param pages The pages to set.
+   */
+  public void setPages(List<Page> pages) {
+    this.pages = pages;
+  }
+
+  /**
+   * Adds the given page to this document.
+   * 
+   * @param page The page to add.
+   */
+  public void addPage(Page page) {
+    this.pages.add(page);
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public ElementList<Paragraph> getParagraphs() {
+    return this.paragraphs;
+  }
+
+  @Override
+  public Paragraph getFirstParagraph() {
+    if (this.paragraphs == null || this.paragraphs.isEmpty()) {
+      return null;
+    }
+    return this.paragraphs.get(0);
+  }
+
+  @Override
+  public Paragraph getLastParagraph() {
+    if (this.paragraphs == null || this.paragraphs.isEmpty()) {
+      return null;
+    }
+    return this.paragraphs.get(this.paragraphs.size() - 1);
+  }
+
+  @Override
+  public void setParagraphs(ElementList<Paragraph> paragraphs) {
+    this.paragraphs = paragraphs;
+  }
+
+  @Override
+  public void addParagraphs(ElementList<Paragraph> paragraphs) {
+    this.paragraphs.addAll(paragraphs);
+  }
+
+  @Override
+  public void addParagraph(Paragraph paragraph) {
+    this.paragraphs.add(paragraph);
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public CharacterStatistic getCharacterStatistic() {
+    return this.characterStatistic;
+  }
+
+  @Override
+  public void setCharacterStatistic(CharacterStatistic statistic) {
+    this.characterStatistic = statistic;
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public TextLineStatistic getTextLineStatistic() {
+    return this.textLineStatistic;
+  }
+
+  @Override
+  public void setTextLineStatistic(TextLineStatistic statistic) {
+    this.textLineStatistic = statistic;
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public String toString() {
+    return "PdfDocument(" + this.path + ")";
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof PdfDocument) {
+      PdfDocument otherDocument = (PdfDocument) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getPath(), otherDocument.getPath());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getPath());
+    return builder.hashCode();
   }
 }

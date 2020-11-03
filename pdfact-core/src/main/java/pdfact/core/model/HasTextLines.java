@@ -3,12 +3,11 @@ package pdfact.core.model;
 import pdfact.core.util.list.ElementList;
 
 /**
- * An interface that is implemented by PDF elements that have text lines.
+ * An interface to implement by elements that consist of at least one text line.
  *
  * @author Claudius Korzen
  */
-public interface HasTextLines extends HasTextLineStatistic,
-    HasCharacterStatistic {
+public interface HasTextLines extends HasTextLineStatistic, HasCharacterStatistic {
   /**
    * Returns the text lines of this element.
    * 
@@ -30,29 +29,26 @@ public interface HasTextLines extends HasTextLineStatistic,
    */
   TextLine getLastTextLine();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Sets the text lines of this element.
    * 
-   * @param lines
-   *        The text lines of this element.
+   * @param lines The text lines of this element.
    */
   void setTextLines(ElementList<TextLine> lines);
 
   /**
    * Adds the given text lines to this element.
    * 
-   * @param lines
-   *        The text lines to add.
+   * @param lines The text lines to add.
    */
   void addTextLines(ElementList<TextLine> lines);
 
   /**
    * Adds the given text line to this element.
    * 
-   * @param line
-   *        The text line to add.
+   * @param line The text line to add.
    */
   void addTextLine(TextLine line);
 }

@@ -1,7 +1,8 @@
 package pdfact.core.model;
 
 /**
- * An interface that is implemented by PDF elements that have text.
+ * An interface to implement by elements that includes text (in form of a
+ * string).
  *
  * @author Claudius Korzen
  */
@@ -16,8 +17,7 @@ public interface HasText {
   /**
    * Sets the text of this element.
    * 
-   * @param text
-   *        The text of this element.
+   * @param text The text of this element.
    */
   void setText(String text);
 }

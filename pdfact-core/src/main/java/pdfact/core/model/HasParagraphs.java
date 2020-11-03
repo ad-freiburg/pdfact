@@ -3,12 +3,11 @@ package pdfact.core.model;
 import pdfact.core.util.list.ElementList;
 
 /**
- * An interface that is implemented by PDF elements that have paragraphs.
+ * An interface to implement by elements that consist of at least one paragraph.
  *
  * @author Claudius Korzen
  */
-public interface HasParagraphs extends HasTextLineStatistic,
-    HasCharacterStatistic {
+public interface HasParagraphs extends HasTextLineStatistic, HasCharacterStatistic {
   /**
    * Returns the paragraphs of this element.
    * 
@@ -30,29 +29,26 @@ public interface HasParagraphs extends HasTextLineStatistic,
    */
   Paragraph getLastParagraph();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Sets the paragraphs of this element.
    * 
-   * @param paragraphs
-   *        The paragraphs of this element.
+   * @param paragraphs The paragraphs of this element.
    */
   void setParagraphs(ElementList<Paragraph> paragraphs);
 
   /**
    * Adds the given paragraphs to this element.
    * 
-   * @param paragraphs
-   *        The paragraphs to add.
+   * @param paragraphs The paragraphs to add.
    */
   void addParagraphs(ElementList<Paragraph> paragraphs);
 
   /**
    * Adds the given paragraph to this element.
    * 
-   * @param paragraph
-   *        The paragraph to add.
+   * @param paragraph The paragraph to add.
    */
   void addParagraph(Paragraph paragraph);
 }

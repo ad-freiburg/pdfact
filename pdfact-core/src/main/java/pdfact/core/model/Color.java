@@ -1,100 +1,142 @@
 package pdfact.core.model;
 
-import com.google.inject.assistedinject.Assisted;
-
 // TODO: Implement the support of other color schemes (CMYK, etc.)
 // TODO: Clarify, if the rgb values are within the interval [0, 1] or [0, 255].
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
- * A color in a PDF document.
+ * A color in a document.
  * 
  * @author Claudius Korzen
  */
-public interface Color extends Resource {
+public class Color extends Resource {
+  /**
+   * The name of this color.
+   */
+  protected String name;
+
+  /**
+   * The RGB value of this color.
+   */
+  protected float[] rgb;
+
+  // ==============================================================================================
+
+  /**
+   * Creates a new color.
+   */
+  public Color() {
+    this.rgb = new float[3];
+  }
+
+  /**
+   * Creates a new color.
+   * 
+   * @param rgb The RGB value given as an array of three float values in [0,1].
+   */
+  public Color(float[] rgb) {
+    this.rgb = rgb;
+  }
+
+  /**
+   * Creates a new color.
+   * 
+   * @param r The R value.
+   * @param g The G value.
+   * @param b The B value.
+   */
+  public Color(float r, float g, float b) {
+    this();
+    this.rgb[0] = r;
+    this.rgb[1] = g;
+    this.rgb[2] = b;
+  }
+
+  // ==============================================================================================
+
   /**
    * Returns the name of this color.
    * 
    * @return The name of this color.
    */
-  String getName();
+  public String getName() {
+    return this.name;
+  }
 
   /**
    * Sets the name of this color.
    * 
-   * @param name
-   *        The name of this color.
+   * @param name The name of this color.
    */
-  void setName(String name);
+  public void setName(String name) {
+    this.name = name;
+  }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the RGB value of this color.
    * 
    * @return The RGB value given as an array of three float values in [0,1].
    */
-  float[] getRGB();
+  public float[] getRGB() {
+    return this.rgb;
+  }
 
   /**
    * Sets the RGB value of this color.
    * 
-   * @param rgb
-   *        The RGB value given as an array of three float values in [0,1].
+   * @param rgb The RGB value given as an array of three float values in [0,1].
    */
-  void setRGB(float[] rgb);
+  public void setRGB(final float[] rgb) {
+    this.rgb = rgb;
+  }
 
   /**
    * Sets the RGB value of this color.
    * 
-   * @param r
-   *        The R value.
-   * @param g
-   *        The G value.
-   * @param b
-   *        The B value.
+   * @param r The R value.
+   * @param g The G value.
+   * @param b The B value.
    */
-  void setRGB(float r, float g, float b);
+  public void setRGB(float r, float g, float b) {
+    this.rgb[0] = r;
+    this.rgb[1] = g;
+    this.rgb[2] = b;
+  }
 
-  // ==========================================================================
+  // ==============================================================================================
 
-  /**
-   * The factory to create instances of {@link Color}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface ColorFactory {
-    /**
-     * Creates a new instance of {@link Color}.
-     * 
-     * @return A new instance of {@link Color}.
-     */
-    Color create();
+  @Override
+  public String toString() {
+    return "Color(" + Arrays.toString(this.rgb) + ")";
+  }
 
-    /**
-     * Creates a new instance of {@link Color}.
-     * 
-     * @param rgb
-     *        The RGB value of the color.
-     * 
-     * @return A new instance of {@link Color}.
-     */
-    Color create(float[] rgb);
+  // ==============================================================================================
 
-    /**
-     * Creates a new instance of {@link Color}.
-     * 
-     * @param r
-     *        The R value.
-     * @param g
-     *        The G value.
-     * @param b
-     *        The B value.
-     * 
-     * @return A new instance of {@link Color}.
-     */
-    Color create(
-        @Assisted("r") float r,
-        @Assisted("g") float g,
-        @Assisted("b") float b);
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Color) {
+      Color otherColor = (Color) other;
+
+      EqualsBuilder builder = new EqualsBuilder();
+      builder.append(getName(), otherColor.getName());
+      builder.append(getRGB(), otherColor.getRGB());
+
+      return builder.isEquals();
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    HashCodeBuilder builder = new HashCodeBuilder();
+    builder.append(getName());
+    builder.append(getRGB());
+    return builder.hashCode();
   }
 }

@@ -3,7 +3,7 @@ package pdfact.core.model;
 import pdfact.core.util.list.ElementList;
 
 /**
- * An interface that is implemented by PDF elements that have figures.
+ * An interface to implement by elements that consist of at least one figure.
  *
  * @author Claudius Korzen
  */
@@ -29,29 +29,26 @@ public interface HasFigures {
    */
   Figure getLastFigure();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Sets the figures of this element.
    * 
-   * @param figures
-   *        The figures of this element.
+   * @param figures The figures of this element.
    */
   void setFigures(ElementList<Figure> figures);
 
   /**
    * Adds the given figures to this element.
    * 
-   * @param figures
-   *        The figures to add.
+   * @param figures The figures to add.
    */
   void addFigures(ElementList<Figure> figures);
 
   /**
    * Adds the given figure to this element.
    * 
-   * @param figure
-   *        The figure to add.
+   * @param figure The figure to add.
    */
   void addFigure(Figure figure);
 }

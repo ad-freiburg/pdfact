@@ -1,8 +1,8 @@
 package pdfact.core.model;
 
 /**
- * An interface that is implemented by PDF elements that have characters and
- * provide a statistic about the characters.
+ * An interface to implement by elements that consist of at least one character and provide a 
+ * statistic about that characters.
  * 
  * @author Claudius Korzen
  */
@@ -17,8 +17,7 @@ public interface HasCharacterStatistic {
   /**
    * Sets the statistic about the characters.
    * 
-   * @param statistic
-   *        The statistic about the characters.
+   * @param statistic The statistic about the characters.
    */
   void setCharacterStatistic(CharacterStatistic statistic);
 }

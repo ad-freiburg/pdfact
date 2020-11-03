@@ -1,8 +1,8 @@
 package pdfact.core.model;
 
 /**
- * An interface that is implemented by PDF elements that have a fixed position
- * in any page of a PDF document.
+ * An interface to implement by elements that have a fixed position in any page
+ * of a document.
  *
  * @author Claudius Korzen
  */
@@ -17,8 +17,7 @@ public interface HasPosition {
   /**
    * Sets the position of this element.
    * 
-   * @param position
-   *        The position of this element.
+   * @param position The position of this element.
    */
   void setPosition(Position position);
 }

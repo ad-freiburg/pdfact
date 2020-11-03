@@ -1,8 +1,8 @@
 package pdfact.core.model;
 
 /**
- * An interface that is implemented by PDF elements that have a font face (a
- * pair consisting of a font and a font size).
+ * An interface to implement by elements that have a font face (that is: a pair
+ * consisting of a font and a font size).
  *
  * @author Claudius Korzen
  */
@@ -17,8 +17,7 @@ public interface HasFontFace {
   /**
    * Sets the given font face of this element.
    * 
-   * @param fontFace
-   *        The font face of this element.
+   * @param fontFace The font face of this element.
    */
   void setFontFace(FontFace fontFace);
 }

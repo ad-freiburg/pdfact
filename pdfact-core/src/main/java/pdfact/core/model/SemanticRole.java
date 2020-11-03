@@ -98,7 +98,7 @@ public enum SemanticRole {
    */
   TITLE("title");
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The name of this semantic role.
@@ -108,14 +108,13 @@ public enum SemanticRole {
   /**
    * Creates a new semantic role.
    * 
-   * @param name
-   *        The name of the role.
+   * @param name The name of the role.
    */
   SemanticRole(String name) {
     this.name = name;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the name of this role.
@@ -126,7 +125,7 @@ public enum SemanticRole {
     return this.name;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The semantic roles by names.
@@ -154,8 +153,7 @@ public enum SemanticRole {
   /**
    * Checks if there exists a semantic role with the given name.
    * 
-   * @param name
-   *        The name to check.
+   * @param name The name to check.
    *
    * @return True, if there exists a semantic role with the given name; false
    *         otherwise.
@@ -167,8 +165,7 @@ public enum SemanticRole {
   /**
    * Returns all semantic roles that relate to the given names.
    * 
-   * @param names
-   *        The names of the roles to fetch.
+   * @param names The names of the roles to fetch.
    * 
    * @return A set of the roles that relate to the given names.
    */
@@ -179,8 +176,7 @@ public enum SemanticRole {
   /**
    * Returns all semantic roles that relate to the given names.
    * 
-   * @param names
-   *        The names of the roles to fetch.
+   * @param names The names of the roles to fetch.
    * 
    * @return A set of the roles that relate to the given names.
    */
@@ -200,8 +196,7 @@ public enum SemanticRole {
   /**
    * Returns the semantic role that relates to the given name.
    * 
-   * @param name
-   *        The name of the role to fetch.
+   * @param name The name of the role to fetch.
    * 
    * @return The semantic role that relates to the given name.
    */

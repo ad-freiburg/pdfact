@@ -3,8 +3,8 @@ package pdfact.core.model;
 import pdfact.core.util.list.ElementList;
 
 /**
- * An interface that is implemented by PDF elements that have shapes (like
- * lines, curves, paths, etc.).
+ * An interface to implement by elements that consist of at least on shapes
+ * (e.g., lines, curves, paths, etc.).
  *
  * @author Claudius Korzen
  */
@@ -30,29 +30,26 @@ public interface HasShapes {
    */
   Shape getLastShape();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Sets the shapes of this element.
    * 
-   * @param shapes
-   *        The shapes of this element.
+   * @param shapes The shapes of this element.
    */
   void setShapes(ElementList<Shape> shapes);
 
   /**
    * Adds the given shapes to this element.
    * 
-   * @param shapes
-   *        The shapes to add.
+   * @param shapes The shapes to add.
    */
   void addShapes(ElementList<Shape> shapes);
 
   /**
    * Adds the given shape to this element.
    * 
-   * @param shape
-   *        The shape to add.
+   * @param shape The shape to add.
    */
   void addShape(Shape shape);
 }

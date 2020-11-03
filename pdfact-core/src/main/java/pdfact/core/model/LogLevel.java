@@ -37,7 +37,7 @@ public enum LogLevel {
    */
   ERROR(4, Level.ERROR);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The level given as an integer value.
@@ -52,10 +52,8 @@ public enum LogLevel {
   /**
    * Creates a new log level.
    * 
-   * @param intLevel
-   *        The level given as an integer value.
-   * @param log4jEquivalent
-   *        The log4j level that is equivalent to this log level.
+   * @param intLevel        The level given as an integer value.
+   * @param log4jEquivalent The log4j level that is equivalent to this log level.
    */
   LogLevel(int intLevel, Level log4jEquivalent) {
     this.intLevel = intLevel;
@@ -83,11 +81,9 @@ public enum LogLevel {
   /**
    * Checks if this log level implies the given other log level.
    * 
-   * @param level
-   *        The other log level.
+   * @param level The other log level.
    * 
-   * @return True, if this log level implies the given log level, False
-   *         otherwise.
+   * @return True, if this log level implies the given log level, False otherwise.
    */
   public boolean implies(LogLevel level) {
     if (this.intLevel == 0) {
@@ -101,7 +97,7 @@ public enum LogLevel {
     return this.intLevel >= level.getIntLevel();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The log levels by their integer values.
@@ -138,8 +134,7 @@ public enum LogLevel {
   /**
    * Checks if there exists a log level with the given integer value.
    * 
-   * @param value
-   *        The integer value to check.
+   * @param value The integer value to check.
    *
    * @return True, if there exists a log level whose integer values is equal to
    *         the given integer value; false otherwise.
@@ -151,8 +146,7 @@ public enum LogLevel {
   /**
    * Returns all log levels that relate to the given integer values.
    * 
-   * @param values
-   *        The integer values to process.
+   * @param values The integer values to process.
    *
    * @return A set of the log levels that relate to the given integer values.
    */
@@ -172,8 +166,7 @@ public enum LogLevel {
   /**
    * Returns the log level that relates to the given integer value.
    * 
-   * @param value
-   *        The integer value to process.
+   * @param value The integer value to process.
    * 
    * @return The log level that relates to the given integer value.
    */
