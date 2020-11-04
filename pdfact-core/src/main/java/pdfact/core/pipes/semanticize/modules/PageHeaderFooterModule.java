@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.util.comparator.MinYComparator;
 import pdfact.core.util.counter.ObjectCounter;
-import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
 
 /**
  * A module that identifies the text blocks with the semantic role "page header"
@@ -21,25 +18,6 @@ import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
  * @author Claudius Korzen
  */
 public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
-  /**
-   * The factory to create instances of {@link ObjectCounter}.
-   */
-  protected ObjectCounterFactory<String> objectCounterFactory;
-
-  /**
-   * Creates a new module that identifies the page headers and footers.
-   * 
-   * @param objectCounterFactory
-   *        The factory to create instances of {@link ObjectCounter}.
-   */
-  @Inject
-  public PageHeaderFooterModule(
-      ObjectCounterFactory<String> objectCounterFactory) {
-    this.objectCounterFactory = objectCounterFactory;
-  }
-
-  // ==========================================================================
-
   @Override
   public void semanticize(PdfDocument pdf) {
     if (pdf == null) {
@@ -77,7 +55,7 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
     semanticizeBlocks(topMostBlocks, SemanticRole.PAGE_HEADER);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Searches the given text blocks for page headers (or page footers). Assigns
@@ -95,7 +73,7 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
     }
 
     // Count the frequencies of texts in the blocks.
-    ObjectCounter<String> textCounter = this.objectCounterFactory.create();
+    ObjectCounter<String> textCounter = new ObjectCounter<>();
     for (TextBlock block : blocks) {
       textCounter.add(getNormalizedText(block));
     }
@@ -114,7 +92,7 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the text of the given text blocks without any numbers.

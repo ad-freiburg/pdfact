@@ -8,12 +8,9 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
-import pdfact.core.model.Point.PointFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
@@ -22,26 +19,6 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
  * @author Claudius Korzen
  */
 public class CurveToReplicateInitialPoint extends OperatorProcessor {
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
-
-  // ==========================================================================
-
-  /**
-   * Creates a new OperatorProcessor to process the operation
-   * "CurveToReplicateInitialPoint".
-   * 
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   */
-  @Inject
-  public CurveToReplicateInitialPoint(PointFactory pointFactory) {
-    this.pointFactory = pointFactory;
-  }
-
-  // ==========================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -52,8 +29,8 @@ public class CurveToReplicateInitialPoint extends OperatorProcessor {
     COSNumber y3 = (COSNumber) args.get(3);
 
     Point2D currentPoint = this.engine.getLinePath().getCurrentPoint();
-    Point point2 = this.pointFactory.create(x2.floatValue(), y2.floatValue());
-    Point point3 = this.pointFactory.create(x3.floatValue(), y3.floatValue());
+    Point point2 = new Point(x2.floatValue(), y2.floatValue());
+    Point point3 = new Point(x3.floatValue(), y3.floatValue());
 
     this.engine.transform(point2);
     this.engine.transform(point3);

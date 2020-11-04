@@ -66,7 +66,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     this.factory = visualizerFactory;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -84,7 +84,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the given PDF document.
@@ -113,7 +113,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Writes the given bytes to the given output stream.
@@ -153,7 +153,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -165,7 +165,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilters() {
@@ -177,7 +177,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     this.roles = roles;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public OutputStream getTargetStream() {
@@ -189,7 +189,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     this.targetStream = stream;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Path getTargetPath() {

@@ -25,7 +25,7 @@ public interface PdfVisualizer {
    */
   byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the text unit.
@@ -42,7 +42,7 @@ public interface PdfVisualizer {
    */
   void setTextUnit(TextUnit unit);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the semantic roles filter.
@@ -59,7 +59,7 @@ public interface PdfVisualizer {
    */
   void setSemanticRolesFilter(Set<SemanticRole> roles);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of PdfVisualizer.

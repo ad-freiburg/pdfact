@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 
 // FIXME: Adjust bounding box.
 
@@ -23,8 +23,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PlainSplitLigaturesPipe.class);
 
   /**
    * A map with the unicodes of ligatures and its individual characters.
@@ -75,7 +74,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
     LIGATURES.put("\uFB06", "st");
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -93,7 +92,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Splits the ligatures of the given PDF document into its individual

@@ -56,7 +56,7 @@ public class ItemizeItemModule implements PdfTextSemanticizerModule {
     ITEMIZE_ITEM_PATTERNS.add(pattern6);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void semanticize(PdfDocument pdf) {

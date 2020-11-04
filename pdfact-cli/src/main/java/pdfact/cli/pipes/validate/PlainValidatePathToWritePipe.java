@@ -27,7 +27,7 @@ public class PlainValidatePathToWritePipe implements ValidatePathToWritePipe {
    */
   protected Path path;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -43,7 +43,7 @@ public class PlainValidatePathToWritePipe implements ValidatePathToWritePipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Validates the given path.
@@ -75,7 +75,7 @@ public class PlainValidatePathToWritePipe implements ValidatePathToWritePipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void setPath(Path path) {

@@ -2,17 +2,14 @@ package pdfact.core.pipes.filter.figures;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link FilterFiguresPipe}.
@@ -23,13 +20,7 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of figures.
-   */
-  protected ElementListFactory<Figure> figureListFactory;
+  protected static Logger log = LogManager.getLogger(PlainFilterFiguresPipe.class);
 
   /**
    * The number of processed figures.
@@ -41,19 +32,7 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
    */
   protected int numFilteredFigures;
 
-  /**
-   * Creates a pipe that filters those figures of a PDF document that should not
-   * be considered.
-   * 
-   * @param figureListFactory
-   *        The factory to create lists of figures.
-   */
-  @Inject
-  public PlainFilterFiguresPipe(ElementListFactory<Figure> figureListFactory) {
-    this.figureListFactory = figureListFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -70,7 +49,7 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Filters those figures of a PDF document that should not be considered.
@@ -84,8 +63,7 @@ public class PlainFilterFiguresPipe implements FilterFiguresPipe {
       for (Page page : pages) {
         ElementList<Figure> before = page.getFigures();
         // Create a new list of figures which should not be filtered.
-        ElementList<Figure> after =
-            this.figureListFactory.create(before.size());
+        ElementList<Figure> after = new ElementList<>(before.size());
         for (Figure figure : before) {
           this.numProcessedFigures++;
 

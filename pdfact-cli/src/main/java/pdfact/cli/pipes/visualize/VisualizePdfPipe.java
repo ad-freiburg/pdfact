@@ -29,7 +29,7 @@ public interface VisualizePdfPipe extends Pipe {
    */
   void setTargetStream(OutputStream stream);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the target path.
@@ -46,7 +46,7 @@ public interface VisualizePdfPipe extends Pipe {
    */
   void setTargetPath(Path path);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the text unit.
@@ -63,7 +63,7 @@ public interface VisualizePdfPipe extends Pipe {
    */
   void setTextUnit(TextUnit unit);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the semantic roles filter.
@@ -80,7 +80,7 @@ public interface VisualizePdfPipe extends Pipe {
    */
   void setSemanticRolesFilters(Set<SemanticRole> roles);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link VisualizePdfPipe}.

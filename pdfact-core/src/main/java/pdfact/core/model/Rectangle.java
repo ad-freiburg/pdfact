@@ -146,6 +146,67 @@ public class Rectangle {
     }
   }
 
+  /**
+   * Creates a new instance of {@link Rectangle} from the union of the given
+   * rectangles.
+   * 
+   * @param rectangles The rectangle to process.
+   * 
+   * @return A new instance of {@link Rectangle}.
+   */
+  public static Rectangle fromUnion(Rectangle... rectangles) {
+    return new Rectangle(rectangles);
+  }
+
+  /**
+   * Creates a new instance of {@link Rectangle} that represents the bounding box
+   * around the given elements that have a single position.
+   * 
+   * @param elements The elements to process.
+   * 
+   * @return A new instance of {@link Rectangle}.
+   */
+  public static Rectangle fromHasPositionElements(Iterable<? extends HasPosition> elements) {
+    return new Rectangle(elements);
+  }
+
+  /**
+   * Creates a new instance of {@link Rectangle} that represents the bounding box
+   * around the given elements that have multiple positions.
+   * 
+   * @param elements The elements to process.
+   * 
+   * @return A new instance of {@link Rectangle}.
+   */
+  public static Rectangle fromHasPositionsElements(Iterable<? extends HasPositions> elements) {
+    float minX = Float.MAX_VALUE;
+    float minY = Float.MAX_VALUE;
+    float maxX = -Float.MAX_VALUE;
+    float maxY = -Float.MAX_VALUE;
+
+    for (HasPositions element : elements) {
+      for (Position pos : element.getPositions()) {
+        Rectangle rect = pos.getRectangle();
+        if (rect.getMinX() < minX) {
+          minX = rect.getMinX();
+        }
+
+        if (rect.getMinY() < minY) {
+          minY = rect.getMinY();
+        }
+
+        if (rect.getMaxX() > maxX) {
+          maxX = rect.getMaxX();
+        }
+
+        if (rect.getMaxY() > maxY) {
+          maxY = rect.getMaxY();
+        }
+      }
+    }
+    return new Rectangle(minX, minY, maxX, maxY);
+  }
+
   // ==============================================================================================
 
   /**

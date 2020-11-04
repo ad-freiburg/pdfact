@@ -50,7 +50,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
   protected static final String TYPES_DELIMITER = System.lineSeparator()
       + System.lineSeparator();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
@@ -77,7 +77,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public byte[] serialize(PdfDocument pdf) {
@@ -120,7 +120,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the paragraphs of the given PDF document.
@@ -162,7 +162,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return serializePdfElement(paragraph);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * Serializes the words of the given PDF document.
@@ -206,7 +206,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return serializePdfElement(word);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * Serializes the characters of the given PDF document.
@@ -252,7 +252,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return serializePdfElement(character);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given PDF element.
@@ -283,7 +283,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -295,7 +295,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilter() {
@@ -307,7 +307,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the semantic role of the given element matches the semantic roles
@@ -337,7 +337,7 @@ public class PlainPdfTxtSerializer implements PdfTxtSerializer {
     return this.rolesFilter.contains(role);
   }
   
-  // ==========================================================================
+  // ==============================================================================================
   // Remaining methods.
   
   /**

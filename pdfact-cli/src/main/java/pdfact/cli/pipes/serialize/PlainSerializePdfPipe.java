@@ -66,7 +66,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   protected Set<SemanticRole> roles;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The default constructor.
@@ -83,7 +83,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -172,7 +172,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -184,7 +184,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilters() {
@@ -196,7 +196,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.roles = filters;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public SerializeFormat getSerializationFormat() {
@@ -208,7 +208,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.format = format;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public OutputStream getTargetStream() {
@@ -220,7 +220,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.targetStream = stream;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Path getTargetPath() {

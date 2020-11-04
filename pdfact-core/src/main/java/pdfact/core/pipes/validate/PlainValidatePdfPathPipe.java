@@ -3,12 +3,12 @@ package pdfact.core.pipes.validate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActValidateException;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link ValidatePdfPathPipe}.
@@ -19,8 +19,7 @@ public class PlainValidatePdfPathPipe implements ValidatePdfPathPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PlainValidatePdfPathPipe.class);
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {

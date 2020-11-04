@@ -1,6 +1,7 @@
 package pdfact.core.util.counter;
 
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * A counter to compute some statistics about objects.
@@ -10,14 +11,50 @@ import gnu.trove.iterator.TObjectIntIterator;
  * 
  * @author Claudius Korzen
  */
-public interface ObjectCounter<T> {
+public class ObjectCounter<T> extends TObjectIntHashMap<T> {
+  /**
+   * The default initial capacity of this counter.
+   */
+  protected static final int DEFAULT_INITIAL_CAPACITY = 10;
+
+  /**
+   * The most common object.
+   */
+  protected T mostCommonObject;
+
+  /**
+   * A flag that indicates whether the statistics were already computed.
+   */
+  protected boolean isStatisticsComputed;
+
+  /**
+   * Creates a new ObjectCounter with the default initial capacity.
+   */
+  public ObjectCounter() {
+    this(DEFAULT_INITIAL_CAPACITY);
+  }
+
+  /**
+   * Creates a new ObjectCounter with the given initial capacity.
+   * 
+   * @param initialCapacity
+   *        The initial capacity.
+   */
+  public ObjectCounter(int initialCapacity) {
+    super(initialCapacity, DEFAULT_LOAD_FACTOR, 0);
+  }
+
+  // ==============================================================================================
+
   /**
    * Adds the given object to this counter.
    * 
    * @param o
    *        The object to add.
    */
-  void add(T o);
+  public void add(T o) {
+    adjustOrPutValue(o, 1, 1);
+  }
 
   /**
    * Adds the given ObjectCounter to this counter.
@@ -25,9 +62,17 @@ public interface ObjectCounter<T> {
    * @param o
    *        The object to add.
    */
-  void add(ObjectCounter<T> o);
+  public void add(ObjectCounter<T> o) {
+    TObjectIntIterator<T> itr = o.iterator();
+    while (itr.hasNext()) {
+      itr.advance();
+      T key = itr.key();
+      int count = itr.value();
+      adjustOrPutValue(key, count, count);
+    }
+  }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the most common object.
@@ -35,23 +80,32 @@ public interface ObjectCounter<T> {
    * @return The most common object in this counter or null if the counter is
    *         empty.
    */
-  T getMostCommonObject();
+  public T getMostCommonObject() {
+    if (!this.isStatisticsComputed) {
+      computeStatistics();
+    }
+    return this.mostCommonObject;
+  }
 
   /**
    * Returns the frequency of the most common object.
    * 
    * @return The frequency of the most common object in this counter.
    */
-  int getMostCommonObjectFrequency();
+  public int getMostCommonObjectFrequency() {
+    return get(getMostCommonObject());
+  }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the objects in this counter.
    * 
    * @return The objects in this counter.
    */
-  Object[] getObjects();
+  public Object[] getObjects() {
+    return keys();
+  }
 
   /**
    * Returns the frequency of the given object in this counter.
@@ -61,59 +115,28 @@ public interface ObjectCounter<T> {
    * 
    * @return The frequency of the given object in this counter.
    */
-  int getFrequency(T object);
+  public int getFrequency(T object) {
+    return get(object);
+  }
 
-  // ==========================================================================
-
-  /**
-   * Returns an iterator overt his counter.
-   * 
-   * @return An iterator overt his counter.
-   */
-  TObjectIntIterator<T> iterator();
-
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
-   * Returns true if this counter is empty.
-   * 
-   * @return True if this counter is empty; false otherwise.
+   * Computes some statistics about the objects.
    */
-  boolean isEmpty();
+  protected void computeStatistics() {
+    int largestFreq = -1;
 
-  /**
-   * Returns the number of unique objects in this counter.
-   * 
-   * @return The number of unique objects in this counter.
-   */
-  int size();
-
-  // ==========================================================================
-
-  /**
-   * The factory to create instances of {@link ObjectCounter}.
-   * 
-   * @author Claudius Korzen
-   * 
-   * @param <T>
-   *        The type of the objects to count.
-   */
-  public interface ObjectCounterFactory<T> {
-    /**
-     * Creates a new instance of {@link ObjectCounter}.
-     * 
-     * @return A new instance of {@link ObjectCounter}.
-     */
-    ObjectCounter<T> create();
-
-    /**
-     * Creates a new instance of {@link ObjectCounter}.
-     * 
-     * @param initialCapacity
-     *        The initial capacity of this counter.
-     * 
-     * @return A new instance of {@link ObjectCounter}.
-     */
-    ObjectCounter<T> create(int initialCapacity);
+    TObjectIntIterator<T> itr = iterator();
+    while (itr.hasNext()) {
+      itr.advance();
+      T object = itr.key();
+      int freq = itr.value();
+      if (freq > largestFreq) {
+        this.mostCommonObject = object;
+        largestFreq = freq;
+      }
+    }
+    this.isStatisticsComputed = true;
   }
 }

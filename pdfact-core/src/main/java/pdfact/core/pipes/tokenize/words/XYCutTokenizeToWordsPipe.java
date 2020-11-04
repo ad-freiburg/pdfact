@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
@@ -16,16 +15,11 @@ import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
-import pdfact.core.model.Word.WordFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.comparator.MinXComparator;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
 
@@ -34,38 +28,16 @@ import pdfact.core.util.xycut.XYCut;
  * 
  * @author Claudius Korzen
  */
-public class XYCutTokenizeToWordsPipe extends XYCut
-    implements TokenizeToWordsPipe {
+public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of words.
-   */
-  protected ElementListFactory<Word> wordListFactory;
-
-  /**
-   * The factory to create instances of {@link Word}.
-   */
-  protected WordFactory wordFactory;
-
-  /**
-   * The factory to create instances of {@link PositionFactory}.
-   */
-  protected PositionFactory positionFactory;
+  protected static Logger log = LogManager.getLogger(XYCutTokenizeToWordsPipe.class);
 
   /**
    * The statistician to compute statistics about characters.
    */
   protected CharacterStatistician charStatistician;
-
-  /**
-   * The factory to create instances of Rectangle.
-   */
-  protected RectangleFactory rectangleFactory;
 
   /**
    * The number of processed text lines.
@@ -79,33 +51,12 @@ public class XYCutTokenizeToWordsPipe extends XYCut
 
   /**
    * Creates a new word tokenizer.
-   * 
-   * @param wordListFactory
-   *        The factory to create lists of words.
-   * @param wordFactory
-   *        The factory to create instances of {@link Word}.
-   * @param characterStatistician
-   *        The statistician to compute statistics about characters.
-   * @param positionFactory
-   *        The factory to create instance of {@link Position}.
-   * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
    */
-  @Inject
-  public XYCutTokenizeToWordsPipe(
-      ElementListFactory<Word> wordListFactory,
-      WordFactory wordFactory,
-      PositionFactory positionFactory,
-      CharacterStatistician characterStatistician,
-      RectangleFactory rectangleFactory) {
-    this.wordListFactory = wordListFactory;
-    this.wordFactory = wordFactory;
-    this.charStatistician = characterStatistician;
-    this.positionFactory = positionFactory;
-    this.rectangleFactory = rectangleFactory;
+  public XYCutTokenizeToWordsPipe() {
+    this.charStatistician = new CharacterStatistician();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -123,7 +74,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Tokenizes the text lines in the pages of the given PDF document into words.
@@ -168,13 +119,13 @@ public class XYCutTokenizeToWordsPipe extends XYCut
    */
   public ElementList<Word> tokenizeToWords(PdfDocument pdf, Page page,
       TextLine line) throws PdfActException {
-    ElementList<Word> result = this.wordListFactory.create();
+    ElementList<Word> result = new ElementList<>();
 
     ElementList<Character> characters = line.getCharacters();
     List<ElementList<Character>> charLists = cut(pdf, page, characters);
     Word word = null;
     for (ElementList<Character> charList : charLists) {
-      word = this.wordFactory.create();
+      word = new Word();
       word.setCharacters(charList);
       word.setText(computeText(word));
       word.setPositions(computePositions(page, word));
@@ -190,7 +141,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public float assessVerticalCut(PdfDocument pdf, Page page,
@@ -210,7 +161,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
     return width;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public float assessHorizontalCut(PdfDocument pdf, Page page,
@@ -218,7 +169,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut
     return -1;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Computes the character statistics for the given word.
@@ -243,8 +194,8 @@ public class XYCutTokenizeToWordsPipe extends XYCut
   protected List<Position> computePositions(Page page, Word word) {
     List<Position> positions = new ArrayList<>();
     ElementList<Character> characters = word.getCharacters();
-    Rectangle rect = this.rectangleFactory.fromHasPositionElements(characters);
-    Position position = this.positionFactory.create(page, rect);
+    Rectangle rect = Rectangle.fromHasPositionElements(characters);
+    Position position = new Position(page, rect);
     positions.add(position);
     return positions;
   }

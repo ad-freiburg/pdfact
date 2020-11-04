@@ -3,10 +3,9 @@ package pdfact.core.pipes.parse.stream.pdfbox.utils;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.encoding.GlyphList;
-
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A collection of some utility methods to manage and process additional glyphs.
@@ -17,8 +16,7 @@ public class PdfBoxGlyphUtils {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PdfBoxGlyphUtils.class);
 
   /**
    * The additional glyphs.
@@ -33,7 +31,7 @@ public class PdfBoxGlyphUtils {
         "org/apache/pdfbox/resources/glyphlist/additional.txt");
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns a list of additional glyphs.

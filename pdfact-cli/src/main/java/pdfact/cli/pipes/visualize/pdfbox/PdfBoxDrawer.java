@@ -200,7 +200,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void drawLine(Line line, int pageNum) throws IOException {
@@ -262,7 +262,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     stream.stroke();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void drawRectangle(Rectangle rect, int pageNum) throws IOException {
@@ -337,7 +337,7 @@ public class PdfBoxDrawer implements PdfDrawer {
     stream.stroke();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void drawBoundingBox(HasRectangle box, int pageNum)
@@ -385,7 +385,7 @@ public class PdfBoxDrawer implements PdfDrawer {
         thickness, relativeToUpperLeft, originInUpperLeft);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   
   @Override
   public void drawPosition(Position position) throws IOException {
@@ -441,7 +441,7 @@ public class PdfBoxDrawer implements PdfDrawer {
         thickness, relativeToUpperLeft, originInUpperLeft);
   }
   
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void drawText(String text, int pageNum) throws IOException {

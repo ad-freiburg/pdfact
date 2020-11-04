@@ -6,9 +6,8 @@ import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
@@ -18,13 +17,9 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Word;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.counter.ObjectCounter;
-import pdfact.core.util.counter.ObjectCounter.ObjectCounterFactory;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.normalize.WordNormalizer;
-import pdfact.core.util.normalize.WordNormalizer.WordNormalizerFactory;
 
 /**
  * A plain implementation of {@link DehyphenateWordsPipe}.
@@ -35,18 +30,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of characters.
-   */
-  protected ElementListFactory<Character> characterListFactory;
-
-  /**
-   * The factory to create lists of words.
-   */
-  protected ElementListFactory<Word> wordListFactory;
+  protected static Logger log = LogManager.getLogger(PlainDehyphenateWordsPipe.class);
 
   /**
    * The factory to create instances of {@link WordNormalizer}.
@@ -105,25 +89,18 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    * @param objectCounterFactory
    *        The factory to create instances of {@link ObjectCounter}.
    */
-  @Inject
-  public PlainDehyphenateWordsPipe(
-      ElementListFactory<Character> characterListFactory,
-      ElementListFactory<Word> wordListFactory,
-      WordNormalizerFactory wordNormalizerFactory,
-      ObjectCounterFactory<String> objectCounterFactory) {
-    this.characterListFactory = characterListFactory;
-    this.wordListFactory = wordListFactory;
-    this.normalWordsIndex = objectCounterFactory.create();
-    this.compoundWordsIndex = objectCounterFactory.create();
-    this.prefixesIndex = objectCounterFactory.create();
+  public PlainDehyphenateWordsPipe() {
+    this.normalWordsIndex = new ObjectCounter<>();
+    this.compoundWordsIndex = new ObjectCounter<>();
+    this.prefixesIndex = new ObjectCounter<>();
 
-    this.wordNormalizer = wordNormalizerFactory.create();
+    this.wordNormalizer = new WordNormalizer();
     this.wordNormalizer.setIsToLowerCase(true);
     this.wordNormalizer.setLeadingCharactersToKeep(LETTERS, HYPHENS);
     this.wordNormalizer.setTrailingCharactersToKeep(LETTERS, HYPHENS);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -151,7 +128,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Counts single, compound and prefixes of compound words.
@@ -230,7 +207,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Dehyphenates the hyphenated words in the given PDF document.
@@ -259,7 +236,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
       }
 
       Iterator<Word> wordItr = words.iterator();
-      ElementList<Word> dehyphWords = this.wordListFactory.create(words.size());
+      ElementList<Word> dehyphWords = new ElementList<>(words.size());
 
       while (wordItr.hasNext()) {
         Word word = wordItr.next();
@@ -310,7 +287,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
     ElementList<Character> chars1 = word1.getCharacters();
     ElementList<Character> chars2 = word2.getCharacters();
-    ElementList<Character> mergedChars = this.characterListFactory.create();
+    ElementList<Character> mergedChars = new ElementList<>();
 
     if (isHyphenMandatory(word1, word2)) {
       mergedChars.addAll(chars1);

@@ -91,7 +91,7 @@ public class PdfActCliGuiceModule extends AbstractModule {
         .implement(PdfVisualizer.class, PlainPdfVisualizer.class)
         .build(PdfVisualizerFactory.class));
 
-    // ========================================================================
+    // ==============================================================================================
 
     MapBinder<SerializeFormat, SerializerFactory> binder = MapBinder
         .newMapBinder(binder(), SerializeFormat.class, SerializerFactory.class);

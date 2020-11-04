@@ -14,17 +14,12 @@ import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Color;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
-import pdfact.core.model.Point.PointFactory;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Shape.ShapeFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDColorConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.util.PdfActUtils;
@@ -36,51 +31,21 @@ import pdfact.core.util.PdfActUtils;
  */
 public class StrokePath extends OperatorProcessor {
   /**
-   * The factory to create instances of {@link Shape}.
-   */
-  protected ShapeFactory shapeFactory;
-
-  /**
    * The converter to convert PDColor objects into PdfColor objects.
    */
   protected PDColorConverter colorConverter;
 
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
-
-  // ==========================================================================
+  // ==============================================================================================
   // Constructors.
 
   /**
    * Creates a new OperatorProcessor to process the operation "StrokePath".
-   * 
-   * @param colorConverter
-   *        The converter to convert PDColor objects into PdfColor objects.
-   * @param shapeFactory
-   *        The factory to create instances of {@link Shape}.
-   * @param pointFactory
-   *        The factory to create instances of {@link Point}.
-   * @param positionFactory
-   *        The factory to create instances of {@link Position}.
    */
-  @Inject
-  public StrokePath(PDColorConverter colorConverter,
-      ShapeFactory shapeFactory, PointFactory pointFactory,
-      PositionFactory positionFactory) {
-    this.colorConverter = colorConverter;
-    this.shapeFactory = shapeFactory;
-    this.pointFactory = pointFactory;
-    this.positionFactory = positionFactory;
+  public StrokePath() {
+    this.colorConverter = new PDColorConverter();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -145,8 +110,8 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_CUBICTO:
           float[] curveEnd = Arrays.copyOfRange(coordinates, 4, 6);
 
-          Point ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
-          Point ur = this.pointFactory.create(curveEnd[0], curveEnd[1]);
+          Point ll = new Point(pathPosition[0], pathPosition[1]);
+          Point ur = new Point(curveEnd[0], curveEnd[1]);
 
           // Round the values.
           ll.setX(PdfActUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
@@ -154,9 +119,9 @@ public class StrokePath extends OperatorProcessor {
           ur.setX(PdfActUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(PdfActUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
 
-          Position position = this.positionFactory.create(page, ll, ur);
+          Position position = new Position(page, ll, ur);
 
-          Shape shape = this.shapeFactory.create();
+          Shape shape = new Shape();
           shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(pdf, page, shape);
@@ -166,8 +131,8 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_LINETO:
           float[] lineEnd = Arrays.copyOf(coordinates, 2);
 
-          ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
-          ur = this.pointFactory.create(lineEnd[0], lineEnd[1]);
+          ll = new Point(pathPosition[0], pathPosition[1]);
+          ur = new Point(lineEnd[0], lineEnd[1]);
 
           // Round the values.
           ll.setX(PdfActUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
@@ -175,9 +140,9 @@ public class StrokePath extends OperatorProcessor {
           ur.setX(PdfActUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(PdfActUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
 
-          position = this.positionFactory.create(page, ll, ur);
+          position = new Position(page, ll, ur);
 
-          shape = this.shapeFactory.create();
+          shape = new Shape();
           shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(pdf, page, shape);
@@ -192,8 +157,8 @@ public class StrokePath extends OperatorProcessor {
         case PathIterator.SEG_QUADTO:
           float[] quadEnd = Arrays.copyOfRange(coordinates, 2, 4);
 
-          ll = this.pointFactory.create(pathPosition[0], pathPosition[1]);
-          ur = this.pointFactory.create(quadEnd[0], quadEnd[1]);
+          ll = new Point(pathPosition[0], pathPosition[1]);
+          ur = new Point(quadEnd[0], quadEnd[1]);
 
           // Round the values.
           ll.setX(PdfActUtils.round(ll.getX(), FLOATING_NUMBER_PRECISION));
@@ -201,9 +166,9 @@ public class StrokePath extends OperatorProcessor {
           ur.setX(PdfActUtils.round(ur.getX(), FLOATING_NUMBER_PRECISION));
           ur.setY(PdfActUtils.round(ur.getY(), FLOATING_NUMBER_PRECISION));
 
-          position = this.positionFactory.create(page, ll, ur);
+          position = new Position(page, ll, ur);
 
-          shape = this.shapeFactory.create();
+          shape = new Shape();
           shape.setPosition(position);
           shape.setColor(color);
           this.engine.handlePdfShape(pdf, page, shape);

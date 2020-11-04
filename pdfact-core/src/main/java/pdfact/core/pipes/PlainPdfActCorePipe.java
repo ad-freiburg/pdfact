@@ -1,29 +1,27 @@
 package pdfact.core.pipes;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.PdfDocument;
-import pdfact.core.pipes.dehyphenate.DehyphenateWordsPipe.DehyphenateWordsPipeFactory;
-import pdfact.core.pipes.filter.characters.FilterCharactersPipe.FilterCharactersPipeFactory;
-import pdfact.core.pipes.filter.figures.FilterFiguresPipe.FilterFiguresPipeFactory;
-import pdfact.core.pipes.filter.shapes.FilterShapesPipe.FilterShapesPipeFactory;
-import pdfact.core.pipes.parse.ParsePdfStreamsPipe.ParsePdfPipeFactory;
-import pdfact.core.pipes.semanticize.DetectSemanticsPipe.DetectSemanticsPipeFactory;
-import pdfact.core.pipes.tokenize.areas.TokenizeToTextAreasPipe.TokenizeToTextAreasPipeFactory;
-import pdfact.core.pipes.tokenize.blocks.TokenizeToTextBlocksPipe.TokenizeToTextBlocksPipeFactory;
-import pdfact.core.pipes.tokenize.lines.TokenizeToTextLinesPipe.TokenizeToTextLinesPipeFactory;
-import pdfact.core.pipes.tokenize.paragraphs.TokenizeToParagraphsPipe.TokenizeToParagraphsPipeFactory;
-import pdfact.core.pipes.tokenize.words.TokenizeToWordsPipe.TokenizeToWordsPipeFactory;
-import pdfact.core.pipes.translate.characters.StandardizeCharactersPipe.StandardizeCharactersPipeFactory;
-import pdfact.core.pipes.translate.diacritics.MergeDiacriticsPipe.MergeDiacriticsPipeFactory;
-import pdfact.core.pipes.translate.ligatures.SplitLigaturesPipe.SplitLigaturesPipeFactory;
-import pdfact.core.pipes.validate.ValidatePdfPathPipe.ValidatePdfPathPipeFactory;
+import pdfact.core.pipes.dehyphenate.PlainDehyphenateWordsPipe;
+import pdfact.core.pipes.filter.characters.PlainFilterCharactersPipe;
+import pdfact.core.pipes.filter.figures.PlainFilterFiguresPipe;
+import pdfact.core.pipes.filter.shapes.PlainFilterShapesPipe;
+import pdfact.core.pipes.parse.PlainParsePdfStreamsPipe;
+import pdfact.core.pipes.semanticize.PlainDetectSemanticsPipe;
+import pdfact.core.pipes.tokenize.areas.XYCutTokenizeToTextAreasPipe;
+import pdfact.core.pipes.tokenize.blocks.PlainTokenizeToTextBlocksPipe;
+import pdfact.core.pipes.tokenize.lines.PlainTokenizeToTextLinesPipe;
+import pdfact.core.pipes.tokenize.paragraphs.PlainTokenizeToParagraphsPipe;
+import pdfact.core.pipes.tokenize.words.XYCutTokenizeToWordsPipe;
+import pdfact.core.pipes.translate.characters.PlainStandardizeCharactersPipe;
+import pdfact.core.pipes.translate.diacritics.PlainMergeDiacriticsPipe;
+import pdfact.core.pipes.translate.ligatures.PlainSplitLigaturesPipe;
+import pdfact.core.pipes.validate.PlainValidatePdfPathPipe;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.pipeline.Pipeline;
-import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
+import pdfact.core.util.pipeline.PlainPipeline;
 
 /**
  * A plain implementation of {@link PdfActCorePipe}.
@@ -34,163 +32,9 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PlainPdfActCorePipe.class);
 
-  /**
-   * The factory to create pipelines.
-   */
-  protected PdfActPipelineFactory pipelineFactory;
-
-  /**
-   * The factory to create the pipe that validates PDF paths.
-   */
-  protected ValidatePdfPathPipeFactory validatePdfPathPipeFactory;
-
-  /**
-   * The factory to create the pipe that parses PDF files.
-   */
-  protected ParsePdfPipeFactory parsePdfPipeFactory;
-
-  /**
-   * The factory to create the pipe that merges diacritic characters.
-   */
-  protected MergeDiacriticsPipeFactory mergeDiacriticsPipeFactory;
-
-  /**
-   * The factory to create the pipe that splits ligatures.
-   */
-  protected SplitLigaturesPipeFactory splitLigaturesPipeFactory;
-
-  /**
-   * The factory to create the pipe that standardizes characters.
-   */
-  protected StandardizeCharactersPipeFactory standardizeCharactersPipeFactory;
-
-  /**
-   * The factory to create the pipe that filters chosen characters.
-   */
-  protected FilterCharactersPipeFactory filterCharactersPipeFactory;
-
-  /**
-   * The factory to create the pipe that filters chosen figures.
-   */
-  protected FilterFiguresPipeFactory filterFiguresPipeFactory;
-
-  /**
-   * The factory to create the pipe that filters chosen shapes.
-   */
-  protected FilterShapesPipeFactory filterShapesPipeFactory;
-
-  /**
-   * The factory to create the pipe that tokenizes pages to text areas.
-   */
-  protected TokenizeToTextAreasPipeFactory tokenizeToTextAreasPipeFactory;
-
-  /**
-   * The factory to create the pipe that tokenizes text areas to lines.
-   */
-  protected TokenizeToTextLinesPipeFactory tokenizeToTextLinesPipeFactory;
-
-  /**
-   * The factory to create the pipe that tokenizes text lines to words.
-   */
-  protected TokenizeToWordsPipeFactory tokenizeToWordsPipeFactory;
-
-  /**
-   * The factory to create the pipe that tokenizes text lines to blocks.
-   */
-  protected TokenizeToTextBlocksPipeFactory tokenizeToTextBlocksPipeFactory;
-
-  /**
-   * The factory to create the pipe that detects the semantics of blocks.
-   */
-  protected DetectSemanticsPipeFactory semanticizeTextBlocksPipeFactory;
-
-  /**
-   * The factory to create the pipe that tokenizes blocks to paragraphs.
-   */
-  protected TokenizeToParagraphsPipeFactory tokenizeToParagraphsPipeFactory;
-
-  /**
-   * The factory to create the pipe that dehyphenates words.
-   */
-  protected DehyphenateWordsPipeFactory dehyphenateWordsPipeFactory;
-
-  // ==========================================================================
-
-  /**
-   * The default constructor.
-   *
-   * @param pipelineFactory
-   *        The factory to create pipelines.
-   * @param validatePdfPathPipeFactory
-   *        The factory to create the pipe that validates PDF paths.
-   * @param parsePdfPipeFactory
-   *        The factory to create the pipe that parses PDF files.
-   * @param mergeDiacriticsPipeFactory
-   *        The factory to create the pipe that merges diacritic characters.
-   * @param splitLigaturesPipeFactory
-   *        The factory to create the pipe that splits ligatures.
-   * @param standardizeCharactersPipeFactory
-   *        The factory to create the pipe that standardizes characters.
-   * @param filterCharactersPipeFactory
-   *        The factory to create the pipe that filters chosen characters.
-   * @param filterFiguresPipeFactory
-   *        The factory to create the pipe that filters chosen figures.
-   * @param filterShapesPipeFactory
-   *        The factory to create the pipe that filters chosen shapes.
-   * @param tokenizeToTextAreasPipeFactory
-   *        The factory to create the pipe that tokenizes pages to text areas.
-   * @param tokenizeToTextLinesPipeFactory
-   *        The factory to create the pipe that tokenizes text areas to lines.
-   * @param tokenizeToWordsPipeFactory
-   *        The factory to create the pipe that tokenizes text lines to words.
-   * @param tokenizeToTextBlocksPipeFactory
-   *        The factory to create the pipe that tokenizes text lines to blocks.
-   * @param semanticizeTextBlocksPipeFactory
-   *        The factory to create the pipe that detects the semantics of blocks.
-   * @param tokenizeToParagraphsPipeFactory
-   *        The factory to create the pipe that tokenizes blocks to paragraphs.
-   * @param dehyphenateWordsPipeFactory
-   *        The factory to create the pipe that dehyphenates words.
-   */
-  @Inject
-  public PlainPdfActCorePipe(PdfActPipelineFactory pipelineFactory,
-      ValidatePdfPathPipeFactory validatePdfPathPipeFactory,
-      ParsePdfPipeFactory parsePdfPipeFactory,
-      MergeDiacriticsPipeFactory mergeDiacriticsPipeFactory,
-      SplitLigaturesPipeFactory splitLigaturesPipeFactory,
-      StandardizeCharactersPipeFactory standardizeCharactersPipeFactory,
-      FilterCharactersPipeFactory filterCharactersPipeFactory,
-      FilterFiguresPipeFactory filterFiguresPipeFactory,
-      FilterShapesPipeFactory filterShapesPipeFactory,
-      TokenizeToTextAreasPipeFactory tokenizeToTextAreasPipeFactory,
-      TokenizeToTextLinesPipeFactory tokenizeToTextLinesPipeFactory,
-      TokenizeToWordsPipeFactory tokenizeToWordsPipeFactory,
-      TokenizeToTextBlocksPipeFactory tokenizeToTextBlocksPipeFactory,
-      DetectSemanticsPipeFactory semanticizeTextBlocksPipeFactory,
-      TokenizeToParagraphsPipeFactory tokenizeToParagraphsPipeFactory,
-      DehyphenateWordsPipeFactory dehyphenateWordsPipeFactory) {
-    this.pipelineFactory = pipelineFactory;
-    this.validatePdfPathPipeFactory = validatePdfPathPipeFactory;
-    this.parsePdfPipeFactory = parsePdfPipeFactory;
-    this.mergeDiacriticsPipeFactory = mergeDiacriticsPipeFactory;
-    this.splitLigaturesPipeFactory = splitLigaturesPipeFactory;
-    this.standardizeCharactersPipeFactory = standardizeCharactersPipeFactory;
-    this.filterCharactersPipeFactory = filterCharactersPipeFactory;
-    this.filterFiguresPipeFactory = filterFiguresPipeFactory;
-    this.filterShapesPipeFactory = filterShapesPipeFactory;
-    this.tokenizeToTextAreasPipeFactory = tokenizeToTextAreasPipeFactory;
-    this.tokenizeToTextLinesPipeFactory = tokenizeToTextLinesPipeFactory;
-    this.tokenizeToWordsPipeFactory = tokenizeToWordsPipeFactory;
-    this.tokenizeToTextBlocksPipeFactory = tokenizeToTextBlocksPipeFactory;
-    this.semanticizeTextBlocksPipeFactory = semanticizeTextBlocksPipeFactory;
-    this.tokenizeToParagraphsPipeFactory = tokenizeToParagraphsPipeFactory;
-    this.dehyphenateWordsPipeFactory = dehyphenateWordsPipeFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Processes the given PDF document.
@@ -209,38 +53,38 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     log.debug("Process: Processing the core pipeline.");
 
     // Fill the pipeline with the pipes to execute
-    Pipeline pipeline = this.pipelineFactory.create();
+    Pipeline pipeline = new PlainPipeline();
 
     // Validate the path to the PDF file.
-    pipeline.addPipe(this.validatePdfPathPipeFactory.create());
+    pipeline.addPipe(new PlainValidatePdfPathPipe());
     // Extract the characters, shapes and figures.
-    pipeline.addPipe(this.parsePdfPipeFactory.create());
+    pipeline.addPipe(new PlainParsePdfStreamsPipe());
     // Merge the diacritics.
-    pipeline.addPipe(this.mergeDiacriticsPipeFactory.create());
+    pipeline.addPipe(new PlainMergeDiacriticsPipe());
     // Split the ligatures.
-    pipeline.addPipe(this.splitLigaturesPipeFactory.create());
+    pipeline.addPipe(new PlainSplitLigaturesPipe());
     // Standardize characters.
-    pipeline.addPipe(this.standardizeCharactersPipeFactory.create());
+    pipeline.addPipe(new PlainStandardizeCharactersPipe());
     // Filter the characters.
-    pipeline.addPipe(this.filterCharactersPipeFactory.create());
+    pipeline.addPipe(new PlainFilterCharactersPipe());
     // Filter the figures.
-    pipeline.addPipe(this.filterFiguresPipeFactory.create());
+    pipeline.addPipe(new PlainFilterFiguresPipe());
     // Filter the shapes.
-    pipeline.addPipe(this.filterShapesPipeFactory.create());
+    pipeline.addPipe(new PlainFilterShapesPipe());
     // Tokenize the page into text areas.
-    pipeline.addPipe(this.tokenizeToTextAreasPipeFactory.create());
+    pipeline.addPipe(new XYCutTokenizeToTextAreasPipe());
     // Tokenize the text areas into text lines.
-    pipeline.addPipe(this.tokenizeToTextLinesPipeFactory.create());
+    pipeline.addPipe(new PlainTokenizeToTextLinesPipe());
     // Tokenize the text lines into words.
-    pipeline.addPipe(this.tokenizeToWordsPipeFactory.create());
+    pipeline.addPipe(new XYCutTokenizeToWordsPipe());
     // Tokenize the text lines into text blocks.
-    pipeline.addPipe(this.tokenizeToTextBlocksPipeFactory.create());
+    pipeline.addPipe(new PlainTokenizeToTextBlocksPipe());
     // Identify the roles of the text blocks.
-    pipeline.addPipe(this.semanticizeTextBlocksPipeFactory.create());
+    pipeline.addPipe(new PlainDetectSemanticsPipe());
     // Tokenize the text blocks into paragraphs.
-    pipeline.addPipe(this.tokenizeToParagraphsPipeFactory.create());
+    pipeline.addPipe(new PlainTokenizeToParagraphsPipe());
     // Dehyphenate the words.
-    pipeline.addPipe(this.dehyphenateWordsPipeFactory.create());
+    pipeline.addPipe(new PlainDehyphenateWordsPipe());
 
     log.debug("# pipes in the pipeline: " + pipeline.size());
 

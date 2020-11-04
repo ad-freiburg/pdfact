@@ -31,7 +31,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setSerializationPath(Path path);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the stream where the serialization should be stored.
@@ -48,7 +48,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setSerializationStream(OutputStream stream);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the target serialization format.
@@ -65,7 +65,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setSerializationFormat(SerializeFormat format);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the path to the file where the visualization should be stored.
@@ -82,7 +82,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setVisualizationPath(Path path);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the stream where the visualization should be stored.
@@ -99,7 +99,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setVisualizationStream(OutputStream stream);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the semantic roles filters.
@@ -116,7 +116,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setSemanticRolesFilters(Set<SemanticRole> filters);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the text unit.
@@ -133,7 +133,7 @@ public interface PdfActServicePipe extends Pipe {
    */
   void setTextUnit(TextUnit unit);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link PdfActServicePipe}.

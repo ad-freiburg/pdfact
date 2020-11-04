@@ -71,7 +71,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    */
   protected static final int INDENT_LENGTH = 2;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The element types to consider on serializing.
@@ -93,7 +93,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
    */
   protected Set<Color> usedColors;
 
-  // ==========================================================================
+  // ==============================================================================================
   // Constructors.
 
   /**
@@ -122,7 +122,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public byte[] serialize(PdfDocument pdf) {
@@ -157,7 +157,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result.getBytes(DEFAULT_ENCODING);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the elements of the given PDF document.
@@ -179,7 +179,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the paragraphs of the given PDF document.
@@ -227,7 +227,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the words of the given PDF document.
@@ -277,7 +277,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the characters of the given PDF document.
@@ -329,7 +329,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given PDF element.
@@ -426,7 +426,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given PDF positions.
@@ -492,7 +492,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return positionJson;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given fonts.
@@ -549,7 +549,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return fontJson;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Methods to serialize colors.
 
   /**
@@ -612,7 +612,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return colorJson;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -624,7 +624,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilter() {
@@ -636,7 +636,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the semantic role of the given element matches the semantic roles
@@ -666,7 +666,7 @@ public class PlainPdfJsonSerializer implements PdfJsonSerializer {
     return this.rolesFilter.contains(role);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Remaining methods.
   
   /**

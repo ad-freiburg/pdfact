@@ -4,15 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Color;
-import pdfact.core.model.Color.ColorFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDColor objects to {@link Color} objects.
@@ -23,13 +20,7 @@ public class PDColorConverter {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of {@link Color}.
-   */
-  protected ColorFactory colorFactory;
+  protected static Logger log = LogManager.getLogger(PDColorConverter.class);
 
   /**
    * A map of the already known colors per name.
@@ -38,17 +29,12 @@ public class PDColorConverter {
 
   /**
    * Creates a new color converter.
-   * 
-   * @param colorFactory
-   *        The factory to create instances of {@link Color}.
    */
-  @Inject
-  public PDColorConverter(ColorFactory colorFactory) {
-    this.colorFactory = colorFactory;
+  public PDColorConverter() {
     this.knownColors = new HashMap<>();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Converts the given PDColor object to a related {@link Color} object.
@@ -72,7 +58,7 @@ public class PDColorConverter {
     }
 
     // The color is not known. Create a new color.
-    Color newColor = this.colorFactory.create();
+    Color newColor = new Color();
     newColor.setId("color-" + this.knownColors.size());
     newColor.setName(computeColorName(color, colorSpace));
     newColor.setRGB(computeRGB(color, colorSpace));
@@ -84,7 +70,7 @@ public class PDColorConverter {
     return newColor;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the given color is an already known color.

@@ -2,17 +2,14 @@ package pdfact.core.pipes.filter.characters;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link FilterCharactersPipe}.
@@ -23,13 +20,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of characters.
-   */
-  protected ElementListFactory<Character> characterListFactory;
+  protected static Logger log = LogManager.getLogger(PlainFilterCharactersPipe.class);
 
   /**
    * The number of processed characters.
@@ -41,20 +32,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
    */
   protected int numFilteredCharacters;
 
-  /**
-   * Creates a pipe that filters those characters of a PDF document that should
-   * not be considered.
-   * 
-   * @param characterListFactory
-   *        The factory to create lists of characters.
-   */
-  @Inject
-  public PlainFilterCharactersPipe(
-      ElementListFactory<Character> characterListFactory) {
-    this.characterListFactory = characterListFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -71,7 +49,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Filters those characters of a PDF document that should not be considered.
@@ -85,8 +63,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
       for (Page page : pages) {
         ElementList<Character> before = page.getCharacters();
         // Create a new list of characters which should not be filtered.
-        ElementList<Character> after =
-            this.characterListFactory.create(before.size());
+        ElementList<Character> after = new ElementList<>(before.size());
         for (Character character : before) {
           this.numProcessedCharacters++;
 

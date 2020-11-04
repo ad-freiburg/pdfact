@@ -3,9 +3,8 @@ package pdfact.core.pipes.tokenize.paragraphs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -13,7 +12,6 @@ import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.Paragraph.ParagraphFactory;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
@@ -24,8 +22,6 @@ import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.lexicon.CharacterLexicon;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 
@@ -38,18 +34,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of paragraphs.
-   */
-  protected ElementListFactory<Paragraph> paragraphListFactory;
-
-  /**
-   * The factory to create instances of {@link Paragraph}.
-   */
-  protected ParagraphFactory paragraphFactory;
+  protected static Logger log = LogManager.getLogger(PlainTokenizeToParagraphsPipe.class);
 
   /**
    * The statistician to compute statistics about characters.
@@ -72,28 +57,11 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   protected int numTokenizedParagraphs;
 
   /**
-   * Creates a new pipe that tokenizes the text blocks of a PDF document into
-   * paragraphs.
-   * 
-   * @param paragraphListFactory
-   *        The factory to create lists of paragraphs.
-   * @param paragraphFactory
-   *        The factory to create instances of {@link Paragraph}.
-   * @param characterStatistician
-   *        The statistician to compute statistics about characters.
-   * @param textLineStatistician
-   *        The statistician to compute statistics about text lines.
+   * Creates a new pipe that tokenizes the text blocks of a PDF document into paragraphs.
    */
-  @Inject
-  public PlainTokenizeToParagraphsPipe(
-      ElementListFactory<Paragraph> paragraphListFactory,
-      ParagraphFactory paragraphFactory,
-      CharacterStatistician characterStatistician,
-      TextLineStatistician textLineStatistician) {
-    this.paragraphListFactory = paragraphListFactory;
-    this.paragraphFactory = paragraphFactory;
-    this.characterStatistician = characterStatistician;
-    this.textLineStatistician = textLineStatistician;
+  public PlainTokenizeToParagraphsPipe() {
+    this.characterStatistician = new CharacterStatistician();
+    this.textLineStatistician = new TextLineStatistician();
   }
 
   @Override
@@ -112,7 +80,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Tokenizes the text block of the given PDF document into paragraphs.
@@ -121,14 +89,14 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    *        The PDF document to process.
    */
   protected void tokenizeToParagraphs(PdfDocument pdf) {
-    ElementList<Paragraph> paragraphs = this.paragraphListFactory.create();
+    ElementList<Paragraph> paragraphs = new ElementList<>();
 
     // Segment the PDF document into paragraphs.
     List<List<TextBlock>> segments = segmentIntoParagraphs(pdf);
 
     // Create the PdfParagraph objects.
     for (List<TextBlock> segment : segments) {
-      Paragraph paragraph = this.paragraphFactory.create();
+      Paragraph paragraph = new Paragraph();
       for (TextBlock block : segment) {
         for (TextLine line : block.getTextLines()) {
           paragraph.addWords(line.getWords());
@@ -201,7 +169,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     return this.characterStatistician.aggregate(paragraph.getWords());
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Segments the given PDF document into paragraphs.
@@ -261,7 +229,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks, if the given text block belongs to the given paragraph.

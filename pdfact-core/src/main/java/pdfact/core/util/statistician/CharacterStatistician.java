@@ -4,8 +4,14 @@ import java.util.List;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Color;
+import pdfact.core.model.FontFace;
 import pdfact.core.model.HasCharacterStatistic;
 import pdfact.core.model.HasCharacters;
+import pdfact.core.model.Position;
+import pdfact.core.model.Rectangle;
+import pdfact.core.util.counter.FloatCounter;
+import pdfact.core.util.counter.ObjectCounter;
 import pdfact.core.util.list.ElementList;
 
 /**
@@ -13,7 +19,7 @@ import pdfact.core.util.list.ElementList;
  * 
  * @author Claudius Korzen
  */
-public interface CharacterStatistician {
+public class CharacterStatistician {
   /**
    * Computes the character statistic for the given characters.
    * 
@@ -22,7 +28,9 @@ public interface CharacterStatistician {
    * 
    * @return The computed character statistics.
    */
-  CharacterStatistic compute(HasCharacters hasCharacters);
+  public CharacterStatistic compute(HasCharacters hasCharacters) {
+    return compute(hasCharacters.getCharacters());
+  }
 
   /**
    * Computes the character statistic for the given characters.
@@ -32,7 +40,55 @@ public interface CharacterStatistician {
    * 
    * @return The computed character statistics.
    */
-  CharacterStatistic compute(ElementList<Character> characters);
+  public CharacterStatistic compute(ElementList<Character> characters) {
+    // Create a new statistic object.
+    CharacterStatistic statistic = new CharacterStatistic();
+
+    // Initialize counters for the heights, widths and font sizes.
+    FloatCounter heightsFrequencies = new FloatCounter();
+    FloatCounter widthsFrequencies = new FloatCounter();
+    FloatCounter fontsizeFrequencies = new FloatCounter();
+
+    // Initialize counters for the colors and font faces.
+    ObjectCounter<Color> colorFreqs = new ObjectCounter<>();
+    ObjectCounter<FontFace> fontFreqs = new ObjectCounter<>();
+
+    for (Character character : characters) {
+      Position position = character.getPosition();
+      Rectangle rectangle = position.getRectangle();
+
+      heightsFrequencies.add(rectangle.getHeight());
+      widthsFrequencies.add(rectangle.getWidth());
+      fontFreqs.add(character.getFontFace());
+      fontsizeFrequencies.add(character.getFontFace().getFontSize());
+      colorFreqs.add(character.getColor());
+
+      if (rectangle.getMinX() < statistic.getSmallestMinX()) {
+        statistic.setSmallestMinX(rectangle.getMinX());
+      }
+
+      if (rectangle.getMinY() < statistic.getSmallestMinY()) {
+        statistic.setSmallestMinY(rectangle.getMinY());
+      }
+
+      if (rectangle.getMaxX() > statistic.getLargestMaxX()) {
+        statistic.setLargestMaxX(rectangle.getMaxX());
+      }
+
+      if (rectangle.getMaxY() > statistic.getLargestMaxY()) {
+        statistic.setLargestMaxY(rectangle.getMaxY());
+      }
+    }
+
+    // Fill the statistic object.
+    statistic.setHeightFrequencies(heightsFrequencies);
+    statistic.setWidthFrequencies(widthsFrequencies);
+    statistic.setFontSizeFrequencies(fontsizeFrequencies);
+    statistic.setColorFrequencies(colorFreqs);
+    statistic.setFontFaceFrequencies(fontFreqs);
+
+    return statistic;
+  }
 
   /**
    * Combines the given list of character statistics to a single statistic.
@@ -42,5 +98,54 @@ public interface CharacterStatistician {
    * 
    * @return The combined statistic.
    */
-  CharacterStatistic aggregate(List<? extends HasCharacterStatistic> stats);
+  public CharacterStatistic aggregate(
+      List<? extends HasCharacterStatistic> stats) {
+    // Create new statistic object.
+    CharacterStatistic statistic = new CharacterStatistic();
+
+    // Initialize counters for the heights, widths and font sizes.
+    FloatCounter heightsFrequencies = new FloatCounter();
+    FloatCounter widthsFrequencies = new FloatCounter();
+    FloatCounter fontsizeFrequencies = new FloatCounter();
+
+    // Initialize counters for the colors and font faces.
+    ObjectCounter<Color> colorFreqs = new ObjectCounter<>();
+    ObjectCounter<FontFace> fontFreqs = new ObjectCounter<>();
+
+    // Aggregate the given statistics.
+    for (HasCharacterStatistic s : stats) {
+      CharacterStatistic stat = s.getCharacterStatistic();
+
+      heightsFrequencies.add(stat.getHeightFrequencies());
+      widthsFrequencies.add(stat.getWidthFrequencies());
+      fontFreqs.add(stat.getFontFaceFrequencies());
+      fontsizeFrequencies.add(stat.getFontSizeFrequencies());
+      colorFreqs.add(stat.getColorFrequencies());
+
+      if (stat.getSmallestMinX() < statistic.getSmallestMinX()) {
+        statistic.setSmallestMinX(stat.getSmallestMinX());
+      }
+
+      if (stat.getSmallestMinY() < statistic.getSmallestMinY()) {
+        statistic.setSmallestMinY(stat.getSmallestMinY());
+      }
+
+      if (stat.getLargestMaxX() > statistic.getLargestMaxX()) {
+        statistic.setLargestMaxX(stat.getLargestMaxX());
+      }
+
+      if (stat.getLargestMaxY() > statistic.getLargestMaxY()) {
+        statistic.setLargestMaxY(stat.getLargestMaxY());
+      }
+    }
+
+    // Fill the statistic object.
+    statistic.setHeightFrequencies(heightsFrequencies);
+    statistic.setWidthFrequencies(widthsFrequencies);
+    statistic.setFontSizeFrequencies(fontsizeFrequencies);
+    statistic.setColorFrequencies(colorFreqs);
+    statistic.setFontFaceFrequencies(fontFreqs);
+
+    return statistic;
+  }
 }

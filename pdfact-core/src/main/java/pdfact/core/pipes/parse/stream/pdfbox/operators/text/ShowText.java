@@ -13,6 +13,7 @@ import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.cff.Type1CharString;
 import org.apache.fontbox.type1.Type1Font;
 import org.apache.fontbox.util.BoundingBox;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -32,8 +33,6 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDTextState;
 import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.util.Vector;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
 import pdfact.core.model.Font;
@@ -43,10 +42,6 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Character.CharacterFactory;
-import pdfact.core.model.Point.PointFactory;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDColorConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDFontConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDFontFaceConverter;
@@ -54,7 +49,6 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxAFMUtils;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import pdfact.core.util.PdfActUtils;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * Tj: Show a text string.
@@ -65,28 +59,7 @@ public class ShowText extends OperatorProcessor {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of {@link CharacterFactory}.
-   */
-  protected CharacterFactory characterFactory;
-
-  /**
-   * The factory to create instances of {@link Rectangle}.
-   */
-  protected RectangleFactory rectangleFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
-
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
+  protected static Logger log = LogManager.getLogger(ShowText.class);
 
   /**
    * The translator to translate PDFont objects to PdfFont objects.
@@ -116,41 +89,15 @@ public class ShowText extends OperatorProcessor {
 
   /**
    * Creates a new OperatorProcessor to process the operation "ShowText".
-   * 
-   * @param characterFactory
-   *        The factory to create instances of {@link CharacterFactory}.
-   * @param fontTranslator
-   *        The translator to translate PDFont objects into PdfFont objects.
-   * @param fontFaceConverter
-   *        The converter to create instances of {@link FontFace}.
-   * @param colorTranslator
-   *        The translator to translate PDColor objects into PdfColor objects.
-   * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
-   * @param pointFactory
-   *        The factory to create instances of {@link Point}.
-   * @param positionFactory
-   *        The factory to create instances of {@link Position}.
-   * @param glyphUtils
-   *        The util to read the specifications of special glyphs.
    */
-  @Inject
-  public ShowText(CharacterFactory characterFactory,
-      PDFontConverter fontTranslator, PDFontFaceConverter fontFaceConverter,
-      PDColorConverter colorTranslator, RectangleFactory rectangleFactory,
-      PointFactory pointFactory, PositionFactory positionFactory,
-      PdfBoxGlyphUtils glyphUtils) {
-    this.characterFactory = characterFactory;
-    this.fontTranslator = fontTranslator;
-    this.fontFaceConverter = fontFaceConverter;
-    this.colorTranslator = colorTranslator;
-    this.rectangleFactory = rectangleFactory;
-    this.pointFactory = pointFactory;
-    this.positionFactory = positionFactory;
-    this.glyphUtils = glyphUtils;
+  public ShowText() {
+    this.fontTranslator = new PDFontConverter();
+    this.fontFaceConverter = new PDFontFaceConverter();
+    this.colorTranslator = new PDColorConverter();
+    this.glyphUtils = new PdfBoxGlyphUtils();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -246,7 +193,7 @@ public class ShowText extends OperatorProcessor {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Methods to process a glyph.
 
   /**
@@ -388,9 +335,9 @@ public class ShowText extends OperatorProcessor {
     box.setMaxX(PdfActUtils.round(box.getMaxX(), FLOATING_NUMBER_PRECISION));
     box.setMaxY(PdfActUtils.round(box.getMaxY(), FLOATING_NUMBER_PRECISION));
 
-    Position position = this.positionFactory.create(page, box);
+    Position position = new Position(page, box);
 
-    Character character = this.characterFactory.create();
+    Character character = new Character();
     character.setText(unicode);
     character.setFontFace(fontFace);
     character.setColor(color);
@@ -400,7 +347,7 @@ public class ShowText extends OperatorProcessor {
     this.engine.handlePdfCharacter(pdf, page, character);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Computes the bounding box for the given glyph in any font.
@@ -572,8 +519,8 @@ public class ShowText extends OperatorProcessor {
       return null;
     }
 
-    Point lowerLeft = this.pointFactory.create(minX, minY);
-    Point upperRight = this.pointFactory.create(maxX, maxY);
+    Point lowerLeft = new Point(minX, minY);
+    Point upperRight = new Point(maxX, maxY);
 
     Matrix fontMatrix = font.getFontMatrix();
 
@@ -585,7 +532,7 @@ public class ShowText extends OperatorProcessor {
     this.engine.transform(lowerLeft, trm);
     this.engine.transform(upperRight, trm);
 
-    return this.rectangleFactory.create(lowerLeft, upperRight);
+    return new Rectangle(lowerLeft, upperRight);
   }
 
   /**
@@ -633,7 +580,7 @@ public class ShowText extends OperatorProcessor {
     float maxX = nextTrm.getTranslateX();
     float maxY = minY + dyDisplay;
 
-    return this.rectangleFactory.create(minX, minY, maxX, maxY);
+    return new Rectangle(minX, minY, maxX, maxY);
   }
 
   @Override

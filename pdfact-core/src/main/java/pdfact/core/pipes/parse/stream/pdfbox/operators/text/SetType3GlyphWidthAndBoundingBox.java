@@ -8,14 +8,10 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Point.PointFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
@@ -31,37 +27,6 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
  * @author Claudius Korzen
  */
 public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
-
-  /**
-   * The factory to create instances of {@link Rectangle}.
-   */
-  protected RectangleFactory rectangleFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new OperatorProcessor to process the operation
-   * "SetType3GlyphWidthAndBoundingBox".
-   * 
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
-   */
-  @Inject
-  public SetType3GlyphWidthAndBoundingBox(PointFactory pointFactory,
-      RectangleFactory rectangleFactory) {
-    this.pointFactory = pointFactory;
-    this.rectangleFactory = rectangleFactory;
-  }
-
-  // ==========================================================================
-
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
       List<COSBase> args) throws IOException {
@@ -77,8 +42,8 @@ public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
     COSNumber urx = (COSNumber) args.get(4);
     COSNumber ury = (COSNumber) args.get(5);
 
-    Point ll = this.pointFactory.create(llx.floatValue(), lly.floatValue());
-    Point ur = this.pointFactory.create(urx.floatValue(), ury.floatValue());
+    Point ll = new Point(llx.floatValue(), lly.floatValue());
+    Point ur = new Point(urx.floatValue(), ury.floatValue());
 
     this.engine.transform(ll);
     this.engine.transform(ur);
@@ -88,7 +53,7 @@ public class SetType3GlyphWidthAndBoundingBox extends OperatorProcessor {
     float maxX = Math.max(ll.getX(), ur.getX());
     float maxY = Math.max(ll.getY(), ur.getY());
 
-    Rectangle boundBox = this.rectangleFactory.create(minX, minY, maxX, maxY);
+    Rectangle boundBox = new Rectangle(minX, minY, maxX, maxY);
     this.engine.setCurrentType3GlyphBoundingBox(boundBox);
   }
 

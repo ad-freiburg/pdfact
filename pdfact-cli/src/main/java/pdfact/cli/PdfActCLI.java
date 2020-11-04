@@ -42,7 +42,7 @@ public class PdfActCLI {
    */
   protected PdfActServicePipeFactory serviceFactory;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Creates a new command line interface of PdfAct.
@@ -126,7 +126,7 @@ public class PdfActCLI {
     System.exit(statusCode);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The main method that runs the command line interface.
@@ -138,7 +138,7 @@ public class PdfActCLI {
     new PdfActCLI().run(args);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * A parser that parses the command line arguments for the CLI of PdfAct.
@@ -151,7 +151,7 @@ public class PdfActCLI {
      */
     protected ArgumentParser parser;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the path to the PDF file to process.
@@ -164,7 +164,7 @@ public class PdfActCLI {
     @Arg(dest = PDF_PATH)
     protected String pdfPath;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the target path for the serialization.
@@ -177,7 +177,7 @@ public class PdfActCLI {
     @Arg(dest = SERIALIZE_PATH)
     protected String serializePath;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the serialization format.
@@ -190,7 +190,7 @@ public class PdfActCLI {
     @Arg(dest = SERIALIZE_FORMAT)
     protected String serializeFormat;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the target path for the visualization.
@@ -203,7 +203,7 @@ public class PdfActCLI {
     @Arg(dest = VISUALIZATION_PATH)
     protected String visualizationPath;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the text unit to extract.
@@ -216,7 +216,7 @@ public class PdfActCLI {
     @Arg(dest = TEXT_UNIT)
     protected String textUnit;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to define the semantic role(s) filters.
@@ -229,7 +229,7 @@ public class PdfActCLI {
     @Arg(dest = SEMANTIC_ROLES_FILTER)
     protected List<String> semanticRolesFilters;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * The name of the option to enable log output.
@@ -242,7 +242,7 @@ public class PdfActCLI {
     @Arg(dest = LOG_LEVEL)
     protected int logLevel;
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Creates a new command line argument parser.
@@ -394,7 +394,7 @@ public class PdfActCLI {
       return this.parser.formatHelp();
     }
 
-    // ========================================================================
+    // ==============================================================================================
     // Getters methods.
 
     /**
@@ -415,7 +415,7 @@ public class PdfActCLI {
       return this.pdfPath;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns true, if a target path for the serialization is given; false
@@ -437,7 +437,7 @@ public class PdfActCLI {
       return this.serializePath;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns true, if an serialization format is given.
@@ -457,7 +457,7 @@ public class PdfActCLI {
       return this.serializeFormat;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns true, if a target path for the visualization is given.
@@ -477,7 +477,7 @@ public class PdfActCLI {
       return this.visualizationPath;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns true, if there is a text unit given.
@@ -498,7 +498,7 @@ public class PdfActCLI {
       return this.textUnit;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns true, if there is at least one semantic role filter given.
@@ -519,7 +519,7 @@ public class PdfActCLI {
       return this.semanticRolesFilters;
     }
 
-    // ========================================================================
+    // ==============================================================================================
 
     /**
      * Returns the log level.

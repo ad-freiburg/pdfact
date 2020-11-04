@@ -25,7 +25,7 @@ public interface ValidatePathToWritePipe extends Pipe {
    */
   Path getPath();
 
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * The factory to create instances of {@link ValidatePathToWritePipe}.

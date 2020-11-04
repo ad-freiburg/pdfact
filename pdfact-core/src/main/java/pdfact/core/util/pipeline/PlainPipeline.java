@@ -3,8 +3,6 @@ package pdfact.core.util.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.inject.assistedinject.AssistedInject;
-
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 
@@ -22,12 +20,11 @@ public class PlainPipeline implements Pipeline {
   /**
    * Creates an empty pipeline.
    */
-  @AssistedInject
   public PlainPipeline() {
     this.pipes = new ArrayList<>();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument process(PdfDocument pdf) throws PdfActException {
@@ -38,7 +35,7 @@ public class PlainPipeline implements Pipeline {
     return processed;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public List<Pipe> getPipes() {
@@ -60,7 +57,7 @@ public class PlainPipeline implements Pipeline {
     this.pipes.add(pipe);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public int size() {

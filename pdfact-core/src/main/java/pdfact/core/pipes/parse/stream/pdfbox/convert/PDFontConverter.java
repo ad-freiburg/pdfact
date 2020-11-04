@@ -11,15 +11,12 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Font;
-import pdfact.core.model.Font.FontFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDFont objects to {@link Font} objects.
@@ -30,13 +27,7 @@ public class PDFontConverter {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of {@link Font}.
-   */
-  protected FontFactory fontFactory;
+  protected static Logger log = LogManager.getLogger(PDFontConverter.class);
 
   /**
    * A map of the already known fonts per name.
@@ -45,17 +36,12 @@ public class PDFontConverter {
 
   /**
    * Creates a new font converter.
-   * 
-   * @param fontFactory
-   *        The factory to create instances of {@link Font}.
    */
-  @Inject
-  public PDFontConverter(FontFactory fontFactory) {
-    this.fontFactory = fontFactory;
+  public PDFontConverter() {
     this.knownFonts = readWellKnownFontsFromFile();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Converts the given PDFont object to a related {@link Font} object.
@@ -77,7 +63,7 @@ public class PDFontConverter {
     }
 
     // The font is not known. Create a new font.
-    Font newFont = this.fontFactory.create();
+    Font newFont = new Font();
     newFont.setId("font-" + this.knownFonts.size());
     newFont.setNormalizedName(computeNormalizedName(font));
     newFont.setBasename(computeBasename(newFont));
@@ -92,7 +78,7 @@ public class PDFontConverter {
     return newFont;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Reads some font specifications from file. This method was introduced to get
@@ -124,7 +110,7 @@ public class PDFontConverter {
         }
 
         // Create the font from the line.
-        Font font = this.fontFactory.create();
+        Font font = new Font();
         font.setId("font-" + knownFonts.size());
         font.setNormalizedName(fields[0]);
         font.setBasename(computeBasename(font));
@@ -171,7 +157,7 @@ public class PDFontConverter {
     return this.knownFonts.get(computeNormalizedName(font));
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Computes the normalized name of the given font, that is the lower cased
@@ -200,7 +186,7 @@ public class PDFontConverter {
     return normalized;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Computes the basename of the given font, that is the normalized name

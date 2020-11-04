@@ -9,11 +9,11 @@ import java.util.Map.Entry;
 import org.apache.fontbox.afm.AFMParser;
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.afm.FontMetrics;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import pdfact.core.util.PdfActUtils;
-import pdfact.core.util.log.InjectLogger;
 
 // TODO: This doesn't work, because the afm files are missing.
 
@@ -26,8 +26,7 @@ public class PdfBoxAFMUtils {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PdfBoxAFMUtils.class);
 
   /**
    * The additional glyphs.

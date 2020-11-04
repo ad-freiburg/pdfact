@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.FontFace;
@@ -18,7 +16,6 @@ import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
 import pdfact.core.util.statistician.CharacterStatistician;
 
 /**
@@ -27,11 +24,6 @@ import pdfact.core.util.statistician.CharacterStatistician;
  * @author Claudius Korzen
  */
 public class HeadingModule implements PdfTextSemanticizerModule {
-  /**
-   * The factory to create lists of characters.
-   */
-  protected ElementListFactory<Character> charListFactory;
-
   /**
    * The character statistician.
    */
@@ -97,25 +89,18 @@ public class HeadingModule implements PdfTextSemanticizerModule {
     KNOWN_HEADINGS.put(SemanticRole.BODY_TEXT, otherHeadings);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Constructors.
 
   /**
    * Creates a new HeadingModule.
-   * 
-   * @param charListFactory
-   *        The factory to create lists of characters.
-   * @param charStatistician
-   *        The character statistician.
+   *
    */
-  @Inject
-  public HeadingModule(ElementListFactory<Character> charListFactory,
-      CharacterStatistician charStatistician) {
-    this.charListFactory = charListFactory;
-    this.charStatistician = charStatistician;
+  public HeadingModule() {
+    this.charStatistician = new CharacterStatistician();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void semanticize(PdfDocument pdf) {
@@ -189,7 +174,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
     }
 
     // The characters of all known section headings.
-    ElementList<Character> headingChars = this.charListFactory.create();
+    ElementList<Character> headingChars = new ElementList<>();
 
     for (Page page : pdf.getPages()) {
       for (TextBlock block : page.getTextBlocks()) {

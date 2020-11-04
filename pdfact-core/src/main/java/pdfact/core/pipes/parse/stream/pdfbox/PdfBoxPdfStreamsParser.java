@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.PDContentStream;
 import org.apache.pdfbox.contentstream.operator.Operator;
@@ -23,21 +23,68 @@ import org.apache.pdfbox.pdmodel.font.PDType3CharProc;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
-import pdfact.core.model.Page.PageFactory;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.Shape;
 import pdfact.core.pipes.parse.stream.PdfStreamsParser;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingColorN;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingColorSpace;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingDeviceCMYKColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingDeviceGrayColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetNonStrokingDeviceRGBColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingColorN;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingColorSpace;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingDeviceCMYKColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingDeviceGrayColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.color.SetStrokingDeviceRGBColor;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.AppendRectangleToPath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.BeginInlineImage;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ClipEvenOddRule;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ClipNonZeroRule;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ClosePath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveTo;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveToReplicateFinalPoint;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveToReplicateInitialPoint;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.EndPath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddAndStrokePath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddRule;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroAndStrokePath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroRule;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.Invoke;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.LineTo;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ModifyCurrentTransformationMatrix;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.MoveTo;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.RestoreGraphicsState;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.SaveGraphicsState;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.SetGraphicsStateParameters;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.StrokePath;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.BeginText;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.EndText;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveText;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveTextSetLeading;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLine;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLineAndShowText;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.MoveToNextLineAndShowTextWithSpacing;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetCharacterSpacing;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetFontAndSize;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetTextHorizontalScaling;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetTextLeading;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetTextMatrix;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetTextRenderingMode;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetTextRise;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetType3GlyphWidthAndBoundingBox;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetWordSpacing;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowText;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPositioning;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActParseException;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 
 // TODO: Refactor all the PDFBox utils (remove unnecessary stuff).
@@ -52,13 +99,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of PdfPage.
-   */
-  protected PageFactory pageFactory;
+  protected static Logger log = LogManager.getLogger(PdfBoxPdfStreamsParser.class);
 
   /**
    * The map of operator processors.
@@ -161,20 +202,76 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param statistician
    *        The statistician to compute statistics about characters.
    */
-  @Inject
-  public PdfBoxPdfStreamsParser(PageFactory pageFactory,
-      Set<OperatorProcessor> operators, CharacterStatistician statistician) {
-    this.pageFactory = pageFactory;
+  public PdfBoxPdfStreamsParser() {
     this.operatorProcessors = new HashMap<>();
-    for (OperatorProcessor operator : operators) {
-      this.operatorProcessors.put(operator.getName(), operator);
-    }
-    this.statistician = statistician;
+
+     // Install the text operator modules.
+     registerOperatorProcessor(new BeginText()); // BT
+     registerOperatorProcessor(new EndText()); // ET
+     registerOperatorProcessor(new MoveText()); // Td
+     registerOperatorProcessor(new MoveTextSetLeading()); // TD
+     registerOperatorProcessor(new MoveToNextLineAndShowText()); // '
+     registerOperatorProcessor(new MoveToNextLineAndShowTextWithSpacing()); // "
+     registerOperatorProcessor(new SetCharacterSpacing()); // Tc
+     registerOperatorProcessor(new SetFontAndSize()); // Tf
+     registerOperatorProcessor(new MoveToNextLine()); // T*
+     registerOperatorProcessor(new SetTextHorizontalScaling()); // Tz
+     registerOperatorProcessor(new SetTextLeading()); // TL
+     registerOperatorProcessor(new SetTextMatrix()); // Tm
+     registerOperatorProcessor(new SetTextRenderingMode()); // Tr
+     registerOperatorProcessor(new SetTextRise()); // Ts
+     registerOperatorProcessor(new SetType3GlyphWidthAndBoundingBox()); // d1
+     registerOperatorProcessor(new SetWordSpacing()); // Tw
+     registerOperatorProcessor(new ShowText()); // Tj
+     registerOperatorProcessor(new ShowTextWithIndividualGlyphPositioning()); // TJ
+ 
+     // Install the graphics operator modules.
+     registerOperatorProcessor(new AppendRectangleToPath()); // re
+     registerOperatorProcessor(new BeginInlineImage()); // BI
+     registerOperatorProcessor(new ClipEvenOddRule()); // W*
+     registerOperatorProcessor(new ClipNonZeroRule()); // W
+     registerOperatorProcessor(new ClosePath()); // h
+     registerOperatorProcessor(new CurveTo()); // c
+     registerOperatorProcessor(new CurveToReplicateFinalPoint()); // y
+     registerOperatorProcessor(new CurveToReplicateInitialPoint()); // v
+     registerOperatorProcessor(new EndPath()); // n
+     registerOperatorProcessor(new FillEvenOddAndStrokePath()); // B*
+     registerOperatorProcessor(new FillEvenOddRule()); // f*
+     registerOperatorProcessor(new FillNonZeroAndStrokePath()); // B
+     registerOperatorProcessor(new FillNonZeroRule()); // f
+     registerOperatorProcessor(new Invoke()); // Do
+     registerOperatorProcessor(new LineTo()); // l
+     registerOperatorProcessor(new ModifyCurrentTransformationMatrix()); // cm
+     registerOperatorProcessor(new MoveTo()); // m
+     registerOperatorProcessor(new RestoreGraphicsState()); // Q
+     registerOperatorProcessor(new SaveGraphicsState()); // q
+     registerOperatorProcessor(new SetGraphicsStateParameters()); // gs
+     registerOperatorProcessor(new StrokePath()); // S
+ 
+     // Install the color operator modules.
+     registerOperatorProcessor(new SetNonStrokingColor()); // sc
+     registerOperatorProcessor(new SetNonStrokingColorN()); // scn
+     registerOperatorProcessor(new SetNonStrokingColorSpace()); // cs
+     registerOperatorProcessor(new SetNonStrokingDeviceCMYKColor()); // k
+     registerOperatorProcessor(new SetNonStrokingDeviceGrayColor()); // g
+     registerOperatorProcessor(new SetNonStrokingDeviceRGBColor()); // rg
+     registerOperatorProcessor(new SetStrokingColor()); // SC
+     registerOperatorProcessor(new SetStrokingColorN()); // SCN
+     registerOperatorProcessor(new SetStrokingColorSpace()); // CS
+     registerOperatorProcessor(new SetStrokingDeviceCMYKColor()); // K
+     registerOperatorProcessor(new SetStrokingDeviceGrayColor()); // G
+     registerOperatorProcessor(new SetStrokingDeviceRGBColor()); // RG
+
+    this.statistician = new CharacterStatistician();
     this.graphicsStack = new Stack<PDGraphicsState>();
     this.linePath = new GeneralPath();
   }
 
-  // ==========================================================================
+  protected void registerOperatorProcessor(OperatorProcessor processor) {
+    this.operatorProcessors.put(processor.getName(), processor);
+  }
+
+  // ==============================================================================================
   // Methods to process the file.
 
   @Override
@@ -228,7 +325,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     this.currentType3GlyphBoundingBox = null;
     this.isType3Stream = false;
 
-    Page pdfPage = this.pageFactory.create(pageNum);
+    Page pdfPage = new Page(pageNum);
     PDRectangle rect = page.getMediaBox();
     if (rect == null) {
       rect = page.getCropBox();
@@ -407,7 +504,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     }
   }
 
-  // ========================================================================
+  // ==============================================================================================
   // Methods related to resources.
 
   /**
@@ -458,7 +555,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     return this.resources;
   }
 
-  // ========================================================================
+  // ==============================================================================================
   // Methods related to the graphics stack.
 
   /**
@@ -515,7 +612,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     this.graphicsStack.pop();
   }
 
-  // ========================================================================
+  // ==============================================================================================
   // Methods related to the current transformation matrix.
 
   /**
@@ -567,7 +664,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     }
   }
 
-  // ========================================================================
+  // ==============================================================================================
   // Methods related to text matrices.
 
   /**
@@ -608,7 +705,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     this.textMatrix = value;
   }
 
-  // ========================================================================
+  // ==============================================================================================
   // Methods related to Type 3 fonts.
 
   /**
@@ -649,7 +746,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     return this.currentType3GlyphBoundingBox;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Methods related to the line path.
 
   /**
@@ -734,7 +831,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     this.clippingWindingRule = rule;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Handler methods.
 
   /**

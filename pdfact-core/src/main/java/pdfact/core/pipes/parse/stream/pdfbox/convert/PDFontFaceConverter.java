@@ -3,14 +3,11 @@ package pdfact.core.pipes.parse.stream.pdfbox.convert;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
-import pdfact.core.model.FontFace.FontFaceFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A converter that converts PDFont objects and font sizes to {@link FontFace}
@@ -22,13 +19,7 @@ public class PDFontFaceConverter {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of {@link FontFace}.
-   */
-  protected FontFaceFactory fontFaceFactory;
+  protected static Logger log = LogManager.getLogger(PDColorConverter.class);
 
   /**
    * The already known {@link FontFace} objects per name.
@@ -41,13 +32,11 @@ public class PDFontFaceConverter {
    * @param fontFaceFactory
    *        The factory to create instances of {@link FontFace}.
    */
-  @Inject
-  public PDFontFaceConverter(FontFaceFactory fontFaceFactory) {
-    this.fontFaceFactory = fontFaceFactory;
+  public PDFontFaceConverter() {
     this.knownFontFaces = new HashMap<>();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Converts the given {@link Font} object and font size to an PdfFontFace
@@ -72,7 +61,7 @@ public class PDFontFaceConverter {
     }
 
     // The font face is not known. Create a new font face.
-    FontFace newFontFace = this.fontFaceFactory.create(font, fontSize);
+    FontFace newFontFace = new FontFace(font, fontSize);
 
     // Add the new font face to the map of known font faces.
     this.knownFontFaces.put(font.getId() + ":" + fontSize, newFontFace);

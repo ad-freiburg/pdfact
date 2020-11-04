@@ -24,7 +24,7 @@ public interface Pipeline {
    */
   PdfDocument process(PdfDocument pdf) throws PdfActException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the registered pipes of this pipeline.
@@ -33,7 +33,7 @@ public interface Pipeline {
    */
   List<Pipe> getPipes();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Registers the pipes to be execute on processing this pipeline.
@@ -59,7 +59,7 @@ public interface Pipeline {
    */
   void addPipe(Pipe pipe);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the number of pipes in this pipeline.
@@ -68,7 +68,7 @@ public interface Pipeline {
    */
   int size();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link Pipeline}.

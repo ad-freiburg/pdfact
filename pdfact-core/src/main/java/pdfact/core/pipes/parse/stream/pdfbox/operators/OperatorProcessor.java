@@ -21,7 +21,7 @@ public abstract class OperatorProcessor {
    */
   protected PdfBoxPdfStreamsParser engine;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Sets the stream engine for this operator processor.
@@ -33,7 +33,7 @@ public abstract class OperatorProcessor {
     this.engine = engine;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Processes the given operator.

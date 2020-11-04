@@ -8,12 +8,9 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
-import pdfact.core.model.Point.PointFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 
 /**
@@ -22,27 +19,6 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
  * @author Claudius Korzen.
  */
 public class AppendRectangleToPath extends OperatorProcessor {
-  /**
-   * The factory to create instances of Point.
-   */
-  protected PointFactory pointFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new OperatorProcessor to process the operation
-   * "AppendRectangleToPath".
-   * 
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   */
-  @Inject
-  public AppendRectangleToPath(PointFactory pointFactory) {
-    this.pointFactory = pointFactory;
-  }
-
-  // ==========================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -57,8 +33,8 @@ public class AppendRectangleToPath extends OperatorProcessor {
     float maxX = minX + w.floatValue();
     float maxY = minY + h.floatValue();
 
-    Point ll = this.pointFactory.create(minX, minY);
-    Point ur = this.pointFactory.create(maxX, maxY);
+    Point ll = new Point(minX, minY);
+    Point ur = new Point(maxX, maxY);
 
     this.engine.transform(ll);
     this.engine.transform(ur);

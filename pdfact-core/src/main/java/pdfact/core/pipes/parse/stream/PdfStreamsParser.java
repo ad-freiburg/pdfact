@@ -22,7 +22,7 @@ public interface PdfStreamsParser {
    */
   void parse(PdfDocument pdf) throws PdfActException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link PdfStreamsParser}.

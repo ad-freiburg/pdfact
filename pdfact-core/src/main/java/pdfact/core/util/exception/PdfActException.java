@@ -46,7 +46,7 @@ public class PdfActException extends Exception {
     this.exitCode = exitCode;
   }
 
-  // ===========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the code to return on exiting PdfAct.

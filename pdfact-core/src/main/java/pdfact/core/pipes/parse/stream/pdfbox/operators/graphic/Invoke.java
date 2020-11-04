@@ -2,12 +2,11 @@ package pdfact.core.pipes.parse.stream.pdfbox.operators.graphic;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
 
-import com.google.inject.Inject;
-
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -18,21 +17,15 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
 
 import pdfact.core.model.Color;
-import pdfact.core.model.Color.ColorFactory;
 import pdfact.core.model.Figure;
-import pdfact.core.model.Figure.FigureFactory;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
-import pdfact.core.model.Point.PointFactory;
 import pdfact.core.model.Position;
-import pdfact.core.model.Position.PositionFactory;
 import pdfact.core.model.Shape;
-import pdfact.core.model.Shape.ShapeFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.ColorUtils;
 import pdfact.core.util.PdfActUtils;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * Do: Invoke a named xobject.
@@ -43,63 +36,9 @@ public class Invoke extends OperatorProcessor {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(Invoke.class);
 
-  /**
-   * The factory to create instances of {@link Figure}.
-   */
-  protected FigureFactory figureFactory;
-
-  /**
-   * The factory to create instances of {@link Color}.
-   */
-  protected ColorFactory colorFactory;
-
-  /**
-   * The factory to create instances of {@link Shape}.
-   */
-  protected ShapeFactory shapeFactory;
-
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new OperatorProcessor to process the operation "Invoke".
-   *
-   * @param figureFactory
-   *     The factory to create instances of {@link Figure}.
-   * @param colorFactory
-   *     The factory to create instances of {@link Color}.
-   * @param shapeFactory
-   *     The factory to create instances of {@link Shape}.
-   * @param pointFactory
-   *     The factory to create instances of {@link Point}.
-   * @param positionactory
-   *     The factory to create instances of {@link Position}.
-   */
-  @Inject
-  public Invoke(FigureFactory figureFactory, ColorFactory colorFactory,
-      ShapeFactory shapeFactory, PointFactory pointFactory,
-      PositionFactory positionactory) {
-    this.figureFactory = figureFactory;
-    this.colorFactory = colorFactory;
-    this.shapeFactory = shapeFactory;
-    this.pointFactory = pointFactory;
-    this.positionFactory = positionactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -162,12 +101,12 @@ public class Invoke extends OperatorProcessor {
       maxX = PdfActUtils.round(maxX, FLOATING_NUMBER_PRECISION);
       maxY = PdfActUtils.round(maxY, FLOATING_NUMBER_PRECISION);
 
-      Point ll = this.pointFactory.create(minX, minY);
-      Point ur = this.pointFactory.create(maxX, maxY);
-      Position position = this.positionFactory.create(page, ll, ur);
+      Point ll = new Point(minX, minY);
+      Point ur = new Point(maxX, maxY);
+      Position position = new Position(page, ll, ur);
 
       // TODO: A PDFormXObject isn't necessarily a figure (but can be).
-      Figure figure = this.figureFactory.create();
+      Figure figure = new Figure();
       figure.setPosition(position);
       this.engine.handlePdfFigure(pdf, page, figure);
     } else if (xobject instanceof PDImageXObject) {
@@ -193,29 +132,29 @@ public class Invoke extends OperatorProcessor {
       maxX = PdfActUtils.round(maxX, FLOATING_NUMBER_PRECISION);
       maxY = PdfActUtils.round(maxY, FLOATING_NUMBER_PRECISION);
 
-      Point ll = this.pointFactory.create(minX, minY);
-      Point ur = this.pointFactory.create(maxX, maxY);
-      Position position = this.positionFactory.create(page, ll, ur);
+      Point ll = new Point(minX, minY);
+      Point ur = new Point(maxX, maxY);
+      Position position = new Position(page, ll, ur);
 
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
 
       if (exclusiveColor != null) {
-        Color color = this.colorFactory.create();
+        Color color = new Color();
         color.setRGB(exclusiveColor);
 
         log.debug("The xobject consists only of the color " + color + ". "
             + "Considering it as a shape.");
 
-        Shape shape = this.shapeFactory.create();
+        Shape shape = new Shape();
         shape.setPosition(position);
         shape.setColor(color);
         this.engine.handlePdfShape(pdf, page, shape);
       } else {
         log.debug("Considering the xobject as a figure.");
 
-        Figure figure = this.figureFactory.create();
+        Figure figure = new Figure();
         figure.setPosition(position);
         this.engine.handlePdfFigure(pdf, page, figure);
       }

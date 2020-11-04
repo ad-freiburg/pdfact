@@ -127,7 +127,7 @@ public interface PdfDrawer {
       boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Draws the given rectangle on the given page.
@@ -249,7 +249,7 @@ public interface PdfDrawer {
       Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
       boolean originInUpperLeft) throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Draws a bounding box on the given page.
@@ -371,7 +371,7 @@ public interface PdfDrawer {
       Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
       boolean originInUpperLeft) throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Draws the given position.
@@ -481,7 +481,7 @@ public interface PdfDrawer {
       Color nonStrokingColor, float thickness, boolean relativeToUpperLeft,
       boolean originInUpperLeft) throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Draws the given text on the given page.
@@ -638,7 +638,7 @@ public interface PdfDrawer {
       float fontsize, boolean relativeToUpperLeft, boolean originInUpperLeft)
       throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the drawn PDF file as byte array.
@@ -649,7 +649,7 @@ public interface PdfDrawer {
    */
   byte[] toByteArray() throws IOException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link PdfDrawer}.

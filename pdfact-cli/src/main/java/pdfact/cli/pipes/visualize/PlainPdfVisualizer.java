@@ -57,7 +57,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    */
   protected Set<SemanticRole> rolesFilter;
 
-  // ==========================================================================
+  // ==============================================================================================
   // Constructors.
 
   /**
@@ -91,7 +91,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException {
@@ -129,7 +129,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     return null;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the characters of the given PDF document.
@@ -188,7 +188,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(character, drawer, Color.BLACK);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the text areas of the given PDF document.
@@ -226,7 +226,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(textArea, drawer, Color.GRAY);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the text lines of the given PDF document.
@@ -264,7 +264,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(textLine, drawer, Color.BLUE);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the words of the given PDF document.
@@ -308,7 +308,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(word, drawer, Color.BLUE);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the text lines of the given PDF document.
@@ -346,7 +346,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(textBlock, drawer, Color.YELLOW);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the paragraphs of the given PDF document.
@@ -388,7 +388,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(paragraph, drawer, Color.BLUE);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the given figure.
@@ -422,7 +422,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     visualizePdfElement(shape, drawer, Color.ORANGE);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Visualizes the given PDF element using the given drawer.
@@ -544,7 +544,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -556,7 +556,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilter() {
@@ -568,7 +568,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
     this.rolesFilter = roles;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the semantic role of the given element matches the semantic roles

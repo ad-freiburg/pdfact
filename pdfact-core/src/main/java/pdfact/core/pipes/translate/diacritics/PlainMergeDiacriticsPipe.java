@@ -5,20 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link MergeDiacriticsPipe}.
@@ -29,18 +25,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of characters.
-   */
-  protected ElementListFactory<Character> characterListFactory;
-
-  /**
-   * The factory to create instances of {@link RectangleFactory}.
-   */
-  protected RectangleFactory rectangleFactory;
+  protected static Logger log = LogManager.getLogger(PlainMergeDiacriticsPipe.class);
 
   /**
    * The number of processed characters.
@@ -52,24 +37,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
    */
   protected int numMergedDiacritics;
 
-  /**
-   * Creates a new pipe that merges diacritics.
-   * 
-   * @param characterListFactory
-   *        The factory to create lists of characters.
-   * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
-   *
-   */
-  @Inject
-  public PlainMergeDiacriticsPipe(
-      ElementListFactory<Character> characterListFactory,
-      RectangleFactory rectangleFactory) {
-    this.characterListFactory = characterListFactory;
-    this.rectangleFactory = rectangleFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -86,7 +54,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Merges the diacritical marks in the given PDF document with their related
@@ -101,8 +69,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       if (pages != null) {
         for (Page page : pages) {
           ElementList<Character> before = page.getCharacters();
-          ElementList<Character> after =
-              this.characterListFactory.create(before.size());
+          ElementList<Character> after = new ElementList<>(before.size());
           if (before != null) {
             for (int i = 0; i < before.size(); i++) {
               Character prev = i > 0 ? before.get(i - 1) : null;
@@ -184,7 +151,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Merges the texts of the given base character and the given diacritic.
@@ -250,10 +217,10 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       return baseRect;
     }
 
-    return this.rectangleFactory.fromUnion(baseRect, diacriticRect);
+    return Rectangle.fromUnion(baseRect, diacriticRect);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the given characters is a diacritic.

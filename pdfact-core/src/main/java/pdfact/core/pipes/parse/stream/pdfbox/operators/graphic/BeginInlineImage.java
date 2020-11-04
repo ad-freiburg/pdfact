@@ -5,6 +5,7 @@ import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
@@ -14,8 +15,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImage;
 import org.apache.pdfbox.pdmodel.graphics.image.PDInlineImage;
 import org.apache.pdfbox.util.Matrix;
 
-import com.google.inject.Inject;
-
 import pdfact.core.model.Color;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
@@ -23,15 +22,9 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
-import pdfact.core.model.Color.ColorFactory;
-import pdfact.core.model.Figure.FigureFactory;
-import pdfact.core.model.Point.PointFactory;
-import pdfact.core.model.Position.PositionFactory;
-import pdfact.core.model.Shape.ShapeFactory;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.ColorUtils;
 import pdfact.core.util.PdfActUtils;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * BI: Begin inline image.
@@ -42,64 +35,9 @@ public class BeginInlineImage extends OperatorProcessor {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(BeginInlineImage.class);
 
-  /**
-   * The factory to create instances of {@link Figure}.
-   */
-  protected FigureFactory figureFactory;
-
-  /**
-   * The factory to create instances of {@link Color}.
-   */
-  protected ColorFactory colorFactory;
-
-  /**
-   * The factory to create instances of {@link Shape}.
-   */
-  protected ShapeFactory shapeFactory;
-
-  /**
-   * The factory to create instances of {@link Point}.
-   */
-  protected PointFactory pointFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
-
-  // ==========================================================================
-  // Constructors.
-
-  /**
-   * Creates a new OperatorProcessor to process the operation
-   * "BeginInlineImage".
-   * 
-   * @param figureFactory
-   *        The factory to create instances of {@link Figure}.
-   * @param colorFactory
-   *        The factory to create instances of {@link Color}.
-   * @param shapeFactory
-   *        The factory to create instances of {@link Shape}.
-   * @param pointFactory
-   *        The factory to create instances of {@link Point}.
-   * @param positionFactory
-   *        The factory to create instances of {@link Position}.
-   */
-  @Inject
-  public BeginInlineImage(FigureFactory figureFactory,
-      ColorFactory colorFactory, ShapeFactory shapeFactory,
-      PointFactory pointFactory, PositionFactory positionFactory) {
-    this.figureFactory = figureFactory;
-    this.colorFactory = colorFactory;
-    this.shapeFactory = shapeFactory;
-    this.pointFactory = pointFactory;
-    this.positionFactory = positionFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
@@ -132,24 +70,24 @@ public class BeginInlineImage extends OperatorProcessor {
       // TODO: Manage the colors.
       float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
 
-      Point ll = this.pointFactory.create(minX, minY);
-      Point ur = this.pointFactory.create(maxX, maxY);
+      Point ll = new Point(minX, minY);
+      Point ur = new Point(maxX, maxY);
       // TODO: Check if we have to check if ur is indeed the upper right.
-      Position position = this.positionFactory.create(page, ll, ur);
+      Position position = new Position(page, ll, ur);
 
       if (exclusiveColor != null) {
-        Color color = this.colorFactory.create();
+        Color color = new Color();
         color.setRGB(exclusiveColor);
 
         log.debug("The inline image consists only of the color " + color + ". "
             + "Considering it as a shape.");
 
-        Shape shape = this.shapeFactory.create();
+        Shape shape = new Shape();
         shape.setPosition(position);
         shape.setColor(color);
         this.engine.handlePdfShape(pdf, page, shape);
       } else {
-        Figure figure = this.figureFactory.create();
+        Figure figure = new Figure();
         figure.setPosition(position);
         this.engine.handlePdfFigure(pdf, page, figure);
       }

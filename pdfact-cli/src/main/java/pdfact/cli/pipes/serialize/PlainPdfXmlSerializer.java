@@ -80,7 +80,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    */
   protected static final String LINE_DELIMITER = System.lineSeparator();
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The text unit.
@@ -102,7 +102,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
    */
   protected Set<Color> usedColors;
 
-  // ==========================================================================
+  // ==============================================================================================
   // Constructors.
 
   /**
@@ -131,7 +131,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public byte[] serialize(PdfDocument pdf) throws PdfActSerializeException {
@@ -181,7 +181,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result.getBytes(DEFAULT_ENCODING);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the elements of the given PDF document.
@@ -205,7 +205,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the paragraphs of the given PDF document.
@@ -259,7 +259,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the words of the given PDF document.
@@ -315,7 +315,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the characters of the given PDF document.
@@ -373,7 +373,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given PDF element.
@@ -476,7 +476,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given list of PDF positions.
@@ -549,7 +549,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given fonts.
@@ -614,7 +614,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Methods to serialize colors.
 
   /**
@@ -684,7 +684,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return result;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Wraps the given text in an XML start tag.
@@ -773,7 +773,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return indent + text;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {
@@ -785,7 +785,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     this.textUnit = textUnit;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilter() {
@@ -797,7 +797,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     this.rolesFilter = rolesFilter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the semantic role of the given element matches the semantic roles
@@ -827,7 +827,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return this.rolesFilter.contains(role);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Repeats the given string <repeats>-times.
@@ -846,7 +846,7 @@ public class PlainPdfXmlSerializer implements PdfXmlSerializer {
     return sb.toString();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Serializes the given text block.

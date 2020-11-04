@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link StandardizeCharactersPipe}.
@@ -22,8 +22,7 @@ public class PlainStandardizeCharactersPipe
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
+  protected static Logger log = LogManager.getLogger(PlainStandardizeCharactersPipe.class);
 
   /**
    * A map that maps some characters to a character with the same semantic
@@ -56,7 +55,7 @@ public class PlainStandardizeCharactersPipe
     CHARACTER_SYNONYMS.put("\uff07", "'"); // ＇
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -73,7 +72,7 @@ public class PlainStandardizeCharactersPipe
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Standardizes the characters of the given PDF document.

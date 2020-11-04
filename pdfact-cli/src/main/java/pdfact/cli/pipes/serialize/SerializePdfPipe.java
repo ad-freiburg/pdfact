@@ -30,7 +30,7 @@ public interface SerializePdfPipe extends Pipe {
    */
   void setSerializationFormat(SerializeFormat format);
 
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * Returns the target stream.
@@ -47,7 +47,7 @@ public interface SerializePdfPipe extends Pipe {
    */
   void setTargetStream(OutputStream stream);
   
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * Returns the target path.
@@ -64,7 +64,7 @@ public interface SerializePdfPipe extends Pipe {
    */
   void setTargetPath(Path path);
   
-  // ==========================================================================
+  // ==============================================================================================
   
   /**
    * Returns the text unit.
@@ -81,7 +81,7 @@ public interface SerializePdfPipe extends Pipe {
    */
   void setTextUnit(TextUnit textUnit);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the semantic roles filter.
@@ -98,7 +98,7 @@ public interface SerializePdfPipe extends Pipe {
    */
   void setSemanticRolesFilters(Set<SemanticRole> roles);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of {@link SerializePdfPipe}.

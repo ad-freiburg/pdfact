@@ -24,7 +24,7 @@ public interface PdfSerializer {
    */
   byte[] serialize(PdfDocument pdf) throws PdfActException;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the text unit.
@@ -41,7 +41,7 @@ public interface PdfSerializer {
    */
   void setTextUnit(TextUnit textUnit);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Returns the semantic roles filter.
@@ -58,7 +58,7 @@ public interface PdfSerializer {
    */
   void setSemanticRolesFilter(Set<SemanticRole> roles);
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The factory to create instances of PdfSerializer.

@@ -212,7 +212,7 @@ public class ElementList<T extends Element> implements List<T> {
   // ==============================================================================================
 
   @Override
-  public ElementList<T> subList(int fromIndex, int toIndex) {
+  public List<T> subList(int fromIndex, int toIndex) {
     return new ElementListView<>(this, fromIndex, toIndex);
   }
 
@@ -289,7 +289,7 @@ public class ElementList<T extends Element> implements List<T> {
      */
     protected int size;
 
-    // ============================================================================================
+    // ==============================================================================================
     // Constructors.
 
     /**
@@ -307,7 +307,7 @@ public class ElementList<T extends Element> implements List<T> {
       this.size = toIndex - fromIndex;
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public S get(int index) {
@@ -320,7 +320,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public boolean contains(Object o) {
@@ -357,7 +357,7 @@ public class ElementList<T extends Element> implements List<T> {
       return -1;
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public boolean add(S e) {
@@ -383,7 +383,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public boolean remove(Object o) {
@@ -415,7 +415,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public int size() {
@@ -427,7 +427,7 @@ public class ElementList<T extends Element> implements List<T> {
       return this.size == 0;
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public Object[] toArray() {
@@ -439,7 +439,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public Iterator<S> iterator() {
@@ -511,7 +511,7 @@ public class ElementList<T extends Element> implements List<T> {
 
     // ============================================================================================
 
-    @Override
+    // @Override
     public List<S> subList(int from, int to) {
       return this.parent.subList(this.from + from, this.from + to);
     }
@@ -557,7 +557,7 @@ public class ElementList<T extends Element> implements List<T> {
       return Arrays.asList(v1, v2);
     }
 
-    // ============================================================================================
+    // ==============================================================================================
 
     @Override
     public boolean equals(Object other) {

@@ -11,7 +11,7 @@ import pdfact.core.model.LogLevel;
  * @author Claudius Korzen
  */
 public class PdfActCoreSettings {
-  // ==========================================================================
+  // ==============================================================================================
   // General settings.
 
   /**
@@ -19,7 +19,7 @@ public class PdfActCoreSettings {
    */
   public static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
-  // ==========================================================================
+  // ==============================================================================================
   // Log settings.
 
   /**
@@ -32,7 +32,7 @@ public class PdfActCoreSettings {
    */
   public static final int FLOATING_NUMBER_PRECISION = 1;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The path to the AFM file.

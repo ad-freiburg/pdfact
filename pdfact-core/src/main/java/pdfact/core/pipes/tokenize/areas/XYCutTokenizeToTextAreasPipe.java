@@ -4,25 +4,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
-import pdfact.core.model.Position.PositionFactory;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.model.TextArea;
-import pdfact.core.model.TextArea.TextAreaFactory;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.xycut.XYCut;
 
@@ -31,33 +25,11 @@ import pdfact.core.util.xycut.XYCut;
  * 
  * @author Claudius Korzen
  */
-public class XYCutTokenizeToTextAreasPipe extends XYCut
-    implements TokenizeToTextAreasPipe {
+public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTextAreasPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of text areas.
-   */
-  protected ElementListFactory<TextArea> textAreaListFactory;
-
-  /**
-   * The factory to create instances of {@link TextArea}.
-   */
-  protected TextAreaFactory textAreaFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
-
-  /**
-   * The factory to create instances of {@link Rectangle}.
-   */
-  protected RectangleFactory rectangleFactory;
+  protected static Logger log = LogManager.getLogger(XYCutTokenizeToTextAreasPipe.class);
 
   /**
    * The statistician to compute statistics about characters.
@@ -77,33 +49,12 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
   /**
    * Creates a new pipe that tokenizes the pages of a PDF document into text
    * areas.
-   * 
-   * @param textAreaListFactory
-   *        The factory to create lists of text areas.
-   * @param textAreaFactory
-   *        The factory to create instances of {@link TextArea}.
-   * @param positionFactory
-   *        The factory to create instances of {@link Position}.
-   * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
-   * @param characterStatistician
-   *        The statistician to compute statistics about characters.
    */
-  @Inject
-  public XYCutTokenizeToTextAreasPipe(
-      ElementListFactory<TextArea> textAreaListFactory,
-      TextAreaFactory textAreaFactory,
-      PositionFactory positionFactory,
-      RectangleFactory rectangleFactory,
-      CharacterStatistician characterStatistician) {
-    this.textAreaListFactory = textAreaListFactory;
-    this.textAreaFactory = textAreaFactory;
-    this.positionFactory = positionFactory;
-    this.rectangleFactory = rectangleFactory;
-    this.characterStatistician = characterStatistician;
+  public XYCutTokenizeToTextAreasPipe() {
+    this.characterStatistician = new CharacterStatistician();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -120,7 +71,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Tokenizes the pages of the given PDF document into text areas.
@@ -170,13 +121,13 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    */
   protected ElementList<TextArea> tokenizeToTextAreas(PdfDocument pdf,
       Page page) throws PdfActException {
-    ElementList<TextArea> result = this.textAreaListFactory.create();
+    ElementList<TextArea> result = new ElementList<>();
 
     ElementList<Character> characters = page.getCharacters();
     List<ElementList<Character>> areaCharsList = cut(pdf, page, characters);
     if (areaCharsList != null) {
       for (ElementList<Character> areaChars : areaCharsList) {
-        TextArea area = this.textAreaFactory.create();
+        TextArea area = new TextArea();
         area.setCharacters(areaChars);
         area.setPosition(computePosition(pdf, page, area));
         area.setCharacterStatistic(computeCharacterStatistic(pdf, page, area));
@@ -201,8 +152,8 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
    */
   protected Position computePosition(PdfDocument pdf, Page page, TextArea a) {
     ElementList<Character> characters = a.getCharacters();
-    Rectangle r = this.rectangleFactory.fromHasPositionElements(characters);
-    return this.positionFactory.create(page, r);
+    Rectangle r = new Rectangle(characters);
+    return new Position(page, r);
   }
 
   /**
@@ -222,7 +173,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     return this.characterStatistician.compute(area.getCharacters());
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public float assessVerticalCut(PdfDocument pdf, Page page,
@@ -258,7 +209,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     return laneWidth;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public float assessHorizontalCut(PdfDocument pdf, Page page,
@@ -292,7 +243,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut
     return laneHeight;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
   // Utility methods.
 
   /**

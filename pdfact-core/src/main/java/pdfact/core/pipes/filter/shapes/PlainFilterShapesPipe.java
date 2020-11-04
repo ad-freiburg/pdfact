@@ -2,17 +2,14 @@ package pdfact.core.pipes.filter.shapes;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Shape;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link FilterShapesPipe}.
@@ -23,13 +20,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of shapes.
-   */
-  protected ElementListFactory<Shape> shapeListFactory;
+  protected static Logger log = LogManager.getLogger(PlainFilterShapesPipe.class);
 
   /**
    * The number of processed shapes.
@@ -41,19 +32,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
    */
   protected int numFilteredShapes;
 
-  /**
-   * Creates a pipe that filters those shapes of a PDF document that should not
-   * be considered.
-   * 
-   * @param shapeListFactory
-   *        The factory to create lists of shapes.
-   */
-  @Inject
-  public PlainFilterShapesPipe(ElementListFactory<Shape> shapeListFactory) {
-    this.shapeListFactory = shapeListFactory;
-  }
-
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -71,7 +50,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Filters those shapes of a PDF document that should not be considered.
@@ -85,7 +64,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
       for (Page page : pages) {
         ElementList<Shape> before = page.getShapes();
         // Create a new list of shapes which should not be filtered.
-        ElementList<Shape> after = this.shapeListFactory.create(before.size());
+        ElementList<Shape> after = new ElementList<>(before.size());
         for (Shape shape : before) {
           this.numProcessedShapes++;
 

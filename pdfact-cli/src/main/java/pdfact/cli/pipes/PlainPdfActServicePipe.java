@@ -65,7 +65,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected VisualizePdfPipeFactory visualizePdfPipeFactory;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The serialization target, given as a file.
@@ -77,7 +77,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected OutputStream serializationStream;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The visualization target, given as a file.
@@ -89,7 +89,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected OutputStream visualizationStream;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The serialization format.
@@ -106,7 +106,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected Set<SemanticRole> roles;
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * The default constructor.
@@ -138,7 +138,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Processes the given PDF document.
@@ -210,7 +210,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Path getSerializationPath() {
@@ -222,7 +222,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.serializationPath = path;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public OutputStream getSerializationStream() {
@@ -234,7 +234,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.serializationStream = stream;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public SerializeFormat getSerializationFormat() {
@@ -246,7 +246,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.serializationFormat = format;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Path getVisualizationPath() {
@@ -258,7 +258,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.visualizationPath = path;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public OutputStream getVisualizationStream() {
@@ -270,7 +270,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.visualizationStream = stream;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public Set<SemanticRole> getSemanticRolesFilters() {
@@ -282,7 +282,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     this.roles = filter;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public TextUnit getTextUnit() {

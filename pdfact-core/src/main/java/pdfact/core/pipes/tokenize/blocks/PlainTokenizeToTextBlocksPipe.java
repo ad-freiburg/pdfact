@@ -3,9 +3,8 @@ package pdfact.core.pipes.tokenize.blocks;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Font;
@@ -14,18 +13,13 @@ import pdfact.core.model.Line;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
-import pdfact.core.model.Position.PositionFactory;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Rectangle.RectangleFactory;
 import pdfact.core.model.TextBlock;
-import pdfact.core.model.TextBlock.TextBlockFactory;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.TextLineStatistic;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
-import pdfact.core.util.list.ElementList.ElementListFactory;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.statistician.CharacterStatistician;
 import pdfact.core.util.statistician.TextLineStatistician;
 
@@ -38,28 +32,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create lists of text blocks.
-   */
-  protected ElementListFactory<TextBlock> textBlockListFactory;
-
-  /**
-   * The factory to create instances of {@link TextBlock}.
-   */
-  protected TextBlockFactory textBlockFactory;
-
-  /**
-   * The factory to create instances of {@link Rectangle}.
-   */
-  protected RectangleFactory rectangleFactory;
-
-  /**
-   * The factory to create instances of {@link Position}.
-   */
-  protected PositionFactory positionFactory;
+  protected static Logger log = LogManager.getLogger(PlainTokenizeToTextBlocksPipe.class);
 
   /**
    * The statistician to compute statistics about characters.
@@ -83,37 +56,13 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * The default constructor.
-   * 
-   * @param textBlockListFactory
-   *        The factory to create lists of text blocks.
-   * @param textBlockFactory
-   *        The factory to create instances of {@link TextBlock}.
-   * @param rectangleFactory
-   *        The factory to create instances of {@link Rectangle}.
-   * @param positionFactory
-   *        The factory to create instances of {@link Position}.
-   * @param characterStatistician
-   *        The statistician to compute statistics about characters.
-   * @param textLineStatistician
-   *        The statistician to compute statistics about text lines.
    */
-  @Inject
-  public PlainTokenizeToTextBlocksPipe(
-      ElementListFactory<TextBlock> textBlockListFactory,
-      TextBlockFactory textBlockFactory,
-      RectangleFactory rectangleFactory,
-      PositionFactory positionFactory,
-      CharacterStatistician characterStatistician,
-      TextLineStatistician textLineStatistician) {
-    this.textBlockListFactory = textBlockListFactory;
-    this.textBlockFactory = textBlockFactory;
-    this.rectangleFactory = rectangleFactory;
-    this.positionFactory = positionFactory;
-    this.characterStatistician = characterStatistician;
-    this.textLineStatistician = textLineStatistician;
+  public PlainTokenizeToTextBlocksPipe() {
+    this.characterStatistician = new CharacterStatistician();
+    this.textLineStatistician = new TextLineStatistician();
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public PdfDocument execute(PdfDocument pdf) throws PdfActException {
@@ -130,17 +79,15 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     return pdf;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Tokenizes the text lines in the pages of the given PDF document into text
    * blocks.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    * 
-   * @throws PdfActException
-   *         If something went wrong while tokenization.
+   * @throws PdfActException If something went wrong while tokenization.
    */
   protected void tokenizeToTextBlocks(PdfDocument pdf) throws PdfActException {
     if (pdf == null) {
@@ -161,25 +108,21 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     }
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Tokenizes the text lines in the given page into text lines.
    * 
-   * @param pdf
-   *        The PDF document to which the given page belongs to.
-   * @param page
-   *        The PDF page to process.
+   * @param pdf  The PDF document to which the given page belongs to.
+   * @param page The PDF page to process.
    * 
    * @return The list of text blocks.
    * 
-   * @throws PdfActException
-   *         If something went wrong while tokenization.
+   * @throws PdfActException If something went wrong while tokenization.
    */
-  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf,
-      Page page) throws PdfActException {
-    ElementList<TextBlock> textBlocks = this.textBlockListFactory.create();
-    TextBlock textBlock = this.textBlockFactory.create();
+  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page) throws PdfActException {
+    ElementList<TextBlock> textBlocks = new ElementList<>();
+    TextBlock textBlock = new TextBlock();
 
     ElementList<TextLine> lines = page.getTextLines();
     for (int i = 0; i < lines.size(); i++) {
@@ -194,7 +137,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
           textBlocks.add(textBlock);
         }
         // Create a new text block.
-        textBlock = this.textBlockFactory.create();
+        textBlock = new TextBlock();
       }
       // Add the current line to the current text block.
       textBlock.addTextLine(line);
@@ -218,13 +161,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     return textBlocks;
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   /**
    * Computes the character statistic for the given text block.
    *
-   * @param block
-   *        The text block to process.
+   * @param block The text block to process.
    * 
    * @return The character statistic for the given text block.
    */
@@ -235,8 +177,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Computes the text line statistic for the given text block.
    *
-   * @param block
-   *        The text block to process.
+   * @param block The text block to process.
    * 
    * @return The text line statistic for the given text block.
    */
@@ -247,53 +188,44 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Computes the position for the given text block.
    *
-   * @param page
-   *        The PDF page in which the block is located.
-   * @param block
-   *        The text block to process.
+   * @param page  The PDF page in which the block is located.
+   * @param block The text block to process.
    * @return The position for the given text block.
    */
   protected Position computePosition(Page page, TextBlock block) {
     ElementList<TextLine> textLines = block.getTextLines();
-    Rectangle rect = this.rectangleFactory.fromHasPositionElements(textLines);
-    return this.positionFactory.create(page, rect);
+    Rectangle rect = Rectangle.fromHasPositionElements(textLines);
+    return new Position(page, rect);
   }
 
   /**
    * Computes the text for the given text block.
    *
-   * @param block
-   *        The text block to process.
+   * @param block The text block to process.
    * @return The text for the given text block.
    */
   protected String computeText(TextBlock block) {
     return PdfActUtils.join(block.getTextLines(), " ");
   }
 
-  // ===========================================================================
+  // ==============================================================================================
 
   /**
    * Checks if the given text line introduces a new text block.
    *
-   * @param pdf
-   *        The PDF document to which the given text line belongs to.
-   * @param page
-   *        The PDF page to which the given text line belongs to.
-   * @param currentTextBlock
-   *        The current text block.
-   * @param prevLine
-   *        The previous text line.
-   * @param line
-   *        The current text line to process.
-   * @param nextLine
-   *        The next text line.
+   * @param pdf              The PDF document to which the given text line belongs
+   *                         to.
+   * @param page             The PDF page to which the given text line belongs to.
+   * @param currentTextBlock The current text block.
+   * @param prevLine         The previous text line.
+   * @param line             The current text line to process.
+   * @param nextLine         The next text line.
    * 
    * @return True, if the given current text line introduces a new text block;
    *         false otherwise.
    */
-  protected boolean introducesNewTextBlock(PdfDocument pdf, Page page,
-      TextBlock currentTextBlock, TextLine prevLine, TextLine line,
-      TextLine nextLine) {
+  protected boolean introducesNewTextBlock(PdfDocument pdf, Page page, TextBlock currentTextBlock, TextLine prevLine,
+      TextLine line, TextLine nextLine) {
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
       return false;
@@ -356,10 +288,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Checks, if the given line overlaps the given text block horizontally.
    *
-   * @param block
-   *        The text block to process.
-   * @param line
-   *        The text line to process.
+   * @param block The text block to process.
+   * @param line  The text line to process.
    * @return True, if the given line overlaps the given text block horizontally,
    *         false otherwise.
    */
@@ -369,7 +299,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     }
 
     ElementList<TextLine> lines = block.getTextLines();
-    Rectangle blockRect = this.rectangleFactory.fromHasPositionElements(lines);
+    Rectangle blockRect = Rectangle.fromHasPositionElements(lines);
     Rectangle lineRect = line.getPosition().getRectangle();
     if (blockRect == null || lineRect == null) {
       return false;
@@ -380,22 +310,17 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Checks if the line pitch between the given line and the given previous line
-   * is larger than expected (larger than the most common line pitch for the
-   * font / font size pair of the given line).
+   * is larger than expected (larger than the most common line pitch for the font
+   * / font size pair of the given line).
    *
-   * @param pdf
-   *        The PDF document to which the given text line belongs to.
-   * @param page
-   *        The PDF page to which the given text line belongs to.
-   * @param prevLine
-   *        The previous text line.
-   * @param line
-   *        The text line to process.
+   * @param pdf      The PDF document to which the given text line belongs to.
+   * @param page     The PDF page to which the given text line belongs to.
+   * @param prevLine The previous text line.
+   * @param line     The text line to process.
    * @return True, if the line pitch between the given text line and the given
    *         previous text line is larger than usual; False otherwise.
    */
-  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf,
-      Page page, TextLine prevLine, TextLine line) {
+  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf, Page page, TextLine prevLine, TextLine line) {
     if (pdf == null) {
       return false;
     }
@@ -416,18 +341,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Checks if the line pitch between the given line and its previous line is
    * larger than the line pitch between the given line and its next line.
    *
-   * @param prevLine
-   *        The previous text line.
-   * @param line
-   *        The text line to process.
-   * @param nextLine
-   *        The next text line.
-   * @return True, if the line pitch between the given line and its previous
-   *         line is larger than the line pitch between the given line and its
-   *         next line, flase otherwise.
+   * @param prevLine The previous text line.
+   * @param line     The text line to process.
+   * @param nextLine The next text line.
+   * @return True, if the line pitch between the given line and its previous line
+   *         is larger than the line pitch between the given line and its next
+   *         line, flase otherwise.
    */
-  protected static boolean isLinePitchLargerThanNextLinePitch(
-      TextLine prevLine, TextLine line, TextLine nextLine) {
+  protected static boolean isLinePitchLargerThanNextLinePitch(TextLine prevLine, TextLine line, TextLine nextLine) {
     float linePitch = computeLinePitch(prevLine, line);
     float nextLinePitch = computeLinePitch(line, nextLine);
 
@@ -436,21 +357,17 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks, if the given line is indented compared to the given previous line
-   * and the given next line.
+   * Checks, if the given line is indented compared to the given previous line and
+   * the given next line.
    *
-   * @param prevLine
-   *        The previous line.
-   * @param line
-   *        The line to process.
-   * @param nextLine
-   *        The next line.
+   * @param prevLine The previous line.
+   * @param line     The line to process.
+   * @param nextLine The next line.
    * @return True, if (1) the line pitches between the lines are equal, (2)
    *         prevLine and nextLine do not start with an reference anchor and (3)
    *         the line is indented compared to the previous and the next line.
    */
-  protected boolean isIndented(TextLine prevLine, TextLine line,
-      TextLine nextLine) {
+  protected boolean isIndented(TextLine prevLine, TextLine line, TextLine nextLine) {
     // The line pitches between the lines must be equal.
     if (!isLinepitchesEqual(prevLine, line, nextLine)) {
       return false;
@@ -477,18 +394,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Checks if the line pitches between the line / previous line and the line /
    * next line are equal.
    * 
-   * @param prevLine
-   *        The previous text line.
-   * @param line
-   *        The text line to process.
-   * @param nextLine
-   *        The next text line.
+   * @param prevLine The previous text line.
+   * @param line     The text line to process.
+   * @param nextLine The next text line.
    * 
    * @return True, if the line pitches between the line / previous line and the
    *         line / next line are equal, false otherwise.
    */
-  public static boolean isLinepitchesEqual(TextLine prevLine,
-      TextLine line, TextLine nextLine) {
+  public static boolean isLinepitchesEqual(TextLine prevLine, TextLine line, TextLine nextLine) {
     float prevLinePitch = computeLinePitch(prevLine, line);
     float nextLinePitch = computeLinePitch(line, nextLine);
     // TODO
@@ -499,21 +412,17 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Computes the line pitch between the given lines. Both lines must share the
    * same page.
    * 
-   * @param firstLine
-   *        The first text line.
-   * @param secondLine
-   *        The second text line.
+   * @param firstLine  The first text line.
+   * @param secondLine The second text line.
    * @return The line pitch between the given lines or Float.NaN if the lines do
    *         not share the same page.
    */
-  public static float computeLinePitch(TextLine firstLine,
-      TextLine secondLine) {
+  public static float computeLinePitch(TextLine firstLine, TextLine secondLine) {
     if (firstLine == null || secondLine == null) {
       return Float.NaN;
     }
 
-    if (firstLine.getPosition().getPage() != secondLine.getPosition()
-        .getPage()) {
+    if (firstLine.getPosition().getPage() != secondLine.getPosition().getPage()) {
       return Float.NaN;
     }
 
@@ -530,14 +439,11 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Checks if the given line has a special font face, compared to the given
    * previous line.
    *
-   * @param prevLine
-   *        The previous line of the line to process.
-   * @param line
-   *        The line to process.
+   * @param prevLine The previous line of the line to process.
+   * @param line     The line to process.
    * @return True, if the given line has a special font face, False otherwise.
    */
-  protected static boolean hasSignificantDifferentFontFace(TextLine prevLine,
-      TextLine line) {
+  protected static boolean hasSignificantDifferentFontFace(TextLine prevLine, TextLine line) {
     if (prevLine == null || line == null) {
       return false;
     }
@@ -571,14 +477,13 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     if (prevLineFontFamilyName != null && lineFontFamilyName == null) {
       return true;
     }
-    if (prevLineFontFamilyName != null
-        && !prevLineFontFamilyName.equals(lineFontFamilyName)) {
+    if (prevLineFontFamilyName != null && !prevLineFontFamilyName.equals(lineFontFamilyName)) {
       return true;
     }
 
     float prevLineFontsize = prevLineFontFace.getFontSize();
     float lineFontsize = lineFontFace.getFontSize();
-    
+
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
     if (prevLineFontsize != lineFontsize) {
@@ -591,16 +496,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Returns true, if the given line is (probably) a reference start.
    *
-   * @param prevLine
-   *        The previous line of the line to process.
-   * @param line
-   *        The line to process.
-   * @param nextLine
-   *        The next line of the line to process.
+   * @param prevLine The previous line of the line to process.
+   * @param line     The line to process.
+   * @param nextLine The next line of the line to process.
    * @return True, if the given line is (probably) a reference start.
    */
-  protected boolean isProbablyReferenceStart(TextLine prevLine,
-      TextLine line, TextLine nextLine) {
+  protected boolean isProbablyReferenceStart(TextLine prevLine, TextLine line, TextLine nextLine) {
     if (prevLine == null || line == null || nextLine == null) {
       return false;
     }
@@ -635,15 +536,13 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * The pattern to identify reference anchors.
    */
-  protected static final Pattern REFERENCE_ANCHOR = Pattern
-      .compile("^\\[(.*)\\]\\s+");
+  protected static final Pattern REFERENCE_ANCHOR = Pattern.compile("^\\[(.*)\\]\\s+");
 
   /**
    * Checks is the given text line starts with a reference anchor like "[1]",
    * "[2]", etc.
    *
-   * @param line
-   *        The text line to check.
+   * @param line The text line to check.
    * @return True, if the given text line starts with a reference anchor, false
    *         otherwise.
    */
@@ -664,10 +563,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Checks if the given line is indented, compared to the given reference line.
    * 
-   * @param line
-   *        The text line to process.
-   * @param refLine
-   *        The reference text line.
+   * @param line    The text line to process.
+   * @param refLine The reference text line.
    * 
    * @return True, if the given line is indented compared to the given reference
    *         line.
@@ -690,10 +587,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Checks, if the minX values for the given lines are equal.
    * 
-   * @param line1
-   *        The first text line.
-   * @param line2
-   *        The second text line-
+   * @param line1 The first text line.
+   * @param line2 The second text line-
    * @return True, if the minX values for the given lines are equal, false
    *         otherwise.
    */

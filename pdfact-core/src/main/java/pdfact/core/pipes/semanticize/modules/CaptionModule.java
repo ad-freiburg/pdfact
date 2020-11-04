@@ -34,7 +34,7 @@ public class CaptionModule implements PdfTextSemanticizerModule {
     CAPTION_PATTERNS.put(SemanticRole.TABLE, tableCaptionPattern);
   }
 
-  // ==========================================================================
+  // ==============================================================================================
 
   @Override
   public void semanticize(PdfDocument pdf) {
