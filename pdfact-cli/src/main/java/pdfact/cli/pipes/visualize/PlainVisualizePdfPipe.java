@@ -6,17 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.inject.Inject;
-
 import pdfact.cli.model.TextUnit;
-import pdfact.cli.pipes.visualize.PdfVisualizer.PdfVisualizerFactory;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link VisualizePdfPipe}.
@@ -27,13 +24,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create instances of {@link PdfVisualizer}.
-   */
-  protected PdfVisualizerFactory factory;
+  protected static Logger log = LogManager.getLogger(PlainVisualizePdfPipe.class);
 
   /**
    * The serialization target, given as a path.
@@ -54,17 +45,6 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
    * The semantic roles filter.
    */
   protected Set<SemanticRole> roles;
-
-  /**
-   * The default constructor.
-   * 
-   * @param visualizerFactory
-   *        The factory to create instances of {@link PdfVisualizer}.
-   */
-  @Inject
-  public PlainVisualizePdfPipe(PdfVisualizerFactory visualizerFactory) {
-    this.factory = visualizerFactory;
-  }
 
   // ==============================================================================================
 
@@ -97,7 +77,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
    */
   protected void visualize(PdfDocument pdf) throws PdfActException {
     // Create the visualizer.
-    PdfVisualizer visualizer = this.factory.create(this.textUnit, this.roles);
+    PdfVisualizer visualizer = new PlainPdfVisualizer(this.textUnit, this.roles);
 
     // Serialize the PDF document.
     byte[] visualization = visualizer.visualize(pdf);

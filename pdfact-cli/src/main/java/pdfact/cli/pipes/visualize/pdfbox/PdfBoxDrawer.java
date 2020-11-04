@@ -18,9 +18,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-
 import pdfact.cli.pipes.visualize.PdfDrawer;
 import pdfact.core.model.HasRectangle;
 import pdfact.core.model.Line;
@@ -28,9 +25,6 @@ import pdfact.core.model.Page;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
-import pdfact.core.model.Line.LineFactory;
-import pdfact.core.model.Point.PointFactory;
-import pdfact.core.model.Rectangle.RectangleFactory;
 
 /**
  * An implementation of PdfVisualizer using PdfBox.
@@ -38,21 +32,6 @@ import pdfact.core.model.Rectangle.RectangleFactory;
  * @author Claudius Korzen.
  */
 public class PdfBoxDrawer implements PdfDrawer {
-  /**
-   * The rectangle to create instances of Rectangle.
-   */
-  protected RectangleFactory rectangleFactory;
-
-  /**
-   * The rectangle to create instances of Line.
-   */
-  protected LineFactory lineFactory;
-
-  /**
-   * The rectangle to create instances of Point.
-   */
-  protected PointFactory pointFactory;
-
   /**
    * The default stroking color.
    */
@@ -96,71 +75,27 @@ public class PdfBoxDrawer implements PdfDrawer {
   /**
    * Creates a new visualizer from the given file.
    * 
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param lineFactory
-   *        The factory to create instances of Line.
    * @param pdfFile
    *        The PDF file to process.
    * @throws IOException
    *         If reading the PDF file failed.
    */
-  @AssistedInject
-  public PdfBoxDrawer(RectangleFactory rectangleFactory,
-      PointFactory pointFactory, LineFactory lineFactory,
-      @Assisted Path pdfFile) throws IOException {
-    this(rectangleFactory, pointFactory, lineFactory,
-        pdfFile != null ? pdfFile.toFile() : null);
+  public PdfBoxDrawer(Path pdfFile) throws IOException {
+    this(pdfFile != null ? pdfFile.toFile() : null);
   }
 
   /**
    * Creates a new visualizer from the given file.
    * 
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param lineFactory
-   *        The factory to create instances of Line.
    * @param pdfFile
    *        The PDF file to process.
    * @throws IOException
    *         If reading the PDF file failed.
    */
-  @AssistedInject
-  public PdfBoxDrawer(RectangleFactory rectangleFactory,
-      PointFactory pointFactory, LineFactory lineFactory,
-      @Assisted File pdfFile) throws IOException {
-    this(rectangleFactory, pointFactory, lineFactory,
-        pdfFile != null ? PDDocument.load(pdfFile) : null);
-  }
+  public PdfBoxDrawer(File pdfFile) throws IOException {
+    this.pdDocument = PDDocument.load(pdfFile);
 
-  /**
-   * Creates a new visualizer from the given PDDocument.
-   * 
-   * @param rectangleFactory
-   *        The factory to create instances of Rectangle.
-   * @param pointFactory
-   *        The factory to create instances of Point.
-   * @param lineFactory
-   *        The factory to create instances of Line.
-   * @param pdDocument
-   *        The PDDocument.
-   * @throws IOException
-   *         If parsing the PDDocument failed.
-   */
-  @AssistedInject
-  public PdfBoxDrawer(RectangleFactory rectangleFactory,
-      PointFactory pointFactory, LineFactory lineFactory, PDDocument pdDocument)
-      throws IOException {
-    this.rectangleFactory = rectangleFactory;
-    this.pointFactory = pointFactory;
-    this.lineFactory = lineFactory;
-    this.pdDocument = pdDocument;
-
-    if (pdDocument == null) {
+    if (this.pdDocument == null) {
       throw new IllegalArgumentException("No PD document given");
     }
 
@@ -183,7 +118,7 @@ public class PdfBoxDrawer implements PdfDrawer {
       this.pageStreams.add(new PDPageContentStream(pdDocument, page,
           PDPageContentStream.AppendMode.APPEND, true));
 
-      Rectangle boundingBox = this.rectangleFactory.create();
+      Rectangle boundingBox = new Rectangle();
 
       PDRectangle box = page.getCropBox();
       if (box == null) {
@@ -198,6 +133,18 @@ public class PdfBoxDrawer implements PdfDrawer {
 
       this.pageBoundingBoxes.add(boundingBox);
     }
+  }
+
+  /**
+   * Creates a new visualizer from the given PDDocument.
+   * 
+   * @param pdDocument
+   *        The PDDocument.
+   * @throws IOException
+   *         If parsing the PDDocument failed.
+   */
+  public PdfBoxDrawer(PDDocument pdDocument) throws IOException {
+    
   }
 
   // ==============================================================================================
@@ -451,7 +398,7 @@ public class PdfBoxDrawer implements PdfDrawer {
   @Override
   public void drawText(String text, int pageNum, boolean relativeToUpperLeft,
       boolean originInUpperLeft) throws IOException {
-    this.drawText(text, pageNum, this.pointFactory.create(0, 0),
+    this.drawText(text, pageNum, new Point(0, 0),
         relativeToUpperLeft, originInUpperLeft);
   }
 
@@ -576,7 +523,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public Point adaptPoint(Point point, int pageNum,
       boolean isRelativeToUpperLeft, boolean isOriginInUpperLeft) {
-    Point copy = this.pointFactory.create(point.getX(), point.getY());
+    Point copy = new Point(point.getX(), point.getY());
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
       copy.setY(pageBoundingBox.getMaxY() - point.getY());
@@ -602,7 +549,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public Line adaptLine(Line l, int pageNum, boolean isRelativeToUpperLeft,
       boolean isOriginInUpperLeft) {
-    Line copy = this.lineFactory.create(l.getStartPoint(), l.getEndPoint());
+    Line copy = new Line(l.getStartPoint(), l.getEndPoint());
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
       copy.setStartY(pageBoundingBox.getMaxY() - l.getStartY());
@@ -629,7 +576,7 @@ public class PdfBoxDrawer implements PdfDrawer {
    */
   public Rectangle adaptRectangle(Rectangle rect, int pageNum,
       boolean isRelativeToUpperLeft, boolean isOriginInUpperLeft) {
-    Rectangle copy = this.rectangleFactory.create(rect);
+    Rectangle copy = new Rectangle(rect);
     if (isRelativeToUpperLeft) {
       Rectangle pageBoundingBox = this.pageBoundingBoxes.get(pageNum);
       copy.setMinY(pageBoundingBox.getMaxY() - rect.getMinY());

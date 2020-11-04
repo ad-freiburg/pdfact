@@ -1,8 +1,5 @@
 package pdfact.cli.pipes.visualize;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,16 +9,12 @@ import java.nio.file.Paths;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
-import pdfact.cli.guice.PdfActCliGuiceModule;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.core.model.Character;
+import pdfact.core.model.Line;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.PdfDocument;
-import pdfact.core.model.PdfDocument.PdfDocumentFactory;
-import pdfact.core.model.PlainLine;
-import pdfact.core.model.PlainPoint;
-import pdfact.core.model.PlainRectangle;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
@@ -54,11 +47,6 @@ public class DFGPdfVisualizer {
   protected String outputPath;
 
   /**
-   * The factory to create instance of PdfDocument.
-   */
-  protected PdfDocumentFactory pdfDocumentFactory;
-
-  /**
    * The factory to create instances of PdfDrawer.
    */
   protected PdfDrawer.PdfDrawerFactory pdfDrawerFactory;
@@ -68,71 +56,41 @@ public class DFGPdfVisualizer {
    */
   protected PdfActServicePipe.PdfActServicePipeFactory serviceFactory;
 
-  /**
-   * The factory to create instances of Rectangle.
-   */
-  protected Rectangle.RectangleFactory rectangleFactory;
-
-  /**
-   * The factory to create instances of Point.
-   */
-  protected Point.PointFactory pointFactory;
-
   // ==============================================================================================
-
-  /**
-   * The default constructor.
-   */
-  public DFGPdfVisualizer() {
-    Injector injector = Guice.createInjector(new PdfActCliGuiceModule());
-    this.pdfDocumentFactory = injector.getInstance(PdfDocumentFactory.class);
-    this.pdfDrawerFactory = injector.getInstance(PdfDrawer.PdfDrawerFactory.class);
-    this.serviceFactory = injector.getInstance(PdfActServicePipe.PdfActServicePipeFactory.class);
-    this.rectangleFactory = injector.getInstance(Rectangle.RectangleFactory.class);
-    this.pointFactory = injector.getInstance(Point.PointFactory.class);
-  }
 
   /**
    * Runs this visualizer.
    *
-   * @param args
-   *     The command line arguments.
+   * @param args The command line arguments.
    *
-   * @throws Exception
-   *     If something went wrong.
+   * @throws Exception If something went wrong.
    */
   public void run(String[] args) throws Exception {
-    ArgumentParser parser = ArgumentParsers.newArgumentParser("DFGPdfVisualizer");
+    ArgumentParser parser = ArgumentParsers.newFor("DFGPdfVisualizer").build();
     parser.description("Creates visualizations needed for our DFG proposal.");
 
-    parser.addArgument("inputPath")
-        .dest("input")
-        .required(true)
-        .metavar("<input-path>")
+    parser.addArgument("inputPath").dest("input").required(true).metavar("<input-path>")
         .help("Defines the path to the input PDF file.");
 
-    parser.addArgument("outputPath")
-        .dest("output")
-        .required(true)
-        .metavar("<output-path>")
+    parser.addArgument("outputPath").dest("output").required(true).metavar("<output-path>")
         .help("Defines the path to the target PDF file.");
 
     parser.parseArgs(args, this);
 
-    PdfDocument pdf = this.pdfDocumentFactory.create(this.inputPath);
+    PdfDocument pdf = new PdfDocument(this.inputPath);
     PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
 
     // Create a service pipe.
     this.serviceFactory.create().execute(pdf);
 
     // Create visualizations.
-    //createWordBoundariesVisualization(pdf, drawer);
-    //createLigaturesVisualization(pdf, drawer);
-    //createDiacriticsVisualization(pdf, drawer);
-    //createHyphenationVisualization(pdf, drawer);
-    //createBlockBoundariesVisualization(pdf, drawer);
-    //createReadingOrderVisualization(pdf, drawer);
-    //createSemanticRoleVisualization(pdf, drawer);
+    // createWordBoundariesVisualization(pdf, drawer);
+    // createLigaturesVisualization(pdf, drawer);
+    // createDiacriticsVisualization(pdf, drawer);
+    // createHyphenationVisualization(pdf, drawer);
+    // createBlockBoundariesVisualization(pdf, drawer);
+    // createReadingOrderVisualization(pdf, drawer);
+    // createSemanticRoleVisualization(pdf, drawer);
 
     // createSegmentationVisualization(pdf, drawer);
     createLineSegmentationVisualization(pdf, drawer);
@@ -146,16 +104,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization as needed for the challenge "word boundaries".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createWordBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createWordBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highlightedCharacterColor = Color.BLUE;
     float highlightedCharacterThickness = 0.1f;
 
@@ -230,16 +184,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "ligatures".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createLigaturesVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createLigaturesVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.1f;
 
@@ -288,16 +238,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "ligatures".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createDiacriticsVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createDiacriticsVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.1f;
 
@@ -323,7 +269,7 @@ public class DFGPdfVisualizer {
         thickness = highThickness;
 
         // draw rectangle for the diacritic.
-        Rectangle diacritic = this.rectangleFactory.create(rect);
+        Rectangle diacritic = new Rectangle(rect);
         diacritic.setMinX(diacritic.getMinX() + 0.3f);
         diacritic.setMaxX(diacritic.getMaxX() - 0.2f);
         diacritic.setMinY(diacritic.getMinY() + 4.5f);
@@ -359,7 +305,7 @@ public class DFGPdfVisualizer {
         thickness = highThickness;
 
         // draw rectangle for the diacritic.
-        Rectangle diacritic = this.rectangleFactory.create(rect);
+        Rectangle diacritic = new Rectangle(rect);
         diacritic.setMaxX(diacritic.getMaxX() - 0.3f);
         diacritic.setMinY(diacritic.getMinY() + 4.5f);
         drawer.drawRectangle(diacritic, pageNum, color, null, thickness);
@@ -380,7 +326,7 @@ public class DFGPdfVisualizer {
         thickness = highThickness;
 
         // draw rectangle for the diacritic.
-        Rectangle diacritic = this.rectangleFactory.create(rect);
+        Rectangle diacritic = new Rectangle(rect);
         diacritic.setMinX(diacritic.getMinX() + 0.3f);
         diacritic.setMaxX(diacritic.getMaxX() - 0.2f);
         diacritic.setMinY(diacritic.getMinY() + 4.5f);
@@ -407,16 +353,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "hyphenation".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createHyphenationVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createHyphenationVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.3f;
 
@@ -446,16 +388,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "block boundaries".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createBlockBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createBlockBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
 
     Color color = Color.LIGHT_GRAY;
@@ -471,10 +409,10 @@ public class DFGPdfVisualizer {
 
     // Summarize the rects of the tree to one rect.
     Rectangle treeRect = page.getTextBlocks().get(9).getPosition().getRectangle();
-//    for (int i = 10; i < 21; i++) {
-//      rect = page.getTextBlocks().get(i).getPosition().getRectangle();
-//      treeRect.extend(rect);
-//    }
+    // for (int i = 10; i < 21; i++) {
+    // rect = page.getTextBlocks().get(i).getPosition().getRectangle();
+    // treeRect.extend(rect);
+    // }
     drawer.drawRectangle(treeRect, page.getPageNumber(), color, null, thickness);
 
     rect = page.getTextBlocks().get(10).getPosition().getRectangle();
@@ -483,8 +421,8 @@ public class DFGPdfVisualizer {
     rect = page.getTextBlocks().get(11).getPosition().getRectangle();
     drawer.drawRectangle(rect, page.getPageNumber(), color, null, thickness);
 
-//    rect = page.getTextBlocks().get(23).getPosition().getRectangle();
-//    drawer.drawRectangle(rect, page.getPageNumber(), color, null, thickness);
+    // rect = page.getTextBlocks().get(23).getPosition().getRectangle();
+    // drawer.drawRectangle(rect, page.getPageNumber(), color, null, thickness);
   }
 
   // ==============================================================================================
@@ -492,16 +430,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "reading order".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createReadingOrderVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createReadingOrderVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 2f;
 
@@ -517,108 +451,58 @@ public class DFGPdfVisualizer {
     }
 
     // For reading order.
-    Point r0 = page.getTextBlocks().get(0)
-      .getPosition().getRectangle().getMidpoint();
-    Point r1 = page.getTextBlocks().get(1)
-      .getPosition().getRectangle().getMidpoint();
-    Point r2 = page.getTextBlocks().get(2)
-      .getPosition().getRectangle().getMidpoint();
-    Point r3 = page.getTextBlocks().get(13)
-      .getPosition().getRectangle().getMidpoint();
-    Point r4 = page.getTextBlocks().get(14)
-      .getPosition().getRectangle().getMidpoint();
-    Point r5 = page.getTextBlocks().get(3)
-      .getPosition().getRectangle().getMidpoint();
-    Point r6 = page.getTextBlocks().get(4)
-      .getPosition().getRectangle().getMidpoint();
-    Point r7 = page.getTextBlocks().get(5)
-      .getPosition().getRectangle().getMidpoint();
-    Point r8 = page.getTextBlocks().get(8)
-      .getPosition().getRectangle().getMidpoint();
-    Point r9 = page.getTextBlocks().get(15)
-      .getPosition().getRectangle().getMidpoint();
-    Point r10 = page.getTextBlocks().get(16)
-      .getPosition().getRectangle().getMidpoint();
-    Point r11 = page.getTextBlocks().get(17)
-      .getPosition().getRectangle().getMidpoint();
+    Point r0 = page.getTextBlocks().get(0).getPosition().getRectangle().getMidpoint();
+    Point r1 = page.getTextBlocks().get(1).getPosition().getRectangle().getMidpoint();
+    Point r2 = page.getTextBlocks().get(2).getPosition().getRectangle().getMidpoint();
+    Point r3 = page.getTextBlocks().get(13).getPosition().getRectangle().getMidpoint();
+    Point r4 = page.getTextBlocks().get(14).getPosition().getRectangle().getMidpoint();
+    Point r5 = page.getTextBlocks().get(3).getPosition().getRectangle().getMidpoint();
+    Point r6 = page.getTextBlocks().get(4).getPosition().getRectangle().getMidpoint();
+    Point r7 = page.getTextBlocks().get(5).getPosition().getRectangle().getMidpoint();
+    Point r8 = page.getTextBlocks().get(8).getPosition().getRectangle().getMidpoint();
+    Point r9 = page.getTextBlocks().get(15).getPosition().getRectangle().getMidpoint();
+    Point r10 = page.getTextBlocks().get(16).getPosition().getRectangle().getMidpoint();
+    Point r11 = page.getTextBlocks().get(17).getPosition().getRectangle().getMidpoint();
 
     int pageNum = page.getPageNumber();
     try {
-      drawer.drawLine(new PlainLine(r0, r1), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r0.getX() - 5f, r0.getY() - 5f, r0.getX() + 5f, r0.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("A", pageNum, 
-        this.pointFactory.create(r0.getX() - 2.75f, r0.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r1, r2), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r1.getX() - 5f, r1.getY() - 5f, r1.getX() + 5f, r1.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("B", pageNum, 
-        this.pointFactory.create(r1.getX() - 2.75f, r1.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r2, r3), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r2.getX() - 5f, r2.getY() - 5f, r2.getX() + 5f, r2.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("C", pageNum, 
-        this.pointFactory.create(r2.getX() - 2.75f, r2.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r3, r4), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r3.getX() - 5f, r3.getY() - 5f, r3.getX() + 5f, r3.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("D", pageNum, 
-        this.pointFactory.create(r3.getX() - 2.75f, r3.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r4, r5), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r4.getX() - 5f, r4.getY() - 5f, r4.getX() + 5f, r4.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("E", pageNum, 
-        this.pointFactory.create(r4.getX() - 2.75f, r4.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r5, r6), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r5.getX() - 5f, r5.getY() - 5f, r5.getX() + 5f, r5.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("F", pageNum, 
-        this.pointFactory.create(r5.getX() - 2.75f, r5.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r6, r7), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r6.getX() - 5f, r6.getY() - 5f, r6.getX() + 5f, r6.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawText("G", pageNum, 
-        this.pointFactory.create(r6.getX() - 3.25f, r6.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawLine(new PlainLine(r8, r9), pageNum, highColor, highThickness);
-      drawer.drawRectangle(new PlainRectangle(
-        this.rectangleFactory, this.pointFactory, 
-        r9.getX() - 5f, r9.getY() - 5f, r9.getX() + 5f, r9.getY() + 5f), 
-        pageNum, highColor, highColor);
-      drawer.drawLine(new PlainLine(r9, r10), pageNum, highColor, 
-        highThickness);
-      drawer.drawText("O", pageNum, 
-        this.pointFactory.create(r9.getX() - 3.25f, r9.getY() - 3f), 
-        Color.WHITE, 8f);
-      drawer.drawRectangle(new PlainRectangle(this.rectangleFactory,
-        this.pointFactory, r10.getX() - 5f, r10.getY() - 5f, r10.getX() + 5f,
-        r10.getY() + 5f), pageNum, highColor, highColor);
-      drawer.drawLine(new PlainLine(r10, r11), pageNum, highColor,
-        highThickness);
-      drawer.drawText("P", pageNum,
-        this.pointFactory.create(r10.getX() - 2.75f, r10.getY() - 3f), 
-        Color.WHITE, 8f);
-
+      drawer.drawLine(new Line(r0, r1), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r0.getX() - 5f, r0.getY() - 5f, r0.getX() + 5f, r0.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("A", pageNum, new Point(r0.getX() - 2.75f, r0.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r1, r2), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r1.getX() - 5f, r1.getY() - 5f, r1.getX() + 5f, r1.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("B", pageNum, new Point(r1.getX() - 2.75f, r1.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r2, r3), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r2.getX() - 5f, r2.getY() - 5f, r2.getX() + 5f, r2.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("C", pageNum, new Point(r2.getX() - 2.75f, r2.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r3, r4), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r3.getX() - 5f, r3.getY() - 5f, r3.getX() + 5f, r3.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("D", pageNum, new Point(r3.getX() - 2.75f, r3.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r4, r5), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r4.getX() - 5f, r4.getY() - 5f, r4.getX() + 5f, r4.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("E", pageNum, new Point(r4.getX() - 2.75f, r4.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r5, r6), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r5.getX() - 5f, r5.getY() - 5f, r5.getX() + 5f, r5.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("F", pageNum, new Point(r5.getX() - 2.75f, r5.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r6, r7), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r6.getX() - 5f, r6.getY() - 5f, r6.getX() + 5f, r6.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawText("G", pageNum, new Point(r6.getX() - 3.25f, r6.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawLine(new Line(r8, r9), pageNum, highColor, highThickness);
+      drawer.drawRectangle(new Rectangle(r9.getX() - 5f, r9.getY() - 5f, r9.getX() + 5f, r9.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawLine(new Line(r9, r10), pageNum, highColor, highThickness);
+      drawer.drawText("O", pageNum, new Point(r9.getX() - 3.25f, r9.getY() - 3f), Color.WHITE, 8f);
+      drawer.drawRectangle(new Rectangle(r10.getX() - 5f, r10.getY() - 5f, r10.getX() + 5f, r10.getY() + 5f), pageNum,
+          highColor, highColor);
+      drawer.drawLine(new Line(r10, r11), pageNum, highColor, highThickness);
+      drawer.drawText("P", pageNum, new Point(r10.getX() - 2.75f, r10.getY() - 3f), Color.WHITE, 8f);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -629,16 +513,12 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization for the challenge "semantic role".
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createSemanticRoleVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createSemanticRoleVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 1f;
 
@@ -741,50 +621,42 @@ public class DFGPdfVisualizer {
   /**
    * Creates a visualization of page segmentation.
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     // First horizontal line.
-    Point line1Point1 = new PlainPoint(40, 688);
-    Point line1Point2 = new PlainPoint(570, 688);
-    drawer.drawLine(new PlainLine(line1Point1, line1Point2), 1, Color.BLUE, 4f);
+    Point line1Point1 = new Point(40, 688);
+    Point line1Point2 = new Point(570, 688);
+    drawer.drawLine(new Line(line1Point1, line1Point2), 1, Color.BLUE, 4f);
 
     // Second horizontal line.
-    Point line2Point1 = new PlainPoint(40, 631);
-    Point line2Point2 = new PlainPoint(570, 631);
-    drawer.drawLine(new PlainLine(line2Point1, line2Point2), 1, Color.BLUE, 4f);
+    Point line2Point1 = new Point(40, 631);
+    Point line2Point2 = new Point(570, 631);
+    drawer.drawLine(new Line(line2Point1, line2Point2), 1, Color.BLUE, 4f);
 
     // First vertical line.
-    Point line3Point1 = new PlainPoint(306, 641);
-    Point line3Point2 = new PlainPoint(306, 678);
-    drawer.drawLine(new PlainLine(line3Point1, line3Point2), 1, Color.BLUE, 4f);
+    Point line3Point1 = new Point(306, 641);
+    Point line3Point2 = new Point(306, 678);
+    drawer.drawLine(new Line(line3Point1, line3Point2), 1, Color.BLUE, 4f);
 
     // Second vertical line.
-    Point line4Point1 = new PlainPoint(306, 621);
-    Point line4Point2 = new PlainPoint(306, 75);
-    drawer.drawLine(new PlainLine(line4Point1, line4Point2), 1, Color.BLUE, 4f);
+    Point line4Point1 = new Point(306, 621);
+    Point line4Point2 = new Point(306, 75);
+    drawer.drawLine(new Line(line4Point1, line4Point2), 1, Color.BLUE, 4f);
   }
 
   /**
    * Creates a visualization how to segement a set of characters int lines.
    *
-   * @param pdf
-   *     The PDF file to process.
-   * @param drawer
-   *     The drawer to use to create the visualization.
+   * @param pdf    The PDF file to process.
+   * @param drawer The drawer to use to create the visualization.
    *
-   * @throws IOException
-   *     If something went wrong.
+   * @throws IOException If something went wrong.
    */
-  protected void createLineSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer)
-      throws IOException {
+  protected void createLineSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer) throws IOException {
     Page firstPage = pdf.getFirstPage();
 
     for (Character character : firstPage.getCharacters()) {
@@ -797,21 +669,21 @@ public class DFGPdfVisualizer {
       System.out.println(line.getPosition().getRectangle());
     }
 
-    Rectangle rect = rectangleFactory.create(75.8, 697.1, 536.1, 709.3);
+    Rectangle rect = new Rectangle(75.8, 697.1, 536.1, 709.3);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(151.9, 674.5, 470.0, 683.0);
+    rect = new Rectangle(151.9, 674.5, 470.0, 683.0);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(138.3, 660.3, 474.7, 669.6);
+    rect = new Rectangle(138.3, 660.3, 474.7, 669.6);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(132.0, 648.3, 481, 657.7);
+    rect = new Rectangle(132.0, 648.3, 481, 657.7);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(134.7, 636.4, 484, 645.7);
+    rect = new Rectangle(134.7, 636.4, 484, 645.7);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(52.5, 617.8, 496.3, 626.7);
+    rect = new Rectangle(52.5, 617.8, 496.3, 626.7);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 2f);
-    rect = rectangleFactory.create(53.8, 602.9, 559.7, 611.3);
+    rect = new Rectangle(53.8, 602.9, 559.7, 611.3);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
-    rect = rectangleFactory.create(53.8, 592.0, 454.3, 600.4);
+    rect = new Rectangle(53.8, 592.0, 454.3, 600.4);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);
 
   }
@@ -821,11 +693,9 @@ public class DFGPdfVisualizer {
   /**
    * The main method.
    *
-   * @param args
-   *     The command line arguments.
+   * @param args The command line arguments.
    *
-   * @throws Exception
-   *     If something went wrong.
+   * @throws Exception If something went wrong.
    */
   public static void main(String[] args) throws Exception {
     new DFGPdfVisualizer().run(args);

@@ -6,11 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-
 import pdfact.cli.model.TextUnit;
-import pdfact.cli.pipes.visualize.PdfDrawer.PdfDrawerFactory;
+import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.cli.util.exception.PdfActVisualizeException;
 import pdfact.core.model.Character;
 import pdfact.core.model.Element;
@@ -29,7 +26,6 @@ import pdfact.core.model.TextArea;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
-import pdfact.core.model.Rectangle.RectangleFactory;
 
 /**
  * A plain implementation of {@link PdfVisualizer}.
@@ -37,16 +33,6 @@ import pdfact.core.model.Rectangle.RectangleFactory;
  * @author Claudius Korzen
  */
 public class PlainPdfVisualizer implements PdfVisualizer {
-  /**
-   * The factory to create instance of {@link PdfDrawer}.
-   */
-  protected PdfDrawerFactory pdfDrawerFactory;
-
-  /**
-   * The factory to create instance of {@link Rectangle}.
-   */
-  protected RectangleFactory rectangleFactory;
-
   /**
    * The text unit.
    */
@@ -65,28 +51,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @param pdfDrawerFactory
    *        The factory to create instances of {@link PdfDrawer}.
-   */
-  @AssistedInject
-  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, RectangleFactory rectangleFactory) {
-    this.pdfDrawerFactory = pdfDrawerFactory;
-    this.rectangleFactory = rectangleFactory;
-  }
-
-  /**
-   * Creates a new PDF visualizer.
-   * 
-   * @param pdfDrawerFactory
-   *        The factory to create instances of {@link PdfDrawer}.
    * @param textUnit
    *        The text unit.
    * @param rolesFilter
    *        The semantic roles filter.
    */
-  @AssistedInject
-  public PlainPdfVisualizer(PdfDrawerFactory pdfDrawerFactory, RectangleFactory rectangleFactory,
-      @Assisted TextUnit textUnit,
-      @Assisted Set<SemanticRole> rolesFilter) {
-    this(pdfDrawerFactory, rectangleFactory);
+  public PlainPdfVisualizer(TextUnit textUnit, Set<SemanticRole> rolesFilter) {
     this.textUnit = textUnit;
     this.rolesFilter = rolesFilter;
   }
@@ -96,31 +66,31 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   @Override
   public byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException {
     if (pdf != null) {
-      PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
-
-      switch (this.textUnit) {
-        case CHARACTER:
-          visualizeCharacters(pdf, drawer);
-          break;
-        case TEXT_AREA:
-          visualizeTextAreas(pdf, drawer);
-          break;
-        case TEXT_LINE:
-          visualizeTextLines(pdf, drawer);
-          break;
-        case WORD:
-          visualizeWords(pdf, drawer);
-          break;
-        case TEXT_BLOCK:
-          visualizeTextBlocks(pdf, drawer);
-          break;
-        case PARAGRAPH:
-        default:
-          visualizeParagraphs(pdf, drawer);
-          break;
-      }
-
       try {
+        PdfDrawer drawer = new PdfBoxDrawer(pdf.getFile());
+
+        switch (this.textUnit) {
+          case CHARACTER:
+            visualizeCharacters(pdf, drawer);
+            break;
+          case TEXT_AREA:
+            visualizeTextAreas(pdf, drawer);
+            break;
+          case TEXT_LINE:
+            visualizeTextLines(pdf, drawer);
+            break;
+          case WORD:
+            visualizeWords(pdf, drawer);
+            break;
+          case TEXT_BLOCK:
+            visualizeTextBlocks(pdf, drawer);
+            break;
+          case PARAGRAPH:
+          default:
+            visualizeParagraphs(pdf, drawer);
+            break;
+        }
+
         return drawer.toByteArray();
       } catch (IOException e) {
         throw new PdfActVisualizeException("Error on visualization.", e);

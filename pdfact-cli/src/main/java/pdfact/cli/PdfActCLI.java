@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import org.apache.logging.log4j.LogManager;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
@@ -15,16 +14,13 @@ import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import pdfact.cli.guice.PdfActCliGuiceModule;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
-import pdfact.cli.pipes.PdfActServicePipe.PdfActServicePipeFactory;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
+import pdfact.core.PdfActCoreSettings;
 import pdfact.core.model.LogLevel;
-import pdfact.core.model.PdfDocument.PdfDocumentFactory;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.Log4JTypeListener;
 
 /**
  * The main class for the command line interface of PdfAct.
@@ -32,27 +28,6 @@ import pdfact.core.util.log.Log4JTypeListener;
  * @author Claudius Korzen
  */
 public class PdfActCLI {
-  /**
-   * The factory to create new PDF documents.
-   */
-  protected PdfDocumentFactory pdfDocumentFactory;
-
-  /**
-   * The factory to create service pipes of PdfAct.
-   */
-  protected PdfActServicePipeFactory serviceFactory;
-
-  // ==============================================================================================
-
-  /**
-   * Creates a new command line interface of PdfAct.
-   */
-  public PdfActCLI() {
-    Injector injector = Guice.createInjector(new PdfActCliGuiceModule());
-    this.pdfDocumentFactory = injector.getInstance(PdfDocumentFactory.class);
-    this.serviceFactory = injector.getInstance(PdfActServicePipeFactory.class);
-  }
-
   /**
    * Starts the command line interface of PdfAct.
    *
@@ -118,7 +93,7 @@ public class PdfActCLI {
       // Print the error message (regardless of the log level).
       System.err.println(errorMessage);
       // Print the stack trace if there is any and debugging is enabled.
-      if (cause != null && Log4JTypeListener.hasLogLevel(LogLevel.DEBUG)) {
+      if (cause != null && LogManager.getRootLogger().isDebugEnabled()) {
         cause.printStackTrace();
       }
     }
@@ -347,7 +322,7 @@ public class PdfActCLI {
           .nargs("?")
           .metavar("<level>")
           .type(Integer.class)
-          .setDefault(Log4JTypeListener.getLogLevel().getIntLevel())
+          .setDefault(PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel())
           .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
           .help("The verbosity of the log messages. Available options:  "
               + choiceStr.toString() + ".\n"

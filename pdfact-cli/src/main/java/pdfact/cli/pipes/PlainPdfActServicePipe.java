@@ -8,25 +8,22 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.Inject;
 
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
+import pdfact.cli.pipes.serialize.PlainSerializePdfPipe;
 import pdfact.cli.pipes.serialize.SerializePdfPipe;
-import pdfact.cli.pipes.serialize.SerializePdfPipe.SerializePdfPipeFactory;
+import pdfact.cli.pipes.validate.PlainValidatePathToWritePipe;
 import pdfact.cli.pipes.validate.ValidatePathToWritePipe;
-import pdfact.cli.pipes.validate.ValidatePathToWritePipe.ValidatePathToWritePipeFactory;
+import pdfact.cli.pipes.visualize.PlainVisualizePdfPipe;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe;
-import pdfact.cli.pipes.visualize.VisualizePdfPipe.VisualizePdfPipeFactory;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
-import pdfact.core.pipes.PdfActCorePipe.PdfActCorePipeFactory;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 import pdfact.core.util.pipeline.Pipeline;
-import pdfact.core.util.pipeline.Pipeline.PdfActPipelineFactory;
+import pdfact.core.util.pipeline.PlainPipeline;
 
 /**
  * A plain implementation of {@link PdfActServicePipe}.
@@ -37,33 +34,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The factory to create a pipeline.
-   */
-  protected PdfActPipelineFactory pipelineFactory;
-
-  /**
-   * The factory to create the core pipe of PdfAct.
-   */
-  protected PdfActCorePipeFactory pdfActCoreFactory;
-
-  /**
-   * The factory to create the pipe that validates PDF paths.
-   */
-  protected ValidatePathToWritePipeFactory validatePathPipeFactory;
-
-  /**
-   * The factory to create the pipe that serializes PDF documents.
-   */
-  protected SerializePdfPipeFactory serializePdfPipeFactory;
-
-  /**
-   * The factory to create the pipe that visualizes PDF documents.
-   */
-  protected VisualizePdfPipeFactory visualizePdfPipeFactory;
+  protected static Logger log = LogManager.getLogger(PlainPdfActServicePipe.class);
 
   // ==============================================================================================
 
@@ -110,29 +81,8 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
 
   /**
    * The default constructor.
-   * 
-   * @param pipelineFactory
-   *        The factory to create a pipeline.
-   * @param pdfActCorePipeFactory
-   *        The factory to create the core pipe of PdfAct.
-   * @param validatePathFactory
-   *        The factory to create the pipe that validates PDF paths.
-   * @param serializePdfPipeFactory
-   *        The factory to create the pipe that serializes PDF documents.
-   * @param visualizePdfPipeFactory
-   *        The factory to create the pipe that visualizes PDF documents.
    */
-  @Inject
-  public PlainPdfActServicePipe(PdfActPipelineFactory pipelineFactory,
-      PdfActCorePipeFactory pdfActCorePipeFactory,
-      ValidatePathToWritePipeFactory validatePathFactory,
-      SerializePdfPipeFactory serializePdfPipeFactory,
-      VisualizePdfPipeFactory visualizePdfPipeFactory) {
-    this.pipelineFactory = pipelineFactory;
-    this.pdfActCoreFactory = pdfActCorePipeFactory;
-    this.validatePathPipeFactory = validatePathFactory;
-    this.serializePdfPipeFactory = serializePdfPipeFactory;
-    this.visualizePdfPipeFactory = visualizePdfPipeFactory;
+  public PlainPdfActServicePipe() {
     this.serializationFormat = DEFAULT_SERIALIZE_FORMAT;
     this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
@@ -156,21 +106,21 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
 
     log.debug("Process: Processing the service pipeline.");
     
-    Pipeline pipeline = this.pipelineFactory.create();
+    Pipeline pipeline = new PlainPipeline();
 
     // Parse the PDF document.
-    pipeline.addPipe(this.pdfActCoreFactory.create());
+    pipeline.addPipe(new PlainPdfActServicePipe());
 
     // Validate the target path for the serialization if there is any given.
     if (this.serializationPath != null) {
-      ValidatePathToWritePipe valPipe = this.validatePathPipeFactory.create();
+      ValidatePathToWritePipe valPipe = new PlainValidatePathToWritePipe();
       valPipe.setPath(this.serializationPath);
       pipeline.addPipe(valPipe);
     }
 
     // Serialize if there is a target given for the serialization.
     if (this.serializationStream != null || this.serializationPath != null) {
-      SerializePdfPipe serializePipe = this.serializePdfPipeFactory.create();
+      SerializePdfPipe serializePipe = new PlainSerializePdfPipe();
       serializePipe.setSerializationFormat(this.serializationFormat);
       serializePipe.setTextUnit(this.textUnit);
       serializePipe.setSemanticRolesFilters(this.roles);
@@ -181,14 +131,14 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
 
     // Validate the target path for the visualization if there is any given.
     if (this.visualizationPath != null) {
-      ValidatePathToWritePipe valPipe = this.validatePathPipeFactory.create();
+      ValidatePathToWritePipe valPipe = new PlainValidatePathToWritePipe();
       valPipe.setPath(this.visualizationPath);
       pipeline.addPipe(valPipe);
     }
 
     // Visualize if there is a target given for the visualization.
     if (this.visualizationStream != null || this.visualizationPath != null) {
-      VisualizePdfPipe visualizePipe = this.visualizePdfPipeFactory.create();
+      VisualizePdfPipe visualizePipe = new PlainVisualizePdfPipe();
       visualizePipe.setTextUnit(this.textUnit);
       visualizePipe.setSemanticRolesFilters(this.roles);
       visualizePipe.setTargetPath(this.visualizationPath);

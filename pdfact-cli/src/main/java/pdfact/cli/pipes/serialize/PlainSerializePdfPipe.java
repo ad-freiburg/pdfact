@@ -8,21 +8,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.inject.assistedinject.AssistedInject;
 
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
-import pdfact.cli.pipes.serialize.PdfSerializer.SerializerFactory;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.InjectLogger;
 
 /**
  * A plain implementation of {@link SerializePdfPipe}.
@@ -33,13 +29,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * The logger.
    */
-  @InjectLogger
-  protected static Logger log;
-
-  /**
-   * The available serializers.
-   */
-  protected Map<SerializeFormat, SerializerFactory> serializers;
+  protected static Logger log = LogManager.getLogger(PlainSerializePdfPipe.class);
 
   /**
    * The serialization format.
@@ -74,10 +64,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    * @param serializers
    *        The factories of the available serializers.
    */
-  @AssistedInject
-  public PlainSerializePdfPipe(
-      Map<SerializeFormat, SerializerFactory> serializers) {
-    this.serializers = serializers;
+  public PlainSerializePdfPipe() {
     this.format = DEFAULT_SERIALIZE_FORMAT;
     this.textUnit = DEFAULT_TEXT_UNIT;
     this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
@@ -111,15 +98,23 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    *         If something went wrong while serializing the PDF document.
    */
   protected void serialize(PdfDocument pdf) throws PdfActException {
-    // Obtain the serializer factory to use.
-    SerializerFactory factory = this.serializers.get(this.format);
-    if (factory == null) {
-      throw new PdfActSerializeException(
+    // Instantiate a serializer.
+    PdfSerializer serializer;
+    switch (this.format) {
+      case XML:
+        serializer = new PdfXmlSerializer(this.textUnit, this.roles);
+        break;
+      case JSON:
+        serializer = new PdfJsonSerializer(this.textUnit, this.roles);
+        break;
+      case TXT:
+        serializer = new PdfTxtSerializer(this.textUnit, this.roles);
+        break;
+      default:
+        throw new PdfActSerializeException(
           "Couldn't find a serializer for the format '" + this.format + "'.");
     }
 
-    // Create the serializer.
-    PdfSerializer serializer = factory.create(this.textUnit, this.roles);
     // Serialize the PDF document.
     byte[] serialization = serializer.serialize(pdf);
 

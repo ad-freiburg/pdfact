@@ -1,24 +1,22 @@
 package pdfact.cli;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import pdfact.cli.guice.PdfActCliGuiceModule;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.Configurator;
+
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.PdfActServicePipe;
-import pdfact.cli.pipes.PdfActServicePipe.PdfActServicePipeFactory;
+import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.core.model.LogLevel;
 import pdfact.core.model.PdfDocument;
-import pdfact.core.model.PdfDocument.PdfDocumentFactory;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
-import pdfact.core.util.log.Log4JTypeListener;
 
 /**
  * The main class for the command line interface of PdfAct.
@@ -26,18 +24,6 @@ import pdfact.core.util.log.Log4JTypeListener;
  * @author Claudius Korzen
  */
 public class PdfAct {
-  /**
-   * The factory to create new PDF documents.
-   */
-  protected PdfDocumentFactory pdfDocumentFactory;
-
-  /**
-   * The factory to create service pipes of PdfAct.
-   */
-  protected PdfActServicePipeFactory serviceFactory;
-
-  // ==============================================================================================
-
   /**
    * The log level.
    */
@@ -76,15 +62,6 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Creates a new command line interface of PdfAct.
-   */
-  public PdfAct() {
-    Injector injector = Guice.createInjector(new PdfActCliGuiceModule());
-    this.pdfDocumentFactory = injector.getInstance(PdfDocumentFactory.class);
-    this.serviceFactory = injector.getInstance(PdfActServicePipeFactory.class);
-  }
-
-  /**
    * Parses the PDF file given by a string path.
    *
    * @param pdfPath
@@ -112,13 +89,14 @@ public class PdfAct {
    */
   public PdfDocument parse(Path pdfPath) throws PdfActException {
     // Create a service pipe.
-    PdfActServicePipe service = this.serviceFactory.create();
+    PdfActServicePipe service = new PlainPdfActServicePipe();
 
     // Create the PDF document from the given path.
-    PdfDocument pdf = this.pdfDocumentFactory.create(pdfPath);
+    PdfDocument pdf = new PdfDocument(pdfPath);
 
     // Pass the log level.
-    Log4JTypeListener.setLogLevel(this.logLevel);
+    Level log4jLevel = this.logLevel.getLog4jEquivalent();
+    Configurator.setAllLevels(LogManager.getRootLogger().getName(), log4jLevel);
 
     // Pass the serialization format if there is any.
     if (this.serializationFormat != null) {

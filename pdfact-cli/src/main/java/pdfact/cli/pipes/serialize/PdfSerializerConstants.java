@@ -6,7 +6,7 @@ package pdfact.cli.pipes.serialize;
  * @author Claudius Korzen
  *
  */
-public class PlainPdfSerializerConstants {
+public class PdfSerializerConstants {
   /** The constant 'B' (The blue part of an RGB color). */
   static final String B = "b";
   /** The constant 'CHARACTER'. */
