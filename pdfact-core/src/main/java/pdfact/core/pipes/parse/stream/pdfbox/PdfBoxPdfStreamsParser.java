@@ -3,6 +3,7 @@ package pdfact.core.pipes.parse.stream.pdfbox;
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
 
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -220,7 +221,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     registerOperatorProcessor(new SetWordSpacing()); // Tw
     registerOperatorProcessor(new ShowText()); // Tj
     registerOperatorProcessor(new ShowTextWithIndividualGlyphPositioning()); // TJ
- 
+
     // Install the graphics operator modules.
     registerOperatorProcessor(new AppendRectangleToPath()); // re
     registerOperatorProcessor(new BeginInlineImage()); // BI
@@ -243,7 +244,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     registerOperatorProcessor(new SaveGraphicsState()); // q
     registerOperatorProcessor(new SetGraphicsStateParameters()); // gs
     registerOperatorProcessor(new StrokePath()); // S
- 
+
     // Install the color operator modules.
     registerOperatorProcessor(new SetNonStrokingColor()); // sc
     registerOperatorProcessor(new SetNonStrokingColorN()); // scn
@@ -296,17 +297,12 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Processes the given page.
    * 
-   * @param pdf
-   *        The PDF document to which the given page belongs to.
-   * @param page
-   *        The page to process
-   * @param pageNum
-   *        The number of the page in the PDF document.
-   * @throws IOException
-   *         If something went wrong while parsing the page.
+   * @param pdf     The PDF document to which the given page belongs to.
+   * @param page    The page to process
+   * @param pageNum The number of the page in the PDF document.
+   * @throws IOException If something went wrong while parsing the page.
    */
-  protected void processPage(PdfDocument pdf, PDPage page, int pageNum)
-      throws IOException {
+  protected void processPage(PdfDocument pdf, PDPage page, int pageNum) throws IOException {
     this.page = page;
     this.graphicsStack.clear();
     this.graphicsStack.push(new PDGraphicsState(page.getCropBox()));
@@ -342,17 +338,12 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Processes the page content stream.
    * 
-   * @param pdf
-   *        The PDF document to which the stream belongs to.
-   * @param page
-   *        The PDF page to which the stream belongs to.
-   * @param stream
-   *        The content stream
-   * @throws IOException
-   *         if there is an exception while processing the stream
+   * @param pdf    The PDF document to which the stream belongs to.
+   * @param page   The PDF page to which the stream belongs to.
+   * @param stream The content stream
+   * @throws IOException if there is an exception while processing the stream
    */
-  public void processStream(PdfDocument pdf, Page page, PDContentStream stream)
-      throws IOException {
+  public void processStream(PdfDocument pdf, Page page, PDContentStream stream) throws IOException {
     if (stream != null) {
       PDResources parent = pushResources(stream);
       Stack<PDGraphicsState> savedStack = saveGraphicsStack();
@@ -377,19 +368,13 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Processes a type 3 character stream.
    * 
-   * @param pdf
-   *        The PDF document to which the stream belongs to.
-   * @param page
-   *        The PDF page to which the stream belongs to.
-   * @param proc
-   *        Type 3 character procedure
-   * @param trm
-   *        The text Rendering Matrix
-   * @throws IOException
-   *         if processing the type stream fails.
+   * @param pdf  The PDF document to which the stream belongs to.
+   * @param page The PDF page to which the stream belongs to.
+   * @param proc Type 3 character procedure
+   * @param trm  The text Rendering Matrix
+   * @throws IOException if processing the type stream fails.
    */
-  public void processType3Stream(PdfDocument pdf, Page page,
-      PDType3CharProc proc, Matrix trm) throws IOException {
+  public void processType3Stream(PdfDocument pdf, Page page, PDType3CharProc proc, Matrix trm) throws IOException {
     PDResources parent = pushResources(proc);
     Stack<PDGraphicsState> savedStack = saveGraphicsStack();
 
@@ -420,17 +405,12 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Processes the operators of the given content stream.
    * 
-   * @param pdf
-   *        The PDF document to which the stream belongs to.
-   * @param page
-   *        The PDF page to which the stream belongs to.
-   * @param stream
-   *        The stream.
-   * @throws IOException
-   *         if parsing the stream fails.
+   * @param pdf    The PDF document to which the stream belongs to.
+   * @param page   The PDF page to which the stream belongs to.
+   * @param stream The stream.
+   * @throws IOException if parsing the stream fails.
    */
-  protected void processStreamOperators(PdfDocument pdf, Page page,
-      PDContentStream stream) throws IOException {
+  protected void processStreamOperators(PdfDocument pdf, Page page, PDContentStream stream) throws IOException {
     List<COSBase> arguments = new ArrayList<COSBase>();
 
     PDFStreamParser parser = new PDFStreamParser(stream);
@@ -451,19 +431,14 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * This is used to handle an operator.
    * 
-   * @param pdf
-   *        The PDF document to which the operator belongs to.
-   * @param page
-   *        The PDF page to which the operator belongs to.
-   * @param operation
-   *        The operation to perform.
-   * @param arguments
-   *        The list of arguments.
-   * @throws IOException
-   *         If there is an error processing the operation.
+   * @param pdf       The PDF document to which the operator belongs to.
+   * @param page      The PDF page to which the operator belongs to.
+   * @param operation The operation to perform.
+   * @param arguments The list of arguments.
+   * @throws IOException If there is an error processing the operation.
    */
-  public void processOperator(PdfDocument pdf, Page page, String operation,
-      List<COSBase> arguments) throws IOException {
+  public void processOperator(PdfDocument pdf, Page page, String operation, List<COSBase> arguments)
+      throws IOException {
     Operator operator = Operator.getOperator(operation);
     processOperator(pdf, page, operator, arguments);
   }
@@ -471,19 +446,13 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * This is used to handle an operator.
    * 
-   * @param pdf
-   *        The PDF document to which the operator belongs to.
-   * @param page
-   *        The PDF page to which the operator belongs to.
-   * @param op
-   *        The operation to perform.
-   * @param args
-   *        The list of arguments.
-   * @throws IOException
-   *         If there is an error processing the operation.
+   * @param pdf  The PDF document to which the operator belongs to.
+   * @param page The PDF page to which the operator belongs to.
+   * @param op   The operation to perform.
+   * @param args The list of arguments.
+   * @throws IOException If there is an error processing the operation.
    */
-  protected void processOperator(PdfDocument pdf, Page page, Operator op,
-      List<COSBase> args) throws IOException {
+  protected void processOperator(PdfDocument pdf, Page page, Operator op, List<COSBase> args) throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
     log.trace("Processing PDF operator: " + op + "; args: " + args);
@@ -504,10 +473,47 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   // Methods related to resources.
 
   /**
+   * use the current transformation matrix to transform a single point.
+   *
+   * @param x x-coordinate of the point to be transform
+   * @param y y-coordinate of the point to be transform
+   * @return the transformed coordinates as Point2D.Double
+   */
+  public Point2D.Double transformedPoint(double x, double y) {
+    double[] position = { x, y };
+    getGraphicsState().getCurrentTransformationMatrix().createAffineTransform()
+            .transform(position, 0, position, 0, 1);
+    return new Point2D.Double(position[0], position[1]);
+  }
+
+  /**
+   * use the current transformation matrix to transform a PDRectangle.
+   * 
+   * @param rect the PDRectangle to transform
+   * @return the transformed coordinates as a GeneralPath
+   */
+  public GeneralPath transformedPDRectanglePath(PDRectangle rect) {
+    float x1 = rect.getLowerLeftX();
+    float y1 = rect.getLowerLeftY();
+    float x2 = rect.getUpperRightX();
+    float y2 = rect.getUpperRightY();
+    Point2D p0 = transformedPoint(x1, y1);
+    Point2D p1 = transformedPoint(x2, y1);
+    Point2D p2 = transformedPoint(x2, y2);
+    Point2D p3 = transformedPoint(x1, y2);
+    GeneralPath path = new GeneralPath();
+    path.moveTo((float) p0.getX(), (float) p0.getY());
+    path.lineTo((float) p1.getX(), (float) p1.getY());
+    path.lineTo((float) p2.getX(), (float) p2.getY());
+    path.lineTo((float) p3.getX(), (float) p3.getY());
+    path.closePath();
+    return path;
+  }
+
+  /**
    * Pushes the given stream's resources, returning the previous resources.
    * 
-   * @param stream
-   *        The stream.
+   * @param stream The stream.
    * @return The resources.
    */
   protected PDResources pushResources(PDContentStream stream) {
@@ -535,8 +541,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Pops the current resources and replaces them with the given resources.
    * 
-   * @param parentResources
-   *        The resources.
+   * @param parentResources The resources.
    */
   protected void popResources(PDResources parentResources) {
     this.resources = parentResources;
@@ -569,8 +574,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Restores the entire graphics stack.
    * 
-   * @param snapshot
-   *        The graphics stack to restore.
+   * @param snapshot The graphics stack to restore.
    */
   public void restoreGraphicsStack(Stack<PDGraphicsState> snapshot) {
     this.graphicsStack = snapshot;
@@ -623,8 +627,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the current transformation matrix.
    * 
-   * @param matrix
-   *        The current transformation matrix.
+   * @param matrix The current transformation matrix.
    */
   public void setCurrentTransformationMatrix(Matrix matrix) {
     getGraphicsState().setCurrentTransformationMatrix(matrix);
@@ -634,8 +637,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * Transforms the given coordinates by applying the current transformation
    * matrix.
    * 
-   * @param p
-   *        The point to transform.
+   * @param p The point to transform.
    */
   // TODO: Maybe its a better idea to make the transformation *not* in place.
   public void transform(Point p) {
@@ -645,18 +647,14 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Transforms the given coordinates by applying the given matrix.
    * 
-   * @param p
-   *        The point to transform.
-   * @param m
-   *        The matrix to apply.
+   * @param p The point to transform.
+   * @param m The matrix to apply.
    */
   // TODO: Maybe its a better idea to make the transformation *not* in place.
   public void transform(Point p, Matrix m) {
     if (p != null && m != null) {
-      p.setX(p.getX() * m.getScaleX() + p.getY() * m.getShearX()
-          + m.getTranslateX());
-      p.setY(p.getX() * m.getShearY() + p.getY() * m.getScaleY()
-          + m.getTranslateY());
+      p.setX(p.getX() * m.getScaleX() + p.getY() * m.getShearX() + m.getTranslateX());
+      p.setY(p.getX() * m.getShearY() + p.getY() * m.getScaleY() + m.getTranslateY());
     }
   }
 
@@ -675,8 +673,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the text line matrix.
    * 
-   * @param value
-   *        The text line matrix.
+   * @param value The text line matrix.
    */
   public void setTextLineMatrix(Matrix value) {
     this.textLineMatrix = value;
@@ -694,8 +691,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the text matrix.
    * 
-   * @param value
-   *        The text matrix to set.
+   * @param value The text matrix to set.
    */
   public void setTextMatrix(Matrix value) {
     this.textMatrix = value;
@@ -716,8 +712,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the isType3Stream flag.
    * 
-   * @param isType3Stream
-   *        The flag to set.
+   * @param isType3Stream The flag to set.
    */
   public void setIsType3Stream(boolean isType3Stream) {
     this.isType3Stream = isType3Stream;
@@ -726,8 +721,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the current type3 glyph bounding box.
    * 
-   * @param boundingBox
-   *        The bounding box.
+   * @param boundingBox The bounding box.
    */
   public void setCurrentType3GlyphBoundingBox(Rectangle boundingBox) {
     this.currentType3GlyphBoundingBox = boundingBox;
@@ -757,8 +751,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the line path of this stripper.
    * 
-   * @param path
-   *        The line path to set.
+   * @param path The line path to set.
    */
   public void setLinePath(GeneralPath path) {
     if (this.linePath == null || this.linePath.getCurrentPoint() == null) {
@@ -780,8 +773,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the current position of the line path.
    * 
-   * @param linePathPosition
-   *        The position to set.
+   * @param linePathPosition The position to set.
    */
   public void setLinePathPosition(float[] linePathPosition) {
     this.linePathPosition = linePathPosition;
@@ -799,8 +791,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * Sets the position of the last moveto operation in line path.
    * 
-   * @param position
-   *        The position to set.
+   * @param position The position to set.
    */
   public void setLinePathLastMoveToPosition(float[] position) {
     this.linePathLastMoveToPosition = position;
@@ -817,11 +808,10 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
 
   /**
    * Modify the current clipping path by intersecting it with the current path.
-   * The clipping path will not be updated until the succeeding painting
-   * operator is called.
+   * The clipping path will not be updated until the succeeding painting operator
+   * is called.
    * 
-   * @param rule
-   *        The winding rule which will be used for clipping.
+   * @param rule The winding rule which will be used for clipping.
    */
   public void setClippingWindingRule(int rule) {
     this.clippingWindingRule = rule;
@@ -833,8 +823,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle the start of parsing the PDF file.
    * 
-   * @param pdf
-   *        The PDF document.
+   * @param pdf The PDF document.
    */
   public void handlePdfFileStart(PdfDocument pdf) {
     // Nothing to do so far.
@@ -843,8 +832,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle the end of parsing the PDF file.
    * 
-   * @param pdf
-   *        The PDF document.
+   * @param pdf The PDF document.
    */
   public void handlePdfFileEnd(PdfDocument pdf) {
     // Compute the character statistics for the whole PDF document.
@@ -854,10 +842,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle the start of the processing of a PDF page.
    * 
-   * @param pdf
-   *        The PDF document to which the given PDF page belongs to.
-   * @param page
-   *        The page to process.
+   * @param pdf  The PDF document to which the given PDF page belongs to.
+   * @param page The page to process.
    */
   public void handlePdfPageStart(PdfDocument pdf, Page page) {
     pdf.addPage(page);
@@ -867,10 +853,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle the end of the processing of a PDF page.
    * 
-   * @param pdf
-   *        The PDF document to which the given PDF page belongs to.
-   * @param page
-   *        The page to process.
+   * @param pdf  The PDF document to which the given PDF page belongs to.
+   * @param page The page to process.
    */
   public void handlePdfPageEnd(PdfDocument pdf, Page page) {
     // Compute the character statistics for the page.
@@ -880,12 +864,9 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle a character.
    * 
-   * @param pdf
-   *        The PDF document to which the given character belongs to.
-   * @param page
-   *        The PDF page to which the given character belongs to.
-   * @param c
-   *        The character to process.
+   * @param pdf  The PDF document to which the given character belongs to.
+   * @param page The PDF page to which the given character belongs to.
+   * @param c    The character to process.
    */
   public void handlePdfCharacter(PdfDocument pdf, Page page, Character c) {
     page.addCharacter(c);
@@ -895,12 +876,9 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle a PdfFigure.
    * 
-   * @param pdf
-   *        The PDF document to which the given figure belongs to.
-   * @param page
-   *        The PDF page to which the given figure belongs to.
-   * @param figure
-   *        The figure to process.
+   * @param pdf    The PDF document to which the given figure belongs to.
+   * @param page   The PDF page to which the given figure belongs to.
+   * @param figure The figure to process.
    */
   public void handlePdfFigure(PdfDocument pdf, Page page, Figure figure) {
     page.addFigure(figure);
@@ -910,12 +888,9 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * A callback to handle a PdfShape.
    * 
-   * @param pdf
-   *        The PDF document to which the given shape belongs to.
-   * @param page
-   *        The PDF page to which the given shape belongs to.
-   * @param shape
-   *        The shape to process.
+   * @param pdf   The PDF document to which the given shape belongs to.
+   * @param page  The PDF page to which the given shape belongs to.
+   * @param shape The shape to process.
    */
   public void handlePdfShape(PdfDocument pdf, Page page, Shape shape) {
     page.addShape(shape);

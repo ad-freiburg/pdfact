@@ -34,7 +34,7 @@ public class MoveTextSetLeading extends OperatorProcessor {
     COSNumber y = (COSNumber) args.get(1);
 
     ArrayList<COSBase> otherArgs = new ArrayList<COSBase>();
-    args.add(new COSFloat(-1 * y.floatValue()));
+    otherArgs.add(new COSFloat(-1 * y.floatValue()));
     this.engine.processOperator(pdf, page, "TL", otherArgs);
     this.engine.processOperator(pdf, page, "Td", args);
   }
