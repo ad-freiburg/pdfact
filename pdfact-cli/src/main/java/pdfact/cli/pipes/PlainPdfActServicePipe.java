@@ -21,6 +21,7 @@ import pdfact.cli.pipes.visualize.PlainVisualizePdfPipe;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
+import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.pipeline.Pipeline;
 import pdfact.core.util.pipeline.PlainPipeline;
@@ -109,7 +110,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     Pipeline pipeline = new PlainPipeline();
 
     // Parse the PDF document.
-    pipeline.addPipe(new PlainPdfActServicePipe());
+    pipeline.addPipe(new PlainPdfActCorePipe());
 
     // Validate the target path for the serialization if there is any given.
     if (this.serializationPath != null) {

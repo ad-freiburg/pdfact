@@ -95,8 +95,8 @@ public class PdfAct {
     PdfDocument pdf = new PdfDocument(pdfPath);
 
     // Pass the log level.
-    Level log4jLevel = this.logLevel.getLog4jEquivalent();
-    Configurator.setAllLevels(LogManager.getRootLogger().getName(), log4jLevel);
+    // Level log4jLevel = this.logLevel.getLog4jEquivalent();
+    // Configurator.setAllLevels(LogManager.getRootLogger().getName(), log4jLevel);
 
     // Pass the serialization format if there is any.
     if (this.serializationFormat != null) {

@@ -51,6 +51,9 @@
                 <manifest>
                   <mainClass>pdfact.cli.PdfActCLI</mainClass>
                 </manifest>
+                <manifestEntries>
+                  <Multi-Release>true</Multi-Release>
+                </manifestEntries>
               </archive>
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
