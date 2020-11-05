@@ -1,9 +1,7 @@
 package pdfact.cli.pipes.visualize;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import pdfact.core.model.HasRectangle;
 import pdfact.core.model.Line;
@@ -648,33 +646,4 @@ public interface PdfDrawer {
    *         If getting the bytes has failed.
    */
   byte[] toByteArray() throws IOException;
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link PdfDrawer}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfDrawerFactory {
-    /**
-     * Creates a new PdfDrawer.
-     * 
-     * @param pdf
-     *        The PDF file to process.
-     * 
-     * @return A new instance of {@link PdfDrawer}.
-     */
-    PdfDrawer create(File pdf);
-
-    /**
-     * Creates a new PdfDrawer.
-     * 
-     * @param pdf
-     *        The PDF file to process.
-     * 
-     * @return A new instance of {@link PdfDrawer}.
-     */
-    PdfDrawer create(Path pdf);
-  }
 }

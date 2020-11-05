@@ -1,5 +1,7 @@
 package pdfact.core.pipes.parse.stream.pdfbox;
 
+import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
+
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,6 +85,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetType3GlyphWidthAn
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.SetWordSpacing;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowText;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.text.ShowTextWithIndividualGlyphPositioning;
+import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActParseException;
 import pdfact.core.util.statistician.CharacterStatistician;
@@ -194,73 +197,66 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
 
   /**
    * Creates a new stream engine.
-   * 
-   * @param pageFactory
-   *        The factory to create instance of {@link Page}.
-   * @param operators
-   *        The operator processors to investigate on parsing.
-   * @param statistician
-   *        The statistician to compute statistics about characters.
    */
   public PdfBoxPdfStreamsParser() {
     this.operatorProcessors = new HashMap<>();
 
-     // Install the text operator modules.
-     registerOperatorProcessor(new BeginText()); // BT
-     registerOperatorProcessor(new EndText()); // ET
-     registerOperatorProcessor(new MoveText()); // Td
-     registerOperatorProcessor(new MoveTextSetLeading()); // TD
-     registerOperatorProcessor(new MoveToNextLineAndShowText()); // '
-     registerOperatorProcessor(new MoveToNextLineAndShowTextWithSpacing()); // "
-     registerOperatorProcessor(new SetCharacterSpacing()); // Tc
-     registerOperatorProcessor(new SetFontAndSize()); // Tf
-     registerOperatorProcessor(new MoveToNextLine()); // T*
-     registerOperatorProcessor(new SetTextHorizontalScaling()); // Tz
-     registerOperatorProcessor(new SetTextLeading()); // TL
-     registerOperatorProcessor(new SetTextMatrix()); // Tm
-     registerOperatorProcessor(new SetTextRenderingMode()); // Tr
-     registerOperatorProcessor(new SetTextRise()); // Ts
-     registerOperatorProcessor(new SetType3GlyphWidthAndBoundingBox()); // d1
-     registerOperatorProcessor(new SetWordSpacing()); // Tw
-     registerOperatorProcessor(new ShowText()); // Tj
-     registerOperatorProcessor(new ShowTextWithIndividualGlyphPositioning()); // TJ
+    // Install the text operator modules.
+    registerOperatorProcessor(new BeginText()); // BT
+    registerOperatorProcessor(new EndText()); // ET
+    registerOperatorProcessor(new MoveText()); // Td
+    registerOperatorProcessor(new MoveTextSetLeading()); // TD
+    registerOperatorProcessor(new MoveToNextLineAndShowText()); // '
+    registerOperatorProcessor(new MoveToNextLineAndShowTextWithSpacing()); // "
+    registerOperatorProcessor(new SetCharacterSpacing()); // Tc
+    registerOperatorProcessor(new SetFontAndSize()); // Tf
+    registerOperatorProcessor(new MoveToNextLine()); // T*
+    registerOperatorProcessor(new SetTextHorizontalScaling()); // Tz
+    registerOperatorProcessor(new SetTextLeading()); // TL
+    registerOperatorProcessor(new SetTextMatrix()); // Tm
+    registerOperatorProcessor(new SetTextRenderingMode()); // Tr
+    registerOperatorProcessor(new SetTextRise()); // Ts
+    registerOperatorProcessor(new SetType3GlyphWidthAndBoundingBox()); // d1
+    registerOperatorProcessor(new SetWordSpacing()); // Tw
+    registerOperatorProcessor(new ShowText()); // Tj
+    registerOperatorProcessor(new ShowTextWithIndividualGlyphPositioning()); // TJ
  
-     // Install the graphics operator modules.
-     registerOperatorProcessor(new AppendRectangleToPath()); // re
-     registerOperatorProcessor(new BeginInlineImage()); // BI
-     registerOperatorProcessor(new ClipEvenOddRule()); // W*
-     registerOperatorProcessor(new ClipNonZeroRule()); // W
-     registerOperatorProcessor(new ClosePath()); // h
-     registerOperatorProcessor(new CurveTo()); // c
-     registerOperatorProcessor(new CurveToReplicateFinalPoint()); // y
-     registerOperatorProcessor(new CurveToReplicateInitialPoint()); // v
-     registerOperatorProcessor(new EndPath()); // n
-     registerOperatorProcessor(new FillEvenOddAndStrokePath()); // B*
-     registerOperatorProcessor(new FillEvenOddRule()); // f*
-     registerOperatorProcessor(new FillNonZeroAndStrokePath()); // B
-     registerOperatorProcessor(new FillNonZeroRule()); // f
-     registerOperatorProcessor(new Invoke()); // Do
-     registerOperatorProcessor(new LineTo()); // l
-     registerOperatorProcessor(new ModifyCurrentTransformationMatrix()); // cm
-     registerOperatorProcessor(new MoveTo()); // m
-     registerOperatorProcessor(new RestoreGraphicsState()); // Q
-     registerOperatorProcessor(new SaveGraphicsState()); // q
-     registerOperatorProcessor(new SetGraphicsStateParameters()); // gs
-     registerOperatorProcessor(new StrokePath()); // S
+    // Install the graphics operator modules.
+    registerOperatorProcessor(new AppendRectangleToPath()); // re
+    registerOperatorProcessor(new BeginInlineImage()); // BI
+    registerOperatorProcessor(new ClipEvenOddRule()); // W*
+    registerOperatorProcessor(new ClipNonZeroRule()); // W
+    registerOperatorProcessor(new ClosePath()); // h
+    registerOperatorProcessor(new CurveTo()); // c
+    registerOperatorProcessor(new CurveToReplicateFinalPoint()); // y
+    registerOperatorProcessor(new CurveToReplicateInitialPoint()); // v
+    registerOperatorProcessor(new EndPath()); // n
+    registerOperatorProcessor(new FillEvenOddAndStrokePath()); // B*
+    registerOperatorProcessor(new FillEvenOddRule()); // f*
+    registerOperatorProcessor(new FillNonZeroAndStrokePath()); // B
+    registerOperatorProcessor(new FillNonZeroRule()); // f
+    registerOperatorProcessor(new Invoke()); // Do
+    registerOperatorProcessor(new LineTo()); // l
+    registerOperatorProcessor(new ModifyCurrentTransformationMatrix()); // cm
+    registerOperatorProcessor(new MoveTo()); // m
+    registerOperatorProcessor(new RestoreGraphicsState()); // Q
+    registerOperatorProcessor(new SaveGraphicsState()); // q
+    registerOperatorProcessor(new SetGraphicsStateParameters()); // gs
+    registerOperatorProcessor(new StrokePath()); // S
  
-     // Install the color operator modules.
-     registerOperatorProcessor(new SetNonStrokingColor()); // sc
-     registerOperatorProcessor(new SetNonStrokingColorN()); // scn
-     registerOperatorProcessor(new SetNonStrokingColorSpace()); // cs
-     registerOperatorProcessor(new SetNonStrokingDeviceCMYKColor()); // k
-     registerOperatorProcessor(new SetNonStrokingDeviceGrayColor()); // g
-     registerOperatorProcessor(new SetNonStrokingDeviceRGBColor()); // rg
-     registerOperatorProcessor(new SetStrokingColor()); // SC
-     registerOperatorProcessor(new SetStrokingColorN()); // SCN
-     registerOperatorProcessor(new SetStrokingColorSpace()); // CS
-     registerOperatorProcessor(new SetStrokingDeviceCMYKColor()); // K
-     registerOperatorProcessor(new SetStrokingDeviceGrayColor()); // G
-     registerOperatorProcessor(new SetStrokingDeviceRGBColor()); // RG
+    // Install the color operator modules.
+    registerOperatorProcessor(new SetNonStrokingColor()); // sc
+    registerOperatorProcessor(new SetNonStrokingColorN()); // scn
+    registerOperatorProcessor(new SetNonStrokingColorSpace()); // cs
+    registerOperatorProcessor(new SetNonStrokingDeviceCMYKColor()); // k
+    registerOperatorProcessor(new SetNonStrokingDeviceGrayColor()); // g
+    registerOperatorProcessor(new SetNonStrokingDeviceRGBColor()); // rg
+    registerOperatorProcessor(new SetStrokingColor()); // SC
+    registerOperatorProcessor(new SetStrokingColorN()); // SCN
+    registerOperatorProcessor(new SetStrokingColorSpace()); // CS
+    registerOperatorProcessor(new SetStrokingDeviceCMYKColor()); // K
+    registerOperatorProcessor(new SetStrokingDeviceGrayColor()); // G
+    registerOperatorProcessor(new SetStrokingDeviceRGBColor()); // RG
 
     this.statistician = new CharacterStatistician();
     this.graphicsStack = new Stack<PDGraphicsState>();
@@ -334,8 +330,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
       rect = page.getTrimBox();
     }
     if (rect != null) {
-      pdfPage.setHeight(rect.getHeight());
-      pdfPage.setWidth(rect.getWidth());
+      pdfPage.setHeight(PdfActUtils.round(rect.getHeight(), FLOATING_NUMBER_PRECISION));
+      pdfPage.setWidth(PdfActUtils.round(rect.getWidth(), FLOATING_NUMBER_PRECISION));
     }
 
     handlePdfPageStart(pdf, pdfPage);

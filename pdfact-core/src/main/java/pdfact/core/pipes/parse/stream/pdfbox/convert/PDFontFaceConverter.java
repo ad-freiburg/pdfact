@@ -28,9 +28,6 @@ public class PDFontFaceConverter {
 
   /**
    * Creates a new font face converter.
-   * 
-   * @param fontFaceFactory
-   *        The factory to create instances of {@link FontFace}.
    */
   public PDFontFaceConverter() {
     this.knownFontFaces = new HashMap<>();

@@ -9,7 +9,8 @@ import java.nio.file.Paths;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
-import pdfact.cli.pipes.PdfActServicePipe;
+import pdfact.cli.pipes.PlainPdfActServicePipe;
+import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.core.model.Character;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
@@ -46,16 +47,6 @@ public class DFGPdfVisualizer {
   @Arg(dest = "output")
   protected String outputPath;
 
-  /**
-   * The factory to create instances of PdfDrawer.
-   */
-  protected PdfDrawer.PdfDrawerFactory pdfDrawerFactory;
-
-  /**
-   * The factory to create instances of PdfActServicePipe.
-   */
-  protected PdfActServicePipe.PdfActServicePipeFactory serviceFactory;
-
   // ==============================================================================================
 
   /**
@@ -78,10 +69,10 @@ public class DFGPdfVisualizer {
     parser.parseArgs(args, this);
 
     PdfDocument pdf = new PdfDocument(this.inputPath);
-    PdfDrawer drawer = this.pdfDrawerFactory.create(pdf.getFile());
+    PdfDrawer drawer = new PdfBoxDrawer(pdf.getFile());
 
     // Create a service pipe.
-    this.serviceFactory.create().execute(pdf);
+    new PlainPdfActServicePipe().execute(pdf);
 
     // Create visualizations.
     // createWordBoundariesVisualization(pdf, drawer);

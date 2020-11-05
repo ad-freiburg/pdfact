@@ -10,17 +10,5 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface StandardizeCharactersPipe extends Pipe {
-  /**
-   * The factory to create instances of {@link StandardizeCharactersPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface StandardizeCharactersPipeFactory {
-    /**
-     * Creates a new instance of {@link StandardizeCharactersPipe}.
-     * 
-     * @return A new instance of {@link StandardizeCharactersPipe}.
-     */
-    StandardizeCharactersPipe create();
-  }
+  
 }

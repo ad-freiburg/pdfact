@@ -9,17 +9,5 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface FilterCharactersPipe extends Pipe {
-  /**
-   * The factory to create instances of {@link FilterCharactersPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface FilterCharactersPipeFactory {
-    /**
-     * Creates a new instance of {@link FilterCharactersPipe}.
-     * 
-     * @return A new instance of {@link FilterCharactersPipe}.
-     */
-    FilterCharactersPipe create();
-  }
+  
 }

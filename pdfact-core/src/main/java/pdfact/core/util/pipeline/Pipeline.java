@@ -67,20 +67,4 @@ public interface Pipeline {
    * @return The number of pipes in this pipeline.
    */
   int size();
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link Pipeline}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfActPipelineFactory {
-    /**
-     * Creates a new instance of {@link Pipeline}.
-     * 
-     * @return A new instance of {@link Pipeline}.
-     */
-    Pipeline create();
-  }
 }

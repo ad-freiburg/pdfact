@@ -2,6 +2,7 @@ package pdfact.cli.pipes.serialize;
 
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.B;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTER;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTERS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLOR;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLORS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.DOCUMENT;
@@ -9,6 +10,7 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.G;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.HEIGHT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ID;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_Y;
@@ -16,8 +18,9 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_Y;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.NAME;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PAGE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PAGES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PARAGRAPH;
-import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PDF;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PARAGRAPHS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITION;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITIONS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.R;
@@ -25,7 +28,9 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ROLE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_LINE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WIDTH;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORD;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORDS;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
 
 import java.util.ArrayList;
@@ -138,34 +143,40 @@ public class PdfXmlSerializer implements PdfSerializer {
       List<String> resultLines = new ArrayList<>();
 
       // Start the XML document.
-      resultLines.add(start(PDF, level++));
+      resultLines.add(start(DOCUMENT, level));
 
       // Create the section that contains all serialized PDF elements.
       List<String> elementsLines = serializePdfElements(level + 1, pdf);
       if (elementsLines != null && !elementsLines.isEmpty()) {
-        resultLines.add(start(DOCUMENT, level));
         resultLines.addAll(elementsLines);
-        resultLines.add(end(DOCUMENT, level));
       }
 
       // Create the section that contains the used fonts.
-      List<String> fontsLines = serializeFonts(level + 1, this.usedFonts);
+      List<String> fontsLines = serializeFonts(level + 2, this.usedFonts);
       if (fontsLines != null && !fontsLines.isEmpty()) {
-        resultLines.add(start(FONTS, level));
+        resultLines.add(start(FONTS, level + 1));
         resultLines.addAll(fontsLines);
-        resultLines.add(end(FONTS, level));
+        resultLines.add(end(FONTS, level + 1));
       }
 
       // Create the section that contains the used colors.
-      List<String> colorsLines = serializeColors(level + 1, this.usedColors);
+      List<String> colorsLines = serializeColors(level + 2, this.usedColors);
       if (colorsLines != null && !colorsLines.isEmpty()) {
-        resultLines.add(start(COLORS, level));
+        resultLines.add(start(COLORS, level + 1));
         resultLines.addAll(colorsLines);
-        resultLines.add(end(COLORS, level));
+        resultLines.add(end(COLORS, level + 1));
+      }
+
+      // Create the section that contains information about the pages.
+      List<String> pagesLines = serializePages(level + 2, pdf.getPages());
+      if (pagesLines != null && !pagesLines.isEmpty()) {
+        resultLines.add(start(PAGES, level + 1));
+        resultLines.addAll(pagesLines);
+        resultLines.add(end(PAGES, level + 1));
       }
 
       // End the XML document.
-      resultLines.add(end(PDF, --level));
+      resultLines.add(end(DOCUMENT, level));
 
       // Join the lines to a single string.
       result = PdfActUtils.join(resultLines, LINE_DELIMITER);
@@ -214,17 +225,19 @@ public class PdfXmlSerializer implements PdfSerializer {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
+      result.add(start(PARAGRAPHS, level));
       for (Paragraph paragraph : pdf.getParagraphs()) {
         // Ignore the paragraph if its role doesn't match the roles filter.
         if (!hasRelevantRole(paragraph)) {
           continue;
         }
 
-        List<String> paragraphLines = serializeParagraph(level, paragraph);
+        List<String> paragraphLines = serializeParagraph(level + 1, paragraph);
         if (paragraphLines != null) {
           result.addAll(paragraphLines);
         }
       }
+      result.add(end(PARAGRAPHS, level));
     }
 
     return result;
@@ -268,6 +281,7 @@ public class PdfXmlSerializer implements PdfSerializer {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
+      result.add(start(WORDS, level));
       for (Paragraph paragraph : pdf.getParagraphs()) {
         // Ignore the paragraph if its role doesn't match the roles filter.
         if (!hasRelevantRole(paragraph)) {
@@ -275,12 +289,13 @@ public class PdfXmlSerializer implements PdfSerializer {
         }
 
         for (Word word : paragraph.getWords()) {
-          List<String> wordLines = serializeWord(level, word);
+          List<String> wordLines = serializeWord(level + 1, word);
           if (wordLines != null) {
             result.addAll(wordLines);
           }
         }
       }
+      result.add(end(WORDS, level));
     }
 
     return result;
@@ -324,6 +339,7 @@ public class PdfXmlSerializer implements PdfSerializer {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
+      result.add(start(CHARACTERS, level));
       for (Paragraph paragraph : pdf.getParagraphs()) {
         // Ignore the paragraph if its role doesn't match the roles filter.
         if (!hasRelevantRole(paragraph)) {
@@ -332,13 +348,14 @@ public class PdfXmlSerializer implements PdfSerializer {
 
         for (Word word : paragraph.getWords()) {
           for (Character character : word.getCharacters()) {
-            List<String> characterLines = serializeCharacter(level, character);
+            List<String> characterLines = serializeCharacter(level + 1, character);
             if (characterLines != null) {
               result.addAll(characterLines);
             }
           }
         }
       }
+      result.add(end(CHARACTERS, level));
     }
 
     return result;
@@ -678,6 +695,71 @@ public class PdfXmlSerializer implements PdfSerializer {
   }
 
   // ==============================================================================================
+  // Methods to serialize the page information.
+
+  /**
+   * Serializes the metadata of the given pages.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param pages
+   *        The pages to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializePages(int level, Page... pages) {
+    return serializePages(level, Arrays.asList(pages));
+  }
+
+  /**
+   * Serializes the metadata of the given pages.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param pages
+   *        The pages to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializePages(int level, List<Page> pages) {
+    List<String> result = new ArrayList<>();
+
+    if (pages != null) {
+      for (Page page : pages) {
+        if (page != null) {
+          List<String> pageLines = serializePage(level, page);
+          if (pageLines != null) {
+            result.addAll(pageLines);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Serializes the metadata of the given page.
+   * 
+   * @param level
+   *        The current indentation level.
+   * @param page
+   *        The page to serialize.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializePage(int level, Page page) {
+    List<String> result = new ArrayList<>();
+    if (page != null) {
+      result.add(start(PAGE, level++));
+      result.add(start(ID, level) + text(page.getPageNumber()) + end(ID));
+      result.add(start(WIDTH, level) + text(page.getWidth()) + end(WIDTH));
+      result.add(start(HEIGHT, level) + text(page.getHeight()) + end(HEIGHT));
+      result.add(end(PAGE, --level));
+    }
+    return result;
+  }
+
+  // ==============================================================================================
 
   /**
    * Wraps the given text in an XML start tag.
@@ -823,13 +905,13 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Repeats the given string <repeats>-times.
+   * Repeats the given string $repeats-times.
    * 
    * @param string
    *        The string to repeat.
    * @param repeats
    *        The number of repeats.
-   * @return The string containing the given string <repeats>-times.
+   * @return The string containing the given string $repeats-times.
    */
   public static String repeat(String string, int repeats) {
     StringBuilder sb = new StringBuilder();

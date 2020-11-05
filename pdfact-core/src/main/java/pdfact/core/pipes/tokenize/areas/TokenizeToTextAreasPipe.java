@@ -8,17 +8,5 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface TokenizeToTextAreasPipe extends Pipe {
-  /**
-   * The factory to create instances of {@link TokenizeToTextAreasPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface TokenizeToTextAreasPipeFactory {
-    /**
-     * Creates a new instance of {@link TokenizeToTextAreasPipe}.
-     * 
-     * @return A new instance of {@link TokenizeToTextAreasPipe}.
-     */
-    TokenizeToTextAreasPipe create();
-  }
+  
 }

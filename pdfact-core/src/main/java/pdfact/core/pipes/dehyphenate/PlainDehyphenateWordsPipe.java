@@ -33,7 +33,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   protected static Logger log = LogManager.getLogger(PlainDehyphenateWordsPipe.class);
 
   /**
-   * The factory to create instances of {@link WordNormalizer}.
+   * The word normalizer.
    */
   protected WordNormalizer wordNormalizer;
 
@@ -79,15 +79,6 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
   /**
    * Creates a new pipe that dehyphenates words.
-   * 
-   * @param characterListFactory
-   *        The factory to create lists of characters.
-   * @param wordListFactory
-   *        The factory to create lists of words.
-   * @param wordNormalizerFactory
-   *        The factory to create instances of {@link WordNormalizer}.
-   * @param objectCounterFactory
-   *        The factory to create instances of {@link ObjectCounter}.
    */
   public PlainDehyphenateWordsPipe() {
     this.normalWordsIndex = new ObjectCounter<>();

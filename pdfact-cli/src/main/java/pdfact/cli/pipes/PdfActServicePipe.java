@@ -132,20 +132,4 @@ public interface PdfActServicePipe extends Pipe {
    *        The text unit.
    */
   void setTextUnit(TextUnit unit);
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link PdfActServicePipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfActServicePipeFactory {
-    /**
-     * Creates a new PdfActServicePipe.
-     * 
-     * @return An instance of {@link PdfActServicePipe}.
-     */
-    PdfActServicePipe create();
-  }
 }

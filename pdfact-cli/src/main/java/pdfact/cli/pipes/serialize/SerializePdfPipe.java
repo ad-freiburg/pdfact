@@ -97,20 +97,4 @@ public interface SerializePdfPipe extends Pipe {
    *        The semantic roles filter.
    */
   void setSemanticRolesFilters(Set<SemanticRole> roles);
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link SerializePdfPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface SerializePdfPipeFactory {
-    /**
-     * Creates a new SerializePdfPipe.
-     * 
-     * @return An instance of {@link SerializePdfPipe}.
-     */
-    SerializePdfPipe create();
-  }
 }

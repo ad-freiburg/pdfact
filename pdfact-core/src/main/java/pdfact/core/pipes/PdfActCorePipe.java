@@ -9,17 +9,5 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface PdfActCorePipe extends Pipe {
-  /**
-   * The factory to create instances of {@link PdfActCorePipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfActCorePipeFactory {
-    /**
-     * Creates a new PdfActCorePipe.
-     * 
-     * @return An instance of {@link PdfActCorePipe}.
-     */
-    PdfActCorePipe create();
-  }
+  
 }

@@ -58,32 +58,4 @@ public interface PdfVisualizer {
    *        The semantic roles filter.
    */
   void setSemanticRolesFilter(Set<SemanticRole> roles);
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of PdfVisualizer.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfVisualizerFactory {
-    /**
-     * Creates a new PdfVisualizer.
-     * 
-     * @return An instance of PdfVisualizer.
-     */
-    PdfVisualizer create();
-
-    /**
-     * Creates a new PdfVisualizer.
-     * 
-     * @param unit
-     *        The text unit to include.
-     * @param roles
-     *        The semantic roles of text units to include.
-     * 
-     * @return An instance of PdfVisualizer.
-     */
-    PdfVisualizer create(TextUnit unit, Set<SemanticRole> roles);
-  }
 }

@@ -21,20 +21,4 @@ public interface PdfStreamsParser {
    *         If something went wrong while parsing the PDF:
    */
   void parse(PdfDocument pdf) throws PdfActException;
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link PdfStreamsParser}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface PdfStreamsParserFactory {
-    /**
-     * Creates a new instance of {@link PdfStreamsParser}.
-     * 
-     * @return A new instance of {@link PdfStreamsParser}.
-     */
-    PdfStreamsParser create();
-  }
 }

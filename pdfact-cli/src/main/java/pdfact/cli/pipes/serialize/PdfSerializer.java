@@ -57,32 +57,4 @@ public interface PdfSerializer {
    *        The semantic roles filter.
    */
   void setSemanticRolesFilter(Set<SemanticRole> roles);
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of PdfSerializer.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface SerializerFactory {
-    /**
-     * Creates a new PdfSerializer.
-     * 
-     * @return An instance of PdfSerializer.
-     */
-    PdfSerializer create();
-
-    /**
-     * Creates a new PdfSerializer.
-     * 
-     * @param textUnit
-     *        The text unit.
-     * @param roles
-     *        The semantic roles filter.
-     * 
-     * @return An instance of PdfSerializer.
-     */
-    PdfSerializer create(TextUnit textUnit, Set<SemanticRole> roles);
-  }
 }

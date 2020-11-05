@@ -24,20 +24,4 @@ public interface ValidatePathToWritePipe extends Pipe {
    * @return The path to validate.
    */
   Path getPath();
-
-  // ==============================================================================================
-  
-  /**
-   * The factory to create instances of {@link ValidatePathToWritePipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface ValidatePathToWritePipeFactory {
-    /**
-     * Creates a new ValidatePathToWritePipeFactory.
-     * 
-     * @return An instance of {@link ValidatePathToWritePipe}.
-     */
-    ValidatePathToWritePipe create();
-  }
 }

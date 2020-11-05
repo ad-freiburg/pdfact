@@ -5,10 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.config.Configurator;
-
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.PdfActServicePipe;

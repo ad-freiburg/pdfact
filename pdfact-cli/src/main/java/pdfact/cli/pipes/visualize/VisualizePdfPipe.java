@@ -79,20 +79,4 @@ public interface VisualizePdfPipe extends Pipe {
    *        The semantic roles filter.
    */
   void setSemanticRolesFilters(Set<SemanticRole> roles);
-
-  // ==============================================================================================
-
-  /**
-   * The factory to create instances of {@link VisualizePdfPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface VisualizePdfPipeFactory {
-    /**
-     * Creates a new VisualizePdfPipe.
-     * 
-     * @return An instance of {@link VisualizePdfPipe}.
-     */
-    VisualizePdfPipe create();
-  }
 }

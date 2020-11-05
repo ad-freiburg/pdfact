@@ -2,13 +2,14 @@ package pdfact.cli.pipes.serialize;
 
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.B;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTER;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTERS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLOR;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLORS;
-import static pdfact.cli.pipes.serialize.PdfSerializerConstants.DOCUMENT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.G;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.HEIGHT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ID;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_Y;
@@ -16,14 +17,18 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_Y;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.NAME;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PAGE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PAGES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PARAGRAPH;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PARAGRAPHS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITIONS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.R;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ROLE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_LINE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WIDTH;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORD;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORDS;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
 
 import java.util.Arrays;
@@ -126,11 +131,8 @@ public class PdfJsonSerializer implements PdfSerializer {
       JSONObject json = new JSONObject();
 
       // Create the section that contains all serialized PDF elements.
-      JSONArray elementsJson = serializePdfElements(pdf);
-      if (elementsJson != null && elementsJson.length() > 0) {
-        json.put(DOCUMENT, elementsJson);
-      }
-
+      serializePdfElements(pdf, json);
+ 
       // Create the section that contains the used fonts.
       JSONArray fontsJson = serializeFonts(this.usedFonts);
       if (fontsJson != null && fontsJson.length() > 0) {
@@ -141,6 +143,12 @@ public class PdfJsonSerializer implements PdfSerializer {
       JSONArray colorsJson = serializeColors(this.usedColors);
       if (colorsJson != null && colorsJson.length() > 0) {
         json.put(COLORS, colorsJson);
+      }
+
+      // Create the section that contains the metadata about the pages.
+      JSONArray pagesJson = serializePages(pdf.getPages());
+      if (pagesJson != null && pagesJson.length() > 0) {
+        json.put(PAGES, pagesJson);
       }
 
       // Serialize the JSON object.
@@ -156,18 +164,21 @@ public class PdfJsonSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
-   *
-   * @return A JSON array that represent the serialized elements.
+   * @param json
+   *        The JSON object to which the serialization should be appended.
    */
-  protected JSONArray serializePdfElements(PdfDocument pdf) {
+  public void serializePdfElements(PdfDocument pdf, JSONObject json) {
     switch (this.textUnit) {
       case CHARACTER:
-        return serializeCharacters(pdf);
+        serializeCharacters(pdf, json);
+        break;
       case WORD:
-        return serializeWords(pdf);
+        serializeWords(pdf, json);
+        break;
       case PARAGRAPH:
       default:
-        return serializeParagraphs(pdf);
+        serializeParagraphs(pdf, json);
+        break;
     }
   }
 
@@ -178,10 +189,10 @@ public class PdfJsonSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
-   * 
-   * @return A JSON array that represent the serialized elements.
+   * @param json
+   *        The JSON object to which the serialization should be appended.
    */
-  protected JSONArray serializeParagraphs(PdfDocument pdf) {
+  protected void serializeParagraphs(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -198,7 +209,7 @@ public class PdfJsonSerializer implements PdfSerializer {
       }
     }
 
-    return result;
+    json.put(PARAGRAPHS, result);
   }
 
   /**
@@ -226,10 +237,10 @@ public class PdfJsonSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
-   * 
-   * @return A JSON array that represent the serialized elements.
+   * @param json
+   *        The JSON object to which the serialization should be appended.
    */
-  protected JSONArray serializeWords(PdfDocument pdf) {
+  protected void serializeWords(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -248,7 +259,7 @@ public class PdfJsonSerializer implements PdfSerializer {
       }
     }
 
-    return result;
+    json.put(WORDS, result);
   }
 
   /**
@@ -276,10 +287,10 @@ public class PdfJsonSerializer implements PdfSerializer {
    * 
    * @param pdf
    *        The PDF document to process.
-   * 
-   * @return A JSON array that represent the serialized elements.
+   * @param json
+   *        The JSON object to which the serialization should be appended.
    */
-  protected JSONArray serializeCharacters(PdfDocument pdf) {
+  protected void serializeCharacters(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -300,7 +311,7 @@ public class PdfJsonSerializer implements PdfSerializer {
       }
     }
 
-    return result;
+    json.put(CHARACTERS, result);
   }
 
   /**
@@ -602,6 +613,63 @@ public class PdfJsonSerializer implements PdfSerializer {
       }
     }
     return colorJson;
+  }
+
+  // ==============================================================================================
+  // Methods to serialize the metadata of pages.
+
+  /**
+   * Serializes the metadata of the given pages.
+   * 
+   * @param pages
+   *        The pages to serialize.
+   * 
+   * @return A JSON array that represents the serialization.
+   */
+  protected JSONArray serializePages(Page... pages) {
+    return serializePages(Arrays.asList(pages));
+  }
+
+  /**
+   * Serializes the given pages.
+   * 
+   * @param pages
+   *        The pages to serialize.
+   * 
+   * @return A JSON array that represents the serialization.
+   */
+  protected JSONArray serializePages(List<Page> pages) {
+    JSONArray result = new JSONArray();
+
+    if (pages != null) {
+      for (Page page : pages) {
+        if (page != null) {
+          JSONObject pageJson = serializePage(page);
+          if (pageJson != null && pageJson.length() > 0) {
+            result.put(pageJson);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Serializes the given page.
+   * 
+   * @param page
+   *        The page to serialize.
+   * 
+   * @return A JSON object that represents the serialization.
+   */
+  protected JSONObject serializePage(Page page) {
+    JSONObject pageJson = new JSONObject();
+    if (page != null) {
+      pageJson.put(ID, page.getPageNumber());
+      pageJson.put(WIDTH, page.getWidth());
+      pageJson.put(HEIGHT, page.getHeight());
+    }
+    return pageJson;
   }
 
   // ==============================================================================================

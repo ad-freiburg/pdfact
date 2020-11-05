@@ -9,17 +9,5 @@ import pdfact.core.util.pipeline.Pipe;
  * @author Claudius Korzen
  */
 public interface FilterFiguresPipe extends Pipe {
-  /**
-   * The factory to create instances of {@link FilterFiguresPipe}.
-   * 
-   * @author Claudius Korzen
-   */
-  public interface FilterFiguresPipeFactory {
-    /**
-     * Creates a new instance of {@link FilterFiguresPipe}.
-     * 
-     * @return A new instance of {@link FilterFiguresPipe}.
-     */
-    FilterFiguresPipe create();
-  }
+  
 }

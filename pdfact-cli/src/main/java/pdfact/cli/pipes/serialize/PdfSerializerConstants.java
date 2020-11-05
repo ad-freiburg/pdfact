@@ -11,6 +11,8 @@ public class PdfSerializerConstants {
   static final String B = "b";
   /** The constant 'CHARACTER'. */
   static final String CHARACTER = "character";
+  /** The constant 'CHARACTERS'. */
+  static final String CHARACTERS = "characters";
   /** The constant 'COLOR'. */
   static final String COLOR = "color";
   /** The constant 'COLORS'. */
@@ -25,6 +27,8 @@ public class PdfSerializerConstants {
   static final String FONTSIZE = "font-size";
   /** The constant 'G' (The green part of an RGB value). */
   static final String G = "g";
+  /** The constant 'HEIGHT'. */
+  static final String HEIGHT = "height";
   /** The constant 'ID'. */
   static final String ID = "id";
   /** The constant 'MAX_X'. */
@@ -43,6 +47,8 @@ public class PdfSerializerConstants {
   static final String PAGES = "pages";
   /** The constant 'PARAGRAPH'. */
   static final String PARAGRAPH = "paragraph";
+  /** The constant 'PARAGRAPHS'. */
+  static final String PARAGRAPHS = "paragraphs";
   /** The constant 'PDF'. */
   static final String PDF = "pdf";
   /** The constant 'POSITION'. */
@@ -59,6 +65,10 @@ public class PdfSerializerConstants {
   static final String TEXT_BLOCK = "block";
   /** The constant 'TEXT_LINE'. */
   static final String TEXT_LINE = "textline";
+  /** The constant 'WIDTH'. */
+  static final String WIDTH = "width";
   /** The constant 'WORD'. */
   static final String WORD = "word";
+  /** The constant 'WORDS'. */
+  static final String WORDS = "words";
 }
