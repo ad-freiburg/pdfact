@@ -1,8 +1,8 @@
 package pdfact.cli.pipes.serialize;
 
-import static pdfact.cli.PdfActCLISettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
-import static pdfact.cli.PdfActCLISettings.DEFAULT_SERIALIZE_FORMAT;
-import static pdfact.cli.PdfActCLISettings.DEFAULT_TEXT_UNIT;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_SERIALIZE_FORMAT;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_TEXT_UNIT;
 
 import java.io.IOException;
 import java.io.OutputStream;

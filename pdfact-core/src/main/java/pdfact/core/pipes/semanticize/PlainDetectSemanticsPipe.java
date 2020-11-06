@@ -1,7 +1,7 @@
 package pdfact.core.pipes.semanticize;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,16 +39,13 @@ public class PlainDetectSemanticsPipe
   /**
    * The semanticizer modules.
    */
-  protected Set<PdfTextSemanticizerModule> modules;
+  protected List<PdfTextSemanticizerModule> modules;
 
   /**
    * The default constructor.
-   * 
-   * @param set
-   *        The semanticizer modules.
    */
   public PlainDetectSemanticsPipe() {
-    this.modules = new HashSet<>();
+    this.modules = new ArrayList<>();
     this.modules.add(new TitleModule());
     this.modules.add(new PageHeaderFooterModule());
     this.modules.add(new HeadingModule());

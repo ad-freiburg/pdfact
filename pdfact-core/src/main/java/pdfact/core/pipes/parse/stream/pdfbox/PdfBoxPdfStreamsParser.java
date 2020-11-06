@@ -60,7 +60,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddAndStr
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddRule;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroAndStrokePath;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroRule;
-import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.Invoke;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.DrawObject;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.LineTo;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ModifyCurrentTransformationMatrix;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.MoveTo;
@@ -236,7 +236,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     registerOperatorProcessor(new FillEvenOddRule()); // f*
     registerOperatorProcessor(new FillNonZeroAndStrokePath()); // B
     registerOperatorProcessor(new FillNonZeroRule()); // f
-    registerOperatorProcessor(new Invoke()); // Do
+    registerOperatorProcessor(new DrawObject()); // Do
     registerOperatorProcessor(new LineTo()); // l
     registerOperatorProcessor(new ModifyCurrentTransformationMatrix()); // cm
     registerOperatorProcessor(new MoveTo()); // m

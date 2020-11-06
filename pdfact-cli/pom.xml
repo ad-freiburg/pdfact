@@ -49,7 +49,7 @@
             <configuration>
               <archive>
                 <manifest>
-                  <mainClass>pdfact.cli.PdfActCLI</mainClass>
+                  <mainClass>pdfact.cli.PdfActCli</mainClass>
                 </manifest>
                 <manifestEntries>
                   <Multi-Release>true</Multi-Release>

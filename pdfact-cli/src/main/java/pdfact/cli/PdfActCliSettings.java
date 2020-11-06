@@ -12,7 +12,7 @@ import pdfact.core.model.SemanticRole;
  * 
  * @author Claudius Korzen
  */
-public class PdfActCLISettings {
+public class PdfActCliSettings {
   /**
    * The default serialization format.
    */

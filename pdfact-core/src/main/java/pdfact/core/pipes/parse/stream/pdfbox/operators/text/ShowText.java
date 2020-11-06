@@ -439,7 +439,6 @@ public class ShowText extends OperatorProcessor {
     Encoding encoding = simpleFont.getEncoding();
     if (encoding != null) {
       String glyphName = encoding.getName(code);
-
       if (glyphName != null) {
         // Check, if the font is a type1 font.
         if (simpleFont instanceof PDType1Font) {

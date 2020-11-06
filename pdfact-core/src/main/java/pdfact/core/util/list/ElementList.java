@@ -88,7 +88,7 @@ public class ElementList<T extends Element> implements List<T> {
    * inclusive, and splitIndex, exclusive; and (2) the portion between splitIndex,
    * inclusive, and this.size(), exclusive.
    * 
-   * @param splitIndex The index where to split this list.
+   * @param index The index where to split this list.
    * @return A list of length 2, containing the two resulting views.
    */
   public List<ElementList<T>> cut(int index) {
@@ -289,7 +289,7 @@ public class ElementList<T extends Element> implements List<T> {
      */
     protected int size;
 
-    // ==============================================================================================
+    // ============================================================================================
     // Constructors.
 
     /**
@@ -307,7 +307,7 @@ public class ElementList<T extends Element> implements List<T> {
       this.size = toIndex - fromIndex;
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public S get(int index) {
@@ -320,7 +320,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public boolean contains(Object o) {
@@ -357,7 +357,7 @@ public class ElementList<T extends Element> implements List<T> {
       return -1;
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public boolean add(S e) {
@@ -383,7 +383,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public boolean remove(Object o) {
@@ -415,7 +415,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public int size() {
@@ -427,7 +427,7 @@ public class ElementList<T extends Element> implements List<T> {
       return this.size == 0;
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public Object[] toArray() {
@@ -439,7 +439,7 @@ public class ElementList<T extends Element> implements List<T> {
       throw new UnsupportedOperationException();
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public Iterator<S> iterator() {
@@ -557,7 +557,7 @@ public class ElementList<T extends Element> implements List<T> {
       return Arrays.asList(v1, v2);
     }
 
-    // ==============================================================================================
+    // ============================================================================================
 
     @Override
     public boolean equals(Object other) {

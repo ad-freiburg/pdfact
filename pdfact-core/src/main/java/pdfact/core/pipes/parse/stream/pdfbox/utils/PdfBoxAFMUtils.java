@@ -31,13 +31,8 @@ public class PdfBoxAFMUtils {
   /**
    * The additional glyphs.
    */
-  protected static final Map<String, PdfBoxFontMetricsWrapper> ADDITIONAL_AFM =
-      new HashMap<>();
-
-  // TODO
-  // static {
-  // ADDITIONAL_AFM = readAdditionalAFMFiles("afm/");
-  // }
+  protected static final Map<String, PdfBoxFontMetricsWrapper> ADDITIONAL_AFM 
+    = readAdditionalAFMFiles("afm/");
 
   /**
    * Returns the CharMetric for the glyph given by glyphName.
@@ -51,7 +46,7 @@ public class PdfBoxAFMUtils {
   public static CharMetric getCharMetric(String glyphName,
       PDType1Font type1Font) {
     if (type1Font != null) {
-      String basename = FontUtils.computeBasename(type1Font);
+      String basename = FontUtils.computeBasename(type1Font).toLowerCase();
 
       PdfBoxFontMetricsWrapper fontMetrics = ADDITIONAL_AFM.get(basename);
       if (fontMetrics != null) {
@@ -80,7 +75,7 @@ public class PdfBoxAFMUtils {
       for (Entry<String, InputStream> file : files.entrySet()) {
         String name = file.getKey();
         try (InputStream stream = file.getValue()) {
-          String basename = PdfActUtils.getBasename(name);
+          String basename = PdfActUtils.getBasename(name).toLowerCase();
 
           try {
             AFMParser parser = new AFMParser(stream);

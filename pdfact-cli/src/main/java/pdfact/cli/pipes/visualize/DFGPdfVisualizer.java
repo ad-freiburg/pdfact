@@ -655,10 +655,10 @@ public class DFGPdfVisualizer {
       drawer.drawRectangle(rect, character.getPosition().getPageNumber(), Color.GRAY, null, 0.1f);
     }
 
-    for (TextLine line : firstPage.getTextLines()) {
-      System.out.println(line.getText());
-      System.out.println(line.getPosition().getRectangle());
-    }
+    // for (TextLine line : firstPage.getTextLines()) {
+    //   System.out.println(line.getText());
+    //   System.out.println(line.getPosition().getRectangle());
+    // }
 
     Rectangle rect = new Rectangle(75.8, 697.1, 536.1, 709.3);
     drawer.drawRectangle(rect, 1, Color.BLUE, null, 1f);

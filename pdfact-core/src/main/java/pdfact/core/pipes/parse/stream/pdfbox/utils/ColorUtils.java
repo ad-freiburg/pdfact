@@ -18,7 +18,7 @@ public class ColorUtils {
    * 
    * @return The RGB values in an array of three values.
    */
-  public static float[] toRGBArray(int pixel) {
+  public static float[] toRgbArray(int pixel) {
     float alpha = (pixel >> 24) & 0xff;
     float red = ((pixel >> 16) & 0xff) / 255f;
     float green = ((pixel >> 8) & 0xff) / 255f;
@@ -58,6 +58,6 @@ public class ColorUtils {
       return null;
     }
 
-    return toRGBArray(lastRgb);
+    return toRgbArray(lastRgb);
   }
 }
