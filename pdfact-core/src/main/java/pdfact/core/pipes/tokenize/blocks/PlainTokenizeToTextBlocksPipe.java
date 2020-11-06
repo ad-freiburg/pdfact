@@ -2,10 +2,8 @@ package pdfact.core.pipes.tokenize.blocks;
 
 import java.util.List;
 import java.util.regex.Pattern;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
@@ -82,8 +80,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   // ==============================================================================================
 
   /**
-   * Tokenizes the text lines in the pages of the given PDF document into text
-   * blocks.
+   * Tokenizes the text lines in the pages of the given PDF document into text blocks.
    * 
    * @param pdf The PDF document to process.
    * 
@@ -120,7 +117,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * 
    * @throws PdfActException If something went wrong while tokenization.
    */
-  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page) throws PdfActException {
+  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page)
+          throws PdfActException {
     ElementList<TextBlock> textBlocks = new ElementList<>();
     TextBlock textBlock = new TextBlock();
 
@@ -213,19 +211,17 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * Checks if the given text line introduces a new text block.
    *
-   * @param pdf              The PDF document to which the given text line belongs
-   *                         to.
+   * @param pdf              The PDF document to which the given text line belongs to.
    * @param page             The PDF page to which the given text line belongs to.
    * @param currentTextBlock The current text block.
    * @param prevLine         The previous text line.
    * @param line             The current text line to process.
    * @param nextLine         The next text line.
    * 
-   * @return True, if the given current text line introduces a new text block;
-   *         false otherwise.
+   * @return True, if the given current text line introduces a new text block; false otherwise.
    */
-  protected boolean introducesNewTextBlock(PdfDocument pdf, Page page, TextBlock currentTextBlock, TextLine prevLine,
-      TextLine line, TextLine nextLine) {
+  protected boolean introducesNewTextBlock(PdfDocument pdf, Page page, TextBlock currentTextBlock,
+          TextLine prevLine, TextLine line, TextLine nextLine) {
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
       return false;
@@ -290,8 +286,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    *
    * @param block The text block to process.
    * @param line  The text line to process.
-   * @return True, if the given line overlaps the given text block horizontally,
-   *         false otherwise.
+   * @return True, if the given line overlaps the given text block horizontally, false otherwise.
    */
   protected boolean overlapsHorizontally(TextBlock block, TextLine line) {
     if (block == null || line == null) {
@@ -309,18 +304,19 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks if the line pitch between the given line and the given previous line
-   * is larger than expected (larger than the most common line pitch for the font
-   * / font size pair of the given line).
+   * Checks if the line pitch between the given line and the given previous line is larger than
+   * expected (larger than the most common line pitch for the font / font size pair of the given
+   * line).
    *
    * @param pdf      The PDF document to which the given text line belongs to.
    * @param page     The PDF page to which the given text line belongs to.
    * @param prevLine The previous text line.
    * @param line     The text line to process.
-   * @return True, if the line pitch between the given text line and the given
-   *         previous text line is larger than usual; False otherwise.
+   * @return True, if the line pitch between the given text line and the given previous text line is
+   *         larger than usual; False otherwise.
    */
-  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf, Page page, TextLine prevLine, TextLine line) {
+  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf, Page page,
+          TextLine prevLine, TextLine line) {
     if (pdf == null) {
       return false;
     }
@@ -338,17 +334,17 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks if the line pitch between the given line and its previous line is
-   * larger than the line pitch between the given line and its next line.
+   * Checks if the line pitch between the given line and its previous line is larger than the line
+   * pitch between the given line and its next line.
    *
    * @param prevLine The previous text line.
    * @param line     The text line to process.
    * @param nextLine The next text line.
-   * @return True, if the line pitch between the given line and its previous line
-   *         is larger than the line pitch between the given line and its next
-   *         line, flase otherwise.
+   * @return True, if the line pitch between the given line and its previous line is larger than the
+   *         line pitch between the given line and its next line, flase otherwise.
    */
-  protected static boolean isLinePitchLargerThanNextLinePitch(TextLine prevLine, TextLine line, TextLine nextLine) {
+  protected static boolean isLinePitchLargerThanNextLinePitch(TextLine prevLine, TextLine line,
+          TextLine nextLine) {
     float linePitch = computeLinePitch(prevLine, line);
     float nextLinePitch = computeLinePitch(line, nextLine);
 
@@ -357,15 +353,15 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks, if the given line is indented compared to the given previous line and
-   * the given next line.
+   * Checks, if the given line is indented compared to the given previous line and the given next
+   * line.
    *
    * @param prevLine The previous line.
    * @param line     The line to process.
    * @param nextLine The next line.
-   * @return True, if (1) the line pitches between the lines are equal, (2)
-   *         prevLine and nextLine do not start with an reference anchor and (3)
-   *         the line is indented compared to the previous and the next line.
+   * @return True, if (1) the line pitches between the lines are equal, (2) prevLine and nextLine do
+   *         not start with an reference anchor and (3) the line is indented compared to the
+   *         previous and the next line.
    */
   protected boolean isIndented(TextLine prevLine, TextLine line, TextLine nextLine) {
     // The line pitches between the lines must be equal.
@@ -391,15 +387,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks if the line pitches between the line / previous line and the line /
-   * next line are equal.
+   * Checks if the line pitches between the line / previous line and the line / next line are equal.
    * 
    * @param prevLine The previous text line.
    * @param line     The text line to process.
    * @param nextLine The next text line.
    * 
-   * @return True, if the line pitches between the line / previous line and the
-   *         line / next line are equal, false otherwise.
+   * @return True, if the line pitches between the line / previous line and the line / next line are
+   *         equal, false otherwise.
    */
   public static boolean isLinepitchesEqual(TextLine prevLine, TextLine line, TextLine nextLine) {
     float prevLinePitch = computeLinePitch(prevLine, line);
@@ -409,13 +404,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Computes the line pitch between the given lines. Both lines must share the
-   * same page.
+   * Computes the line pitch between the given lines. Both lines must share the same page.
    * 
    * @param firstLine  The first text line.
    * @param secondLine The second text line.
-   * @return The line pitch between the given lines or Float.NaN if the lines do
-   *         not share the same page.
+   * @return The line pitch between the given lines or Float.NaN if the lines do not share the same
+   *         page.
    */
   public static float computeLinePitch(TextLine firstLine, TextLine secondLine) {
     if (firstLine == null || secondLine == null) {
@@ -436,8 +430,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   }
 
   /**
-   * Checks if the given line has a special font face, compared to the given
-   * previous line.
+   * Checks if the given line has a special font face, compared to the given previous line.
    *
    * @param prevLine The previous line of the line to process.
    * @param line     The line to process.
@@ -530,7 +523,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     boolean hasNextLineReferenceAnchor = startsWithReferenceAnchor(nextLine);
 
     return (hasPrevLineDifferentMinX || hasPrevLineReferenceAnchor)
-        && (hasNextLineDifferentMinX || hasNextLineReferenceAnchor);
+            && (hasNextLineDifferentMinX || hasNextLineReferenceAnchor);
   }
 
   /**
@@ -539,12 +532,10 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   protected static final Pattern REFERENCE_ANCHOR = Pattern.compile("^\\[(.*)\\]\\s+");
 
   /**
-   * Checks is the given text line starts with a reference anchor like "[1]",
-   * "[2]", etc.
+   * Checks is the given text line starts with a reference anchor like "[1]", "[2]", etc.
    *
    * @param line The text line to check.
-   * @return True, if the given text line starts with a reference anchor, false
-   *         otherwise.
+   * @return True, if the given text line starts with a reference anchor, false otherwise.
    */
   // TODO: Move to any util.
   protected boolean startsWithReferenceAnchor(TextLine line) {
@@ -566,8 +557,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @param line    The text line to process.
    * @param refLine The reference text line.
    * 
-   * @return True, if the given line is indented compared to the given reference
-   *         line.
+   * @return True, if the given line is indented compared to the given reference line.
    */
   public static boolean isIndented(TextLine line, TextLine refLine) {
     if (line == null || refLine == null) {
@@ -589,8 +579,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * 
    * @param line1 The first text line.
    * @param line2 The second text line-
-   * @return True, if the minX values for the given lines are equal, false
-   *         otherwise.
+   * @return True, if the minX values for the given lines are equal, false otherwise.
    */
   public static boolean isMinXEqual(TextLine line1, TextLine line2) {
     if (line1 == null || line2 == null) {

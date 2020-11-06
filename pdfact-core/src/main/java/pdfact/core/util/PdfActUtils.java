@@ -43,8 +43,7 @@ public class PdfActUtils {
    * Returns the string that results from joining the elements in the given
    * collection with the default delimiter.
    * 
-   * @param objects
-   *        The objects to join.
+   * @param objects The objects to join.
    *
    * @return A string containing the joined objects.
    */
@@ -56,8 +55,7 @@ public class PdfActUtils {
    * Returns the string that results from joining the elements in the given
    * collection with the default delimiter.
    * 
-   * @param collection
-   *        The collection to join.
+   * @param collection The collection to join.
    * 
    * @return A string containing the joined collection.
    */
@@ -69,10 +67,8 @@ public class PdfActUtils {
    * Returns the string that results from joining the elements in the given
    * collection with the given delimiter.
    * 
-   * @param objects
-   *        The objects to join.
-   * @param delimiter
-   *        The delimiter to use on joining.
+   * @param objects   The objects to join.
+   * @param delimiter The delimiter to use on joining.
    * 
    * @return A string containing the joined objects.
    */
@@ -84,10 +80,8 @@ public class PdfActUtils {
    * Returns the string that results from joining the elements in the given
    * collection with the given delimiter.
    * 
-   * @param iterable
-   *        The iterable to join.
-   * @param delimiter
-   *        The delimiter to use on joining.
+   * @param iterable  The iterable to join.
+   * @param delimiter The delimiter to use on joining.
    * 
    * @return A string containing the joined objects.
    */
@@ -113,10 +107,8 @@ public class PdfActUtils {
   /**
    * Joins the given text elements.
    * 
-   * @param elements
-   *        The text elements to join.
-   * @param delim
-   *        The delimiter to use on joining.
+   * @param elements The text elements to join.
+   * @param delim    The delimiter to use on joining.
    * 
    * @return The joined elements as a string.
    */
@@ -144,10 +136,8 @@ public class PdfActUtils {
    * Rounds the given number and returns a floating number with the given number
    * of decimal places.
    * 
-   * @param number
-   *        The number to round.
-   * @param numDecimalPlaces
-   *        The number of decimal places.
+   * @param number           The number to round.
+   * @param numDecimalPlaces The number of decimal places.
    * 
    * @return The rounded number.
    */
@@ -160,13 +150,11 @@ public class PdfActUtils {
   }
 
   /**
-   * Ceils the given number and returns a floating number with the given number
-   * of decimal places.
+   * Ceils the given number and returns a floating number with the given number of
+   * decimal places.
    * 
-   * @param number
-   *        The number to ceil.
-   * @param numDecimalPlaces
-   *        The number of decimal places.
+   * @param number           The number to ceil.
+   * @param numDecimalPlaces The number of decimal places.
    * 
    * @return The ceiled number.
    */
@@ -182,10 +170,8 @@ public class PdfActUtils {
    * Floors the given number and returns a floating number with the given number
    * of decimal places.
    * 
-   * @param number
-   *        The number to floor.
-   * @param numDecimalPlaces
-   *        The number of decimal places.
+   * @param number           The number to floor.
+   * @param numDecimalPlaces The number of decimal places.
    * 
    * @return The floored number.
    */
@@ -201,28 +187,23 @@ public class PdfActUtils {
    * Returns true, if the two given float numbers are equal, with respect to a
    * tolerance of 0.001.
    * 
-   * @param float1
-   *        The first float to compare.
-   * @param float2
-   *        The second float to compare.
+   * @param float1 The first float to compare.
+   * @param float2 The second float to compare.
    * 
-   * @return True, if the two given float number are almost equal, with respect
-   *         to a tolerance of 0.001.
+   * @return True, if the two given float number are almost equal, with respect to
+   *         a tolerance of 0.001.
    */
   public static boolean isEqual(float float1, float float2) {
     return isEqual(float1, float2, 0.001f);
   }
 
   /**
-   * Returns true, if the two given float number are almost equal (with respect
-   * to the given tolerance).
+   * Returns true, if the two given float number are almost equal (with respect to
+   * the given tolerance).
    * 
-   * @param f1
-   *        The first float to compare.
-   * @param f2
-   *        The second float to compare.
-   * @param tolerance
-   *        The tolerance.
+   * @param f1        The first float to compare.
+   * @param f2        The second float to compare.
+   * @param tolerance The tolerance.
    *
    * @return True, if the two given float number are almost equal.
    */
@@ -234,12 +215,9 @@ public class PdfActUtils {
    * Returns true, if the first given float is larger (with respect to the given
    * tolerance) than the second given float.
    * 
-   * @param f1
-   *        The first float to compare.
-   * @param f2
-   *        The second float to compare.
-   * @param tolerance
-   *        The tolerance.
+   * @param f1        The first float to compare.
+   * @param f2        The second float to compare.
+   * @param tolerance The tolerance.
    * 
    * @return True, if the first float is larger than the second float.
    */
@@ -248,15 +226,12 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns true, if the first given float is larger than or equal to the
-   * second given float (with respect to the given tolerance).
+   * Returns true, if the first given float is larger than or equal to the second
+   * given float (with respect to the given tolerance).
    * 
-   * @param f1
-   *        The first float to compare.
-   * @param f2
-   *        The second float to compare.
-   * @param tolerance
-   *        The tolerance.
+   * @param f1        The first float to compare.
+   * @param f2        The second float to compare.
+   * @param tolerance The tolerance.
    * 
    * @return True, if the first float is larger than the second float.
    */
@@ -265,15 +240,12 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns true, if the first given float is smaller (with respect to the
-   * given tolerance) than the second given float.
+   * Returns true, if the first given float is smaller (with respect to the given
+   * tolerance) than the second given float.
    * 
-   * @param f1
-   *        The first float to compare.
-   * @param f2
-   *        The second float to compare.
-   * @param tolerance
-   *        The tolerance.
+   * @param f1        The first float to compare.
+   * @param f2        The second float to compare.
+   * @param tolerance The tolerance.
    * 
    * @return True, if the first float is smaller than the second float.
    */
@@ -282,15 +254,12 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns true, if the first given float is smaller than or equal to the
-   * second given float (with respect to the given tolerance).
+   * Returns true, if the first given float is smaller than or equal to the second
+   * given float (with respect to the given tolerance).
    * 
-   * @param f1
-   *        The first float to compare.
-   * @param f2
-   *        The second float to compare.
-   * @param tolerance
-   *        The tolerance.
+   * @param f1        The first float to compare.
+   * @param f2        The second float to compare.
+   * @param tolerance The tolerance.
    * 
    * @return True, if the first float is smaller than the second float.
    */
@@ -305,8 +274,7 @@ public class PdfActUtils {
    * Returns the base name of the given file, that is the filename without the
    * file-extension.
    * 
-   * @param path
-   *        The path to process.
+   * @param path The path to process.
    * @return The base name of the path.
    */
   public static String getBasename(String path) {
@@ -317,8 +285,7 @@ public class PdfActUtils {
    * Returns the basename of the given file, that is the filename without the
    * file-extension.
    * 
-   * @param file
-   *        The file to process.
+   * @param file The file to process.
    * @return The base name of the path.
    */
   public static String getBasename(Path file) {
@@ -336,8 +303,7 @@ public class PdfActUtils {
   /**
    * Returns the file extension of the given file.
    * 
-   * @param file
-   *        The file to process.
+   * @param file The file to process.
    * @return The file extension of the file.
    */
   public static String getExtension(Path file) {
@@ -356,14 +322,11 @@ public class PdfActUtils {
    * Reads the given directory non-recursively and returns a map with the names
    * and the streams of all files in this directory. Works also in jar files.
    * 
-   * @param path
-   *        The path to the directory to read.
+   * @param path The path to the directory to read.
    * @return A map with the names and the streams of all files in this directory
-   * @throws IOException
-   *         If reading the directory failed.
+   * @throws IOException If reading the directory failed.
    */
-  public static Map<String, InputStream> readDirectory(String path)
-      throws IOException {
+  public static Map<String, InputStream> readDirectory(String path) throws IOException {
     Map<String, InputStream> streams = new HashMap<>();
     ClassLoader classLoader = PdfActUtils.class.getClassLoader();
     ProtectionDomain domain = PdfActUtils.class.getProtectionDomain();
@@ -416,13 +379,11 @@ public class PdfActUtils {
   // ==============================================================================================
 
   /**
-   * Returns the first index within the given haystack of the occurrence of one
-   * of the specified needles.
+   * Returns the first index within the given haystack of the occurrence of one of
+   * the specified needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param needles  The patterns to find.
    *
    * @return The first found index.
    */
@@ -431,13 +392,11 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the first index within the given haystack of the occurrence of one
-   * of the specified needles.
+   * Returns the first index within the given haystack of the occurrence of one of
+   * the specified needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param needles  The patterns to find.
    *
    * @return The first found index.
    */
@@ -446,15 +405,12 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the first index within the given haystack of the occurrence of one
-   * of the specified needles.
+   * Returns the first index within the given haystack of the occurrence of one of
+   * the specified needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param from
-   *        The index in the text where to start the search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param from     The index in the text where to start the search.
+   * @param needles  The patterns to find.
    * 
    * @return The first found index.
    */
@@ -480,15 +436,12 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the first index within given haystack of the occurrence of one of
-   * the specified needles.
+   * Returns the first index within given haystack of the occurrence of one of the
+   * specified needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param from
-   *        The index in the text where to start the search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param from     The index in the text where to start the search.
+   * @param needles  The patterns to find.
    * 
    * @return The first found index.
    */
@@ -511,13 +464,11 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the indexes within the given haystack of all occurrences of the
-   * given needles.
+   * Returns the indexes within the given haystack of all occurrences of the given
+   * needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param needles  The patterns to find.
    * 
    * @return The found indexes.
    */
@@ -535,13 +486,11 @@ public class PdfActUtils {
   }
 
   /**
-   * Returns the indexes within the given haystack of all occurrences of the
-   * given needles.
+   * Returns the indexes within the given haystack of all occurrences of the given
+   * needles.
    * 
-   * @param haystack
-   *        The text to search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The text to search.
+   * @param needles  The patterns to find.
    * 
    * @return The found indexes.
    */
@@ -564,16 +513,13 @@ public class PdfActUtils {
    * Returns true, if the given haystack contains at least one of the given
    * needles.
    * 
-   * @param haystack
-   *        The collection to search.
-   * @param needles
-   *        The patterns to find.
+   * @param haystack The collection to search.
+   * @param needles  The patterns to find.
    *
    * @return True, if the given haystack contains at least one of the given
    *         needles; False otherwise.
    */
-  public static boolean containsOneOf(Collection<?> haystack,
-      Object... needles) {
+  public static boolean containsOneOf(Collection<?> haystack, Object... needles) {
     if (haystack == null) {
       return false;
     }

@@ -2,12 +2,10 @@ package pdfact.core.pipes.parse.stream.pdfbox.operators.graphic;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
 import static pdfact.core.util.PdfActUtils.round;
-
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
@@ -19,7 +17,6 @@ import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
-
 import pdfact.core.model.Color;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
@@ -44,7 +41,8 @@ public class DrawObject extends OperatorProcessor {
   // ==============================================================================================
 
   @Override
-  public void process(PdfDocument pdf, Page page, Operator op, List<COSBase> args) throws IOException {
+  public void process(PdfDocument pdf, Page page, Operator op, List<COSBase> args)
+          throws IOException {
     // Get the name of the PDXOject.
     COSName name = (COSName) args.get(0);
 
@@ -83,7 +81,7 @@ public class DrawObject extends OperatorProcessor {
 
       return;
     }
-    
+
     // Consider the object as an image.
     if (xobject instanceof PDImageXObject) {
       PDImageXObject image = (PDImageXObject) xobject;
@@ -116,58 +114,58 @@ public class DrawObject extends OperatorProcessor {
         Shape shape = new Shape();
         shape.setPosition(position);
         shape.setColor(color);
-        
+
         log.debug("The xobject consists only of color " + color + ". Considering it as a shape.");
         this.engine.handlePdfShape(pdf, page, shape);
       } else {
         Figure figure = new Figure();
         figure.setPosition(position);
-        
+
         log.debug("Considering the xobject as a figure.");
         this.engine.handlePdfFigure(pdf, page, figure);
       }
     }
 
     // Primarily, we handled a form object *always* as a figure. But that's wrong, because a form
-    // can contain text (in a substream) which appears as "normal" body text in a PDF, see 
+    // can contain text (in a substream) which appears as "normal" body text in a PDF, see
     // KI_2018.pdf for an example. Here is the old, obsolete code for that:
-    
+
     // if (xobject instanceof PDFormXObject) {
-    //   PDFormXObject form = (PDFormXObject) xobject;
+    // PDFormXObject form = (PDFormXObject) xobject;
 
-    //   // if there is an (optional) form matrix, we have to map the form space to the
-    //   // user space
-    //   Matrix matrix = form.getMatrix();
+    // // if there is an (optional) form matrix, we have to map the form space to the
+    // // user space
+    // Matrix matrix = form.getMatrix();
 
-    //   if (matrix != null) {
-    //     this.engine.getGraphicsState().getCurrentTransformationMatrix().concatenate(matrix);
-    //   }
+    // if (matrix != null) {
+    // this.engine.getGraphicsState().getCurrentTransformationMatrix().concatenate(matrix);
+    // }
 
-    //   float formWidth = form.getBBox().getWidth();
-    //   float formHeight = form.getBBox().getHeight();
+    // float formWidth = form.getBBox().getWidth();
+    // float formHeight = form.getBBox().getHeight();
 
-    //   Matrix ctm = this.engine.getGraphicsState().getCurrentTransformationMatrix().clone();
+    // Matrix ctm = this.engine.getGraphicsState().getCurrentTransformationMatrix().clone();
 
-    //   // TODO: Check if ur and ll are indeed ur and ll.
-    //   float minX = ctm.getTranslateX();
-    //   float minY = ctm.getTranslateY();
-    //   float maxX = minX + ctm.getScaleX() * formWidth;
-    //   float maxY = minY + ctm.getScaleY() * formHeight;
+    // // TODO: Check if ur and ll are indeed ur and ll.
+    // float minX = ctm.getTranslateX();
+    // float minY = ctm.getTranslateY();
+    // float maxX = minX + ctm.getScaleX() * formWidth;
+    // float maxY = minY + ctm.getScaleY() * formHeight;
 
-    //   // Round the values.
-    //   minX = PdfActUtils.round(minX, FLOATING_NUMBER_PRECISION);
-    //   minY = PdfActUtils.round(minY, FLOATING_NUMBER_PRECISION);
-    //   maxX = PdfActUtils.round(maxX, FLOATING_NUMBER_PRECISION);
-    //   maxY = PdfActUtils.round(maxY, FLOATING_NUMBER_PRECISION);
+    // // Round the values.
+    // minX = PdfActUtils.round(minX, FLOATING_NUMBER_PRECISION);
+    // minY = PdfActUtils.round(minY, FLOATING_NUMBER_PRECISION);
+    // maxX = PdfActUtils.round(maxX, FLOATING_NUMBER_PRECISION);
+    // maxY = PdfActUtils.round(maxY, FLOATING_NUMBER_PRECISION);
 
-    //   Point ll = new Point(minX, minY);
-    //   Point ur = new Point(maxX, maxY);
-    //   Position position = new Position(page, ll, ur);
+    // Point ll = new Point(minX, minY);
+    // Point ur = new Point(maxX, maxY);
+    // Position position = new Position(page, ll, ur);
 
-    //   // TODO: A PDFormXObject isn't necessarily a figure (but can be).
-    //   Figure figure = new Figure();
-    //   figure.setPosition(position);
-    //   this.engine.handlePdfFigure(pdf, page, figure);
+    // // TODO: A PDFormXObject isn't necessarily a figure (but can be).
+    // Figure figure = new Figure();
+    // figure.setPosition(position);
+    // this.engine.handlePdfFigure(pdf, page, figure);
   }
 
   @Override

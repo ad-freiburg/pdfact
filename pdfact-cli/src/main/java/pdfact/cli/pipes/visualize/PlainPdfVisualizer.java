@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
 import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.cli.util.exception.PdfActVisualizeException;
@@ -105,7 +104,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeCharacters(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeCharacters(PdfDocument pdf, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     for (Paragraph paragraph : pdf.getParagraphs()) {
       // Ignore the paragraph if its role doesn't match the roles filter.
       if (!hasRelevantRole(paragraph)) {
@@ -142,7 +142,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeCharacter(Character character, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeCharacter(Character character, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     visualizePdfElement(character, drawer, Color.BLACK);
   }
 
@@ -156,7 +157,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextAreas(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextAreas(PdfDocument pdf, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextArea area : page.getTextAreas()) {
         visualizeTextArea(area, drawer);
@@ -172,7 +174,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextArea(TextArea textArea, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextArea(TextArea textArea, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     visualizePdfElement(textArea, drawer, Color.GRAY);
   }
 
@@ -186,7 +189,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextLines(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextLines(PdfDocument pdf, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextLine line : page.getTextLines()) {
         visualizeTextLine(line, drawer);
@@ -202,7 +206,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextLine(TextLine textLine, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextLine(TextLine textLine, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     visualizePdfElement(textLine, drawer, Color.BLUE);
   }
 
@@ -252,7 +257,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextBlocks(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextBlocks(PdfDocument pdf, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextBlock block : page.getTextBlocks()) {
         visualizeTextBlock(block, drawer);
@@ -268,7 +274,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextBlock(TextBlock textBlock, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeTextBlock(TextBlock textBlock, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     visualizePdfElement(textBlock, drawer, Color.YELLOW);
   }
 
@@ -282,7 +289,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeParagraphs(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeParagraphs(PdfDocument pdf, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     // Visualize the textual elements.
     for (Paragraph paragraph : pdf.getParagraphs()) {
       // Ignore the paragraph if its role doesn't match the roles filter.
@@ -302,7 +310,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeParagraph(Paragraph paragraph, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeParagraph(Paragraph paragraph, PdfDrawer drawer)
+          throws PdfActVisualizeException {
     visualizePdfElement(paragraph, drawer, Color.BLUE);
   }
 
@@ -342,7 +351,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @param color   The color to use.
    * @throws PdfActVisualizeException If something went wrong on visualization.
    */
-  protected void visualizePdfElement(Element element, PdfDrawer drawer, Color color) throws PdfActVisualizeException {
+  protected void visualizePdfElement(Element element, PdfDrawer drawer, Color color)
+          throws PdfActVisualizeException {
     if (element instanceof HasPositions) {
       HasPositions hasPositions = (HasPositions) element;
       List<Position> positions = hasPositions.getPositions();
@@ -367,8 +377,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @param positions The positions to visualize.
    * @throws PdfActVisualizeException If something went wrong on visualization.
    */
-  protected void visualizePositions(PdfDrawer drawer, Color color, Element element, Position... positions)
-      throws PdfActVisualizeException {
+  protected void visualizePositions(PdfDrawer drawer, Color color, Element element,
+          Position... positions) throws PdfActVisualizeException {
     visualizePositions(drawer, color, element, Arrays.asList(positions));
   }
 
@@ -381,8 +391,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @param positions The positions to visualize.
    * @throws PdfActVisualizeException If something went wrong on visualization.
    */
-  protected void visualizePositions(PdfDrawer drawer, Color color, Element elem, List<Position> positions)
-      throws PdfActVisualizeException {
+  protected void visualizePositions(PdfDrawer drawer, Color color, Element elem,
+          List<Position> positions) throws PdfActVisualizeException {
     if (drawer == null) {
       return;
     }
@@ -405,8 +415,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * @param color    The color to use.
    * @throws PdfActVisualizeException If something went wrong on visualization.
    */
-  protected void visualizePosition(Element element, Position position, PdfDrawer drawer, Color color)
-      throws PdfActVisualizeException {
+  protected void visualizePosition(Element element, Position position, PdfDrawer drawer,
+          Color color) throws PdfActVisualizeException {
     if (position != null) {
       Page page = position.getPage();
       Rectangle rect = position.getRectangle();
@@ -460,13 +470,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic roles
-   * filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles filter of this
+   * serializer.
    * 
    * @param element The element to check.
    * 
-   * @return True, if the role of the given element matches the semantic roles
-   *         filter of this serializer, false otherwise.
+   * @return True, if the role of the given element matches the semantic roles filter of this
+   *         serializer, false otherwise.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {
     if (element == null) {

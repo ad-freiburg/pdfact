@@ -1,7 +1,6 @@
 package pdfact.core.pipes.parse.stream.pdfbox;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
-
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -10,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.PDContentStream;
@@ -25,7 +23,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType3CharProc;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
@@ -55,12 +52,12 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ClosePath;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveTo;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveToReplicateFinalPoint;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.CurveToReplicateInitialPoint;
+import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.DrawObject;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.EndPath;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddAndStrokePath;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillEvenOddRule;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroAndStrokePath;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.FillNonZeroRule;
-import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.DrawObject;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.LineTo;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.ModifyCurrentTransformationMatrix;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.graphic.MoveTo;
@@ -94,8 +91,8 @@ import pdfact.core.util.statistician.CharacterStatistician;
 // TODO: Refactor all the PDFBox utils (remove unnecessary stuff).
 
 /**
- * Parses PDF content streams and interprets the related operations. Provides a
- * callback interface for clients to handle specific operations.
+ * Parses PDF content streams and interprets the related operations. Provides a callback interface
+ * for clients to handle specific operations.
  * 
  * @author Claudius Korzen
  */
@@ -131,8 +128,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   protected Stack<PDGraphicsState> graphicsStack;
 
   /**
-   * The current geometric path constructed from straight lines, quadratic and
-   * cubic (Bézier) curves.
+   * The current geometric path constructed from straight lines, quadratic and cubic (Bézier)
+   * curves.
    */
   protected GeneralPath linePath;
 
@@ -374,7 +371,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param trm  The text Rendering Matrix
    * @throws IOException if processing the type stream fails.
    */
-  public void processType3Stream(PdfDocument pdf, Page page, PDType3CharProc proc, Matrix trm) throws IOException {
+  public void processType3Stream(PdfDocument pdf, Page page, PDType3CharProc proc, Matrix trm)
+          throws IOException {
     PDResources parent = pushResources(proc);
     Stack<PDGraphicsState> savedStack = saveGraphicsStack();
 
@@ -410,7 +408,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param stream The stream.
    * @throws IOException if parsing the stream fails.
    */
-  protected void processStreamOperators(PdfDocument pdf, Page page, PDContentStream stream) throws IOException {
+  protected void processStreamOperators(PdfDocument pdf, Page page, PDContentStream stream)
+          throws IOException {
     List<COSBase> arguments = new ArrayList<COSBase>();
 
     PDFStreamParser parser = new PDFStreamParser(stream);
@@ -438,7 +437,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @throws IOException If there is an error processing the operation.
    */
   public void processOperator(PdfDocument pdf, Page page, String operation, List<COSBase> arguments)
-      throws IOException {
+          throws IOException {
     Operator operator = Operator.getOperator(operation);
     processOperator(pdf, page, operator, arguments);
   }
@@ -452,7 +451,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param args The list of arguments.
    * @throws IOException If there is an error processing the operation.
    */
-  protected void processOperator(PdfDocument pdf, Page page, Operator op, List<COSBase> args) throws IOException {
+  protected void processOperator(PdfDocument pdf, Page page, Operator op, List<COSBase> args)
+          throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
     log.trace("Processing PDF operator: " + op + "; args: " + args);
@@ -480,9 +480,9 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @return the transformed coordinates as Point2D.Double
    */
   public Point2D.Double transformedPoint(double x, double y) {
-    double[] position = { x, y };
-    getGraphicsState().getCurrentTransformationMatrix().createAffineTransform()
-            .transform(position, 0, position, 0, 1);
+    double[] position = {x, y};
+    getGraphicsState().getCurrentTransformationMatrix().createAffineTransform().transform(position,
+            0, position, 0, 1);
     return new Point2D.Double(position[0], position[1]);
   }
 
@@ -634,8 +634,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   }
 
   /**
-   * Transforms the given coordinates by applying the current transformation
-   * matrix.
+   * Transforms the given coordinates by applying the current transformation matrix.
    * 
    * @param p The point to transform.
    */
@@ -807,9 +806,8 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   }
 
   /**
-   * Modify the current clipping path by intersecting it with the current path.
-   * The clipping path will not be updated until the succeeding painting operator
-   * is called.
+   * Modify the current clipping path by intersecting it with the current path. The clipping path
+   * will not be updated until the succeeding painting operator is called.
    * 
    * @param rule The winding rule which will be used for clipping.
    */
