@@ -5,11 +5,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
@@ -37,9 +35,9 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   protected OutputStream targetStream;
 
   /**
-   * The text unit.
+   * The units to visualize.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles filter.
@@ -56,7 +54,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
     visualize(pdf);
 
     log.debug("Visualizing the PDF document done.");
-    log.debug("text unit: " + this.textUnit);
+    log.debug("text unit: " + this.extractionUnits);
     log.debug("semantic roles: " + this.roles);
 
     log.debug("End of pipe: " + getClass().getSimpleName() + ".");
@@ -77,7 +75,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
    */
   protected void visualize(PdfDocument pdf) throws PdfActException {
     // Create the visualizer.
-    PdfVisualizer visualizer = new PlainPdfVisualizer(this.textUnit, this.roles);
+    PdfVisualizer visualizer = new PlainPdfVisualizer(this.extractionUnits, this.roles);
 
     // Serialize the PDF document.
     byte[] visualization = visualizer.visualize(pdf);
@@ -136,13 +134,13 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 
   // ==============================================================================================

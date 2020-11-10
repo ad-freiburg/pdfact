@@ -3,8 +3,7 @@ package pdfact.cli.pipes.visualize;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
@@ -49,19 +48,19 @@ public interface VisualizePdfPipe extends Pipe {
   // ==============================================================================================
 
   /**
-   * Returns the text unit.
+   * Returns the units to visualize.
    * 
-   * @return The text unit.
+   * @return The units to visualize.
    */
-  TextUnit getTextUnit();
+  Set<ExtractionUnit> getExtractionUnits();
 
   /**
-   * Sets the text unit.
+   * Sets the units to visualize.
    * 
-   * @param unit
-   *        The text unit.
+   * @param units
+   *        The units to visualize.
    */
-  void setTextUnit(TextUnit unit);
+  void setExtractionUnits(Set<ExtractionUnit> units);
 
   // ==============================================================================================
 

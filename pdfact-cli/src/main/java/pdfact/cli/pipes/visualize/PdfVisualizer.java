@@ -1,8 +1,7 @@
 package pdfact.cli.pipes.visualize;
 
 import java.util.Set;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.util.exception.PdfActVisualizeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
@@ -28,19 +27,19 @@ public interface PdfVisualizer {
   // ==============================================================================================
 
   /**
-   * Returns the text unit.
+   * Returns the units to visualize.
    * 
-   * @return The text unit.
+   * @return The units to visualize.
    */
-  TextUnit getTextUnit();
+  Set<ExtractionUnit> getExtractionUnits();
 
   /**
-   * Sets the text unit.
+   * Sets the units to visualize.
    * 
-   * @param unit
-   *        The text unit.
+   * @param units
+   *        The units to visualize.
    */
-  void setTextUnit(TextUnit unit);
+  void setExtractiontUnits(Set<ExtractionUnit> units);
 
   // ==============================================================================================
 

@@ -4,9 +4,8 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
-import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.core.model.LogLevel;
@@ -46,9 +45,9 @@ public class PdfAct {
   protected Path visualizationPath;
 
   /**
-   * The text unit to extract.
+   * The units to extract.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles of the text units to extract.
@@ -111,9 +110,9 @@ public class PdfAct {
       service.setVisualizationPath(this.visualizationPath);
     }
 
-    // Pass the chosen text unit.
-    if (this.textUnit != null) {
-      service.setTextUnit(this.textUnit);
+    // Pass the chosen extraction units.
+    if (this.extractionUnits != null) {
+      service.setExtractionUnits(this.extractionUnits);
     }
 
     // Pass the semantic roles filter for serialization & visualization.
@@ -236,22 +235,22 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the text unit to extract.
+   * Returns the units to extract.
    *
-   * @return The text unit to extract.
+   * @return The units to extract.
    */
-  public TextUnit getTextUnit() {
-    return textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return extractionUnits;
   }
 
   /**
-   * Sets the text unit to extract.
+   * Sets the units to extract.
    *
-   * @param textUnit
-   *     The text unit to extract.
+   * @param extractionUnits
+   *     The units to extract.
    */
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> extractionUnits) {
+    this.extractionUnits = extractionUnits;
   }
 
   // ==============================================================================================

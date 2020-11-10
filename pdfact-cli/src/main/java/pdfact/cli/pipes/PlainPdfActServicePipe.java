@@ -1,18 +1,15 @@
 package pdfact.cli.pipes;
 
-import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_EXTRACTION_UNITS;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SERIALIZE_FORMAT;
-import static pdfact.cli.PdfActCliSettings.DEFAULT_TEXT_UNIT;
-
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
-import pdfact.cli.model.TextUnit;
 import pdfact.cli.pipes.serialize.PlainSerializePdfPipe;
 import pdfact.cli.pipes.serialize.SerializePdfPipe;
 import pdfact.cli.pipes.validate.PlainValidatePathToWritePipe;
@@ -69,9 +66,9 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   protected SerializeFormat serializationFormat;
 
   /**
-   * The text unit to use in serialization and visualization.
+   * The units to use in serialization and visualization.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The roles of text units to be included in serialization and visualization.
@@ -85,8 +82,8 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   public PlainPdfActServicePipe() {
     this.serializationFormat = DEFAULT_SERIALIZE_FORMAT;
-    this.textUnit = DEFAULT_TEXT_UNIT;
-    this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+    this.extractionUnits = DEFAULT_EXTRACTION_UNITS;
+    this.roles = DEFAULT_SEMANTIC_ROLES;
   }
 
   // ==============================================================================================
@@ -123,7 +120,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     if (this.serializationStream != null || this.serializationPath != null) {
       SerializePdfPipe serializePipe = new PlainSerializePdfPipe();
       serializePipe.setSerializationFormat(this.serializationFormat);
-      serializePipe.setTextUnit(this.textUnit);
+      serializePipe.setExtractionUnits(this.extractionUnits);
       serializePipe.setSemanticRolesFilters(this.roles);
       serializePipe.setTargetPath(this.serializationPath);
       serializePipe.setTargetStream(this.serializationStream);
@@ -140,7 +137,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     // Visualize if there is a target given for the visualization.
     if (this.visualizationStream != null || this.visualizationPath != null) {
       VisualizePdfPipe visualizePipe = new PlainVisualizePdfPipe();
-      visualizePipe.setTextUnit(this.textUnit);
+      visualizePipe.setExtractionUnits(this.extractionUnits);
       visualizePipe.setSemanticRolesFilters(this.roles);
       visualizePipe.setTargetPath(this.visualizationPath);
       visualizePipe.setTargetStream(this.visualizationStream);
@@ -236,12 +233,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 }

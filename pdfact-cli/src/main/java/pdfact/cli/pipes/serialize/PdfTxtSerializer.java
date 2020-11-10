@@ -1,13 +1,11 @@
 package pdfact.cli.pipes.serialize;
 
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
 import pdfact.core.model.Element;
@@ -32,9 +30,9 @@ import pdfact.core.util.PdfActUtils;
  */
 public class PdfTxtSerializer implements PdfSerializer {
   /**
-   * The text unit.
+   * The units to serialize.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles to consider on serializing.
@@ -59,14 +57,14 @@ public class PdfTxtSerializer implements PdfSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
-   * @param textUnit
-   *        The text unit.
+   * @param extractionUnits
+   *        The units to serialize.
    * @param rolesFilter
    *        The semantic roles to consider on serializing.
    */
-  public PdfTxtSerializer(TextUnit textUnit, Set<SemanticRole> rolesFilter) {
+  public PdfTxtSerializer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> rolesFilter) {
     this();
-    this.textUnit = textUnit;
+    this.extractionUnits = extractionUnits;
     this.rolesFilter = rolesFilter;
   }
 
@@ -102,15 +100,21 @@ public class PdfTxtSerializer implements PdfSerializer {
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializePdfElements(PdfDocument pdf) {
-    switch (this.textUnit) {
-      case CHARACTER:
-        return serializeCharacters(pdf);
-      case WORD:
-        return serializeWords(pdf);
-      case PARAGRAPH:
-      default:
-        return serializeParagraphs(pdf);
+    List<String> lines = new ArrayList<>();
+    for (ExtractionUnit unit : this.extractionUnits) {
+      switch (unit) {
+        case CHARACTER:
+          lines.addAll(serializeCharacters(pdf));
+          break;
+        case WORD:
+          lines.addAll(serializeWords(pdf));
+          break;
+        case PARAGRAPH:
+        default:
+          lines.addAll(serializeParagraphs(pdf));
+      }
     }
+    return lines;
   }
 
   // ==============================================================================================
@@ -279,13 +283,13 @@ public class PdfTxtSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 
   // ==============================================================================================

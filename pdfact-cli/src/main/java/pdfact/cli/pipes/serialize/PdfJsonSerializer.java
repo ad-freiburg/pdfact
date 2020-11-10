@@ -5,6 +5,8 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTER;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTERS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLOR;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLORS;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FIGURE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FIGURES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
@@ -23,6 +25,8 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.PARAGRAPHS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITIONS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.R;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ROLE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.SHAPE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.SHAPES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_LINE;
@@ -30,19 +34,17 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WIDTH;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORD;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORDS;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
 import pdfact.core.model.Element;
+import pdfact.core.model.Figure;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.HasColor;
@@ -57,12 +59,13 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
+import pdfact.core.model.Shape;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
 
 /**
- * A serializer to serialize a PDF document in JSON format.
+ * A serializer to serialize a document in JSON format.
  *
  * @author Claudius Korzen
  */
@@ -75,9 +78,9 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * The element types to consider on serializing.
+   * The units to serialize.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles to consider on serializing.
@@ -108,14 +111,12 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in JSON format.
    * 
-   * @param textUnit
-   *        The text unit.
-   * @param rolesFilter
-   *        The semantic roles filter.
+   * @param extractionUnits The units to serialize.
+   * @param rolesFilter     The semantic roles filter.
    */
-  public PdfJsonSerializer(TextUnit textUnit, Set<SemanticRole> rolesFilter) {
+  public PdfJsonSerializer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> rolesFilter) {
     this();
-    this.textUnit = textUnit;
+    this.extractionUnits = extractionUnits;
     this.rolesFilter = rolesFilter;
   }
 
@@ -132,7 +133,7 @@ public class PdfJsonSerializer implements PdfSerializer {
 
       // Create the section that contains all serialized PDF elements.
       serializePdfElements(pdf, json);
- 
+
       // Create the section that contains the used fonts.
       JSONArray fontsJson = serializeFonts(this.usedFonts);
       if (fontsJson != null && fontsJson.length() > 0) {
@@ -145,10 +146,12 @@ public class PdfJsonSerializer implements PdfSerializer {
         json.put(COLORS, colorsJson);
       }
 
-      // Create the section that contains the metadata about the pages.
-      JSONArray pagesJson = serializePages(pdf.getPages());
-      if (pagesJson != null && pagesJson.length() > 0) {
-        json.put(PAGES, pagesJson);
+      // Create the section that contains the metadata about the used pages.
+      if (this.extractionUnits.contains(ExtractionUnit.PAGE)) {
+        JSONArray pagesJson = serializePages(pdf.getPages());
+        if (pagesJson != null && pagesJson.length() > 0) {
+          json.put(PAGES, pagesJson);
+        }
       }
 
       // Serialize the JSON object.
@@ -162,23 +165,30 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the elements of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param json
-   *        The JSON object to which the serialization should be appended.
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
    */
   public void serializePdfElements(PdfDocument pdf, JSONObject json) {
-    switch (this.textUnit) {
-      case CHARACTER:
-        serializeCharacters(pdf, json);
-        break;
-      case WORD:
-        serializeWords(pdf, json);
-        break;
-      case PARAGRAPH:
-      default:
-        serializeParagraphs(pdf, json);
-        break;
+    for (ExtractionUnit unit : this.extractionUnits) {
+      switch (unit) {
+        case CHARACTER:
+          serializeCharacters(pdf, json);
+          break;
+        case WORD:
+          serializeWords(pdf, json);
+          break;
+        case PARAGRAPH:
+          serializeParagraphs(pdf, json);
+          break;
+        case FIGURE:
+          serializeFigures(pdf, json);
+          break;
+        case SHAPE:
+          serializeShapes(pdf, json);
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -187,10 +197,8 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the paragraphs of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param json
-   *        The JSON object to which the serialization should be appended.
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
    */
   protected void serializeParagraphs(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
@@ -215,8 +223,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given paragraph.
    * 
-   * @param paragraph
-   *        The paragraph to serialize.
+   * @param paragraph The paragraph to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -235,10 +242,8 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the words of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param json
-   *        The JSON object to which the serialization should be appended.
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
    */
   protected void serializeWords(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
@@ -265,8 +270,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given word.
    * 
-   * @param word
-   *        The word to serialize.
+   * @param word The word to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -285,10 +289,8 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the characters of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
-   * @param json
-   *        The JSON object to which the serialization should be appended.
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
    */
   protected void serializeCharacters(PdfDocument pdf, JSONObject json) {
     JSONArray result = new JSONArray();
@@ -317,8 +319,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given character.
    * 
-   * @param character
-   *        The character to serialize.
+   * @param character The character to serialize.
    *
    * @return A JSON object that represents the serialization.
    */
@@ -335,10 +336,93 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
+   * Serializes the figures of the given PDF document.
+   * 
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
+   */
+  protected void serializeFigures(PdfDocument pdf, JSONObject json) {
+    JSONArray result = new JSONArray();
+
+    if (pdf != null) {
+      for (Page page : pdf.getPages()) {
+        for (Figure figure : page.getFigures()) {
+          JSONObject figureJson = serializeFigure(figure);
+          if (figureJson != null) {
+            result.put(figureJson);
+          }
+        }
+      }
+    }
+
+    json.put(FIGURES, result);
+  }
+
+  /**
+   * Serializes the given figure.
+   * 
+   * @param character The figure to serialize.
+   *
+   * @return A JSON object that represents the serialization.
+   */
+  protected JSONObject serializeFigure(Figure figure) {
+    JSONObject result = new JSONObject();
+    JSONObject figureJson = serializePdfElement(figure);
+    // Wrap the JSON object with a JSON object that describes a character.
+    if (figureJson != null && figureJson.length() > 0) {
+      result.put(FIGURE, figureJson);
+    }
+    return result;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Serializes the shapes of the given PDF document.
+   * 
+   * @param pdf  The PDF document to process.
+   * @param json The JSON object to which the serialization should be appended.
+   */
+  protected void serializeShapes(PdfDocument pdf, JSONObject json) {
+    JSONArray result = new JSONArray();
+
+    if (pdf != null) {
+      for (Page page : pdf.getPages()) {
+        for (Shape shape : page.getShapes()) {
+          JSONObject shapeJson = serializeShape(shape);
+          if (shapeJson != null) {
+            result.put(shapeJson);
+          }
+        }
+      }
+    }
+
+    json.put(SHAPES, result);
+  }
+
+  /**
+   * Serializes the given shape.
+   * 
+   * @param shape The shape to serialize.
+   *
+   * @return A JSON object that represents the serialization.
+   */
+  protected JSONObject serializeShape(Shape shape) {
+    JSONObject result = new JSONObject();
+    JSONObject shapeJson = serializePdfElement(shape);
+    // Wrap the JSON object with a JSON object that describes a character.
+    if (shapeJson != null && shapeJson.length() > 0) {
+      result.put(SHAPE, shapeJson);
+    }
+    return result;
+  }
+
+  // ==============================================================================================
+
+  /**
    * Serializes the given PDF element.
    * 
-   * @param element
-   *        The element to serialize.
+   * @param element The element to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -434,8 +518,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF positions.
    * 
-   * @param positions
-   *        The positions to serialize.
+   * @param positions The positions to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -446,8 +529,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given list of PDF positions.
    * 
-   * @param positions
-   *        The list of positions to serialize.
+   * @param positions The list of positions to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -467,8 +549,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF position.
    * 
-   * @param position
-   *        The position to serialize.
+   * @param position The position to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -500,8 +581,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given fonts.
    * 
-   * @param fonts
-   *        The fonts to serialize.
+   * @param fonts The fonts to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -512,8 +592,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given fonts.
    * 
-   * @param fonts
-   *        The fonts to serialize.
+   * @param fonts The fonts to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -533,8 +612,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given font.
    * 
-   * @param font
-   *        The font to serialize.
+   * @param font The font to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -558,8 +636,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given colors.
    * 
-   * @param colors
-   *        The color to serialize.
+   * @param colors The color to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -570,8 +647,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given colors.
    * 
-   * @param colors
-   *        The colors to serialize.
+   * @param colors The colors to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -594,8 +670,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given color.
    * 
-   * @param color
-   *        The color to serialize.
+   * @param color The color to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -621,8 +696,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the metadata of the given pages.
    * 
-   * @param pages
-   *        The pages to serialize.
+   * @param pages The pages to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -633,8 +707,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given pages.
    * 
-   * @param pages
-   *        The pages to serialize.
+   * @param pages The pages to serialize.
    * 
    * @return A JSON array that represents the serialization.
    */
@@ -651,14 +724,14 @@ public class PdfJsonSerializer implements PdfSerializer {
         }
       }
     }
+
     return result;
   }
 
   /**
    * Serializes the given page.
    * 
-   * @param page
-   *        The page to serialize.
+   * @param page The page to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -675,13 +748,13 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 
   // ==============================================================================================
@@ -699,14 +772,13 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic roles
-   * filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles filter of this
+   * serializer.
    * 
-   * @param element
-   *        The element to check.
+   * @param element The element to check.
    * 
-   * @return True, if the role of the given element matches the semantic roles
-   *         filter of this serializer, false otherwise.
+   * @return True, if the role of the given element matches the semantic roles filter of this
+   *         serializer, false otherwise.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {
     if (element == null) {
@@ -728,12 +800,11 @@ public class PdfJsonSerializer implements PdfSerializer {
 
   // ==============================================================================================
   // Remaining methods.
-  
+
   /**
    * Serializes the given text block.
    * 
-   * @param block
-   *        The text block to serialize.
+   * @param block The text block to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */
@@ -750,8 +821,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * Serializes the given text line.
    * 
-   * @param line
-   *        The text line to serialize.
+   * @param line The text line to serialize.
    * 
    * @return A JSON object that represents the serialization.
    */

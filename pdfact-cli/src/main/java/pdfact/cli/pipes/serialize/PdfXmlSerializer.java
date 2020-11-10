@@ -6,6 +6,8 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.CHARACTERS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLOR;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.COLORS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.DOCUMENT;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FIGURE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FIGURES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
@@ -25,6 +27,8 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITION;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITIONS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.R;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ROLE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.SHAPE;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.SHAPES;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCK;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_LINE;
@@ -32,20 +36,18 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WIDTH;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORD;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.WORDS;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringEscapeUtils;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
 import pdfact.core.model.Element;
+import pdfact.core.model.Figure;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.HasColor;
@@ -60,14 +62,14 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
+import pdfact.core.model.Shape;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
 import pdfact.core.util.PdfActUtils;
 
 /**
- * An implementation of {@link PdfXmlSerializer} that serializes a PDF document
- * in XML format.
+ * An implementation of {@link PdfXmlSerializer} that serializes a PDF document in XML format.
  *
  * @author Claudius Korzen
  */
@@ -85,9 +87,9 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * The text unit.
+   * The units to serialize.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles to consider on serializing.
@@ -118,14 +120,12 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in XML format.
    * 
-   * @param textUnit
-   *        The text unit.
-   * @param rolesFilter
-   *        The semantic roles filter.
+   * @param units       The text unit.
+   * @param rolesFilter The semantic roles filter.
    */
-  public PdfXmlSerializer(TextUnit textUnit, Set<SemanticRole> rolesFilter) {
+  public PdfXmlSerializer(Set<ExtractionUnit> units, Set<SemanticRole> rolesFilter) {
     this();
-    this.textUnit = textUnit;
+    this.extractionUnits = units;
     this.rolesFilter = rolesFilter;
   }
 
@@ -167,12 +167,14 @@ public class PdfXmlSerializer implements PdfSerializer {
         resultLines.add(end(COLORS, level + 1));
       }
 
-      // Create the section that contains information about the pages.
-      List<String> pagesLines = serializePages(level + 2, pdf.getPages());
-      if (pagesLines != null && !pagesLines.isEmpty()) {
-        resultLines.add(start(PAGES, level + 1));
-        resultLines.addAll(pagesLines);
-        resultLines.add(end(PAGES, level + 1));
+      if (this.extractionUnits.contains(ExtractionUnit.PAGE)) {
+        // Create the section that contains information about the pages.
+        List<String> pagesLines = serializePages(level + 2, pdf.getPages());
+        if (pagesLines != null && !pagesLines.isEmpty()) {
+          resultLines.add(start(PAGES, level + 1));
+          resultLines.addAll(pagesLines);
+          resultLines.add(end(PAGES, level + 1));
+        }
       }
 
       // End the XML document.
@@ -190,23 +192,35 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the elements of the given PDF document.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pdf
-   *        The PDF document to process.
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
    *
    * @return A list of strings that represent the serialized elements.
    */
   protected List<String> serializePdfElements(int level, PdfDocument pdf) {
-    switch (this.textUnit) {
-      case CHARACTER:
-        return serializeCharacters(level, pdf);
-      case WORD:
-        return serializeWords(level, pdf);
-      case PARAGRAPH:
-      default:
-        return serializeParagraphs(level, pdf);
+    List<String> lines = new ArrayList<>();
+    for (ExtractionUnit unit : this.extractionUnits) {
+      switch (unit) {
+        case CHARACTER:
+          lines.addAll(serializeCharacters(level, pdf));
+          break;
+        case WORD:
+          lines.addAll(serializeWords(level, pdf));
+          break;
+        case PARAGRAPH:
+          lines.addAll(serializeParagraphs(level, pdf));
+          break;
+        case FIGURE:
+          lines.addAll(serializeFigures(level, pdf));
+          break;
+        case SHAPE:
+          lines.addAll(serializeShapes(level, pdf));
+          break;
+        default:
+          break;
+      }
     }
+    return lines;
   }
 
   // ==============================================================================================
@@ -214,10 +228,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the paragraphs of the given PDF document.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pdf
-   *        The PDF document to process.
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -246,10 +258,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given paragraph.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param paragraph
-   *        The paragraph to serialize.
+   * @param level     The current indentation level.
+   * @param paragraph The paragraph to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -270,10 +280,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the words of the given PDF document.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pdf
-   *        The PDF document to process.
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -304,10 +312,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given word.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param word
-   *        The word to serialize.
+   * @param level The current indentation level.
+   * @param word  The word to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -328,15 +334,14 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the characters of the given PDF document.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pdf
-   *        The PDF document to process.
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializeCharacters(int level, PdfDocument pdf) {
     List<String> result = new ArrayList<>();
+
 
     if (pdf != null) {
       result.add(start(CHARACTERS, level));
@@ -364,10 +369,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given character.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param character
-   *        The character to serialize.
+   * @param level     The current indentation level.
+   * @param character The character to serialize.
    *
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -386,12 +389,108 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
+   * Serializes the figures of the given PDF document.
+   * 
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeFigures(int level, PdfDocument pdf) {
+    List<String> result = new ArrayList<>();
+
+    if (pdf != null) {
+      result.add(start(FIGURES, level));
+      for (Page page : pdf.getPages()) {
+        for (Figure figure : page.getFigures()) {
+          List<String> figureLines = serializeFigure(level + 1, figure);
+          if (figureLines != null) {
+            result.addAll(figureLines);
+          }
+        }
+      }
+      result.add(end(FIGURES, level));
+    }
+
+    return result;
+  }
+
+  /**
+   * Serializes the given figure.
+   * 
+   * @param level  The current indentation level.
+   * @param figure The figure to serialize.
+   *
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeFigure(int level, Figure figure) {
+    List<String> result = new ArrayList<>();
+    List<String> figureLines = serializePdfElement(level + 1, figure);
+    // Wrap the serialized lines with a tag that describes a figure.
+    if (figureLines != null && !figureLines.isEmpty()) {
+      result.add(start(FIGURE, level));
+      result.addAll(figureLines);
+      result.add(end(FIGURE, level));
+    }
+    return result;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Serializes the shapes of the given PDF document.
+   * 
+   * @param level The current indentation level.
+   * @param pdf   The PDF document to process.
+   * 
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeShapes(int level, PdfDocument pdf) {
+    List<String> result = new ArrayList<>();
+
+    if (pdf != null) {
+      result.add(start(SHAPES, level));
+      for (Page page : pdf.getPages()) {
+        for (Shape shape : page.getShapes()) {
+          List<String> shapeLines = serializeShape(level + 1, shape);
+          if (shapeLines != null) {
+            result.addAll(shapeLines);
+          }
+        }
+      }
+      result.add(end(SHAPES, level));
+    }
+
+    return result;
+  }
+
+  /**
+   * Serializes the given shape.
+   * 
+   * @param level  The current indentation level.
+   * @param shape The shape to serialize.
+   *
+   * @return A list of strings that represent the lines of the serialization.
+   */
+  protected List<String> serializeShape(int level, Shape shape) {
+    List<String> result = new ArrayList<>();
+    List<String> shapeLines = serializePdfElement(level + 1, shape);
+    // Wrap the serialized lines with a tag that describes a shape.
+    if (shapeLines != null && !shapeLines.isEmpty()) {
+      result.add(start(SHAPE, level));
+      result.addAll(shapeLines);
+      result.add(end(SHAPE, level));
+    }
+    return result;
+  }
+
+  // ==============================================================================================
+
+  /**
    * Serializes the given PDF element.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param element
-   *        The PDF element to serialize.
+   * @param level   The current indentation level.
+   * @param element The PDF element to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -417,7 +516,7 @@ public class PdfXmlSerializer implements PdfSerializer {
         HasPosition hasPosition = (HasPosition) element;
         Position position = hasPosition.getPosition();
 
-        List<String> serialized = serializePositions(level + 1, position);
+        List<String> serialized = serializePosition(level + 1, position);
         if (serialized != null) {
           result.add(start(POSITIONS, level));
           result.addAll(serialized);
@@ -481,6 +580,7 @@ public class PdfXmlSerializer implements PdfSerializer {
           result.add(start(TEXT, level) + text(text) + end(TEXT));
         }
       }
+      
     }
 
     return result;
@@ -491,10 +591,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given list of PDF positions.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pos
-   *        The positions to serialize.
+   * @param level The current indentation level.
+   * @param pos   The positions to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -505,10 +603,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given list of PDF positions.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pos
-   *        The list of positions to serialize.
+   * @param level The current indentation level.
+   * @param pos   The list of positions to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -528,10 +624,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF position.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param position
-   *        The position to serialize.
+   * @param level    The current indentation level.
+   * @param position The position to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -564,10 +658,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given fonts.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param fonts
-   *        The fonts to serialize.
+   * @param level The current indentation level.
+   * @param fonts The fonts to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -578,10 +670,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given fonts.
    *
-   * @param level
-   *        The current indentation level.
-   * @param fonts
-   *        The fonts to serialize.
+   * @param level The current indentation level.
+   * @param fonts The fonts to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -601,10 +691,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given font.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param font
-   *        The font to serialize.
+   * @param level The current indentation level.
+   * @param font  The font to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -630,10 +718,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given colors.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param colors
-   *        The colors to serialize.
+   * @param level  The current indentation level.
+   * @param colors The colors to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -644,10 +730,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given colors.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param colors
-   *        The colors to serialize.
+   * @param level  The current indentation level.
+   * @param colors The colors to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -670,10 +754,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given color.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param color
-   *        The color to serialize.
+   * @param level The current indentation level.
+   * @param color The color to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -700,10 +782,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the metadata of the given pages.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pages
-   *        The pages to serialize.
+   * @param level The current indentation level.
+   * @param pages The pages to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -714,10 +794,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the metadata of the given pages.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param pages
-   *        The pages to serialize.
+   * @param level The current indentation level.
+   * @param pages The pages to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -740,10 +818,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the metadata of the given page.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param page
-   *        The page to serialize.
+   * @param level The current indentation level.
+   * @param page  The page to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -764,8 +840,7 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Wraps the given text in an XML start tag.
    * 
-   * @param text
-   *        The text to wrap.
+   * @param text The text to wrap.
    * 
    * @return The given text wrapped in an XML start tag.
    */
@@ -774,16 +849,12 @@ public class PdfXmlSerializer implements PdfSerializer {
   }
 
   /**
-   * Wraps the given text in an XML start tag and indents it by the given
-   * indentation level.
+   * Wraps the given text in an XML start tag and indents it by the given indentation level.
    * 
-   * @param text
-   *        The text to wrap.
-   * @param level
-   *        The indentation level.
+   * @param text  The text to wrap.
+   * @param level The indentation level.
    * 
-   * @return The given text wrapped in an XML start tag, indented by the given
-   *         indentation level.
+   * @return The given text wrapped in an XML start tag, indented by the given indentation level.
    */
   protected String start(String text, int level) {
     String indent = repeat(" ", level * INDENT_LENGTH);
@@ -793,8 +864,7 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Wraps the given text in an XML end tag.
    * 
-   * @param text
-   *        The text to wrap.
+   * @param text The text to wrap.
    * 
    * @return The given text wrapped in an XML end tag.
    */
@@ -803,16 +873,12 @@ public class PdfXmlSerializer implements PdfSerializer {
   }
 
   /**
-   * Wraps the given text in an XML end tag and indents it by the given
-   * indentation level.
+   * Wraps the given text in an XML end tag and indents it by the given indentation level.
    * 
-   * @param text
-   *        The text to wrap.
-   * @param level
-   *        The indentation level.
+   * @param text  The text to wrap.
+   * @param level The indentation level.
    * 
-   * @return The given text wrapped in an XML end tag, indented by the given
-   *         indentation level.
+   * @return The given text wrapped in an XML end tag, indented by the given indentation level.
    */
   protected String end(String text, int level) {
     String indent = repeat(" ", level * INDENT_LENGTH);
@@ -822,8 +888,7 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Transform the given object to an XML escaped string.
    * 
-   * @param obj
-   *        The object to process.
+   * @param obj The object to process.
    * 
    * @return The XML escaped string.
    */
@@ -832,13 +897,11 @@ public class PdfXmlSerializer implements PdfSerializer {
   }
 
   /**
-   * Transform the given object to an XML escaped string and indents it by the
-   * given indentation level.
+   * Transform the given object to an XML escaped string and indents it by the given indentation
+   * level.
    * 
-   * @param obj
-   *        The object to process.
-   * @param level
-   *        The indentation level.
+   * @param obj   The object to process.
+   * @param level The indentation level.
    *
    * @return The XML escaped string, indented by the given indentation level.
    */
@@ -851,13 +914,13 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 
   // ==============================================================================================
@@ -875,14 +938,13 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic roles
-   * filter of this serializer.
+   * Checks if the semantic role of the given element matches the semantic roles filter of this
+   * serializer.
    * 
-   * @param element
-   *        The element to check.
+   * @param element The element to check.
    * 
-   * @return True, if the role of the given element matches the semantic roles
-   *         filter of this serializer, false otherwise.
+   * @return True, if the role of the given element matches the semantic roles filter of this
+   *         serializer, false otherwise.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {
     if (element == null) {
@@ -907,10 +969,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Repeats the given string $repeats-times.
    * 
-   * @param string
-   *        The string to repeat.
-   * @param repeats
-   *        The number of repeats.
+   * @param string  The string to repeat.
+   * @param repeats The number of repeats.
    * @return The string containing the given string $repeats-times.
    */
   public static String repeat(String string, int repeats) {
@@ -926,10 +986,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given text block.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param block
-   *        The text block to serialize.
+   * @param level The current indentation level.
+   * @param block The text block to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -948,10 +1006,8 @@ public class PdfXmlSerializer implements PdfSerializer {
   /**
    * Serializes the given text line.
    * 
-   * @param level
-   *        The current indentation level.
-   * @param line
-   *        The text line to serialize.
+   * @param level The current indentation level.
+   * @param line  The text line to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */

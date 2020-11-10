@@ -1,20 +1,17 @@
 package pdfact.cli.pipes.serialize;
 
-import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_EXTRACTION_UNITS;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SERIALIZE_FORMAT;
-import static pdfact.cli.PdfActCliSettings.DEFAULT_TEXT_UNIT;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
-import pdfact.cli.model.TextUnit;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
@@ -47,9 +44,9 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   protected OutputStream targetStream;
 
   /**
-   * The text unit.
+   * The units to extract.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles filter.
@@ -60,14 +57,11 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
   /**
    * The default constructor.
-   * 
-   * @param serializers
-   *        The factories of the available serializers.
    */
   public PlainSerializePdfPipe() {
     this.format = DEFAULT_SERIALIZE_FORMAT;
-    this.textUnit = DEFAULT_TEXT_UNIT;
-    this.roles = DEFAULT_SEMANTIC_ROLES_TO_INCLUDE;
+    this.extractionUnits = DEFAULT_EXTRACTION_UNITS;
+    this.roles = DEFAULT_SEMANTIC_ROLES;
   }
 
   // ==============================================================================================
@@ -81,7 +75,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
     log.debug("Serializing the PDF document done.");
     log.debug("serialization format: " + this.format);
-    log.debug("text unit: " + this.textUnit);
+    log.debug("extraction units: " + this.extractionUnits);
     log.debug("semantic roles: " + this.roles);
 
     log.debug("End of pipe: " + getClass().getSimpleName() + ".");
@@ -102,13 +96,13 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     PdfSerializer serializer;
     switch (this.format) {
       case XML:
-        serializer = new PdfXmlSerializer(this.textUnit, this.roles);
+        serializer = new PdfXmlSerializer(this.extractionUnits, this.roles);
         break;
       case JSON:
-        serializer = new PdfJsonSerializer(this.textUnit, this.roles);
+        serializer = new PdfJsonSerializer(this.extractionUnits, this.roles);
         break;
       case TXT:
-        serializer = new PdfTxtSerializer(this.textUnit, this.roles);
+        serializer = new PdfTxtSerializer(this.extractionUnits, this.roles);
         break;
       default:
         throw new PdfActSerializeException(
@@ -170,13 +164,13 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractionUnits(Set<ExtractionUnit> units) {
+    this.extractionUnits = units;
   }
 
   // ==============================================================================================

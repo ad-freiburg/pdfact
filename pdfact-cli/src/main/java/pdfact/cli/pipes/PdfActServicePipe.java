@@ -3,9 +3,8 @@ package pdfact.cli.pipes;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
-
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
-import pdfact.cli.model.TextUnit;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
@@ -119,17 +118,17 @@ public interface PdfActServicePipe extends Pipe {
   // ==============================================================================================
 
   /**
-   * Returns the text unit.
+   * Returns the unit to extract.
    * 
-   * @return The text unit.
+   * @return The unit to extract.
    */
-  TextUnit getTextUnit();
+  Set<ExtractionUnit> getExtractionUnits();
 
   /**
-   * Sets the text unit.
+   * Sets the units to extract.
    * 
-   * @param unit
-   *        The text unit.
+   * @param units
+   *        The units to extract.
    */
-  void setTextUnit(TextUnit unit);
+  void setExtractionUnits(Set<ExtractionUnit> units);
 }

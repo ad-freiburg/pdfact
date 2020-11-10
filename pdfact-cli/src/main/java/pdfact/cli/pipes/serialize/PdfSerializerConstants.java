@@ -19,6 +19,10 @@ public class PdfSerializerConstants {
   static final String COLORS = "colors";
   /** The constant 'DOCUMENT'. */
   static final String DOCUMENT = "document";
+  /** The constant 'FIGURE'. */
+  static final String FIGURE = "figure";
+  /** The constant 'FIGURES'. */
+  static final String FIGURES = "figures";
   /** The constant 'FONT'. */
   static final String FONT = "font";
   /** The constant 'FONTS'. */
@@ -59,6 +63,10 @@ public class PdfSerializerConstants {
   static final String R = "r";
   /** The constant 'ROLE'. */
   static final String ROLE = "role";
+  /** The constant 'SHAPE'. */
+  static final String SHAPE = "shape";
+  /** The constant 'SHAPES'. */
+  static final String SHAPES = "shapes";
   /** The constant 'TEXT'. */
   static final String TEXT = "text";
   /** The constant 'TEXT_BLOCK'. */

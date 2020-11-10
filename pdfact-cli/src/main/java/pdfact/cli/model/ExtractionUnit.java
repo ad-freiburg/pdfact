@@ -8,78 +8,93 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An enumeration of all available text units.
+ * An enumeration of all available units that can be extracted from a document.
  *
  * @author Claudius Korzen
  */
-public enum TextUnit {
+public enum ExtractionUnit {
   /**
-   * The text unit "paragraphs".
+   * The unit "paragraphs".
    */
   PARAGRAPH("paragraphs"),
 
   /**
-   * The text unit "text blocks".
+   * The unit "text blocks".
    */
   TEXT_BLOCK("blocks"),
 
   /**
-   * The text unit "text lines".
+   * The unit "text lines".
    */
   TEXT_LINE("lines"),
 
   /**
-   * The text unit "words".
+   * The unit "words".
    */
   WORD("words"),
 
   /**
-   * The text unit "characters".
+   * The unit "characters".
    */
   CHARACTER("characters"),
 
   /**
-   * The text unit "text areas".
+   * The unit "text areas".
    */
-  TEXT_AREA("areas");
+  TEXT_AREA("areas"),
+
+  /**
+   * The unit "figures".
+   */
+  FIGURE("figures"),
+
+  /**
+   * The unit "shapes".
+   */
+  SHAPE("shapes"),
+
+  /**
+   * The unit "page".
+   */
+  PAGE("pages");
 
   // ==============================================================================================
 
   /**
-   * The plural name of this text unit.
+   * The plural name of this unit.
    */
   protected String pluralName;
 
   /**
-   * The text units per plural names.
+   * The units per plural names.
    */
-  protected static Map<String, TextUnit> index;
+  protected static Map<String, ExtractionUnit> index;
 
   static {
     index = new HashMap<>();
 
     // Fill the map of types per group name.
-    for (TextUnit type : values()) {
+    for (ExtractionUnit type : values()) {
       index.put(type.getPluralName(), type);
     }
   }
   
   /**
-   * Creates a new text unit.
+   * Creates a new unit.
    * 
    * @param pluralName
-   *        The plural name of this text unit.
+   *        The plural name of this unit.
    */
-  private TextUnit(String pluralName) {
+  private ExtractionUnit(String pluralName) {
     this.pluralName = pluralName;
   }
 
   // ==============================================================================================
   
   /**
-   * Returns the plural name of this text unit.
+   * Returns the plural name of this unit.
    * 
-   * @return The plural name of this text unit.
+   * @return The plural name of this unit.
    */
   public String getPluralName() {
     return this.pluralName;
@@ -88,16 +103,16 @@ public enum TextUnit {
   // ==============================================================================================
   
   /**
-   * Returns a set of the plural names of all text units.
+   * Returns a set of the plural names of all units.
    * 
-   * @return A set of the plural names of all text units.
+   * @return A set of the plural names of all units.
    */
   public static Set<String> getPluralNames() {
     return index.keySet();
   }
 
   /**
-   * Checks if the given name is a plural name of an existing text unit.
+   * Checks if the given name is a plural name of an existing unit.
    * 
    * @param name
    *        The name to check.
@@ -112,30 +127,30 @@ public enum TextUnit {
    * Returns the types that are associated with the given plural names.
    * 
    * @param names
-   *        The names of the text units to fetch.
+   *        The names of the  units to fetch.
    *
-   * @return A set of the fetched text units.
+   * @return A set of the fetched units.
    */
-  public static Set<TextUnit> fromStrings(String... names) {
+  public static Set<ExtractionUnit> fromStrings(String... names) {
     return fromStrings(Arrays.asList(names));
   }
 
   /**
-   * Returns the text units that are associated with the given names.
+   * Returns the units that are associated with the given names.
    * 
    * @param names
-   *        The names of the text units to fetch.
+   *        The names of the units to fetch.
    *
-   * @return A set of the fetched text units.
+   * @return A set of the fetched units.
    */
-  public static Set<TextUnit> fromStrings(List<String> names) {
+  public static Set<ExtractionUnit> fromStrings(List<String> names) {
     if (names == null || names.isEmpty()) {
       return null;
     }
 
-    Set<TextUnit> types = new HashSet<>();
+    Set<ExtractionUnit> types = new HashSet<>();
     for (String name : names) {
-      TextUnit type = fromString(name);
+      ExtractionUnit type = fromString(name);
       if (type != null) {
         types.add(type);
       }
@@ -144,14 +159,14 @@ public enum TextUnit {
   }
 
   /**
-   * Returns the text unit that is associated with the given name.
+   * Returns the unit that is associated with the given name.
    * 
    * @param name
    *        The plural name of the type to fetch.
    *
    * @return The type that is associated with the given plural name.
    */
-  public static TextUnit fromString(String name) {
+  public static ExtractionUnit fromString(String name) {
     if (!isValidType(name)) {
       throw new IllegalArgumentException(name + " isn't a valid type.");
     }

@@ -1,8 +1,7 @@
 package pdfact.cli.pipes.serialize;
 
 import java.util.Set;
-
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
@@ -27,19 +26,19 @@ public interface PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Returns the text unit.
+   * Returns the units to extract.
    * 
-   * @return The text unit.
+   * @return The units to extract.
    */
-  TextUnit getTextUnit();
+  Set<ExtractionUnit> getExtractionUnits();
 
   /**
-   * Sets the text unit.
+   * Sets the units to extract.
    * 
-   * @param textUnit
-   *        The text unit.
+   * @param extractionUnits
+   *        The extraction units.
    */
-  void setTextUnit(TextUnit textUnit);
+  void setExtractionUnits(Set<ExtractionUnit> extractionUnits);
 
   // ==============================================================================================
 

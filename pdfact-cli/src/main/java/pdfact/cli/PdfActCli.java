@@ -4,9 +4,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
-
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.helper.HelpScreenException;
@@ -14,8 +12,8 @@ import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
-import pdfact.cli.model.TextUnit;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
 import pdfact.core.PdfActCoreSettings;
 import pdfact.core.model.LogLevel;
@@ -72,7 +70,7 @@ public class PdfActCli {
 
       // Pass the chosen text unit.
       if (parser.hasTextUnit()) {
-        pdfAct.setTextUnit(TextUnit.fromString(parser.getTextUnit()));
+        pdfAct.setExtractionUnits(ExtractionUnit.fromStrings(parser.getExtractionUnits()));
       }
 
       // Pass the semantic roles filter for serialization & visualization.
@@ -181,15 +179,15 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * The name of the option to define the text unit to extract.
+     * The name of the option to define the units to extract.
      */
-    protected static final String TEXT_UNIT = "unit";
+    protected static final String EXTRACTION_UNIT = "unit";
 
     /**
      * The text unit to extract.
      */
-    @Arg(dest = TEXT_UNIT)
-    protected String textUnit;
+    @Arg(dest = EXTRACTION_UNIT)
+    protected List<String> extractionUnits;
 
     // ============================================================================================
 
@@ -254,25 +252,26 @@ public class PdfActCli {
           .metavar("<format>")
           .help("The output format. Available options: " + formatChoices + ".\n"
               + "If the format is \"txt\", the output will contain the text "
-              + "matching the specified --" + TEXT_UNIT + " and --" 
+              + "matching the specified --" + EXTRACTION_UNIT + " and --" 
               + SEMANTIC_ROLES_FILTER + " options in plain text format (in the "
               + "format: one text element per line). If the format is \"xml\" "
               + "or \"json\", the output will also contain layout information "
               + "for each text element, e.g., the positions in the PDF file.");
 
       // Add an argument to define the text unit to extract.
-      Set<String> unitChoices = TextUnit.getPluralNames();
-      this.parser.addArgument("--" + TEXT_UNIT)
-          .dest(TEXT_UNIT)
+      Set<String> unitChoices = ExtractionUnit.getPluralNames();
+      this.parser.addArgument("--" + EXTRACTION_UNIT)
+          .dest(EXTRACTION_UNIT)
+          .nargs("*")
           .choices(unitChoices)
           .required(false)
-          .metavar("<unit>")
-          .help("The granularity in which the extracted text (and the layout "
+          .metavar("<unit>", "<unit>")
+          .help("The granularity in which the output (and the layout "
               + "information, if the chosen output format is dedicated to "
-              + "provide such information) should be broken down in the "
-              + "output. Available options: " + unitChoices + ".\n"
+              + "provide such information) should be broken down. Available options: " 
+              + unitChoices + ".\n"
               + "For example, when the script is called with the option "
-              + "\"--" + TEXT_UNIT + " words\", the output will be broken down "
+              + "\"--" + EXTRACTION_UNIT + " words\", the output will be broken down "
               + "by words, that is: the text (and layout information) will be "
               + "provided word-wise.");
               
@@ -460,16 +459,16 @@ public class PdfActCli {
      *     False otherwise.
      */
     public boolean hasTextUnit() {
-      return this.textUnit != null;
+      return this.extractionUnits != null;
     }
 
     /**
-     * Returns the text unit.
+     * Returns the units to extract.
      *
-     * @return The text unit.
+     * @return The units to extract.
      */
-    public String getTextUnit() {
-      return this.textUnit;
+    public List<String> getExtractionUnits() {
+      return this.extractionUnits;
     }
 
     // ============================================================================================

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import pdfact.cli.model.TextUnit;
+import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.cli.util.exception.PdfActVisualizeException;
 import pdfact.core.model.Character;
@@ -33,9 +33,9 @@ import pdfact.core.model.Word;
  */
 public class PlainPdfVisualizer implements PdfVisualizer {
   /**
-   * The text unit.
+   * The units to visualize.
    */
-  protected TextUnit textUnit;
+  protected Set<ExtractionUnit> extractionUnits;
 
   /**
    * The semantic roles to consider on visualizing.
@@ -48,11 +48,11 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Creates a new PDF visualizer.
    * 
-   * @param textUnit    The text unit.
-   * @param rolesFilter The semantic roles filter.
+   * @param extractionUnits The text unit.
+   * @param rolesFilter     The semantic roles filter.
    */
-  public PlainPdfVisualizer(TextUnit textUnit, Set<SemanticRole> rolesFilter) {
-    this.textUnit = textUnit;
+  public PlainPdfVisualizer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> rolesFilter) {
+    this.extractionUnits = extractionUnits;
     this.rolesFilter = rolesFilter;
   }
 
@@ -64,26 +64,28 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       try {
         PdfDrawer drawer = new PdfBoxDrawer(pdf.getFile());
 
-        switch (this.textUnit) {
-          case CHARACTER:
-            visualizeCharacters(pdf, drawer);
-            break;
-          case TEXT_AREA:
-            visualizeTextAreas(pdf, drawer);
-            break;
-          case TEXT_LINE:
-            visualizeTextLines(pdf, drawer);
-            break;
-          case WORD:
-            visualizeWords(pdf, drawer);
-            break;
-          case TEXT_BLOCK:
-            visualizeTextBlocks(pdf, drawer);
-            break;
-          case PARAGRAPH:
-          default:
-            visualizeParagraphs(pdf, drawer);
-            break;
+        for (ExtractionUnit unit : this.extractionUnits) {
+          switch (unit) {
+            case CHARACTER:
+              visualizeCharacters(pdf, drawer);
+              break;
+            case TEXT_AREA:
+              visualizeTextAreas(pdf, drawer);
+              break;
+            case TEXT_LINE:
+              visualizeTextLines(pdf, drawer);
+              break;
+            case WORD:
+              visualizeWords(pdf, drawer);
+              break;
+            case TEXT_BLOCK:
+              visualizeTextBlocks(pdf, drawer);
+              break;
+            case PARAGRAPH:
+            default:
+              visualizeParagraphs(pdf, drawer);
+              break;
+          }
         }
 
         return drawer.toByteArray();
@@ -446,13 +448,13 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==============================================================================================
 
   @Override
-  public TextUnit getTextUnit() {
-    return this.textUnit;
+  public Set<ExtractionUnit> getExtractionUnits() {
+    return this.extractionUnits;
   }
 
   @Override
-  public void setTextUnit(TextUnit textUnit) {
-    this.textUnit = textUnit;
+  public void setExtractiontUnits(Set<ExtractionUnit> extractionUnits) {
+    this.extractionUnits = extractionUnits;
   }
 
   // ==============================================================================================
