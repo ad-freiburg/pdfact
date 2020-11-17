@@ -1,13 +1,11 @@
 package pdfact.core.pipes.parse.stream.pdfbox.operators.text;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
-
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.cff.Type1CharString;
@@ -32,7 +30,6 @@ import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.state.PDTextState;
 import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.util.Vector;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
 import pdfact.core.model.Font;
@@ -42,13 +39,13 @@ import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
-import pdfact.core.pipes.parse.stream.pdfbox.convert.PDColorConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDFontConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.convert.PDFontFaceConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxAFMUtils;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.PdfBoxGlyphUtils;
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.color.ColorManager;
 
 /**
  * Tj: Show a text string.
@@ -72,11 +69,6 @@ public class ShowText extends OperatorProcessor {
   protected PDFontFaceConverter fontFaceConverter;
 
   /**
-   * The translator to translate PDColor objects to PdfColor objects.
-   */
-  protected PDColorConverter colorTranslator;
-
-  /**
    * The util to read the specifications of special glyphs.
    */
   protected PdfBoxGlyphUtils glyphUtils;
@@ -93,7 +85,6 @@ public class ShowText extends OperatorProcessor {
   public ShowText() {
     this.fontTranslator = new PDFontConverter();
     this.fontFaceConverter = new PDFontFaceConverter();
-    this.colorTranslator = new PDColorConverter();
     this.glyphUtils = new PdfBoxGlyphUtils();
   }
 
@@ -321,7 +312,7 @@ public class ShowText extends OperatorProcessor {
     PDColorSpace pdColorSpace = graphicsState.getNonStrokingColorSpace();
 
     // Convert the color.
-    Color color = this.colorTranslator.convert(pdColor, pdColorSpace);
+    Color color = ColorManager.getColor(pdColor, pdColorSpace);
 
     // Convert the font.
     Font font = this.fontTranslator.convert(pdFont);

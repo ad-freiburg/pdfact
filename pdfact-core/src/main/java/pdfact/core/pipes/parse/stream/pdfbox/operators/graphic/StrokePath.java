@@ -1,28 +1,25 @@
 package pdfact.core.pipes.parse.stream.pdfbox.operators.graphic;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
-
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
-
 import pdfact.core.model.Color;
 import pdfact.core.model.Page;
 import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
-import pdfact.core.pipes.parse.stream.pdfbox.convert.PDColorConverter;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.color.ColorManager;
 
 /**
  * S: Stroke the path.
@@ -30,23 +27,6 @@ import pdfact.core.util.PdfActUtils;
  * @author Claudius Korzen
  */
 public class StrokePath extends OperatorProcessor {
-  /**
-   * The converter to convert PDColor objects into PdfColor objects.
-   */
-  protected PDColorConverter colorConverter;
-
-  // ==============================================================================================
-  // Constructors.
-
-  /**
-   * Creates a new OperatorProcessor to process the operation "StrokePath".
-   */
-  public StrokePath() {
-    this.colorConverter = new PDColorConverter();
-  }
-
-  // ==============================================================================================
-
   @Override
   public void process(PdfDocument pdf, Page page, Operator op,
       List<COSBase> args) throws IOException {
@@ -72,8 +52,7 @@ public class StrokePath extends OperatorProcessor {
     }
 
     // Convert the color.
-    Color color = this.colorConverter.convert(c, cs);
-
+    Color color = ColorManager.getColor(c, cs);
     GeneralPath linePath = this.engine.getLinePath();
 
     PathIterator itr;

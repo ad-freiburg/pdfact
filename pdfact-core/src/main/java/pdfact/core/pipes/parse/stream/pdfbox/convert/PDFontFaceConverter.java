@@ -2,10 +2,8 @@ package pdfact.core.pipes.parse.stream.pdfbox.convert;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 
@@ -19,7 +17,7 @@ public class PDFontFaceConverter {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PDColorConverter.class);
+  protected static Logger log = LogManager.getLogger(PDFontFaceConverter.class);
 
   /**
    * The already known {@link FontFace} objects per name.

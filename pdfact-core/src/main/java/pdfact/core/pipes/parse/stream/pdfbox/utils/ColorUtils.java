@@ -18,12 +18,12 @@ public class ColorUtils {
    * 
    * @return The RGB values in an array of three values.
    */
-  public static float[] toRgbArray(int pixel) {
-    float alpha = (pixel >> 24) & 0xff;
-    float red = ((pixel >> 16) & 0xff) / 255f;
-    float green = ((pixel >> 8) & 0xff) / 255f;
-    float blue = ((pixel) & 0xff) / 255f;
-    return new float[] { red, green, blue, alpha };
+  public static int[] toRgbArray(int pixel) {
+    int alpha = (pixel >> 24) & 0xff;
+    int red = ((pixel >> 16) & 0xff);
+    int green = ((pixel >> 8) & 0xff);
+    int blue = ((pixel) & 0xff);
+    return new int[] { red, green, blue, alpha };
   }
 
   /**
@@ -38,7 +38,7 @@ public class ColorUtils {
    * @throws IOException
    *         If something went wrong on reading the image.
    */
-  public static float[] getExclusiveColor(BufferedImage im) throws IOException {
+  public static int[] getExclusiveColor(BufferedImage im) throws IOException {
     if (im == null) {
       return null;
     }

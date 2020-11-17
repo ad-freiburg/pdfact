@@ -4,7 +4,6 @@ package pdfact.core.model;
 // TODO: Clarify, if the rgb values are within the interval [0, 1] or [0, 255].
 
 import java.util.Arrays;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -20,9 +19,9 @@ public class Color extends Resource {
   protected String name;
 
   /**
-   * The RGB value of this color.
+   * The RGB values of this color.
    */
-  protected float[] rgb;
+  protected int[] rgb;
 
   // ==============================================================================================
 
@@ -30,15 +29,15 @@ public class Color extends Resource {
    * Creates a new color.
    */
   public Color() {
-    this.rgb = new float[3];
+    this.rgb = new int[3];
   }
 
   /**
    * Creates a new color.
    * 
-   * @param rgb The RGB value given as an array of three float values in [0,1].
+   * @param rgb The RGB value given as an array of three int values in [0,255].
    */
-  public Color(float[] rgb) {
+  public Color(int[] rgb) {
     this.rgb = rgb;
   }
 
@@ -49,7 +48,7 @@ public class Color extends Resource {
    * @param g The G value.
    * @param b The B value.
    */
-  public Color(float r, float g, float b) {
+  public Color(int r, int g, int b) {
     this();
     this.rgb[0] = r;
     this.rgb[1] = g;
@@ -83,7 +82,7 @@ public class Color extends Resource {
    * 
    * @return The RGB value given as an array of three float values in [0,1].
    */
-  public float[] getRGB() {
+  public int[] getRGB() {
     return this.rgb;
   }
 
@@ -92,7 +91,7 @@ public class Color extends Resource {
    * 
    * @param rgb The RGB value given as an array of three float values in [0,1].
    */
-  public void setRGB(final float[] rgb) {
+  public void setRGB(final int[] rgb) {
     this.rgb = rgb;
   }
 
@@ -103,7 +102,7 @@ public class Color extends Resource {
    * @param g The G value.
    * @param b The B value.
    */
-  public void setRGB(float r, float g, float b) {
+  public void setRGB(int r, int g, int b) {
     this.rgb[0] = r;
     this.rgb[1] = g;
     this.rgb[2] = b;

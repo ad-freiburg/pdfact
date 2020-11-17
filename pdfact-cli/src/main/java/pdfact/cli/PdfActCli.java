@@ -266,16 +266,13 @@ public class PdfActCli {
           .choices(unitChoices)
           .required(false)
           .metavar("<unit>", "<unit>")
-          .help("The granularity in which the output (and the layout "
-              + "information, if the chosen output format is dedicated to "
-              + "provide such information) should be broken down. Available options: " 
-              + unitChoices + ".\n"
-              + "For example, when the script is called with the option "
-              + "\"--" + EXTRACTION_UNIT + " words\", the output will be broken down "
-              + "by words, that is: the text (and layout information) will be "
-              + "provided word-wise.");
+          .help("The units in which the output (and the layout information, if the chosen output "
+              + "format is dedicated to provide such information) should be broken down. "
+              + "Available options: " + unitChoices + ".\n"
+              + "For example, when the script is called with the option \"--" + EXTRACTION_UNIT 
+              + " words\", the output will be broken down by words, that is: the text (and layout "
+              + "information) will be provided word-wise.");
               
-
       // Add an argument to define the semantic role(s).
       Set<String> semanticRolesChoices = SemanticRole.getNames();
       this.parser.addArgument("--" + SEMANTIC_ROLES_FILTER)

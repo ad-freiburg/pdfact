@@ -26,6 +26,7 @@ import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.ColorUtils;
+import pdfact.core.util.color.ColorManager;
 
 /**
  * Do: Invoke a named xobject.
@@ -106,11 +107,10 @@ public class DrawObject extends OperatorProcessor {
 
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
-      float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
+      int[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
 
       if (exclusiveColor != null) {
-        Color color = new Color();
-        color.setRGB(exclusiveColor);
+        Color color = ColorManager.getColor(exclusiveColor);
         Shape shape = new Shape();
         shape.setPosition(position);
         shape.setColor(color);

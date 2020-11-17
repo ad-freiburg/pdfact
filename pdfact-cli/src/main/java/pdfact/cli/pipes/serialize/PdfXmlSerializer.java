@@ -762,7 +762,7 @@ public class PdfXmlSerializer implements PdfSerializer {
   protected List<String> serializeColor(int level, Color color) {
     List<String> result = new ArrayList<>();
     if (color != null) {
-      float[] rgb = color.getRGB();
+      int[] rgb = color.getRGB();
 
       if (rgb != null && rgb.length == 3) {
         result.add(start(COLOR, level++));

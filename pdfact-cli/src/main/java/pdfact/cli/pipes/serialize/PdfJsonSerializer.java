@@ -678,7 +678,7 @@ public class PdfJsonSerializer implements PdfSerializer {
     JSONObject colorJson = new JSONObject();
     if (color != null) {
       String colorId = color.getId();
-      float[] rgb = color.getRGB();
+      int[] rgb = color.getRGB();
 
       if (colorId != null && rgb != null && rgb.length == 3) {
         colorJson.put(ID, colorId);

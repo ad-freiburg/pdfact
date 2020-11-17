@@ -1,10 +1,8 @@
 package pdfact.core.pipes.parse.stream.pdfbox.operators.graphic;
 
 import static pdfact.core.PdfActCoreSettings.FLOATING_NUMBER_PRECISION;
-
 import java.io.IOException;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.contentstream.operator.Operator;
@@ -14,7 +12,6 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImage;
 import org.apache.pdfbox.pdmodel.graphics.image.PDInlineImage;
 import org.apache.pdfbox.util.Matrix;
-
 import pdfact.core.model.Color;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
@@ -25,6 +22,7 @@ import pdfact.core.model.Shape;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 import pdfact.core.pipes.parse.stream.pdfbox.utils.ColorUtils;
 import pdfact.core.util.PdfActUtils;
+import pdfact.core.util.color.ColorManager;
 
 /**
  * BI: Begin inline image.
@@ -68,7 +66,7 @@ public class BeginInlineImage extends OperatorProcessor {
 
       // If the image consists of only one color, consider it as a shape.
       // TODO: Manage the colors.
-      float[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
+      int[] exclusiveColor = ColorUtils.getExclusiveColor(image.getImage());
 
       Point ll = new Point(minX, minY);
       Point ur = new Point(maxX, maxY);
@@ -76,8 +74,7 @@ public class BeginInlineImage extends OperatorProcessor {
       Position position = new Position(page, ll, ur);
 
       if (exclusiveColor != null) {
-        Color color = new Color();
-        color.setRGB(exclusiveColor);
+        Color color = ColorManager.getColor(exclusiveColor);
 
         log.debug("The inline image consists only of the color " + color + ". "
             + "Considering it as a shape.");
