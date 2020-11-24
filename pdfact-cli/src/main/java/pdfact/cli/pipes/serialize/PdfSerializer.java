@@ -2,7 +2,7 @@ package pdfact.cli.pipes.serialize;
 
 import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -21,7 +21,7 @@ public interface PdfSerializer {
    * @throws PdfActException
    *         If the serilization failed.
    */
-  byte[] serialize(PdfDocument pdf) throws PdfActException;
+  byte[] serialize(Document pdf) throws PdfActException;
 
   // ==============================================================================================
 

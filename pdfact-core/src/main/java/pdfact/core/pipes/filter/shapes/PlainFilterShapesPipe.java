@@ -1,12 +1,10 @@
 package pdfact.core.pipes.filter.shapes;
 
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Shape;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.list.ElementList;
@@ -35,7 +33,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Filtering shapes.");
@@ -58,7 +56,7 @@ public class PlainFilterShapesPipe implements FilterShapesPipe {
    * @param pdf
    *        The PDF document to process.
    */
-  protected void filterShapes(PdfDocument pdf) {
+  protected void filterShapes(Document pdf) {
     if (pdf != null) {
       List<Page> pages = pdf.getPages();
       for (Page page : pages) {

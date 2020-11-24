@@ -3,13 +3,11 @@ package pdfact.core.pipes.translate.characters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.Character;
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.util.exception.PdfActException;
 
 /**
@@ -58,7 +56,7 @@ public class PlainStandardizeCharactersPipe
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Standardizing the characters.");
@@ -80,7 +78,7 @@ public class PlainStandardizeCharactersPipe
    * @param pdf
    *        The PDF document to process.
    */
-  protected void standardizeCharacters(PdfDocument pdf) {
+  protected void standardizeCharacters(Document pdf) {
     if (pdf != null) {
       List<Page> pages = pdf.getPages();
       if (pages != null) {

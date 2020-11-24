@@ -10,7 +10,7 @@ import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
@@ -103,7 +103,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
   // ==============================================================================================
 
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }
@@ -161,7 +161,7 @@ public class HeadingModule implements PdfTextSemanticizerModule {
    * 
    * @return The most common font face of all known section headings.
    */
-  protected FontFace findSectionHeadingFontFace(PdfDocument pdf) {
+  protected FontFace findSectionHeadingFontFace(Document pdf) {
     if (pdf == null) {
       return null;
     }

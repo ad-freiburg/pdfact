@@ -2,11 +2,9 @@ package pdfact.core.pipes.validate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActValidateException;
 
@@ -22,7 +20,7 @@ public class PlainValidatePdfPathPipe implements ValidatePdfPathPipe {
   protected static Logger log = LogManager.getLogger(PlainValidatePdfPathPipe.class);
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Validating the PDF path.");

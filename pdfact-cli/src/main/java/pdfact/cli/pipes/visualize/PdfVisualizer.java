@@ -3,7 +3,7 @@ package pdfact.cli.pipes.visualize;
 import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.util.exception.PdfActVisualizeException;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 
 /**
@@ -22,7 +22,7 @@ public interface PdfVisualizer {
    * @throws PdfActVisualizeException
    *         If something went wrong while visualizing.
    */
-  byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException;
+  byte[] visualize(Document pdf) throws PdfActVisualizeException;
 
   // ==============================================================================================
 

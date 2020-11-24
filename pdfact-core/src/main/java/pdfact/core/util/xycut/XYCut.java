@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import pdfact.core.model.Character;
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.util.comparator.MaxYComparator;
 import pdfact.core.util.comparator.MinXComparator;
 import pdfact.core.util.list.ElementList;
@@ -31,7 +30,7 @@ public abstract class XYCut {
    * 
    * @return The list of resulting blocks.
    */
-  public List<ElementList<Character>> cut(PdfDocument pdf, Page page,
+  public List<ElementList<Character>> cut(Document pdf, Page page,
       ElementList<Character> characters) {
     List<ElementList<Character>> target = new ArrayList<>();
     cut(pdf, page, characters, target);
@@ -51,7 +50,7 @@ public abstract class XYCut {
    * @param target
    *        The list of blocks to fill.
    */
-  protected void cut(PdfDocument pdf, Page page, ElementList<Character> origin,
+  protected void cut(Document pdf, Page page, ElementList<Character> origin,
       List<ElementList<Character>> target) {
     // Cut the characters vertically (x-cut).
     List<ElementList<Character>> xBlocks = xCut(pdf, page, origin);
@@ -92,7 +91,7 @@ public abstract class XYCut {
    *         list consists only of a single list, which is the original list of
    *         characters.
    */
-  protected List<ElementList<Character>> xCut(PdfDocument pdf, Page page,
+  protected List<ElementList<Character>> xCut(Document pdf, Page page,
       ElementList<Character> chars) {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
@@ -153,7 +152,7 @@ public abstract class XYCut {
    *         be cut, the list consists only of a single set, representing a copy
    *         of the original set of characters.
    */
-  protected List<ElementList<Character>> yCut(PdfDocument pdf, Page page,
+  protected List<ElementList<Character>> yCut(Document pdf, Page page,
       ElementList<Character> chars) {
     if (chars != null && !chars.isEmpty()) {
       // Sort the characters by minX in order to sweep them in x direction.
@@ -211,7 +210,7 @@ public abstract class XYCut {
    *        The characters of the two halves.
    * @return A score that assesses the given cut.
    */
-  public abstract float assessVerticalCut(PdfDocument pdf, Page page,
+  public abstract float assessVerticalCut(Document pdf, Page page,
       List<ElementList<Character>> halves);
 
   /**
@@ -227,7 +226,7 @@ public abstract class XYCut {
    *        The characters of the two halves.
    * @return A score that assesses the given cut.
    */
-  public abstract float assessHorizontalCut(PdfDocument pdf, Page page,
+  public abstract float assessHorizontalCut(Document pdf, Page page,
       List<ElementList<Character>> halves);
 
   // /**

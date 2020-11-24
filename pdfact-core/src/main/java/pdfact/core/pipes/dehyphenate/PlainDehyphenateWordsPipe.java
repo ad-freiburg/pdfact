@@ -2,18 +2,15 @@ package pdfact.core.pipes.dehyphenate;
 
 import static pdfact.core.util.lexicon.CharacterLexicon.HYPHENS;
 import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
-
 import java.util.Iterator;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import pdfact.core.model.Character;
+import pdfact.core.model.Document;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Word;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.counter.ObjectCounter;
@@ -94,7 +91,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Preprocess: Counting words.");
@@ -127,7 +124,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    * @param pdf
    *        The PDF document to process.
    */
-  protected void countWords(PdfDocument pdf) {
+  protected void countWords(Document pdf) {
     if (pdf == null) {
       return;
     }
@@ -206,7 +203,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
    * @param pdf
    *        The PDF document to process.
    */
-  protected void dehyphenate(PdfDocument pdf) {
+  protected void dehyphenate(Document pdf) {
     if (pdf == null) {
       return;
     }

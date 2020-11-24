@@ -7,7 +7,7 @@ import org.apache.pdfbox.contentstream.operator.Operator;
 import org.apache.pdfbox.cos.COSBase;
 
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.pipes.parse.stream.pdfbox.PdfBoxPdfStreamsParser;
 
 /**
@@ -49,7 +49,7 @@ public abstract class OperatorProcessor {
    * @throws IOException
    *         if the operator cannot be processed
    */
-  public abstract void process(PdfDocument pdf, Page page, Operator op,
+  public abstract void process(Document pdf, Page page, Operator op,
       List<COSBase> args) throws IOException;
 
   /**

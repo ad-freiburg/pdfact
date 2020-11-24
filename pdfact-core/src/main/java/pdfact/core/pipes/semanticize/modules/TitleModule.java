@@ -1,11 +1,10 @@
 package pdfact.core.pipes.semanticize.modules;
 
 import java.util.List;
-
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 
@@ -16,7 +15,7 @@ import pdfact.core.model.TextBlock;
  */
 public class TitleModule implements PdfTextSemanticizerModule {
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }
@@ -53,7 +52,6 @@ public class TitleModule implements PdfTextSemanticizerModule {
         largestFontSizeBlock = block;
       }
     }
-
     if (largestFontSizeBlock != null) {
       largestFontSizeBlock.setSemanticRole(SemanticRole.TITLE);
     }

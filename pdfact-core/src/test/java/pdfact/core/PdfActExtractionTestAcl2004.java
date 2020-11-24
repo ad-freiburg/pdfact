@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
@@ -17,14 +17,14 @@ public class PdfActExtractionTestAcl2004 {
   /**
    * The PDF document to examine in this test.
    */
-  protected static PdfDocument pdf;
+  protected static Document pdf;
 
   /**
    * Parses the PDF document.
    */
   @BeforeClass
   public static void setup() throws PdfActException {
-    pdf = new PlainPdfActCorePipe().execute(new PdfDocument("src/test/resources/ACL_2004.pdf"));
+    pdf = new PlainPdfActCorePipe().execute(new Document("src/test/resources/ACL_2004.pdf"));
   }
 
   /**

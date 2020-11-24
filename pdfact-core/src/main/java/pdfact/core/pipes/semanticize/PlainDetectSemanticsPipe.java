@@ -2,11 +2,9 @@ package pdfact.core.pipes.semanticize;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.pipes.semanticize.modules.AbstractModule;
 import pdfact.core.pipes.semanticize.modules.AcknowledgmentsModule;
 import pdfact.core.pipes.semanticize.modules.BodyTextModule;
@@ -65,7 +63,7 @@ public class PlainDetectSemanticsPipe
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Detecting the semantics of the text blocks.");
@@ -86,7 +84,7 @@ public class PlainDetectSemanticsPipe
    * 
    * @return The processed PDF document.
    */
-  protected PdfDocument detectSemantics(PdfDocument pdf) {
+  protected Document detectSemantics(Document pdf) {
     for (PdfTextSemanticizerModule module : this.modules) {
       module.semanticize(pdf);
     }

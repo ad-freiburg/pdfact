@@ -35,6 +35,12 @@ public class PdfSerializerConstants {
   static final String HEIGHT = "height";
   /** The constant 'ID'. */
   static final String ID = "id";
+  /** The constant 'IS_BOLD'. */
+  static final String IS_BOLD = "is-bold";
+  /** The constant 'IS_ITALIC'. */
+  static final String IS_ITALIC = "is-italic";
+  /** The constant 'IS_TYPE3'. */
+  static final String IS_TYPE3 = "is-type3";
   /** The constant 'MAX_X'. */
   static final String MAX_X = "maxX";
   /** The constant 'MAX_Y'. */

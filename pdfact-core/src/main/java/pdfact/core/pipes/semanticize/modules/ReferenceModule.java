@@ -1,9 +1,8 @@
 package pdfact.core.pipes.semanticize.modules;
 
 import java.util.List;
-
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 
@@ -20,7 +19,7 @@ public class ReferenceModule implements PdfTextSemanticizerModule {
   protected boolean isReferences = false;
 
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }

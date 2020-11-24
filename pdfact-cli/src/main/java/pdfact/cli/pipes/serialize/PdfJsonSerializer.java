@@ -13,6 +13,9 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.G;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.HEIGHT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ID;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_BOLD;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_ITALIC;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_TYPE3;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_Y;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_X;
@@ -43,6 +46,7 @@ import org.json.JSONObject;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
+import pdfact.core.model.Document;
 import pdfact.core.model.Element;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Font;
@@ -55,7 +59,6 @@ import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.HasText;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
@@ -123,7 +126,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public byte[] serialize(PdfDocument pdf) {
+  public byte[] serialize(Document pdf) {
     // The serialization to return.
     String result = "";
 
@@ -168,7 +171,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  public void serializePdfElements(PdfDocument pdf, JSONObject json) {
+  public void serializePdfElements(Document pdf, JSONObject json) {
     for (ExtractionUnit unit : this.extractionUnits) {
       switch (unit) {
         case CHARACTER:
@@ -200,7 +203,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeParagraphs(PdfDocument pdf, JSONObject json) {
+  protected void serializeParagraphs(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -245,7 +248,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeWords(PdfDocument pdf, JSONObject json) {
+  protected void serializeWords(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -292,7 +295,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeCharacters(PdfDocument pdf, JSONObject json) {
+  protected void serializeCharacters(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -341,7 +344,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeFigures(PdfDocument pdf, JSONObject json) {
+  protected void serializeFigures(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -383,7 +386,7 @@ public class PdfJsonSerializer implements PdfSerializer {
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeShapes(PdfDocument pdf, JSONObject json) {
+  protected void serializeShapes(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
@@ -620,12 +623,18 @@ public class PdfJsonSerializer implements PdfSerializer {
     JSONObject fontJson = new JSONObject();
     if (font != null) {
       String fontId = font.getId();
-      String fontName = font.getNormalizedName();
-
-      if (fontId != null && fontName != null) {
+      if (fontId != null) {
         fontJson.put(ID, fontId);
+      }
+
+      String fontName = font.getNormalizedName();
+      if (fontName != null) {
         fontJson.put(NAME, fontName);
       }
+
+      fontJson.put(IS_BOLD, font.isBold());
+      fontJson.put(IS_ITALIC, font.isItalic());
+      fontJson.put(IS_TYPE3, font.isType3Font());
     }
     return fontJson;
   }

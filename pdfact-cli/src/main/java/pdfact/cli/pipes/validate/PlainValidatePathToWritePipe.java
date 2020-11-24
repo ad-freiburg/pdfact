@@ -2,11 +2,9 @@ package pdfact.cli.pipes.validate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 import pdfact.core.util.exception.PdfActValidateException;
 
@@ -29,7 +27,7 @@ public class PlainValidatePathToWritePipe implements ValidatePathToWritePipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Validating the path.");
@@ -52,7 +50,7 @@ public class PlainValidatePathToWritePipe implements ValidatePathToWritePipe {
    * @throws PdfActValidateException
    *         If the given path is not valid.
    */
-  protected void validatePath(PdfDocument pdf) throws PdfActValidateException {
+  protected void validatePath(Document pdf) throws PdfActValidateException {
     // Check if a path is given.
     if (this.path == null) {
       throw new PdfActValidateException("No file given.");

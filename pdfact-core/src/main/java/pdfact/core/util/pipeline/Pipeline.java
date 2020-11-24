@@ -1,8 +1,7 @@
 package pdfact.core.util.pipeline;
 
 import java.util.List;
-
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 
 /**
@@ -22,7 +21,7 @@ public interface Pipeline {
    * @throws PdfActException
    *         If something went wrong while processing this pipeline.
    */
-  PdfDocument process(PdfDocument pdf) throws PdfActException;
+  Document process(Document pdf) throws PdfActException;
 
   // ==============================================================================================
 

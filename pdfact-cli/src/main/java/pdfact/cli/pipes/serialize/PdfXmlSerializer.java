@@ -14,6 +14,9 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.FONTSIZE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.G;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.HEIGHT;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ID;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_BOLD;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_ITALIC;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.IS_TYPE3;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_X;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MAX_Y;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.MIN_X;
@@ -58,7 +61,7 @@ import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.HasText;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
@@ -132,7 +135,7 @@ public class PdfXmlSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public byte[] serialize(PdfDocument pdf) throws PdfActSerializeException {
+  public byte[] serialize(Document pdf) throws PdfActSerializeException {
     // The current indentation level.
     int level = 0;
     // The serialization to return.
@@ -197,7 +200,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    *
    * @return A list of strings that represent the serialized elements.
    */
-  protected List<String> serializePdfElements(int level, PdfDocument pdf) {
+  protected List<String> serializePdfElements(int level, Document pdf) {
     List<String> lines = new ArrayList<>();
     for (ExtractionUnit unit : this.extractionUnits) {
       switch (unit) {
@@ -233,7 +236,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeParagraphs(int level, PdfDocument pdf) {
+  protected List<String> serializeParagraphs(int level, Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -285,7 +288,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeWords(int level, PdfDocument pdf) {
+  protected List<String> serializeWords(int level, Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -339,7 +342,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeCharacters(int level, PdfDocument pdf) {
+  protected List<String> serializeCharacters(int level, Document pdf) {
     List<String> result = new ArrayList<>();
 
 
@@ -396,7 +399,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeFigures(int level, PdfDocument pdf) {
+  protected List<String> serializeFigures(int level, Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -445,7 +448,7 @@ public class PdfXmlSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeShapes(int level, PdfDocument pdf) {
+  protected List<String> serializeShapes(int level, Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -700,14 +703,21 @@ public class PdfXmlSerializer implements PdfSerializer {
     List<String> result = new ArrayList<>();
     if (font != null) {
       String fontId = font.getId();
-      String fontName = font.getNormalizedName();
-
-      if (fontId != null && fontName != null) {
-        result.add(start(FONT, level++));
+      result.add(start(FONT, level++));
+      if (fontId != null) {
         result.add(start(ID, level) + text(fontId) + end(ID));
-        result.add(start(NAME, level) + text(fontName) + end(NAME));
-        result.add(end(FONT, --level));
       }
+
+      String fontName = font.getNormalizedName();
+      if (fontName != null) {
+        result.add(start(NAME, level) + text(fontName) + end(NAME));
+      }
+
+      result.add(start(IS_BOLD, level) + text(font.isBold()) + end(IS_BOLD));
+      result.add(start(IS_ITALIC, level) + text(font.isItalic()) + end(IS_ITALIC));
+      result.add(start(IS_TYPE3, level) + text(font.isType3Font()) + end(IS_TYPE3));
+
+      result.add(end(FONT, --level));
     }
     return result;
   }

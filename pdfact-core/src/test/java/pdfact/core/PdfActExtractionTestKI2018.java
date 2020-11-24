@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
@@ -19,14 +19,14 @@ public class PdfActExtractionTestKI2018 {
   /**
    * The PDF document to examine in this test.
    */
-  protected static PdfDocument pdf;
+  protected static Document pdf;
 
   /**
    * Parses the PDF document.
    */
   @BeforeClass
   public static void setup() throws PdfActException {
-    pdf = new PlainPdfActCorePipe().execute(new PdfDocument("src/test/resources/KI_2018.pdf"));
+    pdf = new PlainPdfActCorePipe().execute(new Document("src/test/resources/KI_2018.pdf"));
   }
 
   /**
@@ -126,44 +126,44 @@ public class PdfActExtractionTestKI2018 {
    */
   @Test
   public void testParagraphExtraction() {
-    assertEquals("Künstl Intell (2018) 32:19–26 DOI 10.1007/s13218-017-0513-9", getParagraph(0));
+    assertEquals("Künstl Intell (2018) 32:19–26", getParagraph(0));
+    assertEquals("DOI 10.1007/s13218-017-0513-9", getParagraph(1));
+    assertEquals("TECHNICAL CONTRIBUTION", getParagraph(2));
 
-    assertEquals("TECHNICAL CONTRIBUTION", getParagraph(1));
+    assertEquals("A Quality Evaluation of Combined Search on a Knowledge Base and Text", 
+         getParagraph(3));
 
-    assertEquals("A Quality Evaluation of Combined Search on a Knowledge Base nad Text", 
-         getParagraph(2));
-
-    assertEquals("Hannah Bast1 · Björn Buchhold1 · Elmar Haussmann", getParagraph(3));
+    assertEquals("Hannah Bast1 · Björn Buchhold1 · Elmar Haussmann1", getParagraph(4));
 
     assertEquals("In traditional full-text search, the data consists of text documents. The user "
         + "types a (typically short) list of keywords and gets a list of documents containing some "
         + "or all of these keywords, hopefully ranked by some notion of relevance to the query. "
         + "For example, typing broccoli leaves edible in a web search engine will return lots of "
-        + "web pages with evidence that broccoli leaves are indeed edible.", getParagraph(11));
+        + "web pages with evidence that broccoli leaves are indeed edible.", getParagraph(18));
 
     assertEquals("In KB search, the data is a knowledge base, typically given as a (large) set of "
         + "subject-predicate-object triples. For example, Broccoli is-a plant or Broccoli "
         + "native-to Europe. These triples can be thought of to form a graph of entities "
         + "(the nodes) and relations (the edges), and a language like SPARQL allows to search for "
         + "subgraphs matching a given pattern. For example, find all plants that are native to "
-        + "Europe.", getParagraph(12));
+        + "Europe.", getParagraph(19));
 
     assertEquals("The motivation behind KB+Text search is that many queries of a more \"semantic\" "
         + "nature require the combination of both approaches. For example, consider the query "
         + "plants with edible leaves and native to Europe, which will be our running example in "
         + "this paper. A satisfactory answer for this query requires the combination of two kinds "
-        + "of information:", getParagraph(13));
+        + "of information:", getParagraph(20));
 
     assertEquals("An efficient index for KB+Text search is described in [4]. This index provides "
         + "exactly the support needed for the system shown in Fig. 1: efficient processing of "
         + "tree-shaped KB+Text queries (without variables for relations), efficient excerpt "
         + "generation, and efficient search-as-you-type suggestions that enable a fully "
-        + "interactive incremental query construction.", getParagraph(62));
+        + "interactive incremental query construction.", getParagraph(84));
 
     assertEquals("We briefly discuss the major benchmarks from the past decade, as well as the "
         + "relatively few systems that explicitly combine full-text search and knowledge base "
         + "search. A comprehensive survey of the broad field of semantic search on text and/or "
-        + "knowledge bases is provided in [5].", getParagraph(71));
+        + "knowledge bases is provided in [5].", getParagraph(93));
 
     assertEquals("In 2010, an additional task was added, Entity List Completion (a similar task "
         + "but with an additional set of example result entities given for each query) with BTC "
@@ -171,11 +171,11 @@ public class PdfActExtractionTestKI2018 {
         + "crawled from the semantic web. The BTC dataset contains the complete DBpedia [9]. It "
         + "turned out that the best performing approaches all boost triples from DBpedia to obtain "
         + "good results. Still, working with the dataset turned out to be difficult, with the best "
-        + "systems achieving an R-Precision of 31% (NDCG@R was not reported).", getParagraph(81));
+        + "systems achieving an R-Precision of 31% (NDCG@R was not reported).", getParagraph(103));
         
     assertEquals("In the 2011 challenge [13], there were 50 queries. The best system achieved a "
         + "P@10 of 35% and a MAP of 28%. The 2011 queries are one of our benchmarks in Sect. 4.", 
-        getParagraph(87));
+        getParagraph(109));
   }
 
   /**
@@ -183,12 +183,12 @@ public class PdfActExtractionTestKI2018 {
    */
   @Test
   public void testSemanticRolesExtraction() {
-    assertEquals(SemanticRole.TITLE, pdf.getParagraphs().get(2).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(11).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(12).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(13).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(49).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(71).getSemanticRole());
-    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(87).getSemanticRole());
+    assertEquals(SemanticRole.TITLE, pdf.getParagraphs().get(3).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(18).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(20).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(65).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(75).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(103).getSemanticRole());
+    assertEquals(SemanticRole.BODY_TEXT, pdf.getParagraphs().get(124).getSemanticRole());
   }
 }

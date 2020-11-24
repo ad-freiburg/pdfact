@@ -1,6 +1,6 @@
 package pdfact.core.util.pipeline;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 
 /**
@@ -21,5 +21,5 @@ public interface Pipe {
    * @throws PdfActException
    *         If something went wrong while executing this pipe.
    */
-  PdfDocument execute(PdfDocument pdf) throws PdfActException;
+  Document execute(Document pdf) throws PdfActException;
 }

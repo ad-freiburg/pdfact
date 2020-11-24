@@ -2,8 +2,7 @@ package pdfact.core.util.pipeline;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 
 /**
@@ -27,8 +26,8 @@ public class PlainPipeline implements Pipeline {
   // ==============================================================================================
 
   @Override
-  public PdfDocument process(PdfDocument pdf) throws PdfActException {
-    PdfDocument processed = pdf;
+  public Document process(Document pdf) throws PdfActException {
+    Document processed = pdf;
     for (Pipe pipe : this.pipes) {
       processed = pipe.execute(processed);
     }

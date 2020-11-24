@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 
@@ -59,7 +59,7 @@ public class ItemizeItemModule implements PdfTextSemanticizerModule {
   // ==============================================================================================
 
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }

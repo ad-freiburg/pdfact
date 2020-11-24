@@ -20,7 +20,7 @@ import org.apache.pdfbox.util.Matrix;
 import pdfact.core.model.Color;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
@@ -42,7 +42,7 @@ public class DrawObject extends OperatorProcessor {
   // ==============================================================================================
 
   @Override
-  public void process(PdfDocument pdf, Page page, Operator op, List<COSBase> args)
+  public void process(Document pdf, Page page, Operator op, List<COSBase> args)
           throws IOException {
     // Get the name of the PDXOject.
     COSName name = (COSName) args.get(0);

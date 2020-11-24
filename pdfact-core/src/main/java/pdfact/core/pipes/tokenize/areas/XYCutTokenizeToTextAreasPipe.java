@@ -3,14 +3,12 @@ package pdfact.core.pipes.tokenize.areas;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextArea;
@@ -57,7 +55,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Tokenizing the pages into text areas.");
@@ -82,7 +80,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected void tokenizeToTextAreas(PdfDocument pdf) throws PdfActException {
+  protected void tokenizeToTextAreas(Document pdf) throws PdfActException {
     if (pdf == null) {
       return;
     }
@@ -119,7 +117,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected ElementList<TextArea> tokenizeToTextAreas(PdfDocument pdf,
+  protected ElementList<TextArea> tokenizeToTextAreas(Document pdf,
       Page page) throws PdfActException {
     ElementList<TextArea> result = new ElementList<>();
 
@@ -150,7 +148,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
    * 
    * @return The computed position.
    */
-  protected Position computePosition(PdfDocument pdf, Page page, TextArea a) {
+  protected Position computePosition(Document pdf, Page page, TextArea a) {
     ElementList<Character> characters = a.getCharacters();
     Rectangle r = new Rectangle(characters);
     return new Position(page, r);
@@ -168,7 +166,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
    * 
    * @return The computed statistic.
    */
-  protected CharacterStatistic computeCharacterStatistic(PdfDocument pdf,
+  protected CharacterStatistic computeCharacterStatistic(Document pdf,
       Page page, TextArea area) {
     return this.characterStatistician.compute(area.getCharacters());
   }
@@ -176,7 +174,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public float assessVerticalCut(PdfDocument pdf, Page page,
+  public float assessVerticalCut(Document pdf, Page page,
       List<ElementList<Character>> halves) {
     // Compute the statistics for the characters in the left half.
     ElementList<Character> left = halves.get(0);
@@ -212,7 +210,7 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public float assessHorizontalCut(PdfDocument pdf, Page page,
+  public float assessHorizontalCut(Document pdf, Page page,
       List<ElementList<Character>> halves) {
     // Compute the statistics for the characters in the upper half.
     ElementList<Character> upper = halves.get(0);

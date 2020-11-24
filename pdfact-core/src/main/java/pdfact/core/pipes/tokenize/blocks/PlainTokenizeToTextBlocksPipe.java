@@ -5,11 +5,11 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextBlock;
@@ -63,7 +63,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Tokenizing the text lines into text blocks.");
@@ -86,7 +86,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * 
    * @throws PdfActException If something went wrong while tokenization.
    */
-  protected void tokenizeToTextBlocks(PdfDocument pdf) throws PdfActException {
+  protected void tokenizeToTextBlocks(Document pdf) throws PdfActException {
     if (pdf == null) {
       return;
     }
@@ -117,7 +117,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * 
    * @throws PdfActException If something went wrong while tokenization.
    */
-  protected ElementList<TextBlock> tokenizeToTextBlocks(PdfDocument pdf, Page page)
+  protected ElementList<TextBlock> tokenizeToTextBlocks(Document pdf, Page page)
           throws PdfActException {
     ElementList<TextBlock> textBlocks = new ElementList<>();
     TextBlock textBlock = new TextBlock();
@@ -220,7 +220,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * 
    * @return True, if the given current text line introduces a new text block; false otherwise.
    */
-  protected boolean introducesNewTextBlock(PdfDocument pdf, Page page, TextBlock currentTextBlock,
+  protected boolean introducesNewTextBlock(Document pdf, Page page, TextBlock currentTextBlock,
           TextLine prevLine, TextLine line, TextLine nextLine) {
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
@@ -315,7 +315,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @return True, if the line pitch between the given text line and the given previous text line is
    *         larger than usual; False otherwise.
    */
-  protected static boolean isLinepitchLargerThanExpected(PdfDocument pdf, Page page,
+  protected static boolean isLinepitchLargerThanExpected(Document pdf, Page page,
           TextLine prevLine, TextLine line) {
     if (pdf == null) {
       return false;

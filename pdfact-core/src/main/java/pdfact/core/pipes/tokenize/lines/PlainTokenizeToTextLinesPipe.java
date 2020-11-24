@@ -2,15 +2,13 @@ package pdfact.core.pipes.tokenize.lines;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextArea;
@@ -66,7 +64,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Tokenizing the text areas into text lines.");
@@ -93,7 +91,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected void tokenizeToTextLines(PdfDocument pdf) throws PdfActException {
+  protected void tokenizeToTextLines(Document pdf) throws PdfActException {
     if (pdf == null) {
       return;
     }
@@ -128,7 +126,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected ElementList<TextLine> tokenizeToTextLines(PdfDocument pdf,
+  protected ElementList<TextLine> tokenizeToTextLines(Document pdf,
       Page page) throws PdfActException {
     ElementList<TextLine> result = new ElementList<>();
 
@@ -218,14 +216,14 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public float assessVerticalCut(PdfDocument pdf, Page page, List<ElementList<Character>> halves) {
+  public float assessVerticalCut(Document pdf, Page page, List<ElementList<Character>> halves) {
     return -1;
   }
 
   // ==============================================================================================
 
   @Override
-  public float assessHorizontalCut(PdfDocument pdf, Page page,
+  public float assessHorizontalCut(Document pdf, Page page,
       List<ElementList<Character>> halves) {
     ElementList<Character> upper = halves.get(0);
     CharacterStatistic upperStats = this.characterStatistician.compute(upper);

@@ -24,9 +24,9 @@ import org.apache.pdfbox.pdmodel.font.PDType3CharProc;
 import org.apache.pdfbox.pdmodel.graphics.state.PDGraphicsState;
 import org.apache.pdfbox.util.Matrix;
 import pdfact.core.model.Character;
+import pdfact.core.model.Document;
 import pdfact.core.model.Figure;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.Shape;
@@ -269,7 +269,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   // Methods to process the file.
 
   @Override
-  public void parse(PdfDocument pdf) throws PdfActException {
+  public void parse(Document pdf) throws PdfActException {
     log.debug("Parsing the streams of the PDF file.");
     try (PDDocument doc = PDDocument.load(pdf.getFile())) {
       int numProcessors = this.operatorProcessors.size();
@@ -299,7 +299,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param pageNum The number of the page in the PDF document.
    * @throws IOException If something went wrong while parsing the page.
    */
-  protected void processPage(PdfDocument pdf, PDPage page, int pageNum) throws IOException {
+  protected void processPage(Document pdf, PDPage page, int pageNum) throws IOException {
     this.page = page;
     this.graphicsStack.clear();
     this.graphicsStack.push(new PDGraphicsState(page.getCropBox()));
@@ -340,7 +340,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param stream The content stream
    * @throws IOException if there is an exception while processing the stream
    */
-  public void processStream(PdfDocument pdf, Page page, PDContentStream stream) throws IOException {
+  public void processStream(Document pdf, Page page, PDContentStream stream) throws IOException {
     if (stream != null) {
       PDResources parent = pushResources(stream);
       Stack<PDGraphicsState> savedStack = saveGraphicsStack();
@@ -371,7 +371,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param trm  The text Rendering Matrix
    * @throws IOException if processing the type stream fails.
    */
-  public void processType3Stream(PdfDocument pdf, Page page, PDType3CharProc proc, Matrix trm)
+  public void processType3Stream(Document pdf, Page page, PDType3CharProc proc, Matrix trm)
           throws IOException {
     PDResources parent = pushResources(proc);
     Stack<PDGraphicsState> savedStack = saveGraphicsStack();
@@ -408,7 +408,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param stream The stream.
    * @throws IOException if parsing the stream fails.
    */
-  protected void processStreamOperators(PdfDocument pdf, Page page, PDContentStream stream)
+  protected void processStreamOperators(Document pdf, Page page, PDContentStream stream)
           throws IOException {
     List<COSBase> arguments = new ArrayList<COSBase>();
 
@@ -436,7 +436,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param arguments The list of arguments.
    * @throws IOException If there is an error processing the operation.
    */
-  public void processOperator(PdfDocument pdf, Page page, String operation, List<COSBase> arguments)
+  public void processOperator(Document pdf, Page page, String operation, List<COSBase> arguments)
           throws IOException {
     Operator operator = Operator.getOperator(operation);
     processOperator(pdf, page, operator, arguments);
@@ -451,7 +451,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param args The list of arguments.
    * @throws IOException If there is an error processing the operation.
    */
-  protected void processOperator(PdfDocument pdf, Page page, Operator op, List<COSBase> args)
+  protected void processOperator(Document pdf, Page page, Operator op, List<COSBase> args)
           throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
@@ -823,7 +823,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * 
    * @param pdf The PDF document.
    */
-  public void handlePdfFileStart(PdfDocument pdf) {
+  public void handlePdfFileStart(Document pdf) {
     // Nothing to do so far.
   }
 
@@ -832,7 +832,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * 
    * @param pdf The PDF document.
    */
-  public void handlePdfFileEnd(PdfDocument pdf) {
+  public void handlePdfFileEnd(Document pdf) {
     // Compute the character statistics for the whole PDF document.
     pdf.setCharacterStatistic(this.statistician.aggregate(pdf.getPages()));
   }
@@ -843,7 +843,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param pdf  The PDF document to which the given PDF page belongs to.
    * @param page The page to process.
    */
-  public void handlePdfPageStart(PdfDocument pdf, Page page) {
+  public void handlePdfPageStart(Document pdf, Page page) {
     pdf.addPage(page);
     this.numPages++;
   }
@@ -854,7 +854,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param pdf  The PDF document to which the given PDF page belongs to.
    * @param page The page to process.
    */
-  public void handlePdfPageEnd(PdfDocument pdf, Page page) {
+  public void handlePdfPageEnd(Document pdf, Page page) {
     // Compute the character statistics for the page.
     page.setCharacterStatistic(this.statistician.compute(page));
   }
@@ -866,7 +866,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param page The PDF page to which the given character belongs to.
    * @param c    The character to process.
    */
-  public void handlePdfCharacter(PdfDocument pdf, Page page, Character c) {
+  public void handlePdfCharacter(Document pdf, Page page, Character c) {
     page.addCharacter(c);
     this.numCharacters++;
   }
@@ -878,7 +878,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param page   The PDF page to which the given figure belongs to.
    * @param figure The figure to process.
    */
-  public void handlePdfFigure(PdfDocument pdf, Page page, Figure figure) {
+  public void handlePdfFigure(Document pdf, Page page, Figure figure) {
     page.addFigure(figure);
     this.numFigures++;
   }
@@ -890,7 +890,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
    * @param page  The PDF page to which the given shape belongs to.
    * @param shape The shape to process.
    */
-  public void handlePdfShape(PdfDocument pdf, Page page, Shape shape) {
+  public void handlePdfShape(Document pdf, Page page, Shape shape) {
     page.addShape(shape);
     this.numShapes++;
   }

@@ -8,7 +8,7 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSNumber;
 
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.Point;
 import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 
@@ -20,7 +20,7 @@ import pdfact.core.pipes.parse.stream.pdfbox.operators.OperatorProcessor;
 public class LineTo extends OperatorProcessor {
 
   @Override
-  public void process(PdfDocument pdf, Page page, Operator op,
+  public void process(Document pdf, Page page, Operator op,
       List<COSBase> args) throws IOException {
     // append straight line segment from the current point to the point.
     COSNumber x = (COSNumber) args.get(0);

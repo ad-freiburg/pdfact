@@ -8,13 +8,13 @@ import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
+import pdfact.core.model.Document;
 import pdfact.core.model.Element;
 import pdfact.core.model.HasColor;
 import pdfact.core.model.HasPosition;
 import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.HasText;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
@@ -71,7 +71,7 @@ public class PdfTxtSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public byte[] serialize(PdfDocument pdf) {
+  public byte[] serialize(Document pdf) {
     // The serialization to return.
     String result = "";
 
@@ -99,7 +99,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    *
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializePdfElements(PdfDocument pdf) {
+  protected List<String> serializePdfElements(Document pdf) {
     List<String> lines = new ArrayList<>();
     for (ExtractionUnit unit : this.extractionUnits) {
       switch (unit) {
@@ -127,7 +127,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeParagraphs(PdfDocument pdf) {
+  protected List<String> serializeParagraphs(Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -169,7 +169,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeWords(PdfDocument pdf) {
+  protected List<String> serializeWords(Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {
@@ -213,7 +213,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeCharacters(PdfDocument pdf) {
+  protected List<String> serializeCharacters(Document pdf) {
     List<String> result = new ArrayList<>();
 
     if (pdf != null) {

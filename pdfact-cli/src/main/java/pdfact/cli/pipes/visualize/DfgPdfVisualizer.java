@@ -14,7 +14,7 @@ import pdfact.core.model.Character;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
@@ -66,7 +66,7 @@ public class DfgPdfVisualizer {
 
     parser.parseArgs(args, this);
 
-    PdfDocument pdf = new PdfDocument(this.inputPath);
+    Document pdf = new Document(this.inputPath);
     PdfDrawer drawer = new PdfBoxDrawer(pdf.getFile());
 
     // Create a service pipe.
@@ -98,7 +98,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createWordBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createWordBoundariesVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highlightedCharacterColor = Color.BLUE;
     float highlightedCharacterThickness = 0.1f;
@@ -178,7 +178,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createLigaturesVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createLigaturesVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.1f;
@@ -231,7 +231,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createDiacriticsVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createDiacriticsVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.1f;
@@ -347,7 +347,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createHyphenationVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createHyphenationVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 0.3f;
@@ -383,7 +383,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createBlockBoundariesVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createBlockBoundariesVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
 
@@ -426,7 +426,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createReadingOrderVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createReadingOrderVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 2f;
@@ -520,7 +520,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createSemanticRoleVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createSemanticRoleVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Color highColor = Color.BLUE;
     float highThickness = 1f;
@@ -629,7 +629,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createSegmentationVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     // First horizontal line.
     Point line1Point1 = new Point(40, 688);
@@ -660,7 +660,7 @@ public class DfgPdfVisualizer {
    *
    * @throws IOException If something went wrong.
    */
-  protected void createLineSegmentationVisualization(PdfDocument pdf, PdfDrawer drawer)
+  protected void createLineSegmentationVisualization(Document pdf, PdfDrawer drawer)
           throws IOException {
     Page firstPage = pdf.getFirstPage();
 

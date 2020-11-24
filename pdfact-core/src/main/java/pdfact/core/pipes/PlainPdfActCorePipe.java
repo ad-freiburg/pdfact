@@ -3,12 +3,12 @@ package pdfact.core.pipes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.pipes.dehyphenate.PlainDehyphenateWordsPipe;
 import pdfact.core.pipes.filter.characters.PlainFilterCharactersPipe;
 import pdfact.core.pipes.filter.figures.PlainFilterFiguresPipe;
 import pdfact.core.pipes.filter.shapes.PlainFilterShapesPipe;
-import pdfact.core.pipes.parse.PlainParsePdfStreamsPipe;
+import pdfact.core.pipes.parse.PlainParseDocumentPipe;
 import pdfact.core.pipes.semanticize.PlainDetectSemanticsPipe;
 import pdfact.core.pipes.tokenize.areas.XYCutTokenizeToTextAreasPipe;
 import pdfact.core.pipes.tokenize.blocks.PlainTokenizeToTextBlocksPipe;
@@ -47,7 +47,7 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
    * @throws PdfActException
    *         If something went wrong on processing the PDF document.
    */
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Processing the core pipeline.");
@@ -58,7 +58,7 @@ public class PlainPdfActCorePipe implements PdfActCorePipe {
     // Validate the path to the PDF file.
     pipeline.addPipe(new PlainValidatePdfPathPipe());
     // Extract the characters, shapes and figures.
-    pipeline.addPipe(new PlainParsePdfStreamsPipe());
+    pipeline.addPipe(new PlainParseDocumentPipe());
     // Merge the diacritics.
     pipeline.addPipe(new PlainMergeDiacriticsPipe());
     // Split the ligatures.

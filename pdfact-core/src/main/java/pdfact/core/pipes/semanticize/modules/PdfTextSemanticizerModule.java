@@ -1,6 +1,6 @@
 package pdfact.core.pipes.semanticize.modules;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 
 /**
  * A semantic role module that identifies the text blocks of a specific semantic
@@ -15,5 +15,5 @@ public interface PdfTextSemanticizerModule {
    * @param pdf
    *        The PDF document to semanticize.
    */
-  void semanticize(PdfDocument pdf);
+  void semanticize(Document pdf);
 }

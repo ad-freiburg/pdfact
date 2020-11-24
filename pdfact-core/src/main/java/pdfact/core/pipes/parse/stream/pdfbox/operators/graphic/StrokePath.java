@@ -12,8 +12,8 @@ import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
 import pdfact.core.model.Color;
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Shape;
@@ -28,7 +28,7 @@ import pdfact.core.util.color.ColorManager;
  */
 public class StrokePath extends OperatorProcessor {
   @Override
-  public void process(PdfDocument pdf, Page page, Operator op,
+  public void process(Document pdf, Page page, Operator op,
       List<COSBase> args) throws IOException {
     int windingRule = -1;
     if (args.size() > 0) {

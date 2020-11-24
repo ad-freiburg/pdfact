@@ -9,7 +9,7 @@ import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.core.model.LogLevel;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -67,7 +67,7 @@ public class PdfAct {
    * @throws PdfActException
    *     If something went wrong on parsing the PDF.
    */
-  public PdfDocument parse(String pdfPath) throws PdfActException {
+  public Document parse(String pdfPath) throws PdfActException {
     return parse(Paths.get(pdfPath));
   }
 
@@ -82,7 +82,7 @@ public class PdfAct {
    * @throws PdfActException
    *     If something went wrong on parsing the PDF.
    */
-  public PdfDocument parse(Path pdfPath) throws PdfActException {
+  public Document parse(Path pdfPath) throws PdfActException {
     // Create a service pipe.
     PdfActServicePipe service = new PlainPdfActServicePipe();
 
@@ -121,7 +121,7 @@ public class PdfAct {
     }
 
     // Create the PDF document from the given path.
-    PdfDocument pdf = new PdfDocument(pdfPath);
+    Document pdf = new Document(pdfPath);
 
     // Run PdfAct.
     service.execute(pdf);

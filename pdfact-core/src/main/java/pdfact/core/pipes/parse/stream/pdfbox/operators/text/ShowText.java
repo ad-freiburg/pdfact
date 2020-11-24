@@ -32,10 +32,10 @@ import org.apache.pdfbox.util.Matrix;
 import org.apache.pdfbox.util.Vector;
 import pdfact.core.model.Character;
 import pdfact.core.model.Color;
+import pdfact.core.model.Document;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Point;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
@@ -91,7 +91,7 @@ public class ShowText extends OperatorProcessor {
   // ==============================================================================================
 
   @Override
-  public void process(PdfDocument pdf, Page page, Operator op,
+  public void process(Document pdf, Page page, Operator op,
       List<COSBase> args) throws IOException {
     if (args.size() < 1) {
       // ignore ( )Tj
@@ -205,7 +205,7 @@ public class ShowText extends OperatorProcessor {
    * @throws IOException
    *         if something went wrong on processing the glyph.
    */
-  public void showGlyph(PdfDocument pdf, Page page, String glyph, int code,
+  public void showGlyph(Document pdf, Page page, String glyph, int code,
       PDFont pdFont, Matrix trm) throws IOException {
     // Compute a bounding box that indeed surrounds the whole glyph, even in
     // case of ascenders (e.g., "l") and descenders (e.g., "g").
@@ -247,12 +247,12 @@ public class ShowText extends OperatorProcessor {
     // TODO: Verify, that this is a correct observation.
     PDGraphicsState graphicsState = this.engine.getGraphicsState();
     float fontSize = graphicsState.getTextState().getFontSize();
-//    float scaleFactorX = trm.getScalingFactorX();
+    float scaleFactorX = trm.getScalingFactorX();
     
     // TODO: Check if this approach is correct
-//    if (fontSize != scaleFactorX) {
-//      fontSize *= scaleFactorX;
-//    }
+    if (fontSize != scaleFactorX) {
+      fontSize *= scaleFactorX;
+    }
 
     // Use our additional glyph list for Unicode mapping
     GlyphList additionalGlyphs = this.glyphUtils.getAdditionalGlyphs();
@@ -359,7 +359,7 @@ public class ShowText extends OperatorProcessor {
    * @throws IOException
    *         if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeGlyphBoundingBox(PdfDocument pdf, Page page,
+  protected Rectangle computeGlyphBoundingBox(Document pdf, Page page,
       int code, PDFont font, Matrix trm) throws IOException {
     if (font instanceof PDType3Font) {
       // The font is a Type3 font. We have to compute the bounding box by
@@ -390,7 +390,7 @@ public class ShowText extends OperatorProcessor {
    * @throws IOException
    *         if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeType3GlyphBoundingBox(PdfDocument pdf, Page page,
+  protected Rectangle computeType3GlyphBoundingBox(Document pdf, Page page,
       int code, PDFont font, Matrix trm) throws IOException {
     PDType3Font type3Font = (PDType3Font) font;
     this.engine.processType3Stream(pdf, page, type3Font.getCharProc(code), trm);

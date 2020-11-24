@@ -16,7 +16,7 @@ import pdfact.cli.pipes.validate.PlainValidatePathToWritePipe;
 import pdfact.cli.pipes.validate.ValidatePathToWritePipe;
 import pdfact.cli.pipes.visualize.PlainVisualizePdfPipe;
 import pdfact.cli.pipes.visualize.VisualizePdfPipe;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
@@ -99,7 +99,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    * @throws PdfActException
    *         If something went wrong on processing the PDF document.
    */
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Processing the service pipeline.");

@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import pdfact.cli.PdfAct;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -15,7 +15,7 @@ public class PdfXmlSerializerTest {
   @Test
   public void testParagraphSerialization() throws PdfActException {
     // Parse a PDF document.
-    PdfDocument pdf = new PdfAct().parse("src/test/resources/ACL_2004.pdf");
+    Document pdf = new PdfAct().parse("src/test/resources/ACL_2004.pdf");
 
     Set<ExtractionUnit> units = new HashSet<>();
     units.add(ExtractionUnit.PARAGRAPH);
@@ -44,13 +44,6 @@ public class PdfXmlSerializerTest {
         + "Random Fields</text>\n"
         + "    </paragraph>\n"
         + "  </paragraphs>\n"
-        + "  <pages>\n"
-        + "    <page>\n"
-        + "      <id>1</id>\n"
-        + "      <width>612.0</width>\n"
-        + "      <height>792.0</height>\n"
-        + "    </page>\n"
-        + "  </pages>\n"
         + "</document>", serialization);
   }
 }

@@ -3,14 +3,12 @@ package pdfact.core.pipes.tokenize.words;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import pdfact.core.model.CharacterStatistic;
-import pdfact.core.model.Page;
 import pdfact.core.model.Character;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
+import pdfact.core.model.Page;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.TextLine;
@@ -59,7 +57,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Tokenizing the text lines into words.");
@@ -85,7 +83,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  protected void tokenizeToWords(PdfDocument pdf) throws PdfActException {
+  protected void tokenizeToWords(Document pdf) throws PdfActException {
     if (pdf == null) {
       return;
     }
@@ -117,7 +115,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
    * @throws PdfActException
    *         If something went wrong while tokenization.
    */
-  public ElementList<Word> tokenizeToWords(PdfDocument pdf, Page page,
+  public ElementList<Word> tokenizeToWords(Document pdf, Page page,
       TextLine line) throws PdfActException {
     ElementList<Word> result = new ElementList<>();
 
@@ -144,7 +142,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
   // ==============================================================================================
 
   @Override
-  public float assessVerticalCut(PdfDocument pdf, Page page,
+  public float assessVerticalCut(Document pdf, Page page,
       List<ElementList<Character>> halves) {
     ElementList<Character> left = halves.get(0);
     CharacterStatistic leftStats = this.charStatistician.compute(left);
@@ -164,7 +162,7 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
   // ==============================================================================================
 
   @Override
-  public float assessHorizontalCut(PdfDocument pdf, Page page,
+  public float assessHorizontalCut(Document pdf, Page page,
       List<ElementList<Character>> halves) {
     return -1;
   }

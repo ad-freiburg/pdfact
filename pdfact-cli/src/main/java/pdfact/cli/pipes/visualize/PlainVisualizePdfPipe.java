@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.util.exception.PdfActSerializeException;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -47,7 +47,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Visualizing the PDF document.");
@@ -73,7 +73,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
    * @throws PdfActException
    *         If something went wrong while serializing the PDF document.
    */
-  protected void visualize(PdfDocument pdf) throws PdfActException {
+  protected void visualize(Document pdf) throws PdfActException {
     // Create the visualizer.
     PdfVisualizer visualizer = new PlainPdfVisualizer(this.extractionUnits, this.roles);
 

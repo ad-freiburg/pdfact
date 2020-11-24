@@ -8,7 +8,7 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
  *
  * @author Claudius Korzen
  */
-public class SetStrokingColor extends SetColor {
+public class SetStrokingColor extends SetColorXXX {
   @Override
   protected void setColor(PDColor color) {
     this.engine.getGraphicsState().setStrokingColor(color);

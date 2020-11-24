@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.util.comparator.MinYComparator;
@@ -19,7 +19,7 @@ import pdfact.core.util.counter.ObjectCounter;
  */
 public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }

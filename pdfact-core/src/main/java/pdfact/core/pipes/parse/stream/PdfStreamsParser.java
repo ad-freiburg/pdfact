@@ -1,6 +1,6 @@
 package pdfact.core.pipes.parse.stream;
 
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.util.exception.PdfActException;
 
 /**
@@ -20,5 +20,5 @@ public interface PdfStreamsParser {
    * @throws PdfActException
    *         If something went wrong while parsing the PDF:
    */
-  void parse(PdfDocument pdf) throws PdfActException;
+  void parse(Document pdf) throws PdfActException;
 }

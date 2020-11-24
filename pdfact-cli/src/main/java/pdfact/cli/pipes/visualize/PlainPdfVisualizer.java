@@ -9,6 +9,7 @@ import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.cli.util.exception.PdfActVisualizeException;
 import pdfact.core.model.Character;
+import pdfact.core.model.Document;
 import pdfact.core.model.Element;
 import pdfact.core.model.Figure;
 import pdfact.core.model.HasPosition;
@@ -16,7 +17,6 @@ import pdfact.core.model.HasPositions;
 import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
@@ -59,7 +59,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==============================================================================================
 
   @Override
-  public byte[] visualize(PdfDocument pdf) throws PdfActVisualizeException {
+  public byte[] visualize(Document pdf) throws PdfActVisualizeException {
     if (pdf != null) {
       try {
         PdfDrawer drawer = new PdfBoxDrawer(pdf.getFile());
@@ -106,7 +106,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeCharacters(PdfDocument pdf, PdfDrawer drawer)
+  protected void visualizeCharacters(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     for (Paragraph paragraph : pdf.getParagraphs()) {
       // Ignore the paragraph if its role doesn't match the roles filter.
@@ -159,7 +159,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextAreas(PdfDocument pdf, PdfDrawer drawer)
+  protected void visualizeTextAreas(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextArea area : page.getTextAreas()) {
@@ -191,7 +191,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextLines(PdfDocument pdf, PdfDrawer drawer)
+  protected void visualizeTextLines(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextLine line : page.getTextLines()) {
@@ -223,7 +223,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeWords(PdfDocument pdf, PdfDrawer drawer) throws PdfActVisualizeException {
+  protected void visualizeWords(Document pdf, PdfDrawer drawer) throws PdfActVisualizeException {
     // Visualize the textual elements.
     for (Paragraph paragraph : pdf.getParagraphs()) {
       // Ignore the paragraph if its role doesn't match the roles filter.
@@ -259,7 +259,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeTextBlocks(PdfDocument pdf, PdfDrawer drawer)
+  protected void visualizeTextBlocks(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     for (Page page : pdf.getPages()) {
       for (TextBlock block : page.getTextBlocks()) {
@@ -291,7 +291,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
    * 
    * @throws PdfActVisualizeException If the drawing failed.
    */
-  protected void visualizeParagraphs(PdfDocument pdf, PdfDrawer drawer)
+  protected void visualizeParagraphs(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     // Visualize the textual elements.
     for (Paragraph paragraph : pdf.getParagraphs()) {

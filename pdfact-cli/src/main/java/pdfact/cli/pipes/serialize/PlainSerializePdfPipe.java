@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.util.exception.PdfActSerializeException;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -67,7 +67,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==============================================================================================
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Serializing the PDF document.");
@@ -91,7 +91,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    * @throws PdfActException
    *         If something went wrong while serializing the PDF document.
    */
-  protected void serialize(PdfDocument pdf) throws PdfActException {
+  protected void serialize(Document pdf) throws PdfActException {
     // Instantiate a serializer.
     PdfSerializer serializer;
     switch (this.format) {

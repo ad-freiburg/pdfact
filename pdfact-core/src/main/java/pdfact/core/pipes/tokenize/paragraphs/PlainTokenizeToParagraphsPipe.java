@@ -2,17 +2,15 @@ package pdfact.core.pipes.tokenize.paragraphs;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.PdfDocument;
 import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
@@ -65,7 +63,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   }
 
   @Override
-  public PdfDocument execute(PdfDocument pdf) throws PdfActException {
+  public Document execute(Document pdf) throws PdfActException {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Tokenizing the text blocks into text paragraphs.");
@@ -88,7 +86,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * @param pdf
    *        The PDF document to process.
    */
-  protected void tokenizeToParagraphs(PdfDocument pdf) {
+  protected void tokenizeToParagraphs(Document pdf) {
     ElementList<Paragraph> paragraphs = new ElementList<>();
 
     // Segment the PDF document into paragraphs.
@@ -179,7 +177,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * 
    * @return The list of list of text blocks of a paragraph.
    */
-  protected List<List<TextBlock>> segmentIntoParagraphs(PdfDocument pdf) {
+  protected List<List<TextBlock>> segmentIntoParagraphs(Document pdf) {
     List<List<TextBlock>> result = new ArrayList<>();
 
     // Put all blocks to a single list to be able to iterate them in one go.

@@ -7,7 +7,7 @@ import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
-import pdfact.core.model.PdfDocument;
+import pdfact.core.model.Document;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
@@ -21,7 +21,7 @@ import pdfact.core.util.PdfActUtils;
  */
 public class FootnoteModule implements PdfTextSemanticizerModule {
   @Override
-  public void semanticize(PdfDocument pdf) {
+  public void semanticize(Document pdf) {
     if (pdf == null) {
       return;
     }
