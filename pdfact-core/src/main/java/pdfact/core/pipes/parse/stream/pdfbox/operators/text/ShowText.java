@@ -74,8 +74,8 @@ public class ShowText extends OperatorProcessor {
   protected PdfBoxGlyphUtils glyphUtils;
 
   /**
-   * The number of already processed characters (needed to define the sequence
-   * number of a character).
+   * The number of already processed characters (needed to define the sequence number of a
+   * character).
    */
   protected int sequenceNumber;
 
@@ -91,8 +91,7 @@ public class ShowText extends OperatorProcessor {
   // ==============================================================================================
 
   @Override
-  public void process(Document pdf, Page page, Operator op,
-      List<COSBase> args) throws IOException {
+  public void process(Document pdf, Page page, Operator op, List<COSBase> args) throws IOException {
     if (args.size() < 1) {
       // ignore ( )Tj
       return;
@@ -110,8 +109,8 @@ public class ShowText extends OperatorProcessor {
 
     // Put the text state parameters into matrix form.
     Matrix params = new Matrix(fontSize * horizScaling, 0, // 0
-        0, fontSize, // 0
-        0, textState.getRise()); // 1
+            0, fontSize, // 0
+            0, textState.getRise()); // 1
 
     // Get the current font from the text state.
     PDFont font = textState.getFont();
@@ -190,23 +189,16 @@ public class ShowText extends OperatorProcessor {
   /**
    * Processes a single glyph.
    * 
-   * @param pdf
-   *        The PDF document to which the glyph belongs to.
-   * @param page
-   *        The PDF page to which the glyph belongs to.
-   * @param glyph
-   *        The unicode text for this glyph.
-   * @param code
-   *        The internal PDF character code for the glyph
-   * @param pdFont
-   *        The font of the glyph.
-   * @param trm
-   *        The current text rendering matrix
-   * @throws IOException
-   *         if something went wrong on processing the glyph.
+   * @param pdf    The PDF document to which the glyph belongs to.
+   * @param page   The PDF page to which the glyph belongs to.
+   * @param glyph  The unicode text for this glyph.
+   * @param code   The internal PDF character code for the glyph
+   * @param pdFont The font of the glyph.
+   * @param trm    The current text rendering matrix
+   * @throws IOException if something went wrong on processing the glyph.
    */
-  public void showGlyph(Document pdf, Page page, String glyph, int code,
-      PDFont pdFont, Matrix trm) throws IOException {
+  public void showGlyph(Document pdf, Page page, String glyph, int code, PDFont pdFont, Matrix trm)
+          throws IOException {
     // Compute a bounding box that indeed surrounds the whole glyph, even in
     // case of ascenders (e.g., "l") and descenders (e.g., "g").
     // TODO: Make it faster.
@@ -237,22 +229,10 @@ public class ShowText extends OperatorProcessor {
       box = pdfBoxBoundBox;
     }
 
-    // In some pdfs, fontsize is equal to '1.0' for every character.
-    // In this case, multiplying it with the scaling factor gives the correct
-    // fontsize. In other pdfs, the fontsizes are correct and multiplying it
-    // with the scaling factor would result in too large fontsizes.
-    // Observation: In the latter case, fontsize and scale factor are equal,
-    // so multiply the fontsize and the scale factor only when they aren't
-    // equal.
-    // TODO: Verify, that this is a correct observation.
-    PDGraphicsState graphicsState = this.engine.getGraphicsState();
-    float fontSize = graphicsState.getTextState().getFontSize();
-    float scaleFactorX = trm.getScalingFactorX();
-    
-    // TODO: Check if this approach is correct
-    if (fontSize != scaleFactorX) {
-      fontSize *= scaleFactorX;
-    }
+    // Compute the fontsize. 
+    // See https://stackoverflow.com/questions/48010235/pdf-specification-get-font-size-in-points
+    // for an explanation why we can't use engine.getGraphicsState().getTextState().getFontSize().
+    float fontSize = trm.getScalingFactorX();
 
     // Use our additional glyph list for Unicode mapping
     GlyphList additionalGlyphs = this.glyphUtils.getAdditionalGlyphs();
@@ -288,7 +268,7 @@ public class ShowText extends OperatorProcessor {
     if (unicode == null) {
       if (pdFont instanceof PDSimpleFont) {
         char c = (char) code;
-        unicode = new String(new char[] { c });
+        unicode = new String(new char[] {c});
 
         // TODO: If we need the hasEncoding flag, uncomment the following:
         // // Obtain if the font has an encoding for the given code.
@@ -308,6 +288,7 @@ public class ShowText extends OperatorProcessor {
       }
     }
 
+    PDGraphicsState graphicsState = this.engine.getGraphicsState();
     PDColor pdColor = graphicsState.getNonStrokingColor();
     PDColorSpace pdColorSpace = graphicsState.getNonStrokingColorSpace();
 
@@ -343,24 +324,17 @@ public class ShowText extends OperatorProcessor {
   /**
    * Computes the bounding box for the given glyph in any font.
    * 
-   * @param pdf
-   *        The PDF document to which the stream belongs to.
-   * @param page
-   *        The PDF page to which the stream belongs to.
-   * @param code
-   *        The internal PDF character code for the glyph
-   * @param font
-   *        The font of the glyph.
-   * @param trm
-   *        The current text rendering matrix
+   * @param pdf  The PDF document to which the stream belongs to.
+   * @param page The PDF page to which the stream belongs to.
+   * @param code The internal PDF character code for the glyph
+   * @param font The font of the glyph.
+   * @param trm  The current text rendering matrix
    * 
-   * @return The bounding box of the glyph or null, if the bounding box could
-   *         not be computed.
-   * @throws IOException
-   *         if something went wrong on computing the bounding box.
+   * @return The bounding box of the glyph or null, if the bounding box could not be computed.
+   * @throws IOException if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeGlyphBoundingBox(Document pdf, Page page,
-      int code, PDFont font, Matrix trm) throws IOException {
+  protected Rectangle computeGlyphBoundingBox(Document pdf, Page page, int code, PDFont font,
+          Matrix trm) throws IOException {
     if (font instanceof PDType3Font) {
       // The font is a Type3 font. We have to compute the bounding box by
       // parsing the Type3 stream.
@@ -374,47 +348,34 @@ public class ShowText extends OperatorProcessor {
   /**
    * Computes the bounding box for the given glyph in a Type3 font.
    * 
-   * @param pdf
-   *        The PDF document to which the glyph belongs to.
-   * @param page
-   *        The PDF page to which the glyph belongs to.
-   * @param code
-   *        The internal PDF character code for the glyph
-   * @param font
-   *        The Type3 font of the glyph.
-   * @param trm
-   *        The current text rendering matrix
+   * @param pdf  The PDF document to which the glyph belongs to.
+   * @param page The PDF page to which the glyph belongs to.
+   * @param code The internal PDF character code for the glyph
+   * @param font The Type3 font of the glyph.
+   * @param trm  The current text rendering matrix
    * 
-   * @return The bounding box of the glyph or null, if the bounding box could
-   *         not be computed.
-   * @throws IOException
-   *         if something went wrong on computing the bounding box.
+   * @return The bounding box of the glyph or null, if the bounding box could not be computed.
+   * @throws IOException if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeType3GlyphBoundingBox(Document pdf, Page page,
-      int code, PDFont font, Matrix trm) throws IOException {
+  protected Rectangle computeType3GlyphBoundingBox(Document pdf, Page page, int code, PDFont font,
+          Matrix trm) throws IOException {
     PDType3Font type3Font = (PDType3Font) font;
     this.engine.processType3Stream(pdf, page, type3Font.getCharProc(code), trm);
     return this.engine.getCurrentType3GlyphBoundingBox();
   }
 
   /**
-   * Computes the bounding box for the given glyph, given in any font, different
-   * from a Type3 font.
+   * Computes the bounding box for the given glyph, given in any font, different from a Type3 font.
    * 
-   * @param code
-   *        The internal PDF character code for the glyph
-   * @param font
-   *        The font of the glyph.
-   * @param trm
-   *        The current text rendering matrix
+   * @param code The internal PDF character code for the glyph
+   * @param font The font of the glyph.
+   * @param trm  The current text rendering matrix
    * 
-   * @return The bounding box of the glyph or null, if the bounding box could
-   *         not be computed.
-   * @throws IOException
-   *         if something went wrong on computing the bounding box.
+   * @return The bounding box of the glyph or null, if the bounding box could not be computed.
+   * @throws IOException if something went wrong on computing the bounding box.
    */
-  protected Rectangle computeNonType3GlyphBoundingBox(int code, PDFont font,
-      Matrix trm) throws IOException {
+  protected Rectangle computeNonType3GlyphBoundingBox(int code, PDFont font, Matrix trm)
+          throws IOException {
     if (font == null) {
       return null;
     }
@@ -488,23 +449,17 @@ public class ShowText extends OperatorProcessor {
   /**
    * Transforms the given bounding box into the device space.
    * 
-   * @param minX
-   *        The minX value of the bounding box.
-   * @param minY
-   *        The minY value of the bounding box.
-   * @param maxX
-   *        The maxX value of the bounding box.
-   * @param maxY
-   *        The maxY value of the bounding box.
-   * @param font
-   *        The current font.
-   * @param trm
-   *        The current text rendering matrix.
+   * @param minX The minX value of the bounding box.
+   * @param minY The minY value of the bounding box.
+   * @param maxX The maxX value of the bounding box.
+   * @param maxY The maxY value of the bounding box.
+   * @param font The current font.
+   * @param trm  The current text rendering matrix.
    * 
    * @return The transformed bounding box.
    */
-  protected Rectangle transformBoundingBox(float minX, float minY, float maxX,
-      float maxY, PDFont font, Matrix trm) {
+  protected Rectangle transformBoundingBox(float minX, float minY, float maxX, float maxY,
+          PDFont font, Matrix trm) {
     if (font == null) {
       return null;
     }
@@ -526,22 +481,17 @@ public class ShowText extends OperatorProcessor {
   }
 
   /**
-   * Computes the bounding box for the given glyph by the method of PdfBox, that
-   * is computing an approximate bounding box, without respecting ascenders
-   * (like "l") or descenders (like "g").
+   * Computes the bounding box for the given glyph by the method of PdfBox, that is computing an
+   * approximate bounding box, without respecting ascenders (like "l") or descenders (like "g").
    * 
-   * @param code
-   *        The character
-   * @param font
-   *        The font.
-   * @param trm
-   *        The current text rendering matrix.
+   * @param code The character
+   * @param font The font.
+   * @param trm  The current text rendering matrix.
    * @return The bounding box.
-   * @throws IOException
-   *         if obtaining the default bounding box fails.
+   * @throws IOException if obtaining the default bounding box fails.
    */
-  protected Rectangle computePdfBoxGlyphBoundingBox(int code, PDFont font,
-      Matrix trm) throws IOException {
+  protected Rectangle computePdfBoxGlyphBoundingBox(int code, PDFont font, Matrix trm)
+          throws IOException {
     PDGraphicsState state = this.engine.getGraphicsState();
     Matrix ctm = state.getCurrentTransformationMatrix();
     Matrix textMatrix = this.engine.getTextMatrix();

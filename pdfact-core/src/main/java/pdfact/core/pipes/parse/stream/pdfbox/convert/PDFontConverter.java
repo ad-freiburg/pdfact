@@ -3,19 +3,16 @@ package pdfact.core.pipes.parse.stream.pdfbox.convert;
 import static pdfact.core.PdfActCoreSettings.AFM_FILE_FIELD_DELIMITER;
 import static pdfact.core.PdfActCoreSettings.AFM_FILE_PATH;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType3Font;
-
 import pdfact.core.model.Font;
 
 /**
@@ -52,6 +49,7 @@ public class PDFontConverter {
    * @return The converted font.
    */
   public Font convert(PDFont font) {
+
     if (font == null) {
       return null;
     }
