@@ -76,7 +76,7 @@ public enum SemanticRole {
   /**
    * A page header.
    */
-  PAGE_HEADER("header"),
+  PAGE_HEADER("page-header"),
   /**
    * A page footer.
    */

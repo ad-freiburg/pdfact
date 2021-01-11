@@ -1,6 +1,7 @@
 package pdfact.cli;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,7 +162,7 @@ public class PdfActCli {
      * The serialization format.
      */
     @Arg(dest = SERIALIZE_FORMAT)
-    protected String serializeFormat;
+    protected String serializeFormat = "txt";
 
     // ============================================================================================
 
@@ -181,25 +182,25 @@ public class PdfActCli {
     /**
      * The name of the option to define the units to extract.
      */
-    protected static final String EXTRACTION_UNIT = "unit";
+    protected static final String EXTRACTION_UNITS = "units";
 
     /**
      * The text unit to extract.
      */
-    @Arg(dest = EXTRACTION_UNIT)
-    protected List<String> extractionUnits;
+    @Arg(dest = EXTRACTION_UNITS)
+    protected List<String> extractionUnits = Arrays.asList("paragraphs");
 
     // ============================================================================================
 
     /**
      * The name of the option to define the semantic role(s) filters.
      */
-    protected static final String SEMANTIC_ROLES_FILTER = "role";
+    protected static final String SEMANTIC_ROLE_FILTERS = "roles";
 
     /**
      * The semantic role(s) filters.
      */
-    @Arg(dest = SEMANTIC_ROLES_FILTER)
+    @Arg(dest = SEMANTIC_ROLE_FILTERS)
     protected List<String> semanticRolesFilters;
 
     // ============================================================================================
@@ -213,7 +214,7 @@ public class PdfActCli {
      * The log level.
      */
     @Arg(dest = LOG_LEVEL)
-    protected int logLevel;
+    protected int logLevel = 3;
 
     // ============================================================================================
 
@@ -250,43 +251,47 @@ public class PdfActCli {
           .required(false)
           .choices(formatChoices)
           .metavar("<format>")
-          .help("The output format. Available options: " + formatChoices + ".\n"
-              + "If the format is \"txt\", the output will contain the text "
-              + "matching the specified --" + EXTRACTION_UNIT + " and --" 
-              + SEMANTIC_ROLES_FILTER + " options in plain text format (in the "
-              + "format: one text element per line). If the format is \"xml\" "
-              + "or \"json\", the output will also contain layout information "
-              + "for each text element, e.g., the positions in the PDF file.");
+          .help("The output format. \n"
+              + "Available options: " + String.join(", ", formatChoices) + ". "
+              + "Default: " + this.serializeFormat + ".\n"
+              + "In case of txt, the output will contain the extracted text matching the "
+              + "specified --" + EXTRACTION_UNITS + " and --" + SEMANTIC_ROLE_FILTERS + " options "
+              + "in plain text format (one text element per line). In case of xml or json, the "
+              + "output will also contain layout information for each text element, e.g., the "
+              + "positions in the PDF file.");
 
       // Add an argument to define the text unit to extract.
       Set<String> unitChoices = ExtractionUnit.getPluralNames();
-      this.parser.addArgument("--" + EXTRACTION_UNIT)
-          .dest(EXTRACTION_UNIT)
-          .nargs("*")
-          .choices(unitChoices)
+      this.parser.addArgument("--" + EXTRACTION_UNITS)
+          .dest(EXTRACTION_UNITS)
+          .nargs(1)
+          .action(new SplitAtDelimiterAction(","))
           .required(false)
-          .metavar("<unit>", "<unit>")
-          .help("The units in which the output (and the layout information, if the chosen output "
-              + "format is dedicated to provide such information) should be broken down. "
-              + "Available options: " + unitChoices + ".\n"
-              + "For example, when the script is called with the option \"--" + EXTRACTION_UNIT 
+          .metavar("<units>")
+          .help("The units of the text elements to be extracted, separated by \",\".\n"
+              + "Available options: " + String.join(", ", unitChoices) + ". "
+              + "Default: " + String.join(",", this.extractionUnits) + ".\n"
+              + "This parameter defines the granularity in which the output (and the layout "
+              + "information, if the chosen output format is dedicated to provide such "
+              + "information) should be broken down. "
+              + "For example, when the script is called with the option \"--" + EXTRACTION_UNITS 
               + " words\", the output will be broken down by words, that is: the text (and layout "
               + "information) will be provided word-wise.");
               
       // Add an argument to define the semantic role(s).
       Set<String> semanticRolesChoices = SemanticRole.getNames();
-      this.parser.addArgument("--" + SEMANTIC_ROLES_FILTER)
-          .dest(SEMANTIC_ROLES_FILTER)
-          .nargs("*")
-          .choices(semanticRolesChoices)
+      this.parser.addArgument("--" + SEMANTIC_ROLE_FILTERS)
+          .dest(SEMANTIC_ROLE_FILTERS)
+          .nargs(1)
+          .action(new SplitAtDelimiterAction(","))
           .required(false)
-          .metavar("<role>", "<role>")
-          .help("The semantic role(s) of the text elements to be extracted. "
-              + "Available options: " + semanticRolesChoices + ".\n"
+          .metavar("<roles>")
+          .help("The semantic role(s) of the text elements to be extracted, separated by \",\".\n"
+              + "Available options: " + String.join(", ", semanticRolesChoices) + ".\n"
               + "For example, if the script is called with the option \"--" 
-              + SEMANTIC_ROLES_FILTER + " headings\", the output will only "
+              + SEMANTIC_ROLE_FILTERS + " headings\", the output will only "
               + "contain the text (and optionally, the layout information) of "
-              + "the text belonging to a heading. If not specified, all text "
+              + "the text belonging to a heading. If not specified, all text elements "
               + "will be extracted, regardless of the semantic roles.");
 
       // Add an argument to define the target path for the visualization.
@@ -294,7 +299,7 @@ public class PdfActCli {
           .dest(VISUALIZATION_PATH)
           .required(false)
           .metavar("<path>")
-          .help("The path to the file to which a visualization of the "
+          .help("The path to a file (including filename) to which a visualization of the "
               + "extracted text (that is: the original PDF file enriched "
               + "which bounding boxes around the extracted text elements) "
               + "should be written to. If not specified, no such "
@@ -314,13 +319,15 @@ public class PdfActCli {
       LogLevel debugLevel = LogLevel.DEBUG;
       this.parser.addArgument("--" + LOG_LEVEL)
           .dest(LOG_LEVEL)
-          .nargs("?")
+          .nargs(1)
+          .required(false)
           .metavar("<level>")
           .type(Integer.class)
           .setDefault(PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel())
           .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
-          .help("The verbosity of the log messages. Available options:  "
-              + choiceStr.toString() + ".\n"
+          .help("The verbosity of the log messages.\n"
+              + "Available options: " + choiceStr.toString() + ". "
+              + "Default: " + this.logLevel + ".\n"
               + "The level defines the minimum level of severity required for "
               + "a message to be logged.");
     }
@@ -529,6 +536,49 @@ public class PdfActCli {
         attrs.put(arg.getDest(), this.defaultValue);
       } else {
         attrs.put(arg.getDest(), value);
+      }
+    }
+
+    @Override
+    public void onAttach(Argument arg) {
+    }
+
+    @Override
+    public boolean consumeArgument() {
+      return true;
+    }
+  }
+
+  /**
+   * Argument action to split a given string at a given delimiter and to store a list of all
+   * resulting substrings.
+   */
+  private static class SplitAtDelimiterAction implements ArgumentAction {
+    /**
+     * The delimiter to split at.
+     */
+    protected String delimiter;
+
+    /**
+     * Creates a new SplitAtDelimiterAction.
+     *
+     * @param delimiter
+     *     The delimiter to split at.
+     */
+    public SplitAtDelimiterAction(String delimiter) {
+      this.delimiter = delimiter;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void run(ArgumentParser parser, Argument arg,
+        Map<String, Object> attrs, String flag, Object value)
+        throws ArgumentParserException {
+      if (value != null) {
+        List<String> list = (List<String>) value;
+        if (list.size() > 0) {
+          attrs.put(arg.getDest(), Arrays.asList((list.get(0).split(delimiter))));
+        }
       }
     }
 

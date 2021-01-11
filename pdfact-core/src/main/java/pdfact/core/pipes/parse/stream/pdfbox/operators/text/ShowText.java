@@ -288,6 +288,11 @@ public class ShowText extends OperatorProcessor {
       }
     }
 
+    // Ignore the character if it is empty.
+    if (unicode == null || unicode.trim().isEmpty()) {
+      return;
+    }
+
     PDGraphicsState graphicsState = this.engine.getGraphicsState();
     PDColor pdColor = graphicsState.getNonStrokingColor();
     PDColorSpace pdColorSpace = graphicsState.getNonStrokingColorSpace();

@@ -52,8 +52,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   /**
    * Filters those characters of a PDF document that should not be considered.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    */
   protected void filterCharacters(Document pdf) {
     if (pdf != null) {
@@ -80,11 +79,9 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   /**
    * Checks if the given characters should be filtered out.
    * 
-   * @param character
-   *        The character to check.
+   * @param character The character to check.
    * 
-   * @return True if the given PDF character should be filtered out; False
-   *         otherwise.
+   * @return True if the given PDF character should be filtered out; False otherwise.
    */
   public static boolean isFilterCharacter(Character character) {
     // Ignore the character, if it is null.
@@ -103,10 +100,10 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
     }
 
     // Ignore the the character, if its text is empty.
-//    String text = character.getText();
-//    if (text == null || text.trim().isEmpty()) {
-//      return true;
-//    }
+    String text = character.getText();
+    if (text == null || text.trim().isEmpty()) {
+      return true;
+    }
     return false;
   }
 }

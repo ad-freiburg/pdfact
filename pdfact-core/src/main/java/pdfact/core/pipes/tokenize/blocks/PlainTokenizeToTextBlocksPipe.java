@@ -222,6 +222,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    */
   protected boolean introducesNewTextBlock(Document pdf, Page page, TextBlock currentTextBlock,
           TextLine prevLine, TextLine line, TextLine nextLine) {
+
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
       return false;
@@ -330,7 +331,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     float actualLinePitch = computeLinePitch(prevLine, line);
 
     // TODO
-    return actualLinePitch - expectedLinePitch > 1;
+    return actualLinePitch - expectedLinePitch > 1.5f;
   }
 
   /**

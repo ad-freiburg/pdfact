@@ -266,9 +266,8 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
     float largestMaxX = leftStats.getLargestMaxX();
     Set<Character> leftChars = new HashSet<>();
     for (Character c : left) {
-      // TODO: Allow a certain threshold value.
       Rectangle rect = c.getPosition().getRectangle();
-      if (PdfActUtils.isEqual(rect.getMaxX(), largestMaxX, 1f)) {
+      if (PdfActUtils.isEqual(rect.getMaxX(), largestMaxX, 3 * leftStats.getMostCommonWidth())) {
         leftChars.add(c);
       }
     }
@@ -276,9 +275,8 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
     float smallestMinX = rightStats.getSmallestMinX();
     Set<Character> rightChars = new HashSet<>();
     for (Character c : right) {
-      // TODO: Allow a certain threshold value.
       Rectangle rect = c.getPosition().getRectangle();
-      if (PdfActUtils.isEqual(rect.getMinX(), smallestMinX, 1f)) {
+      if (PdfActUtils.isEqual(rect.getMinX(), smallestMinX, 3 * rightStats.getMostCommonWidth())) {
         rightChars.add(c);
       }
     }
