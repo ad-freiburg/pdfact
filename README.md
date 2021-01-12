@@ -1,79 +1,79 @@
 # PdfAct
 
-**Disclaimer**: This project is in an early alpha state and is still under development. So expect bugs and use it on your own risk :-)
+*PdfAct* is a tool for selectively extracting text from PDF files, optionally together with layout information like positional information, font information, or color information. For example, *PdfAct* allows you to extract only the important pieces of text from a PDF file (e.g., the title, the section headings and the body text paragraphs) and to choose the granularity in which the text should be extracted (e.g., characters, words, text lines or paragraphs). 
+Further features of *PdfAct* are: 
+(1) the detection of correct paragraph boundaries (which is important because paragraphs could be interrupted by for example, column- or page breaks, or figures, or tables, etc.)
+(2) the detection of the natural reading order of text blocks (which is of particular importance in case of multi-column layouts); 
+(3) the translation of ligatures and characters with diacritical marks;
+(3) the detection of the semantic roles played by the text blocks in a PDF file; and
+(4) merging hyphenated words.
 
-## Getting started
+**Disclaimer**: Extracting text from PDF files is a suprisingly difficult task, read our [publication "A Benchmark and Evaluation for Text Extraction from PDF"](https://ad-publications.informatik.uni-freiburg.de/benchmark.pdf) to learn why. Further, PdfAct is still in an early alpha state and is still under development. So please excuse bugs and use *PdfAct* on your own risk :-)
 
-### Checkout
+## 1. Checkout
 
-Checkout the project via
+Checkout the repository
 
-    git clone https://github.com/ad-freiburg/pdfact.git
+```bash
+git clone https://github.com/ad-freiburg/pdfact.git
+cd pdfact
+```
 
-### Build    
+## 2. Run PdfAct using Docker  
 
-Build the project:
+The basic syntax of the command to run *PdfAct* is as follows:
 
-    cd pdfact
-    mvn install
+```bash
+docker run --rm --name pdfact pdfact [--help] [<options>] <pdf-file> [<output-file>]
+```
 
-### Extracting the text and structure from PDF files
+In the following, you will find some example commands that will give you an intuition about how to run *PdfAct* in general.
 
-Extract the text and structure from PDF files with:
+### 2.1 Extract all text blocks from a PDF file as plain text and print them to the console. 
 
-    ./pdfact [options] <pdf-file> [<output-file>]
+To extract the text from a PDF file using the standard settings, type:
 
-This will parse the given PDF file and outputs the extraction results to
-`output-file`, if `output-file` is specified. Otherwise the result will be printed to `stdout`.
+```bash
+docker run --rm --name pdfact -v /home/user/foo.pdf:/input.pdf pdfact input.pdf
+```
 
-Positional Arguments:
+This will extract **all** text blocks from the PDF file `/home/user/foo.pdf` as plain text and print them to the console (each text block separated by a blank line).
+ 
+### 2.2 Write the extraction output to a file.
 
-    <pdf-file>           The path to the PDF file to be processed.
-    <output-file>        The path to the file to which the extraction output should be written.
-                         If not specified, the output will be written to stdout.
+Instead of printing the extraction ouptut to the console, you can also write it to a file:
 
-Optional Arguments:
+```bash
+docker run --rm --name pdfact -v /home/user/foo.pdf:/input.pdf -v /home/user/output.txt:/output.txt pdfact input.pdf output.txt
+```
 
-    -h, --help           show this help message and exit
-    --format <format>    The output format. Available options: [txt, xml, json].
-                         If the format is "txt", the output will contain the text matching the
-                         specified --unit and --role options in plain text format (in the format:
-                         one text element per line). If the format is "xml" or "json", the output
-                         will also contain layout information for each text element, e.g., the
-                         positions in the PDF file.
-    --unit <unit>        The granularity in which the extracted text (and the layout information,
-                         if the chosen output format is dedicated to provide such information)
-                         should be broken down in the output. Available options: [characters,
-                         blocks, words, areas, paragraphs, lines].
-                         For example, when the script is called with the option "--unit words",
-                         the output will be broken down by words, that is: the text (and layout
-                         information) will be provided word-wise.
-    --role [<role> [<role> ...]]
-                         The semantic role(s) of the text elements to be extracted. Available
-                         options: [figure, appendix, keywords, heading, footer, acknowledgments,
-                         caption, toc, abstract, footnote, body, itemize-item, title, reference,
-                         affiliation, general-terms, formula, header, categories, table, authors].
-                         For example, if the script is called with the option "--role headings",
-                         the output will only contain the text (and optionally, the layout
-                         information) of the text belonging to a heading. If not specified, all
-                         text will be extracted, regardless of the semantic roles.
-    --visualize <path>   The path to the file to which a visualization of the extracted text (that
-                         is: the original PDF file enriched which bounding boxes around the
-                         extracted text elements) should be written to. If not specified, no such
-                         visualization will be created.
-    --debug [<level>]    The verbosity of the log messages. Available options: [4 (= ERROR), 3 (=
-                         WARN), 2 (= INFO), 1 (= DEBUG), 0 (= OFF)].
-                         The level defines the minimum level of severity required for a message to
-                         be logged.
+**NOTE**: `/home/user/output.txt` must be an existing file on the host before running the command, because otherwise Docker creates and mount an empty directory (instead of an empty file).  
 
+### 2.3 Create a visualization of the extracted text blocks.
 
-#### Example
+To create a visualization of the extracted text blocks, type:
 
-If you wish to extract the words of the body text from a PDF file "foo.pdf", to
-have the result in XML format and to create a visualization of the extracted
-words to foo-visualized.pdf, use this command:
+```bash
+docker run --rm --name pdfact -v /home/user/foo.pdf:/input.pdf -v /home/user/visualization.pdf:/visualization.pdf pdfact input.pdf --visualize visualization.pdf
+```
 
-    ./pdfact --unit words --format xml --role body --visualize ./foo-visualized.pdf foo.pdf
+This will create the PDF file `/home/user/visualization.pdf`, which is a copy of the input PDF file in which each extracted text block is surrounded by its bounding box and each extracted paragraph is labelled with its semantic role.
 
+**NOTE**: Similar to the note above, `/home/user/visualization.pdf` must be an existing file on the host before running the command, because otherwise Docker creates and mount an empty directory (instead of an empty file).
 
-... to be continued ...
+### 2.4 Extract selected text blocks together with layout information.
+
+If you want to extract only the text blocks with selected semantic roles, say "heading" and "body", together with layout information, type:
+
+```bash
+docker run --rm --name pdfact -v /home/user/foo.pdf:/input.pdf pdfact input.pdf --format json --roles heading,body
+```
+
+The output will be now in JSON format and will provide layout information for the extracted text blocks. Instead of the format "json" you can also choose "xml"; it will provide the exact same layout information in XML format.
+
+### 2.5 Print usage info.
+
+The output and the behavior of *PdfAct* is highly customizable. To get a complete usage info with an overview of all available options, type
+```bash
+docker run --rm --name pdfact pdfact --help
+```
