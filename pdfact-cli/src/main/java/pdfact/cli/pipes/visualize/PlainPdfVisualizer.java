@@ -41,7 +41,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * The semantic roles to consider on visualizing.
    */
-  protected Set<SemanticRole> rolesFilter;
+  protected Set<SemanticRole> semanticRolesToInclude;
 
   // ==============================================================================================
   // Constructors.
@@ -49,12 +49,12 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Creates a new PDF visualizer.
    * 
-   * @param extractionUnits The text unit.
-   * @param rolesFilter     The semantic roles filter.
+   * @param units  The text units.
+   * @param roles  The semantic roles to include.
    */
-  public PlainPdfVisualizer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> rolesFilter) {
+  public PlainPdfVisualizer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> roles) {
     this.extractionUnits = extractionUnits;
-    this.rolesFilter = rolesFilter;
+    this.semanticRolesToInclude = roles;
   }
 
   // ==============================================================================================
@@ -110,7 +110,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected void visualizeCharacters(Document pdf, PdfDrawer drawer)
           throws PdfActVisualizeException {
     for (Paragraph paragraph : pdf.getParagraphs()) {
-      // Ignore the paragraph if its role doesn't match the roles filter.
+      // Ignore the paragraph if its role should not be extracted.
       if (!hasRelevantRole(paragraph)) {
         continue;
       }
@@ -227,7 +227,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   protected void visualizeWords(Document pdf, PdfDrawer drawer) throws PdfActVisualizeException {
     // Visualize the textual elements.
     for (Paragraph paragraph : pdf.getParagraphs()) {
-      // Ignore the paragraph if its role doesn't match the roles filter.
+      // Ignore the paragraph if its role should not be extracted.
       if (!hasRelevantRole(paragraph)) {
         continue;
       }
@@ -296,7 +296,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
           throws PdfActVisualizeException {
     // Visualize the textual elements.
     for (Paragraph paragraph : pdf.getParagraphs()) {
-      // Ignore the paragraph if its role doesn't match the roles filter.
+      // Ignore the paragraph if its role should not be extracted.
       if (!hasRelevantRole(paragraph)) {
         continue;
       }
@@ -461,34 +461,33 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==============================================================================================
 
   @Override
-  public Set<SemanticRole> getSemanticRolesFilter() {
-    return this.rolesFilter;
+  public Set<SemanticRole> getSemanticRolesToInclude() {
+    return this.semanticRolesToInclude;
   }
 
   @Override
-  public void setSemanticRolesFilter(Set<SemanticRole> roles) {
-    this.rolesFilter = roles;
+  public void setSemanticRolesToInclude(Set<SemanticRole> roles) {
+    this.semanticRolesToInclude = roles;
   }
 
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic roles filter of this
-   * serializer.
+   * Checks if the semantic role of the given element is relevant, that is: if it is included in 
+   * this.semanticRolesToInclude.
    * 
    * @param element The element to check.
    * 
-   * @return True, if the role of the given element matches the semantic roles filter of this
-   *         serializer, false otherwise.
+   * @return True, if the role of the given element is relevant.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {
     if (element == null) {
       return false;
     }
 
-    if (this.rolesFilter == null || this.rolesFilter.isEmpty()) {
-      // No filter is given -> The paragraph is relevant.
-      return true;
+    if (this.semanticRolesToInclude == null || this.semanticRolesToInclude.isEmpty()) {
+      // No semantic roles to include -> The element is not relevant.
+      return false;
     }
 
     SemanticRole role = element.getSemanticRole();
@@ -496,6 +495,6 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       return false;
     }
 
-    return this.rolesFilter.contains(role);
+    return this.semanticRolesToInclude.contains(role);
   }
 }

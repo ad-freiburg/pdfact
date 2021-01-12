@@ -65,17 +65,17 @@ public interface VisualizePdfPipe extends Pipe {
   // ==============================================================================================
 
   /**
-   * Returns the semantic roles filter.
+   * Returns the semantic roles to include.
    * 
-   * @return The semantic roles filter.
+   * @return The semantic roles to include.
    */
-  Set<SemanticRole> getSemanticRolesFilters();
+  Set<SemanticRole> getSemanticRolesToInclude();
 
   /**
-   * Sets the semantic roles filter.
+   * Sets the semantic roles to include.
    * 
    * @param roles
-   *        The semantic roles filter.
+   *        The semantic roles to include.
    */
-  void setSemanticRolesFilters(Set<SemanticRole> roles);
+  void setSemanticRolesToInclude(Set<SemanticRole> roles);
 }

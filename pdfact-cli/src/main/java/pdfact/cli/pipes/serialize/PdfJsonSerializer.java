@@ -88,7 +88,7 @@ public class PdfJsonSerializer implements PdfSerializer {
   /**
    * The semantic roles to consider on serializing.
    */
-  protected Set<SemanticRole> rolesFilter;
+  protected Set<SemanticRole> semanticRolesToInclude;
 
   /**
    * The fonts of the PDF elements which were in fact serialized.
@@ -115,12 +115,12 @@ public class PdfJsonSerializer implements PdfSerializer {
    * Creates a new serializer that serializes a PDF document in JSON format.
    * 
    * @param extractionUnits The units to serialize.
-   * @param rolesFilter     The semantic roles filter.
+   * @param roles           The semantic roles to include.
    */
-  public PdfJsonSerializer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> rolesFilter) {
+  public PdfJsonSerializer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> roles) {
     this();
     this.extractionUnits = extractionUnits;
-    this.rolesFilter = rolesFilter;
+    this.semanticRolesToInclude = roles;
   }
 
   // ==============================================================================================
@@ -208,7 +208,7 @@ public class PdfJsonSerializer implements PdfSerializer {
 
     if (pdf != null) {
       for (Paragraph paragraph : pdf.getParagraphs()) {
-        // Ignore the paragraph if its role doesn't match the roles filter.
+        // Ignore the paragraph if its role should not be extracted.
         if (!hasRelevantRole(paragraph)) {
           continue;
         }
@@ -253,7 +253,7 @@ public class PdfJsonSerializer implements PdfSerializer {
 
     if (pdf != null) {
       for (Paragraph paragraph : pdf.getParagraphs()) {
-        // Ignore the paragraph if its role doesn't match the roles filter.
+        // Ignore the paragraph if its role should not be extracted.
         if (!hasRelevantRole(paragraph)) {
           continue;
         }
@@ -300,7 +300,7 @@ public class PdfJsonSerializer implements PdfSerializer {
 
     if (pdf != null) {
       for (Paragraph paragraph : pdf.getParagraphs()) {
-        // Ignore the paragraph if its role doesn't match the roles filter.
+        // Ignore the paragraph if its role should not be extracted.
         if (!hasRelevantRole(paragraph)) {
           continue;
         }
@@ -769,34 +769,33 @@ public class PdfJsonSerializer implements PdfSerializer {
   // ==============================================================================================
 
   @Override
-  public Set<SemanticRole> getSemanticRolesFilter() {
-    return this.rolesFilter;
+  public Set<SemanticRole> getSemanticRolesToInclude() {
+    return this.semanticRolesToInclude;
   }
 
   @Override
-  public void setSemanticRolesFilter(Set<SemanticRole> rolesFilter) {
-    this.rolesFilter = rolesFilter;
+  public void setSemanticRolesToInclude(Set<SemanticRole> roles) {
+    this.semanticRolesToInclude = roles;
   }
 
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element matches the semantic roles filter of this
-   * serializer.
+   * Checks if the semantic role of the given element is relevant, that is: if it is included in 
+   * this.semanticRolesToInclude.
    * 
    * @param element The element to check.
    * 
-   * @return True, if the role of the given element matches the semantic roles filter of this
-   *         serializer, false otherwise.
+   * @return True, if the role of the given element is relevant.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {
     if (element == null) {
       return false;
     }
 
-    if (this.rolesFilter == null || this.rolesFilter.isEmpty()) {
-      // No filter is given -> The element is relevant.
-      return true;
+    if (this.semanticRolesToInclude == null || this.semanticRolesToInclude.isEmpty()) {
+      // No semantic roles to include given -> The element is not relevant.
+      return false;
     }
 
     SemanticRole role = element.getSemanticRole();
@@ -804,7 +803,7 @@ public class PdfJsonSerializer implements PdfSerializer {
       return false;
     }
 
-    return this.rolesFilter.contains(role);
+    return this.semanticRolesToInclude.contains(role);
   }
 
   // ==============================================================================================

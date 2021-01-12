@@ -1,9 +1,9 @@
 package pdfact.core.model;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,6 +73,10 @@ public enum SemanticRole {
    * The keywords.
    */
   KEYWORDS("keywords"),
+  /**
+   * A fallback role.
+   */
+  OTHER("other"),
   /**
    * A page header.
    */
@@ -180,7 +184,7 @@ public enum SemanticRole {
    * 
    * @return A set of the roles that relate to the given names.
    */
-  public static Set<SemanticRole> fromStrings(List<String> names) {
+  public static Set<SemanticRole> fromStrings(Collection<String> names) {
     Set<SemanticRole> roles = new HashSet<>();
     if (names != null) {
       for (String name : names) {

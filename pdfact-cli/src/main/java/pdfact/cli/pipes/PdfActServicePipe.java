@@ -101,19 +101,19 @@ public interface PdfActServicePipe extends Pipe {
   // ==============================================================================================
 
   /**
-   * Returns the semantic roles filters.
+   * Returns the semantic roles to include.
    * 
-   * @return The semantic roles filters.
+   * @return The semantic roles to include.
    */
-  Set<SemanticRole> getSemanticRolesFilters();
+  Set<SemanticRole> getSemanticRolesToInclude();
 
   /**
-   * Sets the semantic roles filters.
+   * Sets the semantic roles to include.
    * 
-   * @param filters
-   *        The semantic roles filters.
+   * @param roles
+   *        The semantic roles to include.
    */
-  void setSemanticRolesFilters(Set<SemanticRole> filters);
+  void setSemanticRolesToInclude(Set<SemanticRole> roles);
 
   // ==============================================================================================
 

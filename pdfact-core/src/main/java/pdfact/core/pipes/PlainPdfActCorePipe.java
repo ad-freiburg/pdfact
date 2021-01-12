@@ -2,7 +2,6 @@ package pdfact.core.pipes;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import pdfact.core.model.Document;
 import pdfact.core.pipes.dehyphenate.PlainDehyphenateWordsPipe;
 import pdfact.core.pipes.filter.characters.PlainFilterCharactersPipe;

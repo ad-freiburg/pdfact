@@ -49,9 +49,9 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   protected Set<ExtractionUnit> extractionUnits;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to include.
    */
-  protected Set<SemanticRole> roles;
+  protected Set<SemanticRole> semanticRolesToInclude;
 
   // ==============================================================================================
 
@@ -61,7 +61,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   public PlainSerializePdfPipe() {
     this.format = DEFAULT_SERIALIZE_FORMAT;
     this.extractionUnits = DEFAULT_EXTRACTION_UNITS;
-    this.roles = DEFAULT_SEMANTIC_ROLES;
+    this.semanticRolesToInclude = DEFAULT_SEMANTIC_ROLES;
   }
 
   // ==============================================================================================
@@ -76,7 +76,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     log.debug("Serializing the PDF document done.");
     log.debug("serialization format: " + this.format);
     log.debug("extraction units: " + this.extractionUnits);
-    log.debug("semantic roles: " + this.roles);
+    log.debug("semantic roles: " + this.semanticRolesToInclude);
 
     log.debug("End of pipe: " + getClass().getSimpleName() + ".");
 
@@ -96,13 +96,13 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     PdfSerializer serializer;
     switch (this.format) {
       case XML:
-        serializer = new PdfXmlSerializer(this.extractionUnits, this.roles);
+        serializer = new PdfXmlSerializer(this.extractionUnits, this.semanticRolesToInclude);
         break;
       case JSON:
-        serializer = new PdfJsonSerializer(this.extractionUnits, this.roles);
+        serializer = new PdfJsonSerializer(this.extractionUnits, this.semanticRolesToInclude);
         break;
       case TXT:
-        serializer = new PdfTxtSerializer(this.extractionUnits, this.roles);
+        serializer = new PdfTxtSerializer(this.extractionUnits, this.semanticRolesToInclude);
         break;
       default:
         throw new PdfActSerializeException(
@@ -176,13 +176,13 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==============================================================================================
 
   @Override
-  public Set<SemanticRole> getSemanticRolesFilters() {
-    return this.roles;
+  public Set<SemanticRole> getSemanticRolesToInclude() {
+    return this.semanticRolesToInclude;
   }
 
   @Override
-  public void setSemanticRolesFilters(Set<SemanticRole> filters) {
-    this.roles = filters;
+  public void setSemanticRolesToInclude(Set<SemanticRole> roles) {
+    this.semanticRolesToInclude = roles;
   }
 
   // ==============================================================================================

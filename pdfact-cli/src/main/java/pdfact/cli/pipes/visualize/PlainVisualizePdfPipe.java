@@ -40,7 +40,7 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   protected Set<ExtractionUnit> extractionUnits;
 
   /**
-   * The semantic roles filter.
+   * The semantic roles to include.
    */
   protected Set<SemanticRole> roles;
 
@@ -146,12 +146,12 @@ public class PlainVisualizePdfPipe implements VisualizePdfPipe {
   // ==============================================================================================
 
   @Override
-  public Set<SemanticRole> getSemanticRolesFilters() {
+  public Set<SemanticRole> getSemanticRolesToInclude() {
     return this.roles;
   }
 
   @Override
-  public void setSemanticRolesFilters(Set<SemanticRole> roles) {
+  public void setSemanticRolesToInclude(Set<SemanticRole> roles) {
     this.roles = roles;
   }
 

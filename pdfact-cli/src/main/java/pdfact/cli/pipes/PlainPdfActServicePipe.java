@@ -121,7 +121,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
       SerializePdfPipe serializePipe = new PlainSerializePdfPipe();
       serializePipe.setSerializationFormat(this.serializationFormat);
       serializePipe.setExtractionUnits(this.extractionUnits);
-      serializePipe.setSemanticRolesFilters(this.roles);
+      serializePipe.setSemanticRolesToInclude(this.roles);
       serializePipe.setTargetPath(this.serializationPath);
       serializePipe.setTargetStream(this.serializationStream);
       pipeline.addPipe(serializePipe);
@@ -138,7 +138,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     if (this.visualizationStream != null || this.visualizationPath != null) {
       VisualizePdfPipe visualizePipe = new PlainVisualizePdfPipe();
       visualizePipe.setExtractionUnits(this.extractionUnits);
-      visualizePipe.setSemanticRolesFilters(this.roles);
+      visualizePipe.setSemanticRolesToInclude(this.roles);
       visualizePipe.setTargetPath(this.visualizationPath);
       visualizePipe.setTargetStream(this.visualizationStream);
       pipeline.addPipe(visualizePipe);
@@ -221,13 +221,13 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==============================================================================================
 
   @Override
-  public Set<SemanticRole> getSemanticRolesFilters() {
+  public Set<SemanticRole> getSemanticRolesToInclude() {
     return this.roles;
   }
 
   @Override
-  public void setSemanticRolesFilters(Set<SemanticRole> filter) {
-    this.roles = filter;
+  public void setSemanticRolesToInclude(Set<SemanticRole> roles) {
+    this.roles = roles;
   }
 
   // ==============================================================================================

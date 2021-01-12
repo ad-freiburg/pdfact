@@ -1,7 +1,9 @@
 package pdfact.cli;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,18 +24,17 @@ import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
 /**
- * The main class for the command line interface of PdfAct.
+ * The command line interface of PdfAct.
  *
  * @author Claudius Korzen
  */
 public class PdfActCli {
   /**
-   * Starts the command line interface of PdfAct.
+   * Starts this command line interface.
    *
-   * @param args
-   *     The command line arguments.
+   * @param args The command line arguments.
    */
-  protected void run(String[] args) {
+  protected void start(String[] args) {
     int statusCode = 0;
     String errorMessage = null;
     Throwable cause = null;
@@ -41,44 +42,53 @@ public class PdfActCli {
     // Create the command line argument parser.
     PdfActCommandLineParser parser = new PdfActCommandLineParser();
 
-    // Create an instance of PdfAct.
-    PdfAct pdfAct = new PdfAct();
-
     try {
       // Parse the command line arguments.
       parser.parseArgs(args);
+
+      // Create an instance of PdfAct.
+      PdfAct pdfAct = new PdfAct();
 
       // Pass the log level.
       pdfAct.setLogLevel(LogLevel.getLogLevel(parser.getLogLevel()));
 
       // Pass the serialization format if there is any.
-      if (parser.hasSerializationFormat()) {
-        String format = parser.getSerializeFormat();
-        pdfAct.setSerializationFormat(SerializeFormat.fromString(format));
+      String serializationFormatStr = parser.getSerializationFormat();
+      if (serializationFormatStr != null) {
+        pdfAct.setSerializationFormat(SerializeFormat.fromString(serializationFormatStr));
       }
 
-      // Pass the target of the serialization.
-      if (parser.hasSerializationPath()) {
-        pdfAct.setSerializationPath(Paths.get(parser.getSerializationPath()));
+      // Pass the serialization target path.
+      String serializationPathStr = parser.getSerializationPath();
+      if (serializationPathStr != null) {
+        pdfAct.setSerializationPath(Paths.get(serializationPathStr));
       } else {
         pdfAct.setSerializationStream(System.out);
       }
 
       // Pass the target of the visualization.
-      if (parser.hasVisualizationPath()) {
-        pdfAct.setVisualizationPath(Paths.get(parser.getVisualizationPath()));
+      String visualizationPathStr = parser.getVisualizationPath();
+      if (visualizationPathStr != null) {
+        pdfAct.setVisualizationPath(Paths.get(visualizationPathStr));
       }
 
       // Pass the chosen text unit.
-      if (parser.hasTextUnit()) {
-        pdfAct.setExtractionUnits(ExtractionUnit.fromStrings(parser.getExtractionUnits()));
+      List<String> extractionUnits = parser.getExtractionUnits();
+      if (extractionUnits != null) {
+        pdfAct.setExtractionUnits(ExtractionUnit.fromStrings(extractionUnits));
       }
 
-      // Pass the semantic roles filter for serialization & visualization.
-      if (parser.hasSemanticRolesFilters()) {
-        List<String> roles = parser.getSemanticRolesFilters();
-        pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
+      // Compute the semantic roles to include on serialization & visualization.
+      Set<String> roles = new HashSet<>();
+      List<String> semanticRolesToInclude = parser.getSemanticRolesToInclude();
+      if (semanticRolesToInclude != null) {
+        roles.addAll(parser.getSemanticRolesToInclude());
       }
+      List<String> semanticRolesToExclude = parser.getSemanticRolesToExclude();
+      if (semanticRolesToExclude != null) {
+        roles.removeAll(parser.getSemanticRolesToExclude());
+      }
+      pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
 
       // Run PdfAct.
       pdfAct.parse(parser.getPdfPath());
@@ -103,19 +113,18 @@ public class PdfActCli {
   // ==============================================================================================
 
   /**
-   * The main method that runs the command line interface.
+   * The main method to run the command line interface.
    *
-   * @param args
-   *     The command line arguments.
+   * @param args The command line arguments.
    */
   public static void main(String[] args) {
-    new PdfActCli().run(args);
+    new PdfActCli().start(args);
   }
 
   // ==============================================================================================
 
   /**
-   * A parser that parses the command line arguments for the CLI of PdfAct.
+   * A parser to parse the command line arguments.
    *
    * @author Claudius Korzen
    */
@@ -193,15 +202,32 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * The name of the option to define the semantic role(s) filters.
+     * The name of the option to define the semantic roles to include (text blocks with a semantic
+     * role that is not included won't be extracted).
      */
-    protected static final String SEMANTIC_ROLE_FILTERS = "roles";
+    protected static final String INCLUDE_SEMANTIC_ROLES = "include-roles";
 
     /**
-     * The semantic role(s) filters.
+     * The semantic role(s) to include (text blocks with a semantic role that is not included won't
+     * be extracted).
      */
-    @Arg(dest = SEMANTIC_ROLE_FILTERS)
-    protected List<String> semanticRolesFilters;
+    @Arg(dest = INCLUDE_SEMANTIC_ROLES)
+    protected List<String> semanticRolesToInclude = new ArrayList<>(SemanticRole.getNames());
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to define the semantic roles to exclude (text blocks with a semantic
+     * role that is excluded won't be extracted).
+     */
+    protected static final String EXCLUDE_SEMANTIC_ROLES = "exclude-roles";
+
+    /**
+     * The semantic role(s) to exclude (text blocks with a semantic role that is excluded won't be
+     * extracted).
+     */
+    @Arg(dest = EXCLUDE_SEMANTIC_ROLES)
+    protected List<String> semanticRolesToExclude = new ArrayList<>();
 
     // ============================================================================================
 
@@ -214,7 +240,7 @@ public class PdfActCli {
      * The log level.
      */
     @Arg(dest = LOG_LEVEL)
-    protected int logLevel = 3;
+    protected int logLevel = PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel();
 
     // ============================================================================================
 
@@ -224,122 +250,133 @@ public class PdfActCli {
     public PdfActCommandLineParser() {
       this.parser = ArgumentParsers.newFor("pdfact")
         .terminalWidthDetection(false)
-        .defaultFormatWidth(100)
-        .build();
-      this.parser.description("A tool for extracting the text and structure from PDF files.");
+        .defaultFormatWidth(100).build();
+      this.parser.description("A tool to extract the text, structure and layout from PDF files.");
 
-      // Add an argument to define the path to the PDF file to be processed.
-      this.parser.addArgument(PDF_PATH)
-          .dest(PDF_PATH)
-          .required(true)
-          .metavar("<pdf-file>")
-          .help("The path to the PDF file to be processed.");
+      // Add an option to define the path to the PDF file to be processed.
+      this.parser.addArgument(PDF_PATH).dest(PDF_PATH)
+        .required(true)
+        .metavar("<pdf-file>")
+        .help("The path to the PDF file to be processed.");
 
       // Add an argument to define the target path to the output file.
-      this.parser.addArgument(SERIALIZE_PATH)
-          .dest(SERIALIZE_PATH)
-          .nargs("?")
-          .metavar("<output-file>")
-          .help("The path to the file to which the extraction output should be "
-              + "written.\nIf not specified, the output will be written to "
-              + "stdout.");
-              
-      // Add an argument to define the output format.
-      Set<String> formatChoices = SerializeFormat.getNames();
-      this.parser.addArgument("--" + SERIALIZE_FORMAT)
-          .dest(SERIALIZE_FORMAT)
-          .required(false)
-          .choices(formatChoices)
-          .metavar("<format>")
-          .help("The output format. \n"
-              + "Available options: " + String.join(", ", formatChoices) + ". "
-              + "Default: " + this.serializeFormat + ".\n"
-              + "In case of txt, the output will contain the extracted text matching the "
-              + "specified --" + EXTRACTION_UNITS + " and --" + SEMANTIC_ROLE_FILTERS + " options "
-              + "in plain text format (one text element per line). In case of xml or json, the "
-              + "output will also contain layout information for each text element, e.g., the "
-              + "positions in the PDF file.");
+      this.parser.addArgument(SERIALIZE_PATH).dest(SERIALIZE_PATH)
+        .required(false).nargs("?")
+        .metavar("<output-file>")
+        .help("The path to the file to which the extraction output should be written.\n"
+            + "If not specified, the output will be written to stdout.");
 
-      // Add an argument to define the text unit to extract.
-      Set<String> unitChoices = ExtractionUnit.getPluralNames();
-      this.parser.addArgument("--" + EXTRACTION_UNITS)
-          .dest(EXTRACTION_UNITS)
-          .nargs(1)
-          .action(new SplitAtDelimiterAction(","))
-          .required(false)
-          .metavar("<units>")
-          .help("The units of the text elements to be extracted, separated by \",\".\n"
-              + "Available options: " + String.join(", ", unitChoices) + ". "
-              + "Default: " + String.join(",", this.extractionUnits) + ".\n"
-              + "This parameter defines the granularity in which the output (and the layout "
-              + "information, if the chosen output format is dedicated to provide such "
-              + "information) should be broken down. "
-              + "For example, when the script is called with the option \"--" + EXTRACTION_UNITS 
-              + " words\", the output will be broken down by words, that is: the text (and layout "
-              + "information) will be provided word-wise.");
-              
-      // Add an argument to define the semantic role(s).
-      Set<String> semanticRolesChoices = SemanticRole.getNames();
-      this.parser.addArgument("--" + SEMANTIC_ROLE_FILTERS)
-          .dest(SEMANTIC_ROLE_FILTERS)
-          .nargs(1)
-          .action(new SplitAtDelimiterAction(","))
-          .required(false)
-          .metavar("<roles>")
-          .help("The semantic role(s) of the text elements to be extracted, separated by \",\".\n"
-              + "Available options: " + String.join(", ", semanticRolesChoices) + ".\n"
-              + "For example, if the script is called with the option \"--" 
-              + SEMANTIC_ROLE_FILTERS + " headings\", the output will only "
-              + "contain the text (and optionally, the layout information) of "
-              + "the text belonging to a heading. If not specified, all text elements "
-              + "will be extracted, regardless of the semantic roles.");
+      // Add an option to define the output format.
+      Set<String> choices = SerializeFormat.getNames();
+      String choicesStr = String.join(", ", choices);
+      String defaultStr = this.serializeFormat;
+      this.parser.addArgument("--" + SERIALIZE_FORMAT).dest(SERIALIZE_FORMAT)
+        .required(false)
+        .metavar("<format>")
+        .choices(choices)
+        .setDefault(this.serializeFormat)
+        .help("The output format.\n" 
+            + "- Available options: " + choicesStr + ".\n" 
+            + "- Default: \"" + defaultStr + "\".\n"
+            + "In case of txt, the text elements will be extracted as plain text, in the "
+            + "format: one text element per line. In case of xml or json, the text elements "
+            + "will be extracted together with their layout information, e.g., their positions "
+            + "in the PDF file, their fonts and their colors.");
+
+      // Add an option to define the text units.
+      choicesStr = String.join(", ", ExtractionUnit.getPluralNames());
+      defaultStr = String.join(",", this.extractionUnits);
+      this.parser.addArgument("--" + EXTRACTION_UNITS).dest(EXTRACTION_UNITS)
+        .required(false)
+        .metavar("<units>")
+        .action(new SplitAtDelimiterAction(","))
+        .setDefault(this.extractionUnits)
+        .help("The granularity in which the elements should be extracted in the output, "
+            + "separated by \",\".\n" 
+            + "- Available options: " + choicesStr + ".\n" 
+            + "- Default: \"" + defaultStr + "\".\n"
+            + "For example, when the script is called with the option \"--" + EXTRACTION_UNITS
+            + " words\", the output will be broken down by words, that is: the text and layout "
+            + "information are provided word-wise.");
+
+      // Add an argument to define the semantic role(s) to include.
+      choicesStr = String.join(", ", SemanticRole.getNames());
+      defaultStr = String.join(",", this.semanticRolesToInclude);
+      this.parser.addArgument("--" + INCLUDE_SEMANTIC_ROLES).dest(INCLUDE_SEMANTIC_ROLES)
+        .required(false)
+        .metavar("<roles>")
+        .action(new SplitAtDelimiterAction(","))
+        .setDefault(this.semanticRolesToInclude)
+        .help("The list of the semantic roles to include, separated by \",\".\n"
+            + "- Available options: " + choicesStr + ".\n"
+            + "- Default: \"" + defaultStr + "\".\n"
+            + "Only the elements with a semantic role that is included in this list will be "
+            + "extracted. All other elements won't be extracted. For example, if the script is "
+            + "called with the option \"--" + INCLUDE_SEMANTIC_ROLES + " headings,body\", the "
+            + "output will only contain the text elements (and optionally, the layout "
+            + "information) belonging to a heading or a body text paragraph. Per default, all "
+            + "available semantic roles are included, that is: all elements will be extracted, "
+            + "regardless of the semantic roles.\n"
+            + "NOTE: The detection of the semantic roles of the text elements is still in an "
+            + "experimental state. So don't expect the semantic roles to be highly accurate.");
+
+      // Add an argument to define the semantic role(s) to exclude.
+      defaultStr = String.join(",", this.semanticRolesToExclude);
+      this.parser.addArgument("--" + EXCLUDE_SEMANTIC_ROLES).dest(EXCLUDE_SEMANTIC_ROLES)
+        .required(false)
+        .metavar("<roles>")
+        .action(new SplitAtDelimiterAction(","))
+        .setDefault(this.semanticRolesToExclude)
+        .help("The list of the semantic roles to exclude, separated by \",\".\n"
+            + "- Available options: " + choicesStr + ".\n"
+            + "- Default: \"" + defaultStr + "\".\n"
+            + "All elements with a semantic role that is included in this list won't be "
+            + "extracted. For example, if the script is called with the option \"--"
+            + EXCLUDE_SEMANTIC_ROLES + " body\", the text (and layout information) belonging to "
+            + "body text paragraphs won't be extracted. Per default, no semantic role is "
+            + "excluded, that is: all elements will be extracted.\n"
+            + "NOTE: The detection of the semantic roles of the text elements is still in an "
+            + "experimental state. So don't expect the semantic roles to be highly accurate.");
 
       // Add an argument to define the target path for the visualization.
-      this.parser.addArgument("--" + VISUALIZATION_PATH)
-          .dest(VISUALIZATION_PATH)
-          .required(false)
-          .metavar("<path>")
-          .help("The path to a file (including filename) to which a visualization of the "
-              + "extracted text (that is: the original PDF file enriched "
-              + "which bounding boxes around the extracted text elements) "
-              + "should be written to. If not specified, no such "
-              + "visualization will be created.");
+      this.parser.addArgument("--" + VISUALIZATION_PATH).dest(VISUALIZATION_PATH)
+        .required(false)
+        .type(String.class)
+        .metavar("<path>")
+        .help("The path to a file (ending in *.pdf) to which a visualization of the extracted "
+            + "elements (that is: the original PDF file enriched which bounding boxes around the "
+            + "extracted elements and the semantic roles in case the unit is \"paragraph\") "
+            + "should be written to. The file doesn't have to be existent before. If not "
+            + "specified, no such visualization will be created.");
 
       // Add an argument to define the log level.
       StringBuilder choiceStr = new StringBuilder();
       int i = 0;
-      choiceStr.append("[");
       for (LogLevel level : LogLevel.getLogLevels()) {
         choiceStr.append(level.getIntLevel() + " (= " + level + ")");
         choiceStr.append(i < LogLevel.getLogLevels().size() - 1 ? ", " : "");
         i++;
       }
-      choiceStr.append("]");
 
       LogLevel debugLevel = LogLevel.DEBUG;
-      this.parser.addArgument("--" + LOG_LEVEL)
-          .dest(LOG_LEVEL)
-          .nargs(1)
-          .required(false)
-          .metavar("<level>")
-          .type(Integer.class)
-          .setDefault(PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel())
-          .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
-          .help("The verbosity of the log messages.\n"
-              + "Available options: " + choiceStr.toString() + ". "
-              + "Default: " + this.logLevel + ".\n"
-              + "The level defines the minimum level of severity required for "
-              + "a message to be logged.");
+      this.parser.addArgument("--" + LOG_LEVEL).dest(LOG_LEVEL)
+        .required(false)
+        .metavar("<level>")
+        .type(Integer.class)
+        .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
+        .setDefault(this.logLevel)
+        .help("The verbosity of the log messages.\n" 
+            + "- Available options: " + choiceStr.toString() + ".\n" 
+            + "- Default: " + this.logLevel + ".\n"
+            + "This defines the minimum level of severity required for a message to be logged.");
     }
 
     /**
      * Parses the given command line arguments.
      *
-     * @param args
-     *     The command line arguments to parse.
+     * @param args The command line arguments to parse.
      *
-     * @throws PdfActException
-     *     If parsing the command line arguments fails.
+     * @throws PdfActException If parsing the command line arguments fails.
      */
     public void parseArgs(String[] args) throws PdfActException {
       try {
@@ -395,11 +432,9 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * Returns true, if a target path for the serialization is given; false
-     * otherwise.
+     * Returns true, if a target path for the serialization is given; false otherwise.
      *
-     * @return True, if a target path for the serialization is given; false
-     *     otherwise.
+     * @return True, if a target path for the serialization is given; false otherwise.
      */
     public boolean hasSerializationPath() {
       return this.serializePath != null;
@@ -430,7 +465,7 @@ public class PdfActCli {
      *
      * @return The serialization format.
      */
-    public String getSerializeFormat() {
+    public String getSerializationFormat() {
       return this.serializeFormat;
     }
 
@@ -459,8 +494,7 @@ public class PdfActCli {
     /**
      * Returns true, if there is a text unit given.
      *
-     * @return True, if there is a text unit given.
-     *     False otherwise.
+     * @return True, if there is a text unit given. False otherwise.
      */
     public boolean hasTextUnit() {
       return this.extractionUnits != null;
@@ -478,22 +512,21 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * Returns true, if there is at least one semantic role filter given.
+     * Returns the list of semantic role(s) to include.
      *
-     * @return True, if there is at least one semantic role filter given; False
-     *     otherwise.
+     * @return The list of semantic role(s) to include.
      */
-    public boolean hasSemanticRolesFilters() {
-      return this.semanticRolesFilters != null;
+    public List<String> getSemanticRolesToInclude() {
+      return this.semanticRolesToInclude;
     }
 
     /**
-     * Returns the semantic role(s) filter(s).
+     * Returns the list of semantic role(s) to exclude.
      *
-     * @return The semantic role(s) filter(s).
+     * @return The list of semantic role(s) to exclude.
      */
-    public List<String> getSemanticRolesFilters() {
-      return this.semanticRolesFilters;
+    public List<String> getSemanticRolesToExclude() {
+      return this.semanticRolesToExclude;
     }
 
     // ============================================================================================
@@ -509,8 +542,7 @@ public class PdfActCli {
   }
 
   /**
-   * Argument action to store argument value or a given default value if the
-   * argument value is null.
+   * Argument action to store argument value or a given default value if the argument value is null.
    */
   private static class StoreDefaultArgumentAction implements ArgumentAction {
     /**
@@ -521,17 +553,15 @@ public class PdfActCli {
     /**
      * Creates a new StoreDefaultArgumentAction.
      *
-     * @param defaultValue
-     *     The default value to store if the argument value is null.
+     * @param defaultValue The default value to store if the argument value is null.
      */
     public StoreDefaultArgumentAction(Object defaultValue) {
       this.defaultValue = defaultValue;
     }
 
     @Override
-    public void run(ArgumentParser parser, Argument arg,
-        Map<String, Object> attrs, String flag, Object value)
-        throws ArgumentParserException {
+    public void run(ArgumentParser parser, Argument arg, Map<String, Object> attrs, String flag,
+            Object value) throws ArgumentParserException {
       if (value == null) {
         attrs.put(arg.getDest(), this.defaultValue);
       } else {
@@ -562,23 +592,17 @@ public class PdfActCli {
     /**
      * Creates a new SplitAtDelimiterAction.
      *
-     * @param delimiter
-     *     The delimiter to split at.
+     * @param delimiter The delimiter to split at.
      */
     public SplitAtDelimiterAction(String delimiter) {
       this.delimiter = delimiter;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void run(ArgumentParser parser, Argument arg,
-        Map<String, Object> attrs, String flag, Object value)
-        throws ArgumentParserException {
+    public void run(ArgumentParser parser, Argument arg, Map<String, Object> attrs, String flag,
+            Object value) throws ArgumentParserException {
       if (value != null) {
-        List<String> list = (List<String>) value;
-        if (list.size() > 0) {
-          attrs.put(arg.getDest(), Arrays.asList((list.get(0).split(delimiter))));
-        }
+        attrs.put(arg.getDest(), Arrays.asList(((String) value).split(delimiter)));
       }
     }
 

@@ -8,8 +8,8 @@ import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PlainPdfActServicePipe;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.Document;
+import pdfact.core.model.LogLevel;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -115,9 +115,9 @@ public class PdfAct {
       service.setExtractionUnits(this.extractionUnits);
     }
 
-    // Pass the semantic roles filter for serialization & visualization.
+    // Pass the semantic roles to include for serialization & visualization.
     if (this.semanticRoles != null) {
-      service.setSemanticRolesFilters(this.semanticRoles);
+      service.setSemanticRolesToInclude(this.semanticRoles);
     }
 
     // Create the PDF document from the given path.

@@ -15,6 +15,7 @@ import pdfact.core.pipes.semanticize.modules.GeneralTermsModule;
 import pdfact.core.pipes.semanticize.modules.HeadingModule;
 import pdfact.core.pipes.semanticize.modules.ItemizeItemModule;
 import pdfact.core.pipes.semanticize.modules.KeywordsModule;
+import pdfact.core.pipes.semanticize.modules.OtherRoleModule;
 import pdfact.core.pipes.semanticize.modules.PageHeaderFooterModule;
 import pdfact.core.pipes.semanticize.modules.PdfTextSemanticizerModule;
 import pdfact.core.pipes.semanticize.modules.ReferenceModule;
@@ -58,6 +59,7 @@ public class PlainDetectSemanticsPipe
     this.modules.add(new ItemizeItemModule());
     this.modules.add(new TableModule());
     this.modules.add(new BodyTextModule());
+    this.modules.add(new OtherRoleModule());
   }
 
   // ==============================================================================================

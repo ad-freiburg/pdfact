@@ -44,17 +44,17 @@ public interface PdfVisualizer {
   // ==============================================================================================
 
   /**
-   * Returns the semantic roles filter.
+   * Returns the semantic roles to include.
    * 
-   * @return The semantic roles filter.
+   * @return The semantic roles to include.
    */
-  Set<SemanticRole> getSemanticRolesFilter();
+  Set<SemanticRole> getSemanticRolesToInclude();
 
   /**
-   * Sets the semantic roles filter.
+   * Sets the semantic roles to include.
    * 
    * @param roles
-   *        The semantic roles filter.
+   *        The semantic roles to include.
    */
-  void setSemanticRolesFilter(Set<SemanticRole> roles);
+  void setSemanticRolesToInclude(Set<SemanticRole> roles);
 }
