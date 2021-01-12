@@ -19,7 +19,6 @@ import pdfact.core.pipes.semanticize.modules.OtherRoleModule;
 import pdfact.core.pipes.semanticize.modules.PageHeaderFooterModule;
 import pdfact.core.pipes.semanticize.modules.PdfTextSemanticizerModule;
 import pdfact.core.pipes.semanticize.modules.ReferenceModule;
-import pdfact.core.pipes.semanticize.modules.TableModule;
 import pdfact.core.pipes.semanticize.modules.TitleModule;
 import pdfact.core.util.exception.PdfActException;
 
@@ -57,7 +56,7 @@ public class PlainDetectSemanticsPipe
     this.modules.add(new CaptionModule());
     this.modules.add(new FootnoteModule());
     this.modules.add(new ItemizeItemModule());
-    this.modules.add(new TableModule());
+    // this.modules.add(new TableModule());
     this.modules.add(new BodyTextModule());
     this.modules.add(new OtherRoleModule());
   }

@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import pdfact.core.model.Page;
 import pdfact.core.model.Document;
+import pdfact.core.model.Page;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 
@@ -26,7 +25,7 @@ public class ItemizeItemModule implements PdfTextSemanticizerModule {
 
     // A pattern to find items that start with "•".
     Pattern pattern1 = Pattern.compile(
-        "^(•)(\\s+\\w|$)", Pattern.CASE_INSENSITIVE);
+        "^(•|-)(\\s+\\w|$)", Pattern.CASE_INSENSITIVE);
     ITEMIZE_ITEM_PATTERNS.add(pattern1);
 
     // A pattern to find items that start with "I.", "II.", "III.", "IV.", etc.
