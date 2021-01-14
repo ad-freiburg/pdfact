@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# NOTE: This is a script that was initally used to run the executable jar file of this project
+# without the need of typing "java -jar ...". But this approach wasn't useful, because both files
+# (the script and the jar file) had to co-exist at any time (copying the script to another place
+# had broken the approach, because the jar-file wasn't found anymore). We now use another approach
+# which prepends stub.sh (located in this same folder) to the jar-file and which allows to use
+# the jar file like a Linux executable.
+
 # The path to java.
 JAVA="java"
 if test -n "$JAVA_HOME"; then

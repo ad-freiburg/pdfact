@@ -13,6 +13,13 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <!-- Define some file paths -->
+    <project.files.jar>${project.dirs.bin}/${project.basename}.jar</project.files.jar>
+    <project.files.executable>${project.dirs.bin}/${project.basename}</project.files.executable>
+    <project.files.stub_sh>${project.dirs.resources}/stub.sh</project.files.stub_sh>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>pdfact</groupId>
@@ -58,7 +65,7 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-              <outputDirectory>../bin</outputDirectory>
+              <outputDirectory>${project.dirs.bin}</outputDirectory>
               <finalName>${project.basename}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <attach>false</attach>
@@ -67,9 +74,11 @@
         </executions>
       </plugin>
       
-      <!-- Configure the antrun plugin to create a script in the root directory
-      of the project that can be used to run the CLI of the project (instead
-      of calling "java -jar foo.jar..."). -->
+      <!-- 
+        Configure the antrun plugin to create an executable resulting from the concatenation
+        of resources/stub.sh and the produced jar file. This will allow the jar-file to be
+        executable like a Linux executable file (without typing java -jar ...). 
+      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.8</version>
@@ -81,16 +90,13 @@
             </goals>
             <configuration>
               <target>
-                <!-- Copy the script template. -->
-                <copy file="src/main/resources/cli_script_template" 
-                      tofile="../pdfact"
-                      overwrite="true" />
-                <!-- Insert the JAR file path into the script. -->
-                <replace file="../pdfact" 
-                         token="{JAR}" 
-                         value="${project.dirs.bin}/${project.basename}.jar"/>
+                <!-- Concat stub.sh and the jar file to ./bin/pdfact -->
+                <concat destfile="${project.files.executable}" binary="yes">
+                  <fileset file="${project.files.stub_sh}"/>
+                  <fileset file="${project.files.jar}"/>
+                </concat>          
                 <!-- Make the script executable. -->
-                <chmod file="../pdfact" perm="755"/>
+                <chmod file="${project.files.executable}" perm="755"/>
               </target>
             </configuration>
           </execution>

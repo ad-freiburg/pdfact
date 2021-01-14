@@ -56,12 +56,20 @@ public class FontFaceComparator implements Comparator<FontFace>, Serializable {
     }
 
     int emph1 = 0;
-    if (font1.isItalic()) { emph1 += 1; }
-    if (font1.isBold()) { emph1 += 2; }
+    if (font1.isItalic()) { 
+      emph1 += 1;
+    }
+    if (font1.isBold()) { 
+      emph1 += 2; 
+    }
     
     int emph2 = 0;
-    if (font2.isItalic()) { emph2 += 1; }
-    if (font2.isBold()) { emph2 += 2; }
+    if (font2.isItalic()) { 
+      emph2 += 1; 
+    }
+    if (font2.isBold()) { 
+      emph2 += 2;
+    }
 
     return emph1 - emph2;
   }

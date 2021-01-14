@@ -11,9 +11,13 @@
 
   <properties>
     <project.basename>pdfact</project.basename>
-    <project.dirs.bin>./bin</project.dirs.bin>
-    <project.dirs.resources>./resources</project.dirs.resources>
 
+    <!-- Define some directory paths -->
+    <project.dirs.base>${maven.multiModuleProjectDirectory}</project.dirs.base>
+    <project.dirs.bin>${project.dirs.base}/bin</project.dirs.bin>
+    <project.dirs.resources>${project.dirs.base}/resources</project.dirs.resources>
+
+    <!-- Define some file paths -->
     <project.files.checkstyle>${project.dirs.resources}/checkstyle_config.xml</project.files.checkstyle>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
