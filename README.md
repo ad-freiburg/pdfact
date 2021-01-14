@@ -131,3 +131,4 @@ docker run --rm -v /home/user/foo.pdf:/input.pdf pdfact input.pdf --format json 
 ```bash
 docker run --rm pdfact --help
 ```
+
