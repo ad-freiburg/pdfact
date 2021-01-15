@@ -53,7 +53,7 @@ Obviously, *Option 2* is much shorter and thus a bit more convenient to write.
 
 In the following, you will find some example commands that will give you an intuition on how to use *PdfAct* in general.
 Note that, for the sake of convenience, the commands are written in the shorter notation of Option 2.
-If you prefer to use the notation of Option 1 instead, just replace the "`./bin/pdfact`" prefixes in the commands below by "`java -jar ./bin/pdfact.jar`".
+If you prefer to use the notation of Option 1 instead, just replace the "`./pdfact`" prefixes in the commands below by "`java -jar ./pdfact.jar`".
 
 *(1) Extract all text blocks from a PDF file as plain text and print them to the console.*
 ```bash

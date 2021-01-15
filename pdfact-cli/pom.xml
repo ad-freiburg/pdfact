@@ -14,9 +14,12 @@
   <packaging>jar</packaging>
 
   <properties>
+    <!-- Define some dir paths. -->
+    <project.dirs.resources>${project.basedir}/src/main/resources</project.dirs.resources>
+
     <!-- Define some file paths -->
-    <project.files.jar>${project.dirs.bin}/${project.basename}.jar</project.files.jar>
-    <project.files.executable>${project.dirs.bin}/${project.basename}</project.files.executable>
+    <project.files.jar>${project.root.dirs.bin}/${project.basename}.jar</project.files.jar>
+    <project.files.executable>${project.root.dirs.bin}/${project.basename}</project.files.executable>
     <project.files.stub_sh>${project.dirs.resources}/stub.sh</project.files.stub_sh>
   </properties>
 
@@ -65,7 +68,7 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-              <outputDirectory>${project.dirs.bin}</outputDirectory>
+              <outputDirectory>${project.root.dirs.bin}</outputDirectory>
               <finalName>${project.basename}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <attach>false</attach>
@@ -91,6 +94,7 @@
             <configuration>
               <target>
                 <!-- Concat stub.sh and the jar file to ./bin/pdfact -->
+                <echo message="Hello ${project.files.stub_sh}"/>
                 <concat destfile="${project.files.executable}" binary="yes">
                   <fileset file="${project.files.stub_sh}"/>
                   <fileset file="${project.files.jar}"/>
