@@ -94,7 +94,6 @@
             <configuration>
               <target>
                 <!-- Concat stub.sh and the jar file to ./bin/pdfact -->
-                <echo message="Hello ${project.files.stub_sh}"/>
                 <concat destfile="${project.files.executable}" binary="yes">
                   <fileset file="${project.files.stub_sh}"/>
                   <fileset file="${project.files.jar}"/>
