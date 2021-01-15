@@ -54,6 +54,12 @@ public class PdfAct {
    */
   protected Set<SemanticRole> semanticRoles;
 
+  /**
+   * The boolean flag indicating whether or not this serializer should insert the page break marker
+   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   */
+  protected boolean insertPageBreakMarkers;
+
   // ==============================================================================================
 
   /**
@@ -119,6 +125,8 @@ public class PdfAct {
     if (this.semanticRoles != null) {
       service.setSemanticRolesToInclude(this.semanticRoles);
     }
+
+    service.setInsertPageBreakMarkers(this.insertPageBreakMarkers);
 
     // Create the PDF document from the given path.
     Document pdf = new Document(pdfPath);
@@ -272,6 +280,24 @@ public class PdfAct {
    */
   public void setSemanticRoles(Set<SemanticRole> semanticRoles) {
     this.semanticRoles = semanticRoles;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
+   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public boolean isInsertPageBreakMarkers() {
+    return this.insertPageBreakMarkers;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not this serializer should insert a page break
+   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
+    this.insertPageBreakMarkers = insertPageBreakMarkers;
   }
 }
 

@@ -9,8 +9,8 @@ import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
 /**
- * A pipe that wires up all necessary steps to identify the document structure
- * of PDF documents, serialize and visualize them to files.
+ * A pipe that wires up all necessary steps to identify the document structure of PDF documents,
+ * serialize and visualize them to files.
  * 
  * @author Claudius Korzen
  */
@@ -25,8 +25,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the path to the file where the serialization should be stored.
    * 
-   * @param path
-   *        The path to the file where the serialization should be stored.
+   * @param path The path to the file where the serialization should be stored.
    */
   void setSerializationPath(Path path);
 
@@ -42,8 +41,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the stream where the serialization should be stored.
    * 
-   * @param stream
-   *        The path to the file where the serialization should be stored.
+   * @param stream The path to the file where the serialization should be stored.
    */
   void setSerializationStream(OutputStream stream);
 
@@ -59,8 +57,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the target serialization format.
    * 
-   * @param format
-   *        The target serialization format.
+   * @param format The target serialization format.
    */
   void setSerializationFormat(SerializeFormat format);
 
@@ -76,8 +73,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the path to the file where the visualization should be stored.
    * 
-   * @param path
-   *        The path to the file where the visualization should be stored.
+   * @param path The path to the file where the visualization should be stored.
    */
   void setVisualizationPath(Path path);
 
@@ -93,8 +89,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the stream where the visualization should be stored.
    * 
-   * @param stream
-   *        The path to the file where the visualization should be stored.
+   * @param stream The path to the file where the visualization should be stored.
    */
   void setVisualizationStream(OutputStream stream);
 
@@ -110,8 +105,7 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the semantic roles to include.
    * 
-   * @param roles
-   *        The semantic roles to include.
+   * @param roles The semantic roles to include.
    */
   void setSemanticRolesToInclude(Set<SemanticRole> roles);
 
@@ -127,8 +121,21 @@ public interface PdfActServicePipe extends Pipe {
   /**
    * Sets the units to extract.
    * 
-   * @param units
-   *        The units to extract.
+   * @param units The units to extract.
    */
   void setExtractionUnits(Set<ExtractionUnit> units);
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
+   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public boolean isInsertPageBreakMarkers();
+
+  /**
+   * Sets the boolean flag indicating whether or not this serializer should insert a page break
+   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers);
 }

@@ -24,13 +24,12 @@ public interface SerializePdfPipe extends Pipe {
   /**
    * Sets the serialization format.
    * 
-   * @param format
-   *        The serialization format.
+   * @param format The serialization format.
    */
   void setSerializationFormat(SerializeFormat format);
 
   // ==============================================================================================
-  
+
   /**
    * Returns the target stream.
    * 
@@ -41,13 +40,12 @@ public interface SerializePdfPipe extends Pipe {
   /**
    * Sets the target stream.
    * 
-   * @param stream
-   *        The target stream.
+   * @param stream The target stream.
    */
   void setTargetStream(OutputStream stream);
-  
+
   // ==============================================================================================
-  
+
   /**
    * Returns the target path.
    * 
@@ -58,13 +56,12 @@ public interface SerializePdfPipe extends Pipe {
   /**
    * Sets the target path.
    * 
-   * @param path
-   *        The target path.
+   * @param path The target path.
    */
   void setTargetPath(Path path);
-  
+
   // ==============================================================================================
-  
+
   /**
    * Returns the units to extract.
    * 
@@ -75,8 +72,7 @@ public interface SerializePdfPipe extends Pipe {
   /**
    * Sets the units to extract.
    * 
-   * @param units
-   *        The units to extract.
+   * @param units The units to extract.
    */
   void setExtractionUnits(Set<ExtractionUnit> units);
 
@@ -92,8 +88,21 @@ public interface SerializePdfPipe extends Pipe {
   /**
    * Sets the semantic roles to include.
    * 
-   * @param roles
-   *        The semantic roles to include.
+   * @param roles The semantic roles to include.
    */
   void setSemanticRolesToInclude(Set<SemanticRole> roles);
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
+   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public boolean isInsertPageBreakMarkers();
+
+  /**
+   * Sets the boolean flag indicating whether or not this serializer should insert a page break
+   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers);
 }

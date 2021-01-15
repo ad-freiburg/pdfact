@@ -37,4 +37,12 @@ public class PdfActCliSettings {
   static {
     DEFAULT_SEMANTIC_ROLES = new HashSet<>();
   }
+
+
+  /**
+   * The default boolean flag indicating whether or not the TXT serializer should insert a page
+   * break marker between two PDF elements in case a page break between the two elements occurs in
+   * the PDF.
+   */
+  public static final boolean DEFAULT_INSERT_PAGE_BREAK_MARKERS = false;
 }

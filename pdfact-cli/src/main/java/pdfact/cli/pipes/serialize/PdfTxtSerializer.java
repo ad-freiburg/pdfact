@@ -12,10 +12,11 @@ import pdfact.core.model.Document;
 import pdfact.core.model.Element;
 import pdfact.core.model.HasColor;
 import pdfact.core.model.HasPosition;
+import pdfact.core.model.HasPositions;
 import pdfact.core.model.HasSemanticRole;
 import pdfact.core.model.HasText;
 import pdfact.core.model.Paragraph;
-import pdfact.core.model.Rectangle;
+import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
@@ -23,12 +24,24 @@ import pdfact.core.model.Word;
 import pdfact.core.util.PdfActUtils;
 
 /**
- * An implementation of {@link PdfSerializer} that serializes a PDF document
- * in TXT format.
+ * An implementation of {@link PdfSerializer} that serializes a PDF document in TXT format.
  *
  * @author Claudius Korzen
  */
 public class PdfTxtSerializer implements PdfSerializer {
+  /**
+   * The page break marker to optionally insert when a page break occurs in the PDF.
+   */
+  protected static final String PAGE_BREAK_MARKER = "\f";
+
+  // ==============================================================================================
+
+  /**
+   * The boolean flag indicating whether or not this serializer should insert the page break marker
+   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   */
+  protected boolean insertPageBreakMarkers;
+
   /**
    * The units to serialize.
    */
@@ -40,30 +53,40 @@ public class PdfTxtSerializer implements PdfSerializer {
   protected Set<SemanticRole> semanticRolesToInclude;
 
   /**
+   * The position of the last serialized PDF element.
+   */
+  protected Position prevPosition;
+
+  /**
    * The delimiter to use on joining the serialized elements.
    */
-  protected static final String TYPES_DELIMITER = System.lineSeparator()
-      + System.lineSeparator();
+  protected static final String TYPES_DELIMITER = System.lineSeparator() + System.lineSeparator();
 
   // ==============================================================================================
 
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
+   * 
+   * @param insertPageBreakMarkers Whether or not page break markers should be inserted between two
+   *                               elements in case a page breaks occurs between the two elements in
+   *                               the PDF.
    */
-  public PdfTxtSerializer() {
-
+  public PdfTxtSerializer(boolean insertPageBreakMarkers) {
+    this.insertPageBreakMarkers = insertPageBreakMarkers;
   }
 
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
-   * @param extractionUnits
-   *        The units to serialize.
-   * @param roles
-   *        The semantic roles to include on serialization.
+   * @param insertPageBreakMarkers Whether or not page break markers should be inserted between two
+   *                               elements in case a page breaks occurs between the two elements in
+   *                               the PDF.
+   * @param extractionUnits        The units to serialize.
+   * @param roles                  The semantic roles to include on serialization.
    */
-  public PdfTxtSerializer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> roles) {
-    this();
+  public PdfTxtSerializer(boolean insertPageBreakMarkers, Set<ExtractionUnit> extractionUnits,
+          Set<SemanticRole> roles) {
+    this(insertPageBreakMarkers);
     this.extractionUnits = extractionUnits;
     this.semanticRolesToInclude = roles;
   }
@@ -72,6 +95,8 @@ public class PdfTxtSerializer implements PdfSerializer {
 
   @Override
   public byte[] serialize(Document pdf) {
+    this.prevPosition = null;
+
     // The serialization to return.
     String result = "";
 
@@ -94,8 +119,7 @@ public class PdfTxtSerializer implements PdfSerializer {
   /**
    * Serializes the elements of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    *
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -122,8 +146,7 @@ public class PdfTxtSerializer implements PdfSerializer {
   /**
    * Serializes the paragraphs of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -146,12 +169,11 @@ public class PdfTxtSerializer implements PdfSerializer {
 
     return result;
   }
-  
+
   /**
    * Serializes the given paragraph.
    * 
-   * @param paragraph
-   *        The paragraph to serialize.
+   * @param paragraph The paragraph to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -160,12 +182,11 @@ public class PdfTxtSerializer implements PdfSerializer {
   }
 
   // ==============================================================================================
-  
+
   /**
    * Serializes the words of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -190,12 +211,11 @@ public class PdfTxtSerializer implements PdfSerializer {
 
     return result;
   }
-  
+
   /**
    * Serializes the given word.
    * 
-   * @param word
-   *        The word to serialize.
+   * @param word The word to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -204,12 +224,11 @@ public class PdfTxtSerializer implements PdfSerializer {
   }
 
   // ==============================================================================================
-  
+
   /**
    * Serializes the characters of the given PDF document.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -236,12 +255,11 @@ public class PdfTxtSerializer implements PdfSerializer {
 
     return result;
   }
-  
+
   /**
    * Serializes the given character.
    * 
-   * @param character
-   *        The character to serialize.
+   * @param character The character to serialize.
    *
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -254,30 +272,74 @@ public class PdfTxtSerializer implements PdfSerializer {
   /**
    * Serializes the given PDF element.
    * 
-   * @param element
-   *        The PDF element to serialize.
+   * @param element The PDF element to serialize.
    *
    * @return A list of strings that represent the lines of the serialization.
    */
   protected List<String> serializePdfElement(Element element) {
     List<String> result = new ArrayList<>();
 
+    Position position = null;
+    Color color = null;
+
     if (element instanceof HasText) {
       HasText hasText = (HasText) element;
       String text = hasText.getText();
 
-      if (element instanceof HasPosition && element instanceof  HasColor) {
-        HasPosition hasPosition = (HasPosition) element;
-        HasColor hasColor = (HasColor) element;
-        Rectangle rect = hasPosition.getPosition().getRectangle();
-        Color color = hasColor.getColor();
-        result.add(text + " " + rect + " " + Arrays.toString(color.getRGB()));
+      // Determine the (first) position of the element.
+      if (element instanceof HasPositions) {
+        position = ((HasPositions) element).getFirstPosition();
+      }
+      if (element instanceof HasPosition) {
+        position = ((HasPosition) element).getPosition();
+      }
+
+      // Determine the color of the element.
+      if (element instanceof HasColor) {
+        color = ((HasColor) element).getColor();
+      }
+
+      // Check if we have to insert a page break marker.
+      if (insertPageBreakMarkers) {
+        // Insert a page break marker between the previous element and the current element if the
+        // page numbers of both elements differ.
+        if (prevPosition != null && position != null) {
+          if (prevPosition.getPageNumber() != position.getPageNumber()) {
+            result.add(PAGE_BREAK_MARKER);
+          }
+        }
+      }
+
+      if (position != null && color != null) {
+        result.add(text + " " + position.getRectangle() + " " + Arrays.toString(color.getRGB()));
       } else {
         result.add(text);
       }
     }
 
+    // Keep track of the position of this element, in order to decide if we have to insert a
+    // page separator between this element and the next element.
+    this.prevPosition = position;
+
     return result;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
+   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public boolean isInsertPageBreakMarkers() {
+    return this.insertPageBreakMarkers;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not this serializer should insert a page break
+   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
+    this.insertPageBreakMarkers = insertPageBreakMarkers;
   }
 
   // ==============================================================================================
@@ -307,7 +369,7 @@ public class PdfTxtSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element is relevant, that is: if it is included in 
+   * Checks if the semantic role of the given element is relevant, that is: if it is included in
    * this.semanticRolesToInclude.
    * 
    * @param element The element to check.
@@ -331,15 +393,14 @@ public class PdfTxtSerializer implements PdfSerializer {
 
     return this.semanticRolesToInclude.contains(role);
   }
-  
+
   // ==============================================================================================
   // Remaining methods.
-  
+
   /**
    * Serializes the given text block.
    * 
-   * @param block
-   *        The text block to serialize.
+   * @param block The text block to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
@@ -347,12 +408,11 @@ public class PdfTxtSerializer implements PdfSerializer {
     return serializePdfElement(block);
   }
 
- 
+
   /**
    * Serializes the given text line.
    * 
-   * @param line
-   *        The text line to serialize.
+   * @param line The text line to serialize.
    * 
    * @return A list of strings that represent the lines of the serialization.
    */

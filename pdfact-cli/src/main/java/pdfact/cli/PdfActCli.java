@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.helper.HelpScreenException;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -89,6 +90,9 @@ public class PdfActCli {
         roles.removeAll(parser.getSemanticRolesToExclude());
       }
       pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
+
+      // Set the "insert page break markers"-flag.
+      pdfAct.setInsertPageBreakMarkers(parser.isInsertPageBreakMarkers()); 
 
       // Run PdfAct.
       pdfAct.parse(parser.getPdfPath());
@@ -242,6 +246,21 @@ public class PdfActCli {
     @Arg(dest = LOG_LEVEL)
     protected int logLevel = PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel();
 
+   // ============================================================================================
+
+    /**
+     * The name of the option to define the "insert page break markers" flag.
+     */
+    protected static final String INSERT_PAGE_BREAK_MARKERS = "insertPageBreakMarkers";
+
+    /**
+     * The flag indicating whether or not to insert page break markers into the serialization 
+     * output.
+     */
+    @Arg(dest = INSERT_PAGE_BREAK_MARKERS)
+    protected boolean insertPageBreakMarkers = false;
+
+
     // ============================================================================================
 
     /**
@@ -299,7 +318,7 @@ public class PdfActCli {
             + " words\", the output will be broken down by words, that is: the text and layout "
             + "information are provided word-wise.");
 
-      // Add an argument to define the semantic role(s) to include.
+      // Add an option to define the semantic role(s) to include.
       choicesStr = String.join(", ", SemanticRole.getNames());
       defaultStr = String.join(",", this.semanticRolesToInclude);
       this.parser.addArgument("--" + INCLUDE_SEMANTIC_ROLES).dest(INCLUDE_SEMANTIC_ROLES)
@@ -320,7 +339,7 @@ public class PdfActCli {
             + "NOTE: The detection of the semantic roles of the text elements is still in an "
             + "experimental state. So don't expect the semantic roles to be highly accurate.");
 
-      // Add an argument to define the semantic role(s) to exclude.
+      // Add an option to define the semantic role(s) to exclude.
       defaultStr = String.join(",", this.semanticRolesToExclude);
       this.parser.addArgument("--" + EXCLUDE_SEMANTIC_ROLES).dest(EXCLUDE_SEMANTIC_ROLES)
         .required(false)
@@ -338,7 +357,7 @@ public class PdfActCli {
             + "NOTE: The detection of the semantic roles of the text elements is still in an "
             + "experimental state. So don't expect the semantic roles to be highly accurate.");
 
-      // Add an argument to define the target path for the visualization.
+      // Add an option to define the target path for the visualization.
       this.parser.addArgument("--" + VISUALIZATION_PATH).dest(VISUALIZATION_PATH)
         .required(false)
         .type(String.class)
@@ -349,7 +368,7 @@ public class PdfActCli {
             + "should be written to. The file doesn't have to be existent before. If not "
             + "specified, no such visualization will be created.");
 
-      // Add an argument to define the log level.
+      // Add an option to define the log level.
       StringBuilder choiceStr = new StringBuilder();
       int i = 0;
       for (LogLevel level : LogLevel.getLogLevels()) {
@@ -357,7 +376,6 @@ public class PdfActCli {
         choiceStr.append(i < LogLevel.getLogLevels().size() - 1 ? ", " : "");
         i++;
       }
-
       LogLevel debugLevel = LogLevel.DEBUG;
       this.parser.addArgument("--" + LOG_LEVEL).dest(LOG_LEVEL)
         .required(false)
@@ -369,6 +387,16 @@ public class PdfActCli {
             + "- Available options: " + choiceStr.toString() + ".\n" 
             + "- Default: " + this.logLevel + ".\n"
             + "This defines the minimum level of severity required for a message to be logged.");
+      
+      // Add an option to define whether or not page break markers should be inserted into the
+      // serialization output.
+      this.parser.addArgument("--" + INSERT_PAGE_BREAK_MARKERS).dest(INSERT_PAGE_BREAK_MARKERS)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.insertPageBreakMarkers)
+        .help("If enabled, a page break marker (the character \"^L\") is inserted between two "
+            + "elements in the TXT serialization output when a page break occurs between the two "
+            + "elements in the PDF.");
     }
 
     /**
@@ -539,7 +567,15 @@ public class PdfActCli {
     public int getLogLevel() {
       return this.logLevel;
     }
+
+    // ============================================================================================
+    
+    public boolean isInsertPageBreakMarkers() {
+      return this.insertPageBreakMarkers;
+    }
   }
+
+  // ==============================================================================================
 
   /**
    * Argument action to store argument value or a given default value if the argument value is null.

@@ -75,6 +75,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected Set<SemanticRole> roles;
 
+  /**
+   * The boolean flag indicating whether or not this serializer should insert the page break marker
+   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   */
+  protected boolean insertPageBreakMarkers;
+
   // ==============================================================================================
 
   /**
@@ -122,6 +128,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
       serializePipe.setSerializationFormat(this.serializationFormat);
       serializePipe.setExtractionUnits(this.extractionUnits);
       serializePipe.setSemanticRolesToInclude(this.roles);
+      serializePipe.setInsertPageBreakMarkers(this.insertPageBreakMarkers);
       serializePipe.setTargetPath(this.serializationPath);
       serializePipe.setTargetStream(this.serializationStream);
       pipeline.addPipe(serializePipe);
@@ -240,5 +247,23 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   @Override
   public void setExtractionUnits(Set<ExtractionUnit> units) {
     this.extractionUnits = units;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
+   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public boolean isInsertPageBreakMarkers() {
+    return this.insertPageBreakMarkers;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not this serializer should insert a page break
+   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   */
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
+    this.insertPageBreakMarkers = insertPageBreakMarkers;
   }
 }

@@ -1,6 +1,7 @@
 package pdfact.cli.pipes.serialize;
 
 import static pdfact.cli.PdfActCliSettings.DEFAULT_EXTRACTION_UNITS;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_INSERT_PAGE_BREAK_MARKERS;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SERIALIZE_FORMAT;
 import java.io.IOException;
@@ -53,6 +54,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   protected Set<SemanticRole> semanticRolesToInclude;
 
+  /**
+   * The boolean flag indicating whether or not the TXT serializer should insert a page break marker
+   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   */
+  protected boolean insertPageBreakMarkers;
+
   // ==============================================================================================
 
   /**
@@ -62,6 +69,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.format = DEFAULT_SERIALIZE_FORMAT;
     this.extractionUnits = DEFAULT_EXTRACTION_UNITS;
     this.semanticRolesToInclude = DEFAULT_SEMANTIC_ROLES;
+    this.insertPageBreakMarkers = DEFAULT_INSERT_PAGE_BREAK_MARKERS;
   }
 
   // ==============================================================================================
@@ -86,10 +94,8 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * Serializes the given PDF document.
    * 
-   * @param pdf
-   *        The PDf document to serialize.
-   * @throws PdfActException
-   *         If something went wrong while serializing the PDF document.
+   * @param pdf The PDf document to serialize.
+   * @throws PdfActException If something went wrong while serializing the PDF document.
    */
   protected void serialize(Document pdf) throws PdfActException {
     // Instantiate a serializer.
@@ -102,11 +108,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
         serializer = new PdfJsonSerializer(this.extractionUnits, this.semanticRolesToInclude);
         break;
       case TXT:
-        serializer = new PdfTxtSerializer(this.extractionUnits, this.semanticRolesToInclude);
+        serializer = new PdfTxtSerializer(this.insertPageBreakMarkers, this.extractionUnits,
+                this.semanticRolesToInclude);
         break;
       default:
         throw new PdfActSerializeException(
-          "Couldn't find a serializer for the format '" + this.format + "'.");
+                "Couldn't find a serializer for the format '" + this.format + "'.");
     }
 
     // Serialize the PDF document.
@@ -126,15 +133,11 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * Writes the given bytes to the given output stream.
    * 
-   * @param bytes
-   *        The bytes to write.
-   * @param stream
-   *        The stream to write to.
-   * @throws PdfActSerializeException
-   *         If something went wrong while writing the bytes to the stream.
+   * @param bytes  The bytes to write.
+   * @param stream The stream to write to.
+   * @throws PdfActSerializeException If something went wrong while writing the bytes to the stream.
    */
-  protected void writeToStream(byte[] bytes, OutputStream stream)
-      throws PdfActSerializeException {
+  protected void writeToStream(byte[] bytes, OutputStream stream) throws PdfActSerializeException {
     try {
       stream.write(bytes);
     } catch (IOException e) {
@@ -145,15 +148,11 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * Writes the given bytes to the given file.
    * 
-   * @param bytes
-   *        The bytes to write.
-   * @param path
-   *        The file to write to.
-   * @throws PdfActSerializeException
-   *         If something went wrong while writing the bytes to the stream.
+   * @param bytes The bytes to write.
+   * @param path  The file to write to.
+   * @throws PdfActSerializeException If something went wrong while writing the bytes to the stream.
    */
-  protected void writeToPath(byte[] bytes, Path path)
-      throws PdfActSerializeException {
+  protected void writeToPath(byte[] bytes, Path path) throws PdfActSerializeException {
     try (OutputStream os = Files.newOutputStream(path)) {
       os.write(bytes);
     } catch (IOException e) {
@@ -219,5 +218,17 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   @Override
   public void setTargetPath(Path path) {
     this.targetPath = path;
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public boolean isInsertPageBreakMarkers() {
+    return this.insertPageBreakMarkers;
+  }
+
+  @Override
+  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
+    this.insertPageBreakMarkers = insertPageBreakMarkers;
   }
 }
