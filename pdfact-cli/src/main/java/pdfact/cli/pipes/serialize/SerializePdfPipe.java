@@ -95,14 +95,16 @@ public interface SerializePdfPipe extends Pipe {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
-   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Returns the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public boolean isInsertPageBreakMarkers();
+  public boolean isWithControlCharacters();
 
   /**
-   * Sets the boolean flag indicating whether or not this serializer should insert a page break
-   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Sets the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers);
+  public void setWithControlCharacters(boolean withControlCharacters);
 }

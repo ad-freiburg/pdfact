@@ -55,10 +55,11 @@ public class PdfAct {
   protected Set<SemanticRole> semanticRoles;
 
   /**
-   * The boolean flag indicating whether or not this serializer should insert the page break marker
-   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   * The boolean flag indicating whether or not this serializer should insert control characters, 
+   * i.e.: "^L" between two PDF elements in case a page break between the two elements occurs in
+   * the PDF and "^A" in front of headings.
    */
-  protected boolean insertPageBreakMarkers;
+  protected boolean withControlCharacters;
 
   // ==============================================================================================
 
@@ -126,7 +127,7 @@ public class PdfAct {
       service.setSemanticRolesToInclude(this.semanticRoles);
     }
 
-    service.setInsertPageBreakMarkers(this.insertPageBreakMarkers);
+    service.setWithControlCharacters(this.withControlCharacters);
 
     // Create the PDF document from the given path.
     Document pdf = new Document(pdfPath);
@@ -285,19 +286,21 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
-   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Returns the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public boolean isInsertPageBreakMarkers() {
-    return this.insertPageBreakMarkers;
+  public boolean isWithControlCharacters() {
+    return this.withControlCharacters;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not this serializer should insert a page break
-   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Sets the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
-    this.insertPageBreakMarkers = insertPageBreakMarkers;
+  public void setWithControlCharacters(boolean withControlCharacters) {
+    this.withControlCharacters = withControlCharacters;
   }
 }
 

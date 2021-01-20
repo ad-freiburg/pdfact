@@ -30,17 +30,23 @@ import pdfact.core.util.PdfActUtils;
  */
 public class PdfTxtSerializer implements PdfSerializer {
   /**
-   * The page break marker to optionally insert when a page break occurs in the PDF.
+   * The control character to optionally insert when a page break occurs in the PDF.
    */
-  protected static final String PAGE_BREAK_MARKER = "\f";
+  protected static final char PAGE_BREAK_CONTROL_CHARACTER = '\f';
+
+  /**
+   * The control character to optionally insert in front of a heading.
+   */
+  protected static final char HEADING_CONTROL_CHARACTER = '\u0001';
 
   // ==============================================================================================
 
   /**
-   * The boolean flag indicating whether or not this serializer should insert the page break marker
-   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+   * The default boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  protected boolean insertPageBreakMarkers;
+  protected boolean withControlCharacters;
 
   /**
    * The units to serialize.
@@ -67,26 +73,22 @@ public class PdfTxtSerializer implements PdfSerializer {
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
-   * @param insertPageBreakMarkers Whether or not page break markers should be inserted between two
-   *                               elements in case a page breaks occurs between the two elements in
-   *                               the PDF.
+   * @param withControlCharacters Whether or not control characters should be inserted.
    */
-  public PdfTxtSerializer(boolean insertPageBreakMarkers) {
-    this.insertPageBreakMarkers = insertPageBreakMarkers;
+  public PdfTxtSerializer(boolean withControlCharacters) {
+    this.withControlCharacters = withControlCharacters;
   }
 
   /**
    * Creates a new serializer that serializes a PDF document in TXT format.
    * 
-   * @param insertPageBreakMarkers Whether or not page break markers should be inserted between two
-   *                               elements in case a page breaks occurs between the two elements in
-   *                               the PDF.
-   * @param extractionUnits        The units to serialize.
-   * @param roles                  The semantic roles to include on serialization.
+   * @param withControlCharacters Whether or not control characters should be inserted.
+   * @param extractionUnits       The units to serialize.
+   * @param roles                 The semantic roles to include on serialization.
    */
-  public PdfTxtSerializer(boolean insertPageBreakMarkers, Set<ExtractionUnit> extractionUnits,
+  public PdfTxtSerializer(boolean withControlCharacters, Set<ExtractionUnit> extractionUnits,
           Set<SemanticRole> roles) {
-    this(insertPageBreakMarkers);
+    this(withControlCharacters);
     this.extractionUnits = extractionUnits;
     this.semanticRolesToInclude = roles;
   }
@@ -162,7 +164,15 @@ public class PdfTxtSerializer implements PdfSerializer {
 
         List<String> paragraphLines = serializeParagraph(paragraph);
         if (paragraphLines != null) {
-          result.addAll(paragraphLines);
+          for (String paragraphLine : paragraphLines) {      
+            // Check if we have to insert control character for the headings.
+            if (withControlCharacters) {
+              if (paragraph.getSemanticRole() == SemanticRole.HEADING) {
+                paragraphLine = HEADING_CONTROL_CHARACTER + paragraphLine;
+              }
+            }
+            result.add(paragraphLine);
+          }
         }
       }
     }
@@ -299,13 +309,13 @@ public class PdfTxtSerializer implements PdfSerializer {
         color = ((HasColor) element).getColor();
       }
 
-      // Check if we have to insert a page break marker.
-      if (insertPageBreakMarkers) {
-        // Insert a page break marker between the previous element and the current element if the
-        // page numbers of both elements differ.
+      // Check if we have to insert the control characters that marks page breaks.
+      if (withControlCharacters) {
+        // Insert the page break control characters between the previous element and the current
+        // element if the page numbers of both elements differ.
         if (prevPosition != null && position != null) {
           if (prevPosition.getPageNumber() != position.getPageNumber()) {
-            result.add(PAGE_BREAK_MARKER);
+            result.add(java.lang.Character.toString(PAGE_BREAK_CONTROL_CHARACTER));
           }
         }
       }
@@ -327,19 +337,21 @@ public class PdfTxtSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not this serializer inserts a page break marker
-   * between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Returns the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public boolean isInsertPageBreakMarkers() {
-    return this.insertPageBreakMarkers;
+  public boolean isWithControlCharacters() {
+    return this.withControlCharacters;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not this serializer should insert a page break
-   * marker between two PDF elements when a page break between the two elements occurs in the PDF.
+   * Sets the boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
-    this.insertPageBreakMarkers = insertPageBreakMarkers;
+  public void setWithControlCharacters(boolean withControlCharacters) {
+    this.withControlCharacters = withControlCharacters;
   }
 
   // ==============================================================================================

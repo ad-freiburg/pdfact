@@ -91,8 +91,8 @@ public class PdfActCli {
       }
       pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
 
-      // Set the "insert page break markers"-flag.
-      pdfAct.setInsertPageBreakMarkers(parser.isInsertPageBreakMarkers()); 
+      // Set the "with control characters"-flag.
+      pdfAct.setWithControlCharacters(parser.isWithControlCharacters()); 
 
       // Run PdfAct.
       pdfAct.parse(parser.getPdfPath());
@@ -249,16 +249,16 @@ public class PdfActCli {
    // ============================================================================================
 
     /**
-     * The name of the option to define the "insert page break markers" flag.
+     * The name of the option to define the "with control characters" flag.
      */
-    protected static final String INSERT_PAGE_BREAK_MARKERS = "insertPageBreakMarkers";
+    protected static final String WITH_CONTROL_CHARACTERS = "withControlCharacters";
 
     /**
-     * The flag indicating whether or not to insert page break markers into the serialization 
+     * The flag indicating whether or not to add control characters to the TXT serialization 
      * output.
      */
-    @Arg(dest = INSERT_PAGE_BREAK_MARKERS)
-    protected boolean insertPageBreakMarkers = false;
+    @Arg(dest = WITH_CONTROL_CHARACTERS)
+    protected boolean withControlCharacters = false;
 
 
     // ============================================================================================
@@ -388,15 +388,17 @@ public class PdfActCli {
             + "- Default: " + this.logLevel + ".\n"
             + "This defines the minimum level of severity required for a message to be logged.");
       
-      // Add an option to define whether or not page break markers should be inserted into the
-      // serialization output.
-      this.parser.addArgument("--" + INSERT_PAGE_BREAK_MARKERS).dest(INSERT_PAGE_BREAK_MARKERS)
+      // Add an option to define whether or not control characters (which identify headings and
+      // page breaks should be inserted into the TXT serialization output.
+      this.parser.addArgument("--" + WITH_CONTROL_CHARACTERS).dest(WITH_CONTROL_CHARACTERS)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.insertPageBreakMarkers)
-        .help("If enabled, a page break marker (the character \"^L\") is inserted between two "
-            + "elements in the TXT serialization output when a page break occurs between the two "
-            + "elements in the PDF.");
+        .setDefault(this.withControlCharacters)
+        .help("If enabled, the following control characters will be added to the TXT serialization "
+             + " output:\n"
+             + "- \"^L\" between two elements when a page break occurs between the two elements in "
+             + "the PDF.\n"
+             + "- \"^A\" in front of headings.");
     }
 
     /**
@@ -570,8 +572,8 @@ public class PdfActCli {
 
     // ============================================================================================
     
-    public boolean isInsertPageBreakMarkers() {
-      return this.insertPageBreakMarkers;
+    public boolean isWithControlCharacters() {
+      return this.withControlCharacters;
     }
   }
 

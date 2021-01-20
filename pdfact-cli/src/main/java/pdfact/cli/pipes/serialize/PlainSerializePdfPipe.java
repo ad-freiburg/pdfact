@@ -1,9 +1,9 @@
 package pdfact.cli.pipes.serialize;
 
 import static pdfact.cli.PdfActCliSettings.DEFAULT_EXTRACTION_UNITS;
-import static pdfact.cli.PdfActCliSettings.DEFAULT_INSERT_PAGE_BREAK_MARKERS;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SEMANTIC_ROLES;
 import static pdfact.cli.PdfActCliSettings.DEFAULT_SERIALIZE_FORMAT;
+import static pdfact.cli.PdfActCliSettings.DEFAULT_WITH_CONTROL_CHARACTERS;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -54,11 +54,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   protected Set<SemanticRole> semanticRolesToInclude;
 
-  /**
-   * The boolean flag indicating whether or not the TXT serializer should insert a page break marker
-   * between two PDF elements in case a page break between the two elements occurs in the PDF.
+ /**
+   * The boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  protected boolean insertPageBreakMarkers;
+  protected boolean withControlCharacters;
 
   // ==============================================================================================
 
@@ -69,7 +70,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
     this.format = DEFAULT_SERIALIZE_FORMAT;
     this.extractionUnits = DEFAULT_EXTRACTION_UNITS;
     this.semanticRolesToInclude = DEFAULT_SEMANTIC_ROLES;
-    this.insertPageBreakMarkers = DEFAULT_INSERT_PAGE_BREAK_MARKERS;
+    this.withControlCharacters = DEFAULT_WITH_CONTROL_CHARACTERS;
   }
 
   // ==============================================================================================
@@ -108,7 +109,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
         serializer = new PdfJsonSerializer(this.extractionUnits, this.semanticRolesToInclude);
         break;
       case TXT:
-        serializer = new PdfTxtSerializer(this.insertPageBreakMarkers, this.extractionUnits,
+        serializer = new PdfTxtSerializer(this.withControlCharacters, this.extractionUnits,
                 this.semanticRolesToInclude);
         break;
       default:
@@ -223,12 +224,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==============================================================================================
 
   @Override
-  public boolean isInsertPageBreakMarkers() {
-    return this.insertPageBreakMarkers;
+  public boolean isWithControlCharacters() {
+    return this.withControlCharacters;
   }
 
   @Override
-  public void setInsertPageBreakMarkers(boolean insertPageBreakMarkers) {
-    this.insertPageBreakMarkers = insertPageBreakMarkers;
+  public void setWithControlCharacters(boolean withControlCharacters) {
+    this.withControlCharacters = withControlCharacters;
   }
 }

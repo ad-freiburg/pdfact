@@ -40,9 +40,9 @@ public class PdfActCliSettings {
 
 
   /**
-   * The default boolean flag indicating whether or not the TXT serializer should insert a page
-   * break marker between two PDF elements in case a page break between the two elements occurs in
-   * the PDF.
+   * The default boolean flag indicating whether or not this serializer should insert control
+   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
+   * occurs in the PDF and "^A" in front of headings.
    */
-  public static final boolean DEFAULT_INSERT_PAGE_BREAK_MARKERS = false;
+  public static final boolean DEFAULT_WITH_CONTROL_CHARACTERS = false;
 }
