@@ -251,7 +251,7 @@ public class PdfActCli {
     /**
      * The name of the option to define the "with control characters" flag.
      */
-    protected static final String WITH_CONTROL_CHARACTERS = "withControlCharacters";
+    protected static final String WITH_CONTROL_CHARACTERS = "with-control-characters";
 
     /**
      * The flag indicating whether or not to add control characters to the TXT serialization 

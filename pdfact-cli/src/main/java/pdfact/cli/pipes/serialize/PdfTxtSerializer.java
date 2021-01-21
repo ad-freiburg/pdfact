@@ -162,21 +162,31 @@ public class PdfTxtSerializer implements PdfSerializer {
           continue;
         }
 
-        List<String> paragraphLines = serializeParagraph(paragraph);
-        if (paragraphLines != null) {
-          for (String paragraphLine : paragraphLines) {      
-            // Check if we have to insert control character for the headings.
-            if (withControlCharacters) {
-              if (paragraph.getSemanticRole() == SemanticRole.HEADING) {
-                paragraphLine = HEADING_CONTROL_CHARACTER + paragraphLine;
+        Position position = paragraph.getFirstPosition();
+        String paragraphStr = serializeParagraph(paragraph);
+                
+        if (paragraphStr != null) {
+          // Check if we have to insert control characters.
+          if (withControlCharacters) {
+            // Check if we have to insert the control character that identifies a heading.
+            if (!paragraphStr.isEmpty() && paragraph.getSemanticRole() == SemanticRole.HEADING) {
+              paragraphStr = HEADING_CONTROL_CHARACTER + paragraphStr;
+            }
+
+            // Check if we have to insert the control character that identifies a page break.
+            if (prevPosition != null && position != null) {
+              if (prevPosition.getPageNumber() != position.getPageNumber()) {
+                result.add(java.lang.Character.toString(PAGE_BREAK_CONTROL_CHARACTER));
               }
             }
-            result.add(paragraphLine);
           }
+          result.add(paragraphStr);
         }
+        // Keep track of the position of this element, for deciding if a page break occured between
+        // this paragraph and the next paragraph.
+        this.prevPosition = position;
       }
     }
-
     return result;
   }
 
@@ -187,7 +197,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeParagraph(Paragraph paragraph) {
+  protected String serializeParagraph(Paragraph paragraph) {
     return serializePdfElement(paragraph);
   }
 
@@ -211,9 +221,9 @@ public class PdfTxtSerializer implements PdfSerializer {
         }
 
         for (Word word : paragraph.getWords()) {
-          List<String> wordLines = serializeWord(word);
-          if (wordLines != null) {
-            result.addAll(wordLines);
+          String wordStr = serializeWord(word);
+          if (wordStr != null) {
+            result.add(wordStr);
           }
         }
       }
@@ -229,7 +239,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeWord(Word word) {
+  protected String serializeWord(Word word) {
     return serializePdfElement(word);
   }
 
@@ -254,9 +264,9 @@ public class PdfTxtSerializer implements PdfSerializer {
 
         for (Word word : paragraph.getWords()) {
           for (Character character : word.getCharacters()) {
-            List<String> characterLines = serializeCharacter(character);
-            if (characterLines != null) {
-              result.addAll(characterLines);
+            String characterStr = serializeCharacter(character);
+            if (characterStr != null) {
+              result.add(characterStr);
             }
           }
         }
@@ -273,7 +283,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    *
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeCharacter(Character character) {
+  protected String serializeCharacter(Character character) {
     return serializePdfElement(character);
   }
 
@@ -286,9 +296,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    *
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializePdfElement(Element element) {
-    List<String> result = new ArrayList<>();
-
+  protected String serializePdfElement(Element element) {
     Position position = null;
     Color color = null;
 
@@ -309,29 +317,14 @@ public class PdfTxtSerializer implements PdfSerializer {
         color = ((HasColor) element).getColor();
       }
 
-      // Check if we have to insert the control characters that marks page breaks.
-      if (withControlCharacters) {
-        // Insert the page break control characters between the previous element and the current
-        // element if the page numbers of both elements differ.
-        if (prevPosition != null && position != null) {
-          if (prevPosition.getPageNumber() != position.getPageNumber()) {
-            result.add(java.lang.Character.toString(PAGE_BREAK_CONTROL_CHARACTER));
-          }
-        }
-      }
-
       if (position != null && color != null) {
-        result.add(text + " " + position.getRectangle() + " " + Arrays.toString(color.getRGB()));
+        return text + " " + position.getRectangle() + " " + Arrays.toString(color.getRGB());
       } else {
-        result.add(text);
+        return text;
       }
     }
 
-    // Keep track of the position of this element, in order to decide if we have to insert a
-    // page separator between this element and the next element.
-    this.prevPosition = position;
-
-    return result;
+    return null;
   }
 
   // ==============================================================================================
@@ -416,7 +409,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeTextBlock(TextBlock block) {
+  protected String serializeTextBlock(TextBlock block) {
     return serializePdfElement(block);
   }
 
@@ -428,7 +421,7 @@ public class PdfTxtSerializer implements PdfSerializer {
    * 
    * @return A list of strings that represent the lines of the serialization.
    */
-  protected List<String> serializeTextLine(TextLine line) {
+  protected String serializeTextLine(TextLine line) {
     return serializePdfElement(line);
   }
 }
