@@ -212,6 +212,9 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
           if (otherBlock.getSemanticRole() == SemanticRole.HEADING) {
             break;
           }
+          if (otherBlock.getSemanticRole() == SemanticRole.ITEMIZE_ITEM) {
+            break;
+          }
           if (otherBlock.getSemanticRole() == SemanticRole.BODY_TEXT) {
             if (!belongsToParagraph(otherBlock, paragraphBlocks)) {
               break;
