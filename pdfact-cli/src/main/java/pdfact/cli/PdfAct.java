@@ -1,15 +1,17 @@
 package pdfact.cli;
 
+import static org.apache.logging.log4j.Level.DEBUG;
+import static org.apache.logging.log4j.Level.ERROR;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import org.apache.logging.log4j.core.config.Configurator;
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.core.model.Document;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -19,11 +21,6 @@ import pdfact.core.util.exception.PdfActException;
  * @author Claudius Korzen
  */
 public class PdfAct {
-  /**
-   * The log level.
-   */
-  protected LogLevel logLevel = LogLevel.WARN;
-
   /**
    * The serialization format.
    */
@@ -55,9 +52,34 @@ public class PdfAct {
   protected Set<SemanticRole> semanticRoles;
 
   /**
-   * The boolean flag indicating whether or not this serializer should insert control characters, 
-   * i.e.: "^L" between two PDF elements in case a page break between the two elements occurs in
-   * the PDF and "^A" in front of headings.
+   * The boolean flag indicating whether or not to print debug info about the parsed PDF operators.
+   */
+  protected boolean isDebugPdfOperators;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the characters extraction.
+   */
+  protected boolean isDebugCharactersExtraction;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the text line detection.
+   */
+  protected boolean isDebugTextLineDetection;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the word detection.
+   */
+  protected boolean isDebugWordDetection;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the text block detection.
+   */
+  protected boolean isDebugTextBlockDetection;
+
+  /**
+   * The boolean flag indicating whether or not this serializer should insert control characters,
+   * i.e.: "^L" between two PDF elements in case a page break between the two elements occurs in the
+   * PDF and "^A" in front of headings.
    */
   protected boolean withControlCharacters;
 
@@ -66,13 +88,11 @@ public class PdfAct {
   /**
    * Parses the PDF file given by a string path.
    *
-   * @param pdfPath
-   *     The path to the PDF file to parse.
+   * @param pdfPath The path to the PDF file to parse.
    *
    * @return The parsed PDF document.
    *
-   * @throws PdfActException
-   *     If something went wrong on parsing the PDF.
+   * @throws PdfActException If something went wrong on parsing the PDF.
    */
   public Document parse(String pdfPath) throws PdfActException {
     return parse(Paths.get(pdfPath));
@@ -81,21 +101,30 @@ public class PdfAct {
   /**
    * Parses the PDF file given by the path.
    *
-   * @param pdfPath
-   *     The path to the PDF file to parse.
+   * @param pdfPath The path to the PDF file to parse.
    *
    * @return The parsed PDF document.
    *
-   * @throws PdfActException
-   *     If something went wrong on parsing the PDF.
+   * @throws PdfActException If something went wrong on parsing the PDF.
    */
   public Document parse(Path pdfPath) throws PdfActException {
     // Create a service pipe.
     PdfActServicePipe service = new PlainPdfActServicePipe();
 
-    // Pass the log level.
-    // Level log4jLevel = this.logLevel.getLog4jEquivalent();
-    // Configurator.setAllLevels(LogManager.getRootLogger().getName(), log4jLevel);
+    // Set the debug levels according to the given debug flags.
+    Configurator.setLevel("pdf-operators", this.isDebugPdfOperators ? DEBUG : ERROR);
+    // Configurator.setLevel("pdf-parsing", this.isDebugPdfOperators ? Level.DEBUG : Level.ERROR);
+    Configurator.setLevel("char-extraction", this.isDebugCharactersExtraction ? DEBUG : ERROR);
+    Configurator.setLevel("line-detection", this.isDebugTextLineDetection ? DEBUG : ERROR);
+    Configurator.setLevel("word-detection", this.isDebugWordDetection ? DEBUG : ERROR);
+    Configurator.setLevel("block-detection", this.isDebugTextBlockDetection ? DEBUG : ERROR);
+    // Configurator.setLevel("semantic-roles-detection", this.isDebugPdfOperators ? Level.DEBUG :
+    // Level.ERROR);
+    // Configurator.setLevel("paragraphs-detection", this.isDebugPdfOperators ? Level.DEBUG :
+    // Level.ERROR);
+    // Configurator.setLevel("word-dehyphenation", this.isDebugPdfOperators ? Level.DEBUG :
+    // Level.ERROR);
+
 
     // Pass the serialization format if there is any.
     if (this.serializationFormat != null) {
@@ -141,22 +170,110 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the log level.
+   * Returns the boolean flag indicating whether or not to print debug info about the parsed PDF
+   * operators.
    *
-   * @return The log level.
+   * @return The boolean flag.
    */
-  public LogLevel getLogLevel() {
-    return logLevel;
+  public boolean isDebugPdfOperators() {
+    return isDebugPdfOperators;
   }
 
   /**
-   * Sets the log level.
+   * Sets the boolean flag indicating whether or not to print debug info about the parsed PDF
+   * operators.
    *
-   * @param logLevel
-   *     The log level.
+   * @param debugPdfOperators The boolean flag.
    */
-  public void setLogLevel(LogLevel logLevel) {
-    this.logLevel = logLevel;
+  public void setDebugPdfOperators(boolean debugPdfOperators) {
+    this.isDebugPdfOperators = debugPdfOperators;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not to print debug info about the characters
+   * extraction.
+   *
+   * @return The boolean flag.
+   */
+  public boolean isDebugCharactersExtraction() {
+    return isDebugCharactersExtraction;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not to print debug info about the characters
+   * extraction.
+   *
+   * @param debugCharactersExtraction The boolean flag.
+   */
+  public void setDebugCharactersExtraction(boolean debugCharactersExtraction) {
+    this.isDebugCharactersExtraction = debugCharactersExtraction;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not to print debug info about the text line
+   * detection.
+   *
+   * @return The boolean flag.
+   */
+  public boolean isDebugTextLineDetection() {
+    return isDebugTextLineDetection;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not to print debug info about the text line
+   * detection.
+   *
+   * @param isDebugTextLineDetection The boolean flag.
+   */
+  public void setDebugTextLineDetection(boolean isDebugTextLineDetection) {
+    this.isDebugTextLineDetection = isDebugTextLineDetection;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not to print debug info about the word
+   * detection.
+   *
+   * @return The boolean flag.
+   */
+  public boolean isDebugWordDetection() {
+    return isDebugWordDetection;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not to print debug info about the word detection.
+   *
+   * @param isDebugTextBlockDetection The boolean flag.
+   */
+  public void setDebugWordDetection(boolean isDebugWordDetection) {
+    this.isDebugWordDetection = isDebugWordDetection;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not to print debug info about the text block
+   * detection.
+   *
+   * @return The boolean flag.
+   */
+  public boolean isDebugTextBlockDetection() {
+    return isDebugTextBlockDetection;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not to print debug info about the text line
+   * detection.
+   *
+   * @param isDebugTextBlockDetection The boolean flag.
+   */
+  public void setDebugTextBlockDetection(boolean isDebugTextBlockDetection) {
+    this.isDebugTextBlockDetection = isDebugTextBlockDetection;
   }
 
   // ==============================================================================================
@@ -173,8 +290,7 @@ public class PdfAct {
   /**
    * Sets the serialization format.
    *
-   * @param serializationFormat
-   *     The serialization format.
+   * @param serializationFormat The serialization format.
    */
   public void setSerializationFormat(SerializeFormat serializationFormat) {
     this.serializationFormat = serializationFormat;
@@ -194,8 +310,7 @@ public class PdfAct {
   /**
    * Sets the path to the serialization target.
    *
-   * @param serializationPath
-   *     The path to the serialization target.
+   * @param serializationPath The path to the serialization target.
    */
   public void setSerializationPath(Path serializationPath) {
     this.serializationPath = serializationPath;
@@ -213,8 +328,7 @@ public class PdfAct {
   /**
    * Sets the serialization stream.
    *
-   * @param serializationStream
-   *     The path to the serialization stream.
+   * @param serializationStream The path to the serialization stream.
    */
   public void setSerializationStream(OutputStream serializationStream) {
     this.serializationStream = serializationStream;
@@ -234,8 +348,7 @@ public class PdfAct {
   /**
    * Sets the path to the visualization target.
    *
-   * @param visualizationPath
-   *     The path to the visualization target.
+   * @param visualizationPath The path to the visualization target.
    */
   public void setVisualizationPath(Path visualizationPath) {
     this.visualizationPath = visualizationPath;
@@ -255,8 +368,7 @@ public class PdfAct {
   /**
    * Sets the units to extract.
    *
-   * @param extractionUnits
-   *     The units to extract.
+   * @param extractionUnits The units to extract.
    */
   public void setExtractionUnits(Set<ExtractionUnit> extractionUnits) {
     this.extractionUnits = extractionUnits;
@@ -276,8 +388,7 @@ public class PdfAct {
   /**
    * Sets the semantic roles of the text units to extract.
    *
-   * @param semanticRoles
-   *     The semantic roles of the text units to extract.
+   * @param semanticRoles The semantic roles of the text units to extract.
    */
   public void setSemanticRoles(Set<SemanticRole> semanticRoles) {
     this.semanticRoles = semanticRoles;

@@ -1,13 +1,16 @@
 package pdfact.core.pipes.tokenize.words;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Color;
 import pdfact.core.model.Document;
+import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
 import pdfact.core.model.Position;
 import pdfact.core.model.Rectangle;
@@ -28,9 +31,10 @@ import pdfact.core.util.xycut.XYCut;
  */
 public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPipe {
   /**
-   * The logger.
+   * The loggers.
    */
-  protected static Logger log = LogManager.getLogger(XYCutTokenizeToWordsPipe.class);
+  protected static Logger llog = LogManager.getLogger("line-detection");
+  protected static Logger wlog = LogManager.getLogger("word-detection");
 
   /**
    * The statistician to compute statistics about characters.
@@ -57,19 +61,69 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
   // ==============================================================================================
 
   @Override
-  public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+  public Document execute(Document doc) throws PdfActException {
+    tokenizeToWords(doc);
 
-    log.debug("Process: Tokenizing the text lines into words.");
-    tokenizeToWords(pdf);
+    // Print the debug info for line detection here (and not in PlainTokenizeToTextLines.class),
+    // because the text of text lines is only known after words were detected.
+    if (llog.isDebugEnabled()) {
+      for (Page page : doc.getPages()) {
+        llog.debug("==================== Page " + page.getPageNumber() + " ====================");
+        for (TextLine line : page.getTextLines()) {
+          llog.debug("-------------------------------------------");
+          llog.debug("Text line:          " + line.getText());
+          llog.debug("... page:           " + line.getPosition().getPageNumber());
+          String x1 = String.format("%.1f", line.getPosition().getRectangle().getMinX());
+          String y1 = String.format("%.1f", line.getPosition().getRectangle().getMinY());
+          String x2 = String.format("%.1f", line.getPosition().getRectangle().getMaxX());
+          String y2 = String.format("%.1f", line.getPosition().getRectangle().getMaxY());
+          llog.debug("... position:       [" + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "]");          
+          FontFace fontFace = line.getCharacterStatistic().getMostCommonFontFace();
+          String avgFs = String.format("%.1f", line.getCharacterStatistic().getAverageFontsize());
+          llog.debug("... main font:      " + fontFace.getFont().getBaseName());
+          llog.debug("... main fontsize:  " + fontFace.getFontSize() + "pt");
+          llog.debug("... avg. fontsize:  " + avgFs + "pt");
+          llog.debug("... mainly bold:    " + fontFace.getFont().isBold());
+          llog.debug("... mainly italic:  " + fontFace.getFont().isItalic());
+          llog.debug("... mainly type3:   " + fontFace.getFont().isType3Font());
+          Color color = line.getCharacterStatistic().getMostCommonColor();
+          llog.debug("... main RGB color: " + Arrays.toString(color.getRGB()));
+          llog.debug("... baseline:       " + line.getBaseline());
+        }
+      }
+    }
 
-    log.debug("Tokenizing the text lines into words done.");
-    log.debug("# processed text lines: " + this.numProcessedTextLines);
-    log.debug("# tokenized words : " + this.numTokenizedWords);
+    if (wlog.isDebugEnabled()) {
+      for (Page page : doc.getPages()) {
+        wlog.debug("==================== Page " + page.getPageNumber() + " ====================");
+        for (TextLine line : page.getTextLines()) {
+          for (Word word : line.getWords()) {
+            wlog.debug("-------------------------------------------");
+            wlog.debug("Word:               " + word.getText());
+            Position position = word.getFirstPosition();
+            wlog.debug("... page:           " + position.getPageNumber());
+            String x1 = String.format("%.1f", position.getRectangle().getMinX());
+            String y1 = String.format("%.1f", position.getRectangle().getMinY());
+            String x2 = String.format("%.1f", position.getRectangle().getMaxX());
+            String y2 = String.format("%.1f", position.getRectangle().getMaxY());
+            wlog.debug("... position:       [" + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "]");          
+            FontFace fontFace = word.getCharacterStatistic().getMostCommonFontFace();
+            String avgFs = String.format("%.1f", word.getCharacterStatistic().getAverageFontsize());
+            wlog.debug("... main font:      " + fontFace.getFont().getBaseName());
+            wlog.debug("... main fontsize:  " + fontFace.getFontSize() + "pt");
+            wlog.debug("... avg. fontsize:  " + avgFs + "pt");
+            wlog.debug("... mainly bold:    " + fontFace.getFont().isBold());
+            wlog.debug("... mainly italic:  " + fontFace.getFont().isItalic());
+            wlog.debug("... mainly type3:   " + fontFace.getFont().isType3Font());
+            Color color = word.getCharacterStatistic().getMostCommonColor();
+            wlog.debug("... main RGB color: " + Arrays.toString(color.getRGB()));
+            wlog.debug("... hyphenated:     " + word.isHyphenated());
+          }
+        }
+      }
+    }
 
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-
-    return pdf;
+    return doc;
   }
 
   // ==============================================================================================

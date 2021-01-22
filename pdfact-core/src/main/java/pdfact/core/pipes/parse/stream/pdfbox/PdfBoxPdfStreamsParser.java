@@ -100,7 +100,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PdfBoxPdfStreamsParser.class);
+  protected static Logger log = LogManager.getLogger("pdf-operators");
 
   /**
    * The map of operator processors.
@@ -270,22 +270,13 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
 
   @Override
   public void parse(Document pdf) throws PdfActException {
-    log.debug("Parsing the streams of the PDF file.");
     try (PDDocument doc = PDDocument.load(pdf.getFile())) {
-      int numProcessors = this.operatorProcessors.size();
-      log.debug("# registered PDF operator processors: " + numProcessors);
-
       handlePdfFileStart(pdf);
       for (int i = 0; i < doc.getPages().getCount(); i++) {
+        log.debug("==================== Page " + (i + 1) + " ====================");
         processPage(pdf, doc.getPages().get(i), i + 1);
       }
       handlePdfFileEnd(pdf);
-
-      log.debug("Parsing the streams of the PDF file done.");
-      log.debug("# extracted pages: " + this.numPages);
-      log.debug("# extracted characters: " + this.numCharacters);
-      log.debug("# extracted figures: " + this.numFigures);
-      log.debug("# extracted shapes: " + this.numShapes);
     } catch (IOException e) {
       throw new PdfActParseException("Couldn't parse the PDF.", e);
     }
@@ -455,17 +446,17 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
           throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
-    log.trace("Processing PDF operator: " + op + "; args: " + args);
+    log.debug("Operator: " + op + "; Args: " + args);
 
     if (processor != null) {
       try {
         processor.setStreamEngine(this);
         processor.process(pdf, page, op, args);
       } catch (IOException e) {
-        log.warn("Error on processing operator '" + op + "'. ", e);
+        log.warn("... error on processing the operator.", e);
       }
     } else {
-      log.trace("Unsupported operator: " + op + "; args: " + args);
+      log.debug("... unsupported operator.");
     }
   }
 

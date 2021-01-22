@@ -31,7 +31,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainTokenizeToTextLinesPipe.class);
+  protected static Logger log = LogManager.getLogger("line-detection");
 
   /**
    * The statistician to compute statistics about characters.
@@ -64,32 +64,20 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+  public Document execute(Document doc) throws PdfActException {
+    tokenizeToTextLines(doc);
 
-    log.debug("Process: Tokenizing the text areas into text lines.");
-    tokenizeToTextLines(pdf);
-
-    log.debug("Tokenizing the text areas into text lines done.");
-    log.debug("# processed text areas: " + this.numProcessedTextAreas);
-    log.debug("# tokenized text lines: " + this.numTokenizedTextLines);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-
-    return pdf;
+    return doc;
   }
 
   // ==============================================================================================
 
   /**
-   * Tokenizes the text areas in the pages of the given PDF document into text
-   * lines.
+   * Tokenizes the text areas in the pages of the given PDF document into text lines.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    * 
-   * @throws PdfActException
-   *         If something went wrong while tokenization.
+   * @throws PdfActException If something went wrong while tokenization.
    */
   protected void tokenizeToTextLines(Document pdf) throws PdfActException {
     if (pdf == null) {
@@ -116,18 +104,15 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   /**
    * Tokenizes the text areas in the given page into text lines.
    * 
-   * @param pdf
-   *        The PDF document to which the given page belongs to.
-   * @param page
-   *        The PDF page to process.
+   * @param pdf  The PDF document to which the given page belongs to.
+   * @param page The PDF page to process.
    * 
    * @return The list of text lines.
    * 
-   * @throws PdfActException
-   *         If something went wrong while tokenization.
+   * @throws PdfActException If something went wrong while tokenization.
    */
-  protected ElementList<TextLine> tokenizeToTextLines(Document pdf,
-      Page page) throws PdfActException {
+  protected ElementList<TextLine> tokenizeToTextLines(Document pdf, Page page)
+          throws PdfActException {
     ElementList<TextLine> result = new ElementList<>();
 
     for (TextArea area : page.getTextAreas()) {
@@ -157,8 +142,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   /**
    * Computes the baseline from the given characters of a line.
    * 
-   * @param characters
-   *        The list of characters to process.
+   * @param characters The list of characters to process.
    * @return The computed baseline.
    */
   protected Line computeBaseline(ElementList<Character> characters) {
@@ -191,8 +175,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   /**
    * Computes the character statistics for the given text line.
    * 
-   * @param chars
-   *        The characters to process.
+   * @param chars The characters to process.
    * @return The character statistics for the given text line.
    */
   protected CharacterStatistic computeCharacterStatistic(ElementList<Character> chars) {
@@ -202,10 +185,8 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   /**
    * Computes the position for the given text line.
    * 
-   * @param page
-   *        The PDF page in which the line is located.
-   * @param chars
-   *        The characters of the text line.
+   * @param page  The PDF page in which the line is located.
+   * @param chars The characters of the text line.
    * @return The position for the given text line.
    */
   protected Position computePosition(Page page, ElementList<Character> chars) {
@@ -223,8 +204,7 @@ public class PlainTokenizeToTextLinesPipe extends XYCut implements TokenizeToTex
   // ==============================================================================================
 
   @Override
-  public float assessHorizontalCut(Document pdf, Page page,
-      List<ElementList<Character>> halves) {
+  public float assessHorizontalCut(Document pdf, Page page, List<ElementList<Character>> halves) {
     ElementList<Character> upper = halves.get(0);
     CharacterStatistic upperStats = this.characterStatistician.compute(upper);
     float upperMinY = upperStats.getSmallestMinY();

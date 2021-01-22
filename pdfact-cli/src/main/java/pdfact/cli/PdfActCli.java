@@ -20,7 +20,6 @@ import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.model.SerializeFormat;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
 import pdfact.core.PdfActCoreSettings;
-import pdfact.core.model.LogLevel;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -50,8 +49,12 @@ public class PdfActCli {
       // Create an instance of PdfAct.
       PdfAct pdfAct = new PdfAct();
 
-      // Pass the log level.
-      pdfAct.setLogLevel(LogLevel.getLogLevel(parser.getLogLevel()));
+      // Pass the debugging flags.
+      pdfAct.setDebugPdfOperators(parser.isDebugPdfOperators());
+      pdfAct.setDebugCharactersExtraction(parser.isDebugCharactersExtraction());
+      pdfAct.setDebugTextLineDetection(parser.isDebugTextLineDetection());
+      pdfAct.setDebugWordDetection(parser.isDebugWordDetection());
+      pdfAct.setDebugTextBlockDetection(parser.isDebugTextBlockDetection());
 
       // Pass the serialization format if there is any.
       String serializationFormatStr = parser.getSerializationFormat();
@@ -236,15 +239,60 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * The name of the option to enable log output.
+     * The name of the option to enable the printing of debug info about the parsed PDF operators.
      */
-    protected static final String LOG_LEVEL = "debug";
+    protected static final String DEBUG_PDF_OPERATORS = "debug-pdf-operators";
 
     /**
-     * The log level.
+     * The boolean flag indicating whether or not to print debug info about the parsed PDF
+     * operators.
      */
-    @Arg(dest = LOG_LEVEL)
-    protected int logLevel = PdfActCoreSettings.DEFAULT_LOG_LEVEL.getIntLevel();
+    @Arg(dest = DEBUG_PDF_OPERATORS)
+    protected boolean debugPdfOperators = PdfActCoreSettings.DEFAULT_IS_DEBUG_PDF_OPERATORS;
+
+    /**
+     * The name of the option to enable the printing of debug info about the extracted characters.
+     */
+    protected static final String DEBUG_CHAR_EXTRACTION = "debug-characters-extraction";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the extracted chars.
+     */
+    @Arg(dest = DEBUG_CHAR_EXTRACTION)
+    protected boolean debugCharExtraction = PdfActCoreSettings.DEFAULT_IS_DEBUG_CHARS_EXTRACTION;
+
+    /**
+     * The name of the option to enable the printing of debug info about the text line detection.
+     */
+    protected static final String DEBUG_LINE_DETECTION = "debug-text-line-detection";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the text line detection.
+     */
+    @Arg(dest = DEBUG_LINE_DETECTION)
+    protected boolean debugLineDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_LINE_DETECTION;
+
+    /**
+     * The name of the option to enable the printing of debug info about the word detection.
+     */
+    protected static final String DEBUG_WORD_DETECTION = "debug-word-detection";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the word detection.
+     */
+    @Arg(dest = DEBUG_WORD_DETECTION)
+    protected boolean debugWordDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_WORD_DETECTION;
+
+    /**
+     * The name of the option to enable the printing of debug info about the text block detection.
+     */
+    protected static final String DEBUG_BLOCK_DETECTION = "debug-text-block-detection";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the text block detection.
+     */
+    @Arg(dest = DEBUG_BLOCK_DETECTION)
+    protected boolean debugBlockDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_BLOCK_DETECTION;
 
    // ============================================================================================
 
@@ -368,26 +416,41 @@ public class PdfActCli {
             + "should be written to. The file doesn't have to be existent before. If not "
             + "specified, no such visualization will be created.");
 
-      // Add an option to define the log level.
-      StringBuilder choiceStr = new StringBuilder();
-      int i = 0;
-      for (LogLevel level : LogLevel.getLogLevels()) {
-        choiceStr.append(level.getIntLevel() + " (= " + level + ")");
-        choiceStr.append(i < LogLevel.getLogLevels().size() - 1 ? ", " : "");
-        i++;
-      }
-      LogLevel debugLevel = LogLevel.DEBUG;
-      this.parser.addArgument("--" + LOG_LEVEL).dest(LOG_LEVEL)
+      // Add an option to enable the printing of debug info about the parsed PDF operators.
+      this.parser.addArgument("--" + DEBUG_PDF_OPERATORS).dest(DEBUG_PDF_OPERATORS)
         .required(false)
-        .metavar("<level>")
-        .type(Integer.class)
-        .action(new StoreDefaultArgumentAction(debugLevel.getIntLevel()))
-        .setDefault(this.logLevel)
-        .help("The verbosity of the log messages.\n" 
-            + "- Available options: " + choiceStr.toString() + ".\n" 
-            + "- Default: " + this.logLevel + ".\n"
-            + "This defines the minimum level of severity required for a message to be logged.");
+        .action(Arguments.storeTrue())
+        .setDefault(this.debugPdfOperators)
+        .help("Print debug info about the parsed PDF operators.");
       
+      // Add an option to enable the printing of debug info about the characters extraction.
+      this.parser.addArgument("--" + DEBUG_CHAR_EXTRACTION).dest(DEBUG_CHAR_EXTRACTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.debugCharExtraction)
+        .help("Print debug info about the characters extraction.");
+
+      // Add an option to enable the printing of debug info about the text line detection.
+      this.parser.addArgument("--" + DEBUG_LINE_DETECTION).dest(DEBUG_LINE_DETECTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.debugLineDetection)
+        .help("Print debug info about the text line detection.");
+
+      // Add an option to enable the printing of debug info about the word detection.
+      this.parser.addArgument("--" + DEBUG_WORD_DETECTION).dest(DEBUG_WORD_DETECTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.debugWordDetection)
+        .help("Print debug info about the word detection.");
+
+      // Add an option to enable the printing of debug info about the text block detection.
+      this.parser.addArgument("--" + DEBUG_BLOCK_DETECTION).dest(DEBUG_BLOCK_DETECTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.debugBlockDetection)
+        .help("Print debug info about the text block detection.");
+
       // Add an option to define whether or not control characters (which identify headings and
       // page breaks should be inserted into the TXT serialization output.
       this.parser.addArgument("--" + WITH_CONTROL_CHARACTERS).dest(WITH_CONTROL_CHARACTERS)
@@ -562,60 +625,69 @@ public class PdfActCli {
     // ============================================================================================
 
     /**
-     * Returns the log level.
+     * Returns the boolean flag indicating whether or not to print debug info about the parsed PDF
+     * operators.
      *
-     * @return The log level.
+     * @return The boolean flag.
      */
-    public int getLogLevel() {
-      return this.logLevel;
+    public boolean isDebugPdfOperators() {
+      return this.debugPdfOperators;
+    }
+
+    /**
+     * Returns the boolean flag indicating whether or not to print debug info about the characters
+     * extraction.
+     *
+     * @return The boolean flag.
+     */
+    public boolean isDebugCharactersExtraction() {
+      return this.debugCharExtraction;
+    }
+
+    /**
+     * Returns the boolean flag indicating whether or not to print debug info about the text line
+     * detection.
+     *
+     * @return The boolean flag.
+     */
+    public boolean isDebugTextLineDetection() {
+      return this.debugLineDetection;
+    }
+
+    /**
+     * Returns the boolean flag indicating whether or not to print debug info about the word
+     * detection.
+     *
+     * @return The boolean flag.
+     */
+    public boolean isDebugWordDetection() {
+      return this.debugWordDetection;
+    }
+
+    /**
+     * Returns the boolean flag indicating whether or not to print debug info about the text block
+     * detection.
+     *
+     * @return The boolean flag.
+     */
+    public boolean isDebugTextBlockDetection() {
+      return this.debugBlockDetection;
     }
 
     // ============================================================================================
     
+    /**
+     * Returns the boolean flag indicating whether or not control characters should be added to the 
+     * TXT serialization output.
+     *
+     * @return The boolean flag.
+     */
     public boolean isWithControlCharacters() {
       return this.withControlCharacters;
     }
   }
 
   // ==============================================================================================
-
-  /**
-   * Argument action to store argument value or a given default value if the argument value is null.
-   */
-  private static class StoreDefaultArgumentAction implements ArgumentAction {
-    /**
-     * The default value to store if the argument value is null.
-     */
-    protected Object defaultValue;
-
-    /**
-     * Creates a new StoreDefaultArgumentAction.
-     *
-     * @param defaultValue The default value to store if the argument value is null.
-     */
-    public StoreDefaultArgumentAction(Object defaultValue) {
-      this.defaultValue = defaultValue;
-    }
-
-    @Override
-    public void run(ArgumentParser parser, Argument arg, Map<String, Object> attrs, String flag,
-            Object value) throws ArgumentParserException {
-      if (value == null) {
-        attrs.put(arg.getDest(), this.defaultValue);
-      } else {
-        attrs.put(arg.getDest(), value);
-      }
-    }
-
-    @Override
-    public void onAttach(Argument arg) {
-    }
-
-    @Override
-    public boolean consumeArgument() {
-      return true;
-    }
-  }
 
   /**
    * Argument action to split a given string at a given delimiter and to store a list of all

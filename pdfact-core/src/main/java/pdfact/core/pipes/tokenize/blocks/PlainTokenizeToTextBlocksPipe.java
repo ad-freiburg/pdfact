@@ -1,10 +1,12 @@
 package pdfact.core.pipes.tokenize.blocks;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Color;
 import pdfact.core.model.Document;
 import pdfact.core.model.Font;
 import pdfact.core.model.FontFace;
@@ -30,7 +32,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainTokenizeToTextBlocksPipe.class);
+  protected static Logger log = LogManager.getLogger("block-detection");
 
   /**
    * The statistician to compute statistics about characters.
@@ -63,18 +65,38 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
   // ==============================================================================================
 
   @Override
-  public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
+  public Document execute(Document doc) throws PdfActException {
+    tokenizeToTextBlocks(doc);
 
-    log.debug("Process: Tokenizing the text lines into text blocks.");
-    tokenizeToTextBlocks(pdf);
+    // Print the debug info for line detection here (and not in PlainTokenizeToTextLines.class),
+    // because the text of text lines is only known after words were detected.
+    if (log.isDebugEnabled()) {
+      for (Page page : doc.getPages()) {
+        log.debug("==================== Page " + page.getPageNumber() + " ====================");
+        for (TextBlock block : page.getTextBlocks()) {
+          log.debug("-------------------------------------------");
+          log.debug("Text block:         " + block.getText());
+          log.debug("... page:           " + block.getPosition().getPageNumber());
+          String minX = String.format("%.1f", block.getPosition().getRectangle().getMinX());
+          String minY = String.format("%.1f", block.getPosition().getRectangle().getMinY());
+          String maxX = String.format("%.1f", block.getPosition().getRectangle().getMaxX());
+          String maxY = String.format("%.1f", block.getPosition().getRectangle().getMaxY());
+          log.debug("... position:       [" + minX + ", " + minY + ", " + maxX + ", " + maxY + "]");          
+          FontFace fontFace = block.getCharacterStatistic().getMostCommonFontFace();
+          String avgFs = String.format("%.1f", block.getCharacterStatistic().getAverageFontsize());
+          log.debug("... main font:      " + fontFace.getFont().getBaseName());
+          log.debug("... main fontsize:  " + fontFace.getFontSize() + "pt");
+          log.debug("... avg. fontsize:  " + avgFs + "pt");
+          log.debug("... mainly bold:    " + fontFace.getFont().isBold());
+          log.debug("... mainly italic:  " + fontFace.getFont().isItalic());
+          log.debug("... mainly type3:   " + fontFace.getFont().isType3Font());
+          Color color = block.getCharacterStatistic().getMostCommonColor();
+          log.debug("... main RGB color: " + Arrays.toString(color.getRGB()));
+        }
+      }
+    }
 
-    log.debug("Tokenizing the text lines into text blocks done.");
-    log.debug("# processed text lines : " + this.numProcessedTextLines);
-    log.debug("# tokenized text blocks: " + this.numTokenizedTextBlocks);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-    return pdf;
+    return doc;
   }
 
   // ==============================================================================================
@@ -101,6 +123,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
         continue;
       }
 
+      log.debug("====================== Page " + page.getPageNumber() + " ======================");
       page.setTextBlocks(tokenizeToTextBlocks(pdf, page));
     }
   }
@@ -222,37 +245,46 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    */
   protected boolean introducesNewTextBlock(Document pdf, Page page, TextBlock currentTextBlock,
           TextLine prevLine, TextLine line, TextLine nextLine) {
+    log.debug("Line: " + line + " ...");
 
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
+      log.debug("... introduces *no* new text block because it is null.");
       return false;
     }
 
     // The line introduces a text block, if there is no previous line.
     if (prevLine == null) {
+      log.debug("... introduces a new text block because no previous line exists.");
       return true;
     }
 
     // The line introduces a text block, if there is no current text block.
     if (currentTextBlock == null) {
+      log.debug("... introduces a new text block because there is no current text block.");
       return true;
     }
 
     // The line does *not* introduce a text block, if the current text block is
     // empty.
     if (currentTextBlock.getTextLines().isEmpty()) {
+      log.debug("... introduces *no* new text block because the current text block is empty.");
       return false;
     }
 
     // The line introduces a text block, if it doesn't overlap the text
     // block horizontally.
     if (!overlapsHorizontally(currentTextBlock, line)) {
+      log.debug("... introduces a new text block because it doesn't have a horizontal overlap with "
+        + "the current text block.");
       return true;
     }
 
     // The line introduces a new text block, if the line pitch between the
     // line and the previous line is larger than expected.
     if (isLinepitchLargerThanExpected(pdf, page, prevLine, line)) {
+      log.debug("... introduces a new text block because the line pitch to the previous line is "
+        + "larger than expected.");
       return true;
     }
 
@@ -260,25 +292,32 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // line and the previous line is larger than the line pitch between the
     // line and the next line.
     if (isLinePitchLargerThanNextLinePitch(prevLine, line, nextLine)) {
+      log.debug("... introduces a new text block because the line pitch to the previous line is "
+        + "larger than the line pitch to the next line.");
       return true;
     }
 
     // The line introduces a text block, if it is indented compared to the
     // previous and the next line.
     if (isIndented(prevLine, line, nextLine)) {
+      log.debug("... introduces a new text block because it is indented.");
       return true;
     }
 
     // The line introduces a text block, if it has a special font face.
     if (hasSignificantDifferentFontFace(prevLine, line)) {
+      log.debug("... introduces a new text block because it has a different font face than the "
+        + "previous line.");
       return true;
     }
 
     // The line introduces a text block, if it is the start of a reference.
     if (isProbablyReferenceStart(prevLine, line, nextLine)) {
+      log.debug("... introduces a new text block because it is probably a reference start.");
       return true;
     }
 
+    log.debug("... introduces *no* new text block because no rule applied.");
     return false;
   }
 
@@ -299,6 +338,18 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     Rectangle lineRect = line.getPosition().getRectangle();
     if (blockRect == null || lineRect == null) {
       return false;
+    }
+
+    boolean b = blockRect.overlapsHorizontally(lineRect);
+
+    if (!b) {
+      String blockMinX = String.format("%.2f", blockRect.getMinX());
+      String blockMaxX = String.format("%.2f", blockRect.getMaxX());
+      log.debug("... x-range of text block: [" + blockMinX + ", " + blockMaxX + "]");
+      
+      String lineMinX = String.format("%.2f", lineRect.getMinX());
+      String lineMaxX = String.format("%.2f", lineRect.getMaxX());
+      log.debug("... x-range of text line:  [" + lineMinX + ", " + lineMaxX + "]");
     }
 
     return blockRect.overlapsHorizontally(lineRect);
@@ -330,8 +381,14 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     float expectedLinePitch = textLineStats.getMostCommonLinePitch(fontFace);
     float actualLinePitch = computeLinePitch(prevLine, line);
 
-    // TODO
-    return actualLinePitch - expectedLinePitch > 1.5f;
+    boolean b = actualLinePitch - expectedLinePitch > 1.5f;
+
+    if (b) {
+      log.debug("... actual line pitch:   " + String.format("%.2f", actualLinePitch));
+      log.debug("... expected line pitch: " + String.format("%.2f", expectedLinePitch));
+    }
+
+    return b;
   }
 
   /**
@@ -349,8 +406,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     float linePitch = computeLinePitch(prevLine, line);
     float nextLinePitch = computeLinePitch(line, nextLine);
 
-    // TODO
-    return linePitch - nextLinePitch > 1;
+    boolean b = linePitch - nextLinePitch > 1;
+    if (b) {
+      log.debug("... line pitch to previous line: " + String.format("%.2f", linePitch));
+      log.debug("... line pitch to next line:     " + String.format("%.2f", nextLinePitch));
+    }
+    return b;
   }
 
   /**
@@ -384,7 +445,24 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // Check if the minX values of the previous and the next lines are equal.
     boolean isMinXEqual = isMinXEqual(prevLine, nextLine);
 
-    return isIndentedToPrevLine && isIndentedToNextLine && isMinXEqual;
+    boolean b = isIndentedToPrevLine && isIndentedToNextLine && isMinXEqual;
+
+    if (b) {
+      float prevMinX = prevLine.getPosition().getRectangle().getMinX();
+      float minX = line.getPosition().getRectangle().getMinX();
+      float nextMinX = nextLine.getPosition().getRectangle().getMinX();
+      log.debug("... minX of previous line: " + String.format("%.2f", prevMinX));
+      log.debug("... minX of current line:  " + String.format("%.2f", minX));
+      log.debug("... minX of next line:     " + String.format("%.2f", nextMinX));
+      if (isIndentedToPrevLine) {
+        log.debug("... current line is indented compared to previous line.");
+      }
+      if (isIndentedToNextLine) {
+        log.debug("... current line is indented compared to next line.");
+      }
+    }
+
+    return b;
   }
 
   /**
@@ -466,12 +544,18 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     String lineFontFamilyName = lineFont.getFontFamilyName();
 
     if (prevLineFontFamilyName == null && lineFontFamilyName != null) {
+      log.debug("... font family of previous line: " + prevLineFontFamilyName);
+      log.debug("... font family of current line:  " + lineFontFamilyName);
       return true;
     }
     if (prevLineFontFamilyName != null && lineFontFamilyName == null) {
+      log.debug("... font family of previous line: " + prevLineFontFamilyName);
+      log.debug("... font family of current line:  " + lineFontFamilyName);
       return true;
     }
     if (prevLineFontFamilyName != null && !prevLineFontFamilyName.equals(lineFontFamilyName)) {
+      log.debug("... font family of previous line: " + prevLineFontFamilyName);
+      log.debug("... font family of current line:  " + lineFontFamilyName);
       return true;
     }
 
@@ -481,6 +565,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
     if (prevLineFontsize != lineFontsize) {
+      log.debug("... font size of previous line: " + prevLineFontsize);
+      log.debug("... font size of current line:  " + lineFontsize);
       return true;
     }
 
