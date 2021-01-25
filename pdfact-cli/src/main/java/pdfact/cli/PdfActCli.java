@@ -17,9 +17,8 @@ import net.sourceforge.argparse4j.inf.ArgumentAction;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.cli.util.exception.PdfActParseCommandLineException;
-import pdfact.core.PdfActCoreSettings;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
@@ -50,20 +49,23 @@ public class PdfActCli {
       PdfAct pdfAct = new PdfAct();
 
       // Pass the debugging flags.
-      pdfAct.setDebugPdfOperators(parser.isDebugPdfOperators());
-      pdfAct.setDebugCharactersExtraction(parser.isDebugCharactersExtraction());
-      pdfAct.setDebugTextLineDetection(parser.isDebugTextLineDetection());
-      pdfAct.setDebugWordDetection(parser.isDebugWordDetection());
-      pdfAct.setDebugTextBlockDetection(parser.isDebugTextBlockDetection());
+      pdfAct.setDebugPdfParsing(parser.isDebugPdfParsing);
+      pdfAct.setDebugCharacterExtraction(parser.isDebugCharExtraction);
+      pdfAct.setDebugTextLineDetection(parser.isDebugLineDetection);
+      pdfAct.setDebugWordDetection(parser.isDebugWordDetection);
+      pdfAct.setDebugTextBlockDetection(parser.isDebugBlockDetection);
+      pdfAct.setDebugRoleDetection(parser.isDebugRoleDetection);
+      pdfAct.setDebugParagraphDetection(parser.isDebugParagraphDetection);
+      pdfAct.setDebugWordDehyphenation(parser.isDebugWordDehyphenation);
 
       // Pass the serialization format if there is any.
-      String serializationFormatStr = parser.getSerializationFormat();
+      String serializationFormatStr = parser.serializationFormat;
       if (serializationFormatStr != null) {
-        pdfAct.setSerializationFormat(SerializeFormat.fromString(serializationFormatStr));
+        pdfAct.setSerializationFormat(SerializationFormat.fromString(serializationFormatStr));
       }
 
       // Pass the serialization target path.
-      String serializationPathStr = parser.getSerializationPath();
+      String serializationPathStr = parser.serializationPath;
       if (serializationPathStr != null) {
         pdfAct.setSerializationPath(Paths.get(serializationPathStr));
       } else {
@@ -71,34 +73,34 @@ public class PdfActCli {
       }
 
       // Pass the target of the visualization.
-      String visualizationPathStr = parser.getVisualizationPath();
+      String visualizationPathStr = parser.visualizationPath;
       if (visualizationPathStr != null) {
         pdfAct.setVisualizationPath(Paths.get(visualizationPathStr));
       }
 
       // Pass the chosen text unit.
-      List<String> extractionUnits = parser.getExtractionUnits();
+      List<String> extractionUnits = parser.extractionUnits;
       if (extractionUnits != null) {
         pdfAct.setExtractionUnits(ExtractionUnit.fromStrings(extractionUnits));
       }
 
       // Compute the semantic roles to include on serialization & visualization.
       Set<String> roles = new HashSet<>();
-      List<String> semanticRolesToInclude = parser.getSemanticRolesToInclude();
+      List<String> semanticRolesToInclude = parser.semanticRolesToInclude;
       if (semanticRolesToInclude != null) {
-        roles.addAll(parser.getSemanticRolesToInclude());
+        roles.addAll(semanticRolesToInclude);
       }
-      List<String> semanticRolesToExclude = parser.getSemanticRolesToExclude();
+      List<String> semanticRolesToExclude = parser.semanticRolesToExclude;
       if (semanticRolesToExclude != null) {
-        roles.removeAll(parser.getSemanticRolesToExclude());
+        roles.removeAll(semanticRolesToExclude);
       }
       pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
 
       // Set the "with control characters"-flag.
-      pdfAct.setWithControlCharacters(parser.isWithControlCharacters()); 
+      pdfAct.setInsertControlCharacters(parser.withControlCharacters); 
 
       // Run PdfAct.
-      pdfAct.parse(parser.getPdfPath());
+      pdfAct.parse(parser.pdfPath);
     } catch (PdfActException e) {
       statusCode = e.getExitCode();
       errorMessage = e.getMessage();
@@ -146,65 +148,65 @@ public class PdfActCli {
     /**
      * The name of the option to define the path to the PDF file to process.
      */
-    protected static final String PDF_PATH = "pdfPath";
+    public static final String PDF_PATH = "pdfPath";
 
     /**
      * The path to the PDF file to process.
      */
     @Arg(dest = PDF_PATH)
-    protected String pdfPath;
+    public String pdfPath;
 
     // ============================================================================================
 
     /**
      * The name of the option to define the target path for the serialization.
      */
-    protected static final String SERIALIZE_PATH = "serializationPath";
+    public static final String SERIALIZE_PATH = "serializationPath";
 
     /**
      * The target path for the serialization.
      */
     @Arg(dest = SERIALIZE_PATH)
-    protected String serializePath;
+    public String serializationPath;
 
     // ============================================================================================
 
     /**
      * The name of the option to define the serialization format.
      */
-    protected static final String SERIALIZE_FORMAT = "format";
+    public static final String SERIALIZE_FORMAT = "format";
 
     /**
      * The serialization format.
      */
     @Arg(dest = SERIALIZE_FORMAT)
-    protected String serializeFormat = "txt";
+    public String serializationFormat = "txt";
 
     // ============================================================================================
 
     /**
      * The name of the option to define the target path for the visualization.
      */
-    protected static final String VISUALIZATION_PATH = "visualize";
+    public static final String VISUALIZATION_PATH = "visualize";
 
     /**
      * The target path for the visualization.
      */
     @Arg(dest = VISUALIZATION_PATH)
-    protected String visualizationPath;
+    public String visualizationPath;
 
     // ============================================================================================
 
     /**
      * The name of the option to define the units to extract.
      */
-    protected static final String EXTRACTION_UNITS = "units";
+    public static final String EXTRACTION_UNITS = "units";
 
     /**
      * The text unit to extract.
      */
     @Arg(dest = EXTRACTION_UNITS)
-    protected List<String> extractionUnits = Arrays.asList("paragraphs");
+    public List<String> extractionUnits = Arrays.asList("paragraphs");
 
     // ============================================================================================
 
@@ -212,14 +214,14 @@ public class PdfActCli {
      * The name of the option to define the semantic roles to include (text blocks with a semantic
      * role that is not included won't be extracted).
      */
-    protected static final String INCLUDE_SEMANTIC_ROLES = "include-roles";
+    public static final String INCLUDE_SEMANTIC_ROLES = "include-roles";
 
     /**
      * The semantic role(s) to include (text blocks with a semantic role that is not included won't
      * be extracted).
      */
     @Arg(dest = INCLUDE_SEMANTIC_ROLES)
-    protected List<String> semanticRolesToInclude = new ArrayList<>(SemanticRole.getNames());
+    public List<String> semanticRolesToInclude = new ArrayList<>(SemanticRole.getNames());
 
     // ============================================================================================
 
@@ -227,86 +229,136 @@ public class PdfActCli {
      * The name of the option to define the semantic roles to exclude (text blocks with a semantic
      * role that is excluded won't be extracted).
      */
-    protected static final String EXCLUDE_SEMANTIC_ROLES = "exclude-roles";
+    public static final String EXCLUDE_SEMANTIC_ROLES = "exclude-roles";
 
     /**
      * The semantic role(s) to exclude (text blocks with a semantic role that is excluded won't be
      * extracted).
      */
     @Arg(dest = EXCLUDE_SEMANTIC_ROLES)
-    protected List<String> semanticRolesToExclude = new ArrayList<>();
+    public List<String> semanticRolesToExclude = new ArrayList<>();
 
     // ============================================================================================
 
     /**
-     * The name of the option to enable the printing of debug info about the parsed PDF operators.
+     * The name of the option to enable the printing of debug info about the PDF parsing step.
      */
-    protected static final String DEBUG_PDF_OPERATORS = "debug-pdf-operators";
+    public static final String DEBUG_PDF_PARSING = "debug-pdf-parsing";
 
     /**
-     * The boolean flag indicating whether or not to print debug info about the parsed PDF
-     * operators.
+     * The boolean flag indicating whether or not to print debug info about the PDF parsing step.
      */
-    @Arg(dest = DEBUG_PDF_OPERATORS)
-    protected boolean debugPdfOperators = PdfActCoreSettings.DEFAULT_IS_DEBUG_PDF_OPERATORS;
+    @Arg(dest = DEBUG_PDF_PARSING)
+    public boolean isDebugPdfParsing = false;
+
+    // ============================================================================================
 
     /**
      * The name of the option to enable the printing of debug info about the extracted characters.
      */
-    protected static final String DEBUG_CHAR_EXTRACTION = "debug-characters-extraction";
+    public static final String DEBUG_CHAR_EXTRACTION = "debug-character-extraction";
 
     /**
      * The boolean flag indicating whether or not to print debug info about the extracted chars.
      */
     @Arg(dest = DEBUG_CHAR_EXTRACTION)
-    protected boolean debugCharExtraction = PdfActCoreSettings.DEFAULT_IS_DEBUG_CHARS_EXTRACTION;
+    public boolean isDebugCharExtraction = false;
+
+    // ============================================================================================
 
     /**
      * The name of the option to enable the printing of debug info about the text line detection.
      */
-    protected static final String DEBUG_LINE_DETECTION = "debug-text-line-detection";
+    public static final String DEBUG_LINE_DETECTION = "debug-text-line-detection";
 
     /**
      * The boolean flag indicating whether or not to print debug info about the text line detection.
      */
     @Arg(dest = DEBUG_LINE_DETECTION)
-    protected boolean debugLineDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_LINE_DETECTION;
+    public boolean isDebugLineDetection = false;
+
+    // ============================================================================================
 
     /**
      * The name of the option to enable the printing of debug info about the word detection.
      */
-    protected static final String DEBUG_WORD_DETECTION = "debug-word-detection";
+    public static final String DEBUG_WORD_DETECTION = "debug-word-detection";
 
     /**
      * The boolean flag indicating whether or not to print debug info about the word detection.
      */
     @Arg(dest = DEBUG_WORD_DETECTION)
-    protected boolean debugWordDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_WORD_DETECTION;
+    public boolean isDebugWordDetection = false;
+
+    // ============================================================================================
 
     /**
      * The name of the option to enable the printing of debug info about the text block detection.
      */
-    protected static final String DEBUG_BLOCK_DETECTION = "debug-text-block-detection";
+    public static final String DEBUG_BLOCK_DETECTION = "debug-text-block-detection";
 
     /**
-     * The boolean flag indicating whether or not to print debug info about the text block detection.
+     * The boolean flag indicating whether or not to print debug info about the text block
+     * detection.
      */
     @Arg(dest = DEBUG_BLOCK_DETECTION)
-    protected boolean debugBlockDetection = PdfActCoreSettings.DEFAULT_IS_DEBUG_BLOCK_DETECTION;
+    public boolean isDebugBlockDetection = false;
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the printing of debug info about the semantic roles
+     * detection.
+     */
+    public static final String DEBUG_ROLE_DETECTION = "debug-semantic-role-detection";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the semantic roles
+     * detection.
+     */
+    @Arg(dest = DEBUG_ROLE_DETECTION)
+    public boolean isDebugRoleDetection = false;
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the printing of debug info about the paragraphs detection.
+     */
+    public static final String DEBUG_PARAGRAPH_DETECTION = "debug-paragraph-detection";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the paragraphs
+     * detection.
+     */
+    @Arg(dest = DEBUG_PARAGRAPH_DETECTION)
+    public boolean isDebugParagraphDetection = false;
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the printing of debug info about the word dehyphenation.
+     */
+    public static final String DEBUG_WORD_DEHYPHENATION = "debug-word-dehyphenation";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about the word dehyphenation.
+     */
+    @Arg(dest = DEBUG_WORD_DEHYPHENATION)
+    public boolean isDebugWordDehyphenation = false;
 
    // ============================================================================================
 
     /**
      * The name of the option to define the "with control characters" flag.
      */
-    protected static final String WITH_CONTROL_CHARACTERS = "with-control-characters";
+    public static final String WITH_CONTROL_CHARACTERS = "with-control-characters";
 
     /**
      * The flag indicating whether or not to add control characters to the TXT serialization 
      * output.
      */
     @Arg(dest = WITH_CONTROL_CHARACTERS)
-    protected boolean withControlCharacters = false;
+    public boolean withControlCharacters = false;
 
 
     // ============================================================================================
@@ -334,14 +386,14 @@ public class PdfActCli {
             + "If not specified, the output will be written to stdout.");
 
       // Add an option to define the output format.
-      Set<String> choices = SerializeFormat.getNames();
+      Set<String> choices = SerializationFormat.getNames();
       String choicesStr = String.join(", ", choices);
-      String defaultStr = this.serializeFormat;
+      String defaultStr = this.serializationFormat;
       this.parser.addArgument("--" + SERIALIZE_FORMAT).dest(SERIALIZE_FORMAT)
         .required(false)
         .metavar("<format>")
         .choices(choices)
-        .setDefault(this.serializeFormat)
+        .setDefault(this.serializationFormat)
         .help("The output format.\n" 
             + "- Available options: " + choicesStr + ".\n" 
             + "- Default: \"" + defaultStr + "\".\n"
@@ -416,40 +468,61 @@ public class PdfActCli {
             + "should be written to. The file doesn't have to be existent before. If not "
             + "specified, no such visualization will be created.");
 
-      // Add an option to enable the printing of debug info about the parsed PDF operators.
-      this.parser.addArgument("--" + DEBUG_PDF_OPERATORS).dest(DEBUG_PDF_OPERATORS)
+      // Add an option to enable the printing of debug info about the PDF parsing step.
+      this.parser.addArgument("--" + DEBUG_PDF_PARSING).dest(DEBUG_PDF_PARSING)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.debugPdfOperators)
-        .help("Print debug info about the parsed PDF operators.");
+        .setDefault(this.isDebugPdfParsing)
+        .help("Print debug info about the PDF parsing step.");
       
       // Add an option to enable the printing of debug info about the characters extraction.
       this.parser.addArgument("--" + DEBUG_CHAR_EXTRACTION).dest(DEBUG_CHAR_EXTRACTION)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.debugCharExtraction)
-        .help("Print debug info about the characters extraction.");
+        .setDefault(this.isDebugCharExtraction)
+        .help("Print debug info about the characters extraction step.");
 
       // Add an option to enable the printing of debug info about the text line detection.
       this.parser.addArgument("--" + DEBUG_LINE_DETECTION).dest(DEBUG_LINE_DETECTION)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.debugLineDetection)
-        .help("Print debug info about the text line detection.");
+        .setDefault(this.isDebugLineDetection)
+        .help("Print debug info about the text line detection step.");
 
       // Add an option to enable the printing of debug info about the word detection.
       this.parser.addArgument("--" + DEBUG_WORD_DETECTION).dest(DEBUG_WORD_DETECTION)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.debugWordDetection)
-        .help("Print debug info about the word detection.");
+        .setDefault(this.isDebugWordDetection)
+        .help("Print debug info about the word detection step.");
 
       // Add an option to enable the printing of debug info about the text block detection.
       this.parser.addArgument("--" + DEBUG_BLOCK_DETECTION).dest(DEBUG_BLOCK_DETECTION)
         .required(false)
         .action(Arguments.storeTrue())
-        .setDefault(this.debugBlockDetection)
-        .help("Print debug info about the text block detection.");
+        .setDefault(this.isDebugBlockDetection)
+        .help("Print debug info about the text block detection step.");
+
+      // Add an option to enable the printing of debug info about the roles detection.
+      this.parser.addArgument("--" + DEBUG_ROLE_DETECTION).dest(DEBUG_ROLE_DETECTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isDebugRoleDetection)
+        .help("Print debug info about the semantic roles detection step.");
+
+      // Add an option to enable the printing of debug info about the paragraphs detection.
+      this.parser.addArgument("--" + DEBUG_PARAGRAPH_DETECTION).dest(DEBUG_PARAGRAPH_DETECTION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isDebugParagraphDetection)
+        .help("Print debug info about the paragraphs detection step.");
+
+      // Add an option to enable the printing of debug info about the word dehyphenation.
+      this.parser.addArgument("--" + DEBUG_WORD_DEHYPHENATION).dest(DEBUG_WORD_DEHYPHENATION)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isDebugWordDehyphenation)
+        .help("Print debug info about the word dehyphenation step.");
 
       // Add an option to define whether or not control characters (which identify headings and
       // page breaks should be inserted into the TXT serialization output.
@@ -499,191 +572,6 @@ public class PdfActCli {
      */
     public String getHelp() {
       return this.parser.formatHelp();
-    }
-
-    // ============================================================================================
-    // Getters methods.
-
-    /**
-     * Returns true, if a path to a PDF file is given; false otherwise.
-     *
-     * @return True, if a path to a PDF file is given; false otherwise.
-     */
-    public boolean hasPdfPath() {
-      return this.pdfPath != null;
-    }
-
-    /**
-     * Returns the path to the PDF file.
-     *
-     * @return The path to the PDF file.
-     */
-    public String getPdfPath() {
-      return this.pdfPath;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns true, if a target path for the serialization is given; false otherwise.
-     *
-     * @return True, if a target path for the serialization is given; false otherwise.
-     */
-    public boolean hasSerializationPath() {
-      return this.serializePath != null;
-    }
-
-    /**
-     * Returns the target path for the serialization.
-     *
-     * @return The target path for the serialization.
-     */
-    public String getSerializationPath() {
-      return this.serializePath;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns true, if an serialization format is given.
-     *
-     * @return True, if an serialization format is given.
-     */
-    public boolean hasSerializationFormat() {
-      return this.serializeFormat != null;
-    }
-
-    /**
-     * Returns the serialization format.
-     *
-     * @return The serialization format.
-     */
-    public String getSerializationFormat() {
-      return this.serializeFormat;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns true, if a target path for the visualization is given.
-     *
-     * @return True, if a target path for the visualization is given.
-     */
-    public boolean hasVisualizationPath() {
-      return this.visualizationPath != null;
-    }
-
-    /**
-     * Returns the target path for the visualization.
-     *
-     * @return The target path for the visualization.
-     */
-    public String getVisualizationPath() {
-      return this.visualizationPath;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns true, if there is a text unit given.
-     *
-     * @return True, if there is a text unit given. False otherwise.
-     */
-    public boolean hasTextUnit() {
-      return this.extractionUnits != null;
-    }
-
-    /**
-     * Returns the units to extract.
-     *
-     * @return The units to extract.
-     */
-    public List<String> getExtractionUnits() {
-      return this.extractionUnits;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns the list of semantic role(s) to include.
-     *
-     * @return The list of semantic role(s) to include.
-     */
-    public List<String> getSemanticRolesToInclude() {
-      return this.semanticRolesToInclude;
-    }
-
-    /**
-     * Returns the list of semantic role(s) to exclude.
-     *
-     * @return The list of semantic role(s) to exclude.
-     */
-    public List<String> getSemanticRolesToExclude() {
-      return this.semanticRolesToExclude;
-    }
-
-    // ============================================================================================
-
-    /**
-     * Returns the boolean flag indicating whether or not to print debug info about the parsed PDF
-     * operators.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isDebugPdfOperators() {
-      return this.debugPdfOperators;
-    }
-
-    /**
-     * Returns the boolean flag indicating whether or not to print debug info about the characters
-     * extraction.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isDebugCharactersExtraction() {
-      return this.debugCharExtraction;
-    }
-
-    /**
-     * Returns the boolean flag indicating whether or not to print debug info about the text line
-     * detection.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isDebugTextLineDetection() {
-      return this.debugLineDetection;
-    }
-
-    /**
-     * Returns the boolean flag indicating whether or not to print debug info about the word
-     * detection.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isDebugWordDetection() {
-      return this.debugWordDetection;
-    }
-
-    /**
-     * Returns the boolean flag indicating whether or not to print debug info about the text block
-     * detection.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isDebugTextBlockDetection() {
-      return this.debugBlockDetection;
-    }
-
-    // ============================================================================================
-    
-    /**
-     * Returns the boolean flag indicating whether or not control characters should be added to the 
-     * TXT serialization output.
-     *
-     * @return The boolean flag.
-     */
-    public boolean isWithControlCharacters() {
-      return this.withControlCharacters;
     }
   }
 

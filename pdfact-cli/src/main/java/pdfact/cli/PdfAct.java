@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.Set;
 import org.apache.logging.log4j.core.config.Configurator;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.cli.pipes.PdfActServicePipe;
 import pdfact.cli.pipes.PlainPdfActServicePipe;
 import pdfact.core.model.Document;
@@ -16,7 +16,7 @@ import pdfact.core.model.SemanticRole;
 import pdfact.core.util.exception.PdfActException;
 
 /**
- * The main class for the command line interface of PdfAct.
+ * The main class of PdfAct.
  *
  * @author Claudius Korzen
  */
@@ -24,45 +24,45 @@ public class PdfAct {
   /**
    * The serialization format.
    */
-  protected SerializeFormat serializationFormat;
+  protected SerializationFormat serializationFormat;
 
   /**
-   * The path to the serialization target.
+   * The path to file to which the serialization should be written.
    */
   protected Path serializationPath;
 
   /**
-   * The serialization stream.
+   * The stream (e.g., System.out) to which the serialization should be written.
    */
   protected OutputStream serializationStream;
 
   /**
-   * The path to the visualization target.
+   * The path to the file to which the visualization PDF should be written.
    */
   protected Path visualizationPath;
 
   /**
-   * The units to extract.
+   * The units of text to extract (e.g., "characters", "words", etc.).
    */
   protected Set<ExtractionUnit> extractionUnits;
 
   /**
-   * The semantic roles of the text units to extract.
+   * The semantic roles of the text units to extract (e.g., "title", "author", etc.)
    */
   protected Set<SemanticRole> semanticRoles;
 
   /**
-   * The boolean flag indicating whether or not to print debug info about the parsed PDF operators.
+   * A boolean flag indicating whether or not to print debug info about the PDF parsing step.
    */
-  protected boolean isDebugPdfOperators;
+  protected boolean isDebugPdfParsing;
 
   /**
-   * The boolean flag indicating whether or not to print debug info about the characters extraction.
+   * A boolean flag indicating whether or not to print debug info about the extracted characters.
    */
-  protected boolean isDebugCharactersExtraction;
+  protected boolean isDebugCharacterExtraction;
 
   /**
-   * The boolean flag indicating whether or not to print debug info about the text line detection.
+   * A boolean flag indicating whether or not to print debug info about the text line detection.
    */
   protected boolean isDebugTextLineDetection;
 
@@ -77,11 +77,27 @@ public class PdfAct {
   protected boolean isDebugTextBlockDetection;
 
   /**
-   * The boolean flag indicating whether or not this serializer should insert control characters,
-   * i.e.: "^L" between two PDF elements in case a page break between the two elements occurs in the
-   * PDF and "^A" in front of headings.
+   * The boolean flag indicating whether or not to print debug info about the roles detection.
    */
-  protected boolean withControlCharacters;
+  protected boolean isDebugRoleDetection;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the paragraphs detection.
+   */
+  protected boolean isDebugParagraphDetection;
+
+  /**
+   * The boolean flag indicating whether or not to print debug info about the word dehyphenation.
+   */
+  protected boolean isDebugWordDehyphenation;
+
+  /**
+   * A boolean flag indicating whether or not to insert certain control characters into the TXT
+   * serialization output, for example: (1) the character "^L" ("form feed"), representing a page
+   * break between two PDF elements; or (2) the character "^A" ("start of heading"), identifying the
+   * headings of a document.
+   */
+  protected boolean insertControlCharacters;
 
   // ==============================================================================================
 
@@ -108,45 +124,40 @@ public class PdfAct {
    * @throws PdfActException If something went wrong on parsing the PDF.
    */
   public Document parse(Path pdfPath) throws PdfActException {
-    // Create a service pipe.
-    PdfActServicePipe service = new PlainPdfActServicePipe();
-
-    // Set the debug levels according to the given debug flags.
-    Configurator.setLevel("pdf-operators", this.isDebugPdfOperators ? DEBUG : ERROR);
-    // Configurator.setLevel("pdf-parsing", this.isDebugPdfOperators ? Level.DEBUG : Level.ERROR);
-    Configurator.setLevel("char-extraction", this.isDebugCharactersExtraction ? DEBUG : ERROR);
+    // Set the different debug levels according to the given debug flags.
+    Configurator.setLevel("pdf-parsing", this.isDebugPdfParsing ? DEBUG : ERROR);
+    Configurator.setLevel("char-extraction", this.isDebugCharacterExtraction ? DEBUG : ERROR);
     Configurator.setLevel("line-detection", this.isDebugTextLineDetection ? DEBUG : ERROR);
     Configurator.setLevel("word-detection", this.isDebugWordDetection ? DEBUG : ERROR);
     Configurator.setLevel("block-detection", this.isDebugTextBlockDetection ? DEBUG : ERROR);
-    // Configurator.setLevel("semantic-roles-detection", this.isDebugPdfOperators ? Level.DEBUG :
-    // Level.ERROR);
-    // Configurator.setLevel("paragraphs-detection", this.isDebugPdfOperators ? Level.DEBUG :
-    // Level.ERROR);
-    // Configurator.setLevel("word-dehyphenation", this.isDebugPdfOperators ? Level.DEBUG :
-    // Level.ERROR);
+    Configurator.setLevel("role-detection", this.isDebugRoleDetection ? DEBUG : ERROR);
+    Configurator.setLevel("paragraph-detection", this.isDebugParagraphDetection ? DEBUG : ERROR);
+    Configurator.setLevel("word-dehyphenation", this.isDebugWordDehyphenation ? DEBUG : ERROR);
 
+    // Create a service pipe.
+    PdfActServicePipe service = new PlainPdfActServicePipe();
 
-    // Pass the serialization format if there is any.
+    // Pass the serialization format, if there is any.
     if (this.serializationFormat != null) {
       service.setSerializationFormat(this.serializationFormat);
     }
 
-    // Pass the path to the serialization target.
+    // Pass the path to the serialization file, if there is any.
     if (this.serializationPath != null) {
       service.setSerializationPath(this.serializationPath);
     }
 
-    // Pass the serialization stream.
+    // Pass the serialization stream, if there is any.
     if (this.serializationStream != null) {
       service.setSerializationStream(this.serializationStream);
     }
 
-    // Pass the target of the visualization.
+    // Pass the path to the visualization file.
     if (this.visualizationPath != null) {
       service.setVisualizationPath(this.visualizationPath);
     }
 
-    // Pass the chosen extraction units.
+    // Pass the units of text to extract.
     if (this.extractionUnits != null) {
       service.setExtractionUnits(this.extractionUnits);
     }
@@ -156,7 +167,7 @@ public class PdfAct {
       service.setSemanticRolesToInclude(this.semanticRoles);
     }
 
-    service.setWithControlCharacters(this.withControlCharacters);
+    service.setInsertControlCharacters(this.insertControlCharacters);
 
     // Create the PDF document from the given path.
     Document pdf = new Document(pdfPath);
@@ -170,64 +181,48 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not to print debug info about the parsed PDF
-   * operators.
-   *
-   * @return The boolean flag.
+   * Returns true if debug info about the PDF parsing step should be printed, false otherwise.
    */
-  public boolean isDebugPdfOperators() {
-    return isDebugPdfOperators;
+  public boolean isDebugPdfParsing() {
+    return isDebugPdfParsing;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not to print debug info about the parsed PDF
-   * operators.
-   *
-   * @param debugPdfOperators The boolean flag.
+   * Sets whether or not debug info about the PDF parsing step should be printed.
    */
-  public void setDebugPdfOperators(boolean debugPdfOperators) {
-    this.isDebugPdfOperators = debugPdfOperators;
+  public void setDebugPdfParsing(boolean debugPdfParsing) {
+    this.isDebugPdfParsing = debugPdfParsing;
   }
 
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not to print debug info about the characters
-   * extraction.
-   *
-   * @return The boolean flag.
+   * Returns true if debug info about the character extraction step should be printed, false
+   * otherwise.
    */
-  public boolean isDebugCharactersExtraction() {
-    return isDebugCharactersExtraction;
+  public boolean isDebugCharacterExtraction() {
+    return isDebugCharacterExtraction;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not to print debug info about the characters
-   * extraction.
-   *
-   * @param debugCharactersExtraction The boolean flag.
+   * Sets whether or not debug info about the characters extraction step should be printed.
    */
-  public void setDebugCharactersExtraction(boolean debugCharactersExtraction) {
-    this.isDebugCharactersExtraction = debugCharactersExtraction;
+  public void setDebugCharacterExtraction(boolean debugCharacterExtraction) {
+    this.isDebugCharacterExtraction = debugCharacterExtraction;
   }
 
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not to print debug info about the text line
-   * detection.
-   *
-   * @return The boolean flag.
+   * Returns true if debug info about the text line detection step should be printed, false
+   * otherwise.
    */
   public boolean isDebugTextLineDetection() {
     return isDebugTextLineDetection;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not to print debug info about the text line
-   * detection.
-   *
-   * @param isDebugTextLineDetection The boolean flag.
+   * Sets whether or not debug info about the text line detection step should be printed.
    */
   public void setDebugTextLineDetection(boolean isDebugTextLineDetection) {
     this.isDebugTextLineDetection = isDebugTextLineDetection;
@@ -236,19 +231,14 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not to print debug info about the word
-   * detection.
-   *
-   * @return The boolean flag.
+   * Returns true if debug info about the word detection step should be printed, false otherwise.
    */
   public boolean isDebugWordDetection() {
     return isDebugWordDetection;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not to print debug info about the word detection.
-   *
-   * @param isDebugTextBlockDetection The boolean flag.
+   * Sets whether or not debug info about the word detection step should be printed.
    */
   public void setDebugWordDetection(boolean isDebugWordDetection) {
     this.isDebugWordDetection = isDebugWordDetection;
@@ -257,23 +247,67 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not to print debug info about the text block
-   * detection.
-   *
-   * @return The boolean flag.
+   * Returns true if debug info about the block detection step should be printed, false otherwise.
    */
   public boolean isDebugTextBlockDetection() {
     return isDebugTextBlockDetection;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not to print debug info about the text line
-   * detection.
-   *
-   * @param isDebugTextBlockDetection The boolean flag.
+   * Sets whether or not debug info about the block detection step should be printed.
    */
   public void setDebugTextBlockDetection(boolean isDebugTextBlockDetection) {
     this.isDebugTextBlockDetection = isDebugTextBlockDetection;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if debug info about the roles detection step should be printed, false otherwise.
+   */
+  public boolean isDebugRoleDetection() {
+    return isDebugRoleDetection;
+  }
+
+  /**
+   * Sets whether or not debug info about the roles detection step should be printed.
+   */
+  public void setDebugRoleDetection(boolean isDebugRoleDetection) {
+    this.isDebugRoleDetection = isDebugRoleDetection;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if debug info about the paragraphs detection step should be printed, false
+   * otherwise.
+   */
+  public boolean isDebugParagraphDetection() {
+    return isDebugParagraphDetection;
+  }
+
+  /**
+   * Sets whether or not debug info about the paragraphs detection step should be printed.
+   */
+  public void setDebugParagraphDetection(boolean isDebugParagraphDetection) {
+    this.isDebugParagraphDetection = isDebugParagraphDetection;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if debug info about the word dehyphenation step should be printed, false
+   * otherwise.
+   */
+  public boolean isDebugWordDehyphenation() {
+    return isDebugWordDehyphenation;
+  }
+
+  /**
+   * Sets whether or not debug info about the word dehyphenation step should be printed.
+   */
+  public void setDebugWordDehyphenation(boolean isDebugWordDehyphenation) {
+    this.isDebugWordDehyphenation = isDebugWordDehyphenation;
   }
 
   // ==============================================================================================
@@ -283,7 +317,7 @@ public class PdfAct {
    *
    * @return The serialization format.
    */
-  public SerializeFormat getSerializationFormat() {
+  public SerializationFormat getSerializationFormat() {
     return serializationFormat;
   }
 
@@ -292,43 +326,35 @@ public class PdfAct {
    *
    * @param serializationFormat The serialization format.
    */
-  public void setSerializationFormat(SerializeFormat serializationFormat) {
+  public void setSerializationFormat(SerializationFormat serializationFormat) {
     this.serializationFormat = serializationFormat;
   }
 
   // ==============================================================================================
 
   /**
-   * Returns the path to the serialization target.
-   *
-   * @return The path to the serialization target.
+   * Returns the path to the file to which the serialization output should be written.
    */
   public Path getSerializationPath() {
     return serializationPath;
   }
 
   /**
-   * Sets the path to the serialization target.
-   *
-   * @param serializationPath The path to the serialization target.
+   * Sets the path to the file to which the serialization output should be written.
    */
   public void setSerializationPath(Path serializationPath) {
     this.serializationPath = serializationPath;
   }
 
   /**
-   * Returns the serialization stream.
-   *
-   * @return The serialization stream.
+   * Returns the stream to which the serialization output should be written.
    */
   public OutputStream getSerializationStream() {
     return serializationStream;
   }
 
   /**
-   * Sets the serialization stream.
-   *
-   * @param serializationStream The path to the serialization stream.
+   * Sets the stream to which the serialization output should be written.
    */
   public void setSerializationStream(OutputStream serializationStream) {
     this.serializationStream = serializationStream;
@@ -337,18 +363,14 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the path to the visualization target.
-   *
-   * @return The path to the visualization target.
+   * Returns the path to the file to which the visualization should be written.
    */
   public Path getVisualizationPath() {
     return visualizationPath;
   }
 
   /**
-   * Sets the path to the visualization target.
-   *
-   * @param visualizationPath The path to the visualization target.
+   * Sets the path to the file to which the visualization should be written.
    */
   public void setVisualizationPath(Path visualizationPath) {
     this.visualizationPath = visualizationPath;
@@ -357,18 +379,14 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the units to extract.
-   *
-   * @return The units to extract.
+   * Returns the set of text units to extract.
    */
   public Set<ExtractionUnit> getExtractionUnits() {
     return extractionUnits;
   }
 
   /**
-   * Sets the units to extract.
-   *
-   * @param extractionUnits The units to extract.
+   * Sets the text units to extract.
    */
   public void setExtractionUnits(Set<ExtractionUnit> extractionUnits) {
     this.extractionUnits = extractionUnits;
@@ -377,9 +395,7 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the semantic roles of the text units to extract.
-   *
-   * @return The semantic roles of the text units to extract.
+   * Returns the set of semantic roles of the text units to extract.
    */
   public Set<SemanticRole> getSemanticRoles() {
     return semanticRoles;
@@ -387,8 +403,6 @@ public class PdfAct {
 
   /**
    * Sets the semantic roles of the text units to extract.
-   *
-   * @param semanticRoles The semantic roles of the text units to extract.
    */
   public void setSemanticRoles(Set<SemanticRole> semanticRoles) {
     this.semanticRoles = semanticRoles;
@@ -397,21 +411,23 @@ public class PdfAct {
   // ==============================================================================================
 
   /**
-   * Returns the boolean flag indicating whether or not this serializer should insert control
-   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
-   * occurs in the PDF and "^A" in front of headings.
+   * Returns the boolean flag indicating whether or not to insert certain control characters into
+   * the TXT serialization output, for example: (1) the character "^L" ("form feed"), representing a
+   * page break between two PDF elements; or (2) the character "^A" ("start of heading"),
+   * identifying the headings of a document.
    */
-  public boolean isWithControlCharacters() {
-    return this.withControlCharacters;
+  public boolean isInsertControlCharacters() {
+    return this.insertControlCharacters;
   }
 
   /**
-   * Sets the boolean flag indicating whether or not this serializer should insert control
-   * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
-   * occurs in the PDF and "^A" in front of headings.
+   * Sets the boolean flag indicating whether or not to insert certain control characters into the
+   * TXT serialization output, for example: (1) the character "^L" ("form feed"), representing a
+   * page break between two PDF elements; or (2) the character "^A" ("start of heading"),
+   * identifying the headings of a document.
    */
-  public void setWithControlCharacters(boolean withControlCharacters) {
-    this.withControlCharacters = withControlCharacters;
+  public void setInsertControlCharacters(boolean insertControlCharacters) {
+    this.insertControlCharacters = insertControlCharacters;
   }
 }
 

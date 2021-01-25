@@ -5,12 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
-import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.model.TextLine;
@@ -24,6 +25,11 @@ import pdfact.core.util.statistician.CharacterStatistician;
  * @author Claudius Korzen
  */
 public class HeadingModule implements PdfTextSemanticizerModule {
+  /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+
   /**
    * The character statistician.
    */
@@ -104,6 +110,10 @@ public class HeadingModule implements PdfTextSemanticizerModule {
 
   @Override
   public void semanticize(Document pdf) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.HEADING);
+    log.debug("=====================================================");
+    
     if (pdf == null) {
       return;
     }
@@ -138,6 +148,12 @@ public class HeadingModule implements PdfTextSemanticizerModule {
         // The text block is a heading if its font face is equal to the
         // computed section heading font face.
         if (headingFontFace == fontFace) {
+          log.debug("-----------------------------------------------------");
+          log.debug("Text block: \"%s\" ...", block.getText());
+          log.debug("... page:          %d", block.getPosition().getPageNumber());
+          log.debug("... font face:     %s", block.getCharacterStatistic().getMostCommonFontFace());
+          log.debug("... assigned role: %s", SemanticRole.HEADING);
+          log.debug("... role reason:   the block exhibits the detected heading font face");
           block.setSemanticRole(SemanticRole.HEADING);
           // Iterate through the known headings to obtain the secondary role.
           for (SemanticRole role : KNOWN_HEADINGS.keySet()) {

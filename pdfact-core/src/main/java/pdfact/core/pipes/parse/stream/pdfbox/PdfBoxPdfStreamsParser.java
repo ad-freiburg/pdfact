@@ -100,7 +100,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger("pdf-operators");
+  protected static Logger log = LogManager.getFormatterLogger("pdf-parsing");
 
   /**
    * The map of operator processors.
@@ -273,7 +273,7 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
     try (PDDocument doc = PDDocument.load(pdf.getFile())) {
       handlePdfFileStart(pdf);
       for (int i = 0; i < doc.getPages().getCount(); i++) {
-        log.debug("==================== Page " + (i + 1) + " ====================");
+        log.debug("==================== Page %d ====================", i + 1);
         processPage(pdf, doc.getPages().get(i), i + 1);
       }
       handlePdfFileEnd(pdf);
@@ -446,17 +446,18 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
           throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
-    log.debug("Operator: " + op + "; Args: " + args);
-
+    log.debug("Operator: %s; Args: %s", op.getName(), args);
+    
     if (processor != null) {
+      log.debug("... handled by %s.class.", processor.getClass().getSimpleName());
       try {
         processor.setStreamEngine(this);
         processor.process(pdf, page, op, args);
       } catch (IOException e) {
-        log.warn("... error on processing the operator.", e);
+        log.warn("... error on handling the operator.", e);
       }
     } else {
-      log.debug("... unsupported operator.");
+      log.debug("... not handled.");
     }
   }
 

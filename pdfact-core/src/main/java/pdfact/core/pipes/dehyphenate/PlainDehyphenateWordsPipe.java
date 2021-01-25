@@ -27,7 +27,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainDehyphenateWordsPipe.class);
+  protected static Logger log = LogManager.getFormatterLogger("word-dehyphenation");
 
   /**
    * The word normalizer.
@@ -92,27 +92,8 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Preprocess: Counting words.");
     countWords(pdf);
-
-    log.debug("Counting words done.");
-    log.debug("# words               : " + this.numWords);
-    log.debug("# uniq. normal words  : " + this.normalWordsIndex.size());
-    log.debug("# uniq. compound words: " + this.compoundWordsIndex.size());
-    log.debug("# uniq. prefixes      : " + this.prefixesIndex.size());
-
-    log.debug("Process: Dehyphenating words.");
     dehyphenate(pdf);
-
-    log.debug("Dehyphenating words done.");
-    log.debug("# processed words   : " + this.numProcessedWords);
-    log.debug("# dehyphenated words: " + this.numDehyphenatedWords);
-    log.debug("> to normal words   : " + this.numNormalWords);
-    log.debug("> to compound words : " + this.numCompoundWords);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -312,6 +293,9 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     String word1Str = this.wordNormalizer.normalize(word1);
     String word2Str = this.wordNormalizer.normalize(word2);
 
+    log.debug("-------------------------------------------");
+    log.debug("Merging words \"%s\" and \"%s\" ...", word1Str, word2Str);
+
     // TODO: Use the word normalizer.
     String prefix = word1Str.replaceAll("[-]$", "");
     String withHyphen = word1Str + word2Str;
@@ -321,10 +305,34 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     int compoundWordFreq = this.compoundWordsIndex.getFrequency(withHyphen);
     int compoundWordPrefixFreq = this.prefixesIndex.getFrequency(prefix);
 
+    log.debug("... frequency of combined word without hyphen: %d", singleWordFreq);
+    log.debug("... frequency of combined word with hyphen:    %d", compoundWordFreq);
+    log.debug("... frequency of prefix with hyphen:           %d", compoundWordPrefixFreq);
+
     if (compoundWordFreq != singleWordFreq) {
-      return compoundWordFreq > singleWordFreq;
+      if (compoundWordFreq > singleWordFreq) {
+        log.debug("... hyphen is mandatory:                       true");
+        log.debug("... reason:                                    freq(\"%s\") > freq(\"%s\")", 
+            withHyphen, withoutHyphen);
+        return true;
+      } else {
+        log.debug("... hyphen is mandatory:                       false");
+        log.debug("... reason:                                    freq(\"%s\") < freq(\"%s\")", 
+            withHyphen, withoutHyphen);
+        return false;
+      }
     }
 
-    return compoundWordPrefixFreq > 0;
+    if (compoundWordPrefixFreq > 0) {
+      log.debug("... hyphen is mandatory:                       true");
+      log.debug("... reason:                                    freq(\"%s\") == freq(\"%s\") and "
+         + "freq(\"%s\") > 0.", withHyphen, withoutHyphen, prefix);
+      return true;
+    } else {
+      log.debug("... hyphen is mandatory:                       false");
+      log.debug("... reason:                                    freq(\"%s\") == freq(\"%s\") and "
+      + "freq(\"%s\") < 0.", withHyphen, withoutHyphen, prefix);
+      return false;
+    }
   }
 }

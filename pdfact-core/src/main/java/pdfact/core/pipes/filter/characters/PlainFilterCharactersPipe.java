@@ -18,7 +18,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainFilterCharactersPipe.class);
+  protected final Logger log = LogManager.getLogger("char-extraction");
 
   /**
    * The number of processed characters.
@@ -34,16 +34,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Filtering characters.");
     filterCharacters(pdf);
-
-    log.debug("Filtering characters done.");
-    log.debug("# processed characters: " + this.numProcessedCharacters);
-    log.debug("# filtered characters : " + this.numFilteredCharacters);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -86,6 +77,7 @@ public class PlainFilterCharactersPipe implements FilterCharactersPipe {
   public static boolean isFilterCharacter(Character character) {
     // Ignore the character, if it is null.
     if (character == null) {
+      
       return true;
     }
 

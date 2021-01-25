@@ -3,9 +3,10 @@ package pdfact.core.pipes.semanticize.modules;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import pdfact.core.model.Page;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Document;
+import pdfact.core.model.Page;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 import pdfact.core.util.comparator.MinYComparator;
@@ -18,6 +19,11 @@ import pdfact.core.util.counter.ObjectCounter;
  * @author Claudius Korzen
  */
 public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
+  /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+
   @Override
   public void semanticize(Document pdf) {
     if (pdf == null) {
@@ -68,6 +74,10 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
    *        The semantic role to assign to the related text blocks.
    */
   protected void semanticizeBlocks(List<TextBlock> blocks, SemanticRole role) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", role);
+    log.debug("=====================================================");
+    
     if (blocks == null || blocks.isEmpty()) {
       return;
     }
@@ -84,9 +94,15 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
     }
 
     String mostCommonText = textCounter.getMostCommonObject();
+
     for (TextBlock block : blocks) {
       String normalizedText = getNormalizedText(block);
       if (normalizedText.equals(mostCommonText)) {
+        log.debug("-----------------------------------------------------");
+        log.debug("Text block: \"%s\" ...", block.getText());
+        log.debug("... page:          %d", block.getPosition().getPageNumber());
+        log.debug("... assigned role: %s", role);
+        log.debug("... role reason:   the text occurs on more than half of the pages.");
         block.setSemanticRole(role);
       }
     }

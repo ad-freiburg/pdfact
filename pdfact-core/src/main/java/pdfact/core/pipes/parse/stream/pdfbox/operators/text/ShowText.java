@@ -5,7 +5,10 @@ import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.fontbox.afm.CharMetric;
 import org.apache.fontbox.cff.CFFType1Font;
 import org.apache.fontbox.cff.Type1CharString;
@@ -56,7 +59,7 @@ public class ShowText extends OperatorProcessor {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(ShowText.class);
+  protected final Logger log = LogManager.getFormatterLogger("char-extraction");
 
   /**
    * The translator to translate PDFont objects to PdfFont objects.
@@ -321,6 +324,35 @@ public class ShowText extends OperatorProcessor {
     character.setPosition(position);
     character.setExtractionRank(this.sequenceNumber++);
 
+    log.debug("---------------------------------------------");
+    log.debug("Extracted char:   %s", character.getText());
+
+    // Check if we have to normalize the character.
+    String normalized = normalizeCharacter(unicode);
+    if (normalized != null) {
+      log.debug("... normalized to:   %s", normalized);        
+      character.setText(normalized);
+    }
+      
+    log.debug("... page:         %d", character.getPosition().getPageNumber());
+    float minX = character.getPosition().getRectangle().getMinX();
+    float minY = character.getPosition().getRectangle().getMinY();
+    float maxX = character.getPosition().getRectangle().getMaxX();
+    float maxY = character.getPosition().getRectangle().getMaxY();
+    log.debug("... bounding box: [%.1f, %.1f, %.1f, %.1f]", minX, minY, maxX, maxY);
+    log.debug("... font:         %s", character.getFontFace().getFont().getBaseName());
+    log.debug("... fontsize:     %.1fpt", character.getFontFace().getFontSize());
+    log.debug("... is bold:      %s", character.getFontFace().getFont().isBold());
+    log.debug("... is italic:    %s", character.getFontFace().getFont().isItalic());
+    log.debug("... is type3:     %s", character.getFontFace().getFont().isType3Font());
+    log.debug("... RGB color:    %s", Arrays.toString(character.getColor().getRGB()));
+    log.debug("... rank:         %s", character.getExtractionRank());        
+    
+    // Check if we have to ignore the character.
+    if (ignoreCharacter(character)) {
+      return;
+    }
+
     this.engine.handlePdfCharacter(pdf, page, character);
   }
 
@@ -526,6 +558,70 @@ public class ShowText extends OperatorProcessor {
     float maxY = minY + dyDisplay;
 
     return new Rectangle(minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Returns true if the given character should be ignored on further processings; false otherwise.
+   */
+  protected boolean ignoreCharacter(Character character) {
+    // Ignore the character, if it is null.
+    if (character == null) {
+      log.debug("... ignore:       true (because it is null)");
+      return true;
+    }
+
+    // Ignore the character, if the width of its bounding box is <= 0.
+    if (character.getPosition().getRectangle().getWidth() <= 0) {
+      log.debug("... ignore:       true (because the width of the bounding box is <= 0");
+      return true;
+    }
+
+    // Ignore the character, if the height of its bounding box is <= 0.
+    if (character.getPosition().getRectangle().getHeight() <= 0) {
+      log.debug("... ignore:       true (because the height of the bounding box is <= 0");
+      return true;
+    }
+
+    // Ignore the the character, if it doesn't contain text.
+    String text = character.getText();
+    if (text == null || text.trim().isEmpty()) {
+      log.debug("... ignore:       true (because it doesn't contain text)");
+      return true;
+    }
+
+    log.debug("... ignore:       false");
+    return false;
+  }
+
+  /**
+   * A map that maps some characters to a character with the same semantic
+   * meaning.
+   */
+  protected static final Map<String, String> CHARACTER_SYNONYMS;
+
+  // TODO: Move this to character lexicon.
+  static {
+    CHARACTER_SYNONYMS = new HashMap<String, String>();
+    CHARACTER_SYNONYMS.put("\u2018", "'"); // ‘
+    CHARACTER_SYNONYMS.put("\u2019", "'"); // ’
+    CHARACTER_SYNONYMS.put("\u201b", "'"); // ‛
+    CHARACTER_SYNONYMS.put("\u201c", "\""); // “
+    CHARACTER_SYNONYMS.put("\u201d", "\""); // ”
+    CHARACTER_SYNONYMS.put("\u201f", "\""); // ‟
+    CHARACTER_SYNONYMS.put("\u301d", "\""); // 〝
+    CHARACTER_SYNONYMS.put("\u301e", "\""); // 〞
+    CHARACTER_SYNONYMS.put("\uff02", "\""); // ＂
+    CHARACTER_SYNONYMS.put("\uff07", "'"); // ＇
+  }
+
+  /**
+   * Normalizes the given character.
+   */
+  protected String normalizeCharacter(String ch) {
+    if (ch != null && CHARACTER_SYNONYMS.containsKey(ch)) {
+      return CHARACTER_SYNONYMS.get(ch);
+    }
+    return null;
   }
 
   @Override

@@ -33,8 +33,8 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
   /**
    * The loggers.
    */
-  protected static Logger llog = LogManager.getLogger("line-detection");
-  protected static Logger wlog = LogManager.getLogger("word-detection");
+  protected static Logger llog = LogManager.getFormatterLogger("line-detection");
+  protected static Logger wlog = LogManager.getFormatterLogger("word-detection");
 
   /**
    * The statistician to compute statistics about characters.
@@ -68,56 +68,55 @@ public class XYCutTokenizeToWordsPipe extends XYCut implements TokenizeToWordsPi
     // because the text of text lines is only known after words were detected.
     if (llog.isDebugEnabled()) {
       for (Page page : doc.getPages()) {
-        llog.debug("==================== Page " + page.getPageNumber() + " ====================");
+        llog.debug("==================== Page %d ====================", page.getPageNumber());
         for (TextLine line : page.getTextLines()) {
           llog.debug("-------------------------------------------");
-          llog.debug("Text line:          " + line.getText());
-          llog.debug("... page:           " + line.getPosition().getPageNumber());
-          String x1 = String.format("%.1f", line.getPosition().getRectangle().getMinX());
-          String y1 = String.format("%.1f", line.getPosition().getRectangle().getMinY());
-          String x2 = String.format("%.1f", line.getPosition().getRectangle().getMaxX());
-          String y2 = String.format("%.1f", line.getPosition().getRectangle().getMaxY());
-          llog.debug("... position:       [" + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "]");          
+          llog.debug("Detected text line:  \"%s\"", line.getText());
+          llog.debug("... page:            %d", line.getPosition().getPageNumber());
+          float x1 = line.getPosition().getRectangle().getMinX();
+          float y1 = line.getPosition().getRectangle().getMinY();
+          float x2 = line.getPosition().getRectangle().getMaxX();
+          float y2 = line.getPosition().getRectangle().getMaxY();
+          llog.debug("... bounding box:    [%.1f, %.1f, %.1f, %.1f]", x1, y1, x2, y2);
           FontFace fontFace = line.getCharacterStatistic().getMostCommonFontFace();
-          String avgFs = String.format("%.1f", line.getCharacterStatistic().getAverageFontsize());
-          llog.debug("... main font:      " + fontFace.getFont().getBaseName());
-          llog.debug("... main fontsize:  " + fontFace.getFontSize() + "pt");
-          llog.debug("... avg. fontsize:  " + avgFs + "pt");
-          llog.debug("... mainly bold:    " + fontFace.getFont().isBold());
-          llog.debug("... mainly italic:  " + fontFace.getFont().isItalic());
-          llog.debug("... mainly type3:   " + fontFace.getFont().isType3Font());
+          llog.debug("... main font:       %s", fontFace.getFont().getBaseName());
+          llog.debug("... main fontsize:   %.1fpt", fontFace.getFontSize());
+          float avgFontsize = line.getCharacterStatistic().getAverageFontsize();
+          llog.debug("... avg. fontsize:   %.1fpt", avgFontsize);
+          llog.debug("... mainly bold:     %s", fontFace.getFont().isBold());
+          llog.debug("... mainly italic:   %s", fontFace.getFont().isItalic());
+          llog.debug("... mainly type3:    %s", fontFace.getFont().isType3Font());
           Color color = line.getCharacterStatistic().getMostCommonColor();
-          llog.debug("... main RGB color: " + Arrays.toString(color.getRGB()));
-          llog.debug("... baseline:       " + line.getBaseline());
+          llog.debug("... main RGB color:  %s", Arrays.toString(color.getRGB()));
+          llog.debug("... baseline:        %s", line.getBaseline());
         }
       }
     }
 
     if (wlog.isDebugEnabled()) {
       for (Page page : doc.getPages()) {
-        wlog.debug("==================== Page " + page.getPageNumber() + " ====================");
+        wlog.debug("==================== Page %d ====================", page.getPageNumber());
         for (TextLine line : page.getTextLines()) {
           for (Word word : line.getWords()) {
             wlog.debug("-------------------------------------------");
-            wlog.debug("Word:               " + word.getText());
-            Position position = word.getFirstPosition();
-            wlog.debug("... page:           " + position.getPageNumber());
-            String x1 = String.format("%.1f", position.getRectangle().getMinX());
-            String y1 = String.format("%.1f", position.getRectangle().getMinY());
-            String x2 = String.format("%.1f", position.getRectangle().getMaxX());
-            String y2 = String.format("%.1f", position.getRectangle().getMaxY());
-            wlog.debug("... position:       [" + x1 + ", " + y1 + ", " + x2 + ", " + y2 + "]");          
+            wlog.debug("Detected word:      \"%s\"", word.getText());
+            wlog.debug("... page:           %d", word.getFirstPosition().getPageNumber());
+            float x1 = word.getFirstPosition().getRectangle().getMinX();
+            float y1 = word.getFirstPosition().getRectangle().getMinY();
+            float x2 = word.getFirstPosition().getRectangle().getMaxX();
+            float y2 = word.getFirstPosition().getRectangle().getMaxY();
+            wlog.debug("... bounding box:   [%.1f, %.1f, %.1f, %.1f]", x1, y1, x2, y2);        
             FontFace fontFace = word.getCharacterStatistic().getMostCommonFontFace();
-            String avgFs = String.format("%.1f", word.getCharacterStatistic().getAverageFontsize());
-            wlog.debug("... main font:      " + fontFace.getFont().getBaseName());
-            wlog.debug("... main fontsize:  " + fontFace.getFontSize() + "pt");
-            wlog.debug("... avg. fontsize:  " + avgFs + "pt");
-            wlog.debug("... mainly bold:    " + fontFace.getFont().isBold());
-            wlog.debug("... mainly italic:  " + fontFace.getFont().isItalic());
-            wlog.debug("... mainly type3:   " + fontFace.getFont().isType3Font());
+            wlog.debug("... main font:      %s", fontFace.getFont().getBaseName());
+            wlog.debug("... main fontsize:  %.1fpt", fontFace.getFontSize());
+            float avgFontsize = word.getCharacterStatistic().getAverageFontsize();
+            wlog.debug("... avg. fontsize:  %.1fpt", avgFontsize);
+            wlog.debug("... mainly bold:    %s", fontFace.getFont().isBold());
+            wlog.debug("... mainly italic:  %s", fontFace.getFont().isItalic());
+            wlog.debug("... mainly type3:   %s", fontFace.getFont().isType3Font());
             Color color = word.getCharacterStatistic().getMostCommonColor();
-            wlog.debug("... main RGB color: " + Arrays.toString(color.getRGB()));
-            wlog.debug("... hyphenated:     " + word.isHyphenated());
+            wlog.debug("... main RGB color: %s", Arrays.toString(color.getRGB()));
+            wlog.debug("... hyphenated:     %s", word.isHyphenated());
           }
         }
       }

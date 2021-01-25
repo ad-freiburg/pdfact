@@ -20,7 +20,7 @@ public class PlainStandardizeCharactersPipe
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainStandardizeCharactersPipe.class);
+  protected final Logger log = LogManager.getLogger("char-extraction");
 
   /**
    * A map that maps some characters to a character with the same semantic
@@ -57,16 +57,7 @@ public class PlainStandardizeCharactersPipe
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Standardizing the characters.");
     standardizeCharacters(pdf);
-
-    log.debug("Standardizing the characters done.");
-    log.debug("# processed characters: " + this.numProcessedCharacters);
-    log.debug("# standardized characters: " + this.numStandardizedCharacters);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
@@ -121,10 +112,6 @@ public class PlainStandardizeCharactersPipe
       return;
     }
 
-    if (CHARACTER_SYNONYMS.containsKey(ch.getText())) {
-      ch.setText(CHARACTER_SYNONYMS.get(ch.getText()));
-      this.numStandardizedCharacters++;
-    }
     this.numProcessedCharacters++;
   }
 }

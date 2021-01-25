@@ -18,39 +18,6 @@ public class PdfActCoreSettings {
   public static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
   // ==============================================================================================
-  // Debug settings.
-
-  /**
-   * The default boolean flag indicating whether or not to print debug info about the parsed PDF
-   * operators.
-   */
-  public static final boolean DEFAULT_IS_DEBUG_PDF_OPERATORS = false;
-
-  /**
-   * The default boolean flag indicating whether or not to print debug info about the characters
-   * extraction.
-   */
-  public static final boolean DEFAULT_IS_DEBUG_CHARS_EXTRACTION = false;
-
-  /**
-   * The default boolean flag indicating whether or not to print debug info about the text line
-   * detection.
-   */
-  public static final boolean DEFAULT_IS_DEBUG_LINE_DETECTION = false;
-
-  /**
-   * The default boolean flag indicating whether or not to print debug info about the word
-   * detection.
-   */
-  public static final boolean DEFAULT_IS_DEBUG_WORD_DETECTION = false;
-
-  /**
-   * The default boolean flag indicating whether or not to print debug info about the text block
-   * detection.
-   */
-  public static final boolean DEFAULT_IS_DEBUG_BLOCK_DETECTION = false;
-
-  // ==============================================================================================
 
   /**
    * The number of decimal places for floating numbers.

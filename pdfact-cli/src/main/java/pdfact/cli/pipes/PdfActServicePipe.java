@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
@@ -52,14 +52,14 @@ public interface PdfActServicePipe extends Pipe {
    * 
    * @return The target serialization format.
    */
-  SerializeFormat getSerializationFormat();
+  SerializationFormat getSerializationFormat();
 
   /**
    * Sets the target serialization format.
    * 
    * @param format The target serialization format.
    */
-  void setSerializationFormat(SerializeFormat format);
+  void setSerializationFormat(SerializationFormat format);
 
   // ==============================================================================================
 
@@ -139,5 +139,5 @@ public interface PdfActServicePipe extends Pipe {
    * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
    * occurs in the PDF and "^A" in front of headings.
    */
-  public void setWithControlCharacters(boolean withControlCharacters);
+  public void setInsertControlCharacters(boolean withControlCharacters);
 }

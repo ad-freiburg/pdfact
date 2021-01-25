@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.util.pipeline.Pipe;
 
@@ -19,14 +19,14 @@ public interface SerializePdfPipe extends Pipe {
    * 
    * @return The serialization format.
    */
-  SerializeFormat getSerializationFormat();
+  SerializationFormat getSerializationFormat();
 
   /**
    * Sets the serialization format.
    * 
    * @param format The serialization format.
    */
-  void setSerializationFormat(SerializeFormat format);
+  void setSerializationFormat(SerializationFormat format);
 
   // ==============================================================================================
 

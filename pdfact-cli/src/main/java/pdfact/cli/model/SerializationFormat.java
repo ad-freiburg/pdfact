@@ -10,7 +10,7 @@ import java.util.Set;
  * 
  * @author Claudius Korzen
  */
-public enum SerializeFormat {
+public enum SerializationFormat {
   /**
    * The serialization format "XML".
    */
@@ -36,13 +36,13 @@ public enum SerializeFormat {
   /**
    * The serialization formats per names.
    */
-  protected static final Map<String, SerializeFormat> FORMATS;
+  protected static final Map<String, SerializationFormat> FORMATS;
 
   static {
     FORMATS = new HashMap<>();
 
     // Fill the map of serialization formats per name.
-    for (SerializeFormat format : values()) {
+    for (SerializationFormat format : values()) {
       FORMATS.put(format.getName(), format);
     }
   }
@@ -52,7 +52,7 @@ public enum SerializeFormat {
    * 
    * @param name The name of the format.
    */
-  private SerializeFormat(String name) {
+  private SerializationFormat(String name) {
     this.name = name;
   }
 
@@ -97,14 +97,14 @@ public enum SerializeFormat {
    * 
    * @return A set of the fetched serialization formats.
    */
-  public static Set<SerializeFormat> fromStrings(String... names) {
+  public static Set<SerializationFormat> fromStrings(String... names) {
     if (names == null || names.length == 0) {
       return null;
     }
 
-    Set<SerializeFormat> formats = new HashSet<>();
+    Set<SerializationFormat> formats = new HashSet<>();
     for (String name : names) {
-      SerializeFormat format = fromString(name);
+      SerializationFormat format = fromString(name);
       if (format != null) {
         formats.add(format);
       }
@@ -119,7 +119,7 @@ public enum SerializeFormat {
    * 
    * @return The serialization format that is associated with the given name.
    */
-  public static SerializeFormat fromString(String name) {
+  public static SerializationFormat fromString(String name) {
     if (!isValidSerializeFormat(name)) {
       throw new IllegalArgumentException(name + " isn't a valid serialization format.");
     }

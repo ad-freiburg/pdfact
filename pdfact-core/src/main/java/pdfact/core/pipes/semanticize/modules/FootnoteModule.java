@@ -1,13 +1,14 @@
 package pdfact.core.pipes.semanticize.modules;
 
 import java.util.List;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Document;
 import pdfact.core.model.FontFace;
 import pdfact.core.model.Line;
 import pdfact.core.model.Page;
-import pdfact.core.model.Document;
 import pdfact.core.model.Rectangle;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
@@ -20,8 +21,17 @@ import pdfact.core.util.PdfActUtils;
  * @author Claudius Korzen
  */
 public class FootnoteModule implements PdfTextSemanticizerModule {
+   /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+  
   @Override
   public void semanticize(Document pdf) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.FOOTNOTE);
+    log.debug("=====================================================");
+    
     if (pdf == null) {
       return;
     }
@@ -69,13 +79,24 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
         }
 
         CharacterStatistic blockCharStats = block.getCharacterStatistic();
-        FontFace fontFace = blockCharStats.getMostCommonFontFace();
+        FontFace blockFontFace = blockCharStats.getMostCommonFontFace();
+        FontFace firstCharFontFace = firstChar.getFontFace();
         // The text block is *not* a footnote, if the font face of the 1st char
         // is equal to the most common font face in the text line.
-        if (firstChar.getFontFace() == fontFace) {
+        if (firstCharFontFace == blockFontFace) {
           continue;
         }
 
+        log.debug("-----------------------------------------------------");
+        log.debug("Text block: \"%s\" ...", block.getText());
+        log.debug("... page:                       %.1f", block.getPosition().getPageNumber());
+        log.debug("... font face:                  %s", blockFontFace);
+        log.debug("... min-y of 1st character:     %.1f", firstCharMinY);
+        log.debug("... min-y of 1st text line:     %.1f", lineBaseLineY);
+        log.debug("... font face of 1st character: %s", firstCharFontFace);
+        log.debug("... assigned role:              %s", SemanticRole.FOOTNOTE);
+        log.debug("... role reason:                the first character is raised compared to the "
+          + "first text line and doesn't exhibit the font most commonly used in the text block");
         block.setSemanticRole(SemanticRole.FOOTNOTE);
       }
     }

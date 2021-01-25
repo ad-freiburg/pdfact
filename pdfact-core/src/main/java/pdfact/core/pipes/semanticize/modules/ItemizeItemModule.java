@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Document;
 import pdfact.core.model.Page;
 import pdfact.core.model.SemanticRole;
@@ -15,6 +17,11 @@ import pdfact.core.model.TextBlock;
  * @author Claudius Korzen
  */
 public class ItemizeItemModule implements PdfTextSemanticizerModule {
+  /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+
   /**
    * A list of patterns to identify items of itemizes.
    */
@@ -59,6 +66,10 @@ public class ItemizeItemModule implements PdfTextSemanticizerModule {
 
   @Override
   public void semanticize(Document pdf) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.ITEMIZE_ITEM);
+    log.debug("=====================================================");
+    
     if (pdf == null) {
       return;
     }
@@ -88,6 +99,11 @@ public class ItemizeItemModule implements PdfTextSemanticizerModule {
         for (Pattern pattern : ITEMIZE_ITEM_PATTERNS) {
           Matcher matcher = pattern.matcher(block.getText());
           if (matcher.find() && !matcher.group(1).isEmpty()) {
+            log.debug("-----------------------------------------------------");
+            log.debug("Text block: \"%s\" ...", block.getText());
+            log.debug("... page:          %d", block.getPosition().getPageNumber());
+            log.debug("... assigned role: %s", SemanticRole.ITEMIZE_ITEM); 
+            log.debug("... role reason:   the text matches the regex '%s'", pattern);
             block.setSemanticRole(SemanticRole.ITEMIZE_ITEM);
             break;
           }

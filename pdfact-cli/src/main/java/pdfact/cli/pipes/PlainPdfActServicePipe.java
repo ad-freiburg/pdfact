@@ -9,7 +9,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.cli.pipes.serialize.PlainSerializePdfPipe;
 import pdfact.cli.pipes.serialize.SerializePdfPipe;
 import pdfact.cli.pipes.validate.PlainValidatePathToWritePipe;
@@ -63,7 +63,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   /**
    * The serialization format.
    */
-  protected SerializeFormat serializationFormat;
+  protected SerializationFormat serializationFormat;
 
   /**
    * The units to use in serialization and visualization.
@@ -193,12 +193,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
   // ==============================================================================================
 
   @Override
-  public SerializeFormat getSerializationFormat() {
+  public SerializationFormat getSerializationFormat() {
     return this.serializationFormat;
   }
 
   @Override
-  public void setSerializationFormat(SerializeFormat format) {
+  public void setSerializationFormat(SerializationFormat format) {
     this.serializationFormat = format;
   }
 
@@ -266,7 +266,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
    * occurs in the PDF and "^A" in front of headings.
    */
-  public void setWithControlCharacters(boolean withControlCharacters) {
+  public void setInsertControlCharacters(boolean withControlCharacters) {
     this.withControlCharacters = withControlCharacters;
   }
 }

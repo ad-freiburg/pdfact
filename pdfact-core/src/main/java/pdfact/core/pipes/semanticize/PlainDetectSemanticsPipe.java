@@ -32,7 +32,7 @@ public class PlainDetectSemanticsPipe
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainDetectSemanticsPipe.class);
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
 
   /**
    * The semanticizer modules.
@@ -65,15 +65,7 @@ public class PlainDetectSemanticsPipe
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Detecting the semantics of the text blocks.");
-    log.debug("# registered semanticizer modules: " + this.modules.size());
     detectSemantics(pdf);
-
-    log.debug("Detecting the semantics of the text blocks done.");
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-
     return pdf;
   }
 

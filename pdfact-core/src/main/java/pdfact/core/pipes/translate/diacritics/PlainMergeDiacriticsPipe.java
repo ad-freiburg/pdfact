@@ -23,7 +23,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainMergeDiacriticsPipe.class);
+  protected final Logger log = LogManager.getFormatterLogger("char-extraction");
 
   /**
    * The number of processed characters.
@@ -39,27 +39,16 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Merging the diacritics.");
     mergeDiacritics(pdf);
-
-    log.debug("Merging the diacritics done.");
-    log.debug("# processed characters: " + this.numProcessedCharacters);
-    log.debug("# merged diacritics: " + this.numMergedDiacritics);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
     return pdf;
   }
 
   // ==============================================================================================
 
   /**
-   * Merges the diacritical marks in the given PDF document with their related
-   * characters.
+   * Merges the diacritical marks in the given PDF document with their related characters.
    * 
-   * @param pdf
-   *        The PDF document to process.
+   * @param pdf The PDF document to process.
    */
   protected void mergeDiacritics(Document pdf) {
     if (pdf != null) {
@@ -91,19 +80,15 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   }
 
   /**
-   * Chooses the belonging base character (either the given character to the
-   * left or the given character to the right of the diacritic) and merges the
-   * given diacritic with this base character.
+   * Chooses the belonging base character (either the given character to the left or the given
+   * character to the right of the diacritic) and merges the given diacritic with this base
+   * character.
    * 
-   * @param prev
-   *        The character to the left of the diacritic.
-   * @param diacritic
-   *        The diacritic.
-   * @param next
-   *        The character to the right of the diacritic.
+   * @param prev      The character to the left of the diacritic.
+   * @param diacritic The diacritic.
+   * @param next      The character to the right of the diacritic.
    */
-  public void mergeDiacritic(Character prev, Character diacritic,
-      Character next) {
+  public void mergeDiacritic(Character prev, Character diacritic, Character next) {
     if (diacritic == null) {
       return;
     }
@@ -118,6 +103,17 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       return;
     }
 
+    if (log.isDebugEnabled()) {
+      Position pos = diacritic.getPosition();
+      int pageNum = pos.getPageNumber();
+      float minX = pos.getRectangle().getMinX();
+      float minY = pos.getRectangle().getMinY();
+      float maxX = pos.getRectangle().getMaxX();
+      float maxY = pos.getRectangle().getMaxY();
+      log.debug("Merging diacritic '{}' (page: {}, box: [{:.1f}, {:.1f}, {:.1f}, {:.1f}] ...",
+              diacritic.getText(), pageNum, minX, minY, maxX, maxY);
+    }
+
     // Choose the belonging base character:
     // (1) Compute the horizontal overlap with the left character.
     float prevOverlap = 0;
@@ -126,6 +122,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       if (prevPosition != null) {
         Rectangle prevRect = prevPosition.getRectangle();
         prevOverlap = diacriticRect.getHorizontalOverlapLength(prevRect);
+        log.debug("... horizontal overlap with prev. char: {:.1f}pt", prevOverlap);
       }
     }
 
@@ -136,6 +133,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       if (nextPosition != null) {
         Rectangle nextRect = nextPosition.getRectangle();
         nextOverlap = diacriticRect.getHorizontalOverlapLength(nextRect);
+        log.debug("... horizontal overlap with next char:  {:.1f}pt", nextOverlap);
       }
     }
 
@@ -143,9 +141,11 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
     if (prevOverlap > 0 && prevOverlap >= nextOverlap) {
       prev.setText(mergeTexts(prev, diacritic));
       prev.getPosition().setRectangle(mergeRectangles(prev, diacritic));
+      log.debug("... merging with prev. character to '{}'.", prev.getText());
     } else if (nextOverlap > 0 && nextOverlap > prevOverlap) {
       next.setText(mergeTexts(next, diacritic));
       next.getPosition().setRectangle(mergeRectangles(next, diacritic));
+      log.debug("... merging with next character to '{}'.", next.getText());
     }
   }
 
@@ -154,10 +154,8 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * Merges the texts of the given base character and the given diacritic.
    * 
-   * @param diacritic
-   *        The diacritic to merge with the base character.
-   * @param base
-   *        The base character to merge with the diacritic.
+   * @param diacritic The diacritic to merge with the base character.
+   * @param base      The base character to merge with the diacritic.
    *
    * @return The merged text.
    */
@@ -187,10 +185,8 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * Merges the rectangles of the given base character and the given diacritic.
    * 
-   * @param diacritic
-   *        The diacritic to merge with the base character.
-   * @param base
-   *        The base character to merge with the diacritic.
+   * @param diacritic The diacritic to merge with the base character.
+   * @param base      The base character to merge with the diacritic.
    *
    * @return The merged rectangle.
    */
@@ -223,8 +219,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * Checks if the given characters is a diacritic.
    * 
-   * @param character
-   *        The character to check.
+   * @param character The character to check.
    * @return True, if the given character is a diacritic; false otherwise.
    */
   public static boolean isDiacritic(Character character) {
@@ -239,16 +234,15 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
 
     int type = java.lang.Character.getType(text.charAt(0));
     return type == java.lang.Character.NON_SPACING_MARK
-        || type == java.lang.Character.MODIFIER_SYMBOL
-        || type == java.lang.Character.MODIFIER_LETTER;
+            || type == java.lang.Character.MODIFIER_SYMBOL
+            || type == java.lang.Character.MODIFIER_LETTER;
   }
 
   /**
-   * Adds non-decomposing diacritics to the hash with their related combining
-   * character. These are values that the unicode spec claims are equivalent but
-   * are not mapped in the form NFKC normalization method. Determined by going
-   * through the Combining Diacritical Marks section of the Unicode spec and
-   * identifying which characters are not mapped to by the normalization. For
+   * Adds non-decomposing diacritics to the hash with their related combining character. These are
+   * values that the unicode spec claims are equivalent but are not mapped in the form NFKC
+   * normalization method. Determined by going through the Combining Diacritical Marks section of
+   * the Unicode spec and identifying which characters are not mapped to by the normalization. For
    * example, maps "ACUTE ACCENT" to "COMBINING ACUTE ACCENT".
    */
   static final Map<Integer, String> COMBINING_DIACRITICS;

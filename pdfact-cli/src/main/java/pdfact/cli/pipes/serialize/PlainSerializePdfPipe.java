@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.cli.util.exception.PdfActSerializeException;
 import pdfact.core.model.Document;
 import pdfact.core.model.SemanticRole;
@@ -32,7 +32,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   /**
    * The serialization format.
    */
-  protected SerializeFormat format;
+  protected SerializationFormat format;
 
   /**
    * The serialization target, given as a file.
@@ -188,12 +188,12 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   // ==============================================================================================
 
   @Override
-  public SerializeFormat getSerializationFormat() {
+  public SerializationFormat getSerializationFormat() {
     return this.format;
   }
 
   @Override
-  public void setSerializationFormat(SerializeFormat format) {
+  public void setSerializationFormat(SerializationFormat format) {
     this.format = format;
   }
 

@@ -1,6 +1,8 @@
 package pdfact.core.pipes.semanticize.modules;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Document;
 import pdfact.core.model.Page;
 import pdfact.core.model.Rectangle;
@@ -14,8 +16,17 @@ import pdfact.core.model.TextBlock;
  * @author Claudius Korzen
  */
 public class TableModule implements PdfTextSemanticizerModule {
+  /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+
   @Override
   public void semanticize(Document pdf) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.TABLE);
+    log.debug("=====================================================");
+    
     if (pdf == null) {
       return;
     }
@@ -55,6 +66,14 @@ public class TableModule implements PdfTextSemanticizerModule {
           if (!shapeRectangle.overlaps(blockRectangle)) {
             continue;
           }
+          log.debug("-----------------------------------------------------");
+          log.debug("Text block: \"%s\" ...", block.getText());
+          log.debug("... page:          %d", block.getPosition().getPageNumber());
+          log.debug("... bounding box:  %s", blockRectangle);
+          log.debug("... shape:         %s", shapeRectangle);
+          log.debug("... assigned role: %s", SemanticRole.TABLE);
+          log.debug("... role reason:   the above shape overlaps the text block but is not fully "
+                  + "contained in the text block.");
           block.setSemanticRole(SemanticRole.TABLE);
           break;
         }

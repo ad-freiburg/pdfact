@@ -1,6 +1,7 @@
 package pdfact.core.pipes.tokenize.paragraphs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,7 +9,9 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import pdfact.core.model.Character;
 import pdfact.core.model.CharacterStatistic;
+import pdfact.core.model.Color;
 import pdfact.core.model.Document;
+import pdfact.core.model.FontFace;
 import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.Position;
@@ -32,7 +35,7 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainTokenizeToParagraphsPipe.class);
+  protected static Logger log = LogManager.getFormatterLogger("paragraph-detection");
 
   /**
    * The statistician to compute statistics about characters.
@@ -64,17 +67,36 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Tokenizing the text blocks into text paragraphs.");
     tokenizeToParagraphs(pdf);
 
-    log.debug("Tokenizing the text blocks into text paragraphs done.");
-    log.debug("# processed text blocks: " + this.numProcessedTextBlocks);
-    log.debug("# tokenized paragraphs : " + this.numTokenizedParagraphs);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-
+    if (log.isDebugEnabled()) {
+      for (Paragraph paragraph : pdf.getParagraphs()) {
+        log.debug("-------------------------------------------");
+        log.debug("Detected paragraph: \"%s\"", paragraph.getText());
+        for (int i = 0; i < paragraph.getPositions().size(); i++) {
+          Position pos = paragraph.getPositions().get(i);
+          log.debug("... page[%d]:         %d", i, pos.getPageNumber());
+          float x1 = pos.getRectangle().getMinX();
+          float y1 = pos.getRectangle().getMinY();
+          float x2 = pos.getRectangle().getMaxX();
+          float y2 = pos.getRectangle().getMaxY();
+          log.debug("... bounding box[%d]: [%.1f, %.1f, %.1f, %.1f]", i, x1, y1, x2, y2);
+        }
+        
+        FontFace fontFace = paragraph.getCharacterStatistic().getMostCommonFontFace();
+        log.debug("... main font:       %s", fontFace.getFont().getBaseName());
+        log.debug("... main fontsize:   %.1fpt", fontFace.getFontSize());
+        float avgFontsize = paragraph.getCharacterStatistic().getAverageFontsize();
+        log.debug("... avg. fontsize:   %.1fpt", avgFontsize);
+        log.debug("... mainly bold:     %s", fontFace.getFont().isBold());
+        log.debug("... mainly italic:   %s", fontFace.getFont().isItalic());
+        log.debug("... mainly type3:    %s", fontFace.getFont().isType3Font());
+        Color color = paragraph.getCharacterStatistic().getMostCommonColor();
+        log.debug("... main RGB color:  %s", Arrays.toString(color.getRGB()));
+        log.debug("... role:            %s", paragraph.getSemanticRole());
+      }
+    }
+    
     return pdf;
   }
 
@@ -242,23 +264,31 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
    * 
    * @return True, if the given text block should be added to the paragraph.
    */
-  protected boolean belongsToParagraph(TextBlock block,
-      List<TextBlock> paraBlocks) {
-    if (block == null || paraBlocks == null) {
+  protected boolean belongsToParagraph(TextBlock block, List<TextBlock> paraBlocks) {
+    if (block == null) {
       return false;
-    }
+    } 
+    
+    log.debug("-----------------------------------------------------");
+    log.debug("Text block: \"%s\" ...", block.getText());
 
-    if (paraBlocks.isEmpty()) {
+    if (paraBlocks == null || paraBlocks.isEmpty()) {
+      log.debug("... does *not* belong to the prev. paragraph because there is no prev. paragraph");
       return false;
     }
 
     TextBlock lastParaBlock = paraBlocks.get(paraBlocks.size() - 1);
+    log.debug("... page:                          %s", block.getPosition().getPageNumber());
+    log.debug("... bounding box:                  %s", block.getPosition().getRectangle());
+    log.debug("... last block of prev. paragraph: %s", lastParaBlock.getText());
 
     // The block belongs to the paragraph, if the paragraph doesn't end with
     // a punctuation mark.
     Word word = lastParaBlock.getLastTextLine().getLastWord();
     Character lastChar = word != null ? word.getLastCharacter() : null;
     if (!CharacterLexicon.isPunctuationMark(lastChar)) {
+      log.debug("... belongs to prev. paragraph:    true (the prev. paragraph doesn't end "
+         + "with an punctuation mark).");
       return true;
     }
 
@@ -266,8 +296,11 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     // lowercased letter.
     Word firstWord = block.getFirstTextLine().getFirstWord();
     if (CharacterLexicon.isLowercase(firstWord.getFirstCharacter())) {
+      log.debug("... belongs to prev. paragraph:    true (the block starts lowercased).");
       return true;
     }
+
+    log.debug("... belongs to prev. paragraph:    false (no rule applied).");
 
     return false;
   }

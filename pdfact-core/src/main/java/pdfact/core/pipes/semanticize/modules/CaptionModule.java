@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import pdfact.core.model.Page;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Document;
+import pdfact.core.model.Page;
 import pdfact.core.model.SemanticRole;
 import pdfact.core.model.TextBlock;
 
@@ -17,6 +18,11 @@ import pdfact.core.model.TextBlock;
  * @author Claudius Korzen
  */
 public class CaptionModule implements PdfTextSemanticizerModule {
+  /**
+   * The logger.
+   */
+  protected static Logger log = LogManager.getFormatterLogger("role-detection");
+  
   /**
    * The patterns to identify caption, per *secondary* role.
    */
@@ -38,6 +44,10 @@ public class CaptionModule implements PdfTextSemanticizerModule {
 
   @Override
   public void semanticize(Document pdf) {
+    log.debug("=====================================================");
+    log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.CAPTION);
+    log.debug("=====================================================");
+    
     if (pdf == null) {
       return;
     }
@@ -62,12 +72,16 @@ public class CaptionModule implements PdfTextSemanticizerModule {
           continue;
         }
 
-        // The text block is a caption if its text matches to one of the given
-        // patterns.
+        // The text block is a caption if its text matches to one of the given patterns.
         for (SemanticRole role : CAPTION_PATTERNS.keySet()) {
           Pattern captionPattern = CAPTION_PATTERNS.get(role);
           Matcher captionMatcher = captionPattern.matcher(block.getText());
           if (captionMatcher.find()) {
+            log.debug("-----------------------------------------------------");
+            log.debug("Text block: \"%s\" ...", block.getText());
+            log.debug("... page:          %d", block.getPosition().getPageNumber());
+            log.debug("... assigned role: %s", SemanticRole.CAPTION);
+            log.debug("... role reason:   the text matches the regex '%s'", captionPattern);
             block.setSemanticRole(SemanticRole.CAPTION);
             // Set also the secondary role, e.g. "figure" for a figures
             // caption.

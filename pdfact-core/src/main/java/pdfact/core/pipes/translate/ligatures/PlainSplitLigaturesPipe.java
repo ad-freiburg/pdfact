@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import pdfact.core.model.Character;
 import pdfact.core.model.Document;
 import pdfact.core.model.Page;
+import pdfact.core.model.Position;
 import pdfact.core.util.exception.PdfActException;
 
 // FIXME: Adjust bounding box.
@@ -21,22 +22,12 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getLogger(PlainSplitLigaturesPipe.class);
+  protected static Logger log = LogManager.getFormatterLogger("char-extraction");
 
   /**
    * A map with the unicodes of ligatures and its individual characters.
    */
   protected static final Map<String, String> LIGATURES;
-
-  /**
-   * The number of processed characters.
-   */
-  protected int numProcessedCharacters;
-
-  /**
-   * The number of split ligatures.
-   */
-  protected int numSplitLigatures;
 
   // TODO: Move it to character lexicon.
   static {
@@ -76,17 +67,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
 
   @Override
   public Document execute(Document pdf) throws PdfActException {
-    log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
-
-    log.debug("Process: Splitting the ligatures.");
     splitLigatures(pdf);
-
-    log.debug("Splitting the ligatures done.");
-    log.debug("# processed characters: " + this.numProcessedCharacters);
-    log.debug("# split ligatures: " + this.numSplitLigatures);
-
-    log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-
     return pdf;
   }
 
@@ -125,10 +106,21 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
    */
   protected void splitLigature(Character character) {
     if (isLigature(character)) {
-      character.setText(getResolvedLigatureText(character));
-      this.numSplitLigatures++;
+      String resolved = getResolvedLigatureText(character);
+
+      if (log.isDebugEnabled()) {
+        Position pos = character.getPosition();
+        int pageNum = pos.getPageNumber();
+        float minX = pos.getRectangle().getMinX();
+        float minY = pos.getRectangle().getMinY();
+        float maxX = pos.getRectangle().getMaxX();
+        float maxY = pos.getRectangle().getMaxY();
+        log.debug("Translated '{}' (page: {}, box: [{:.1f}, {:.1f}, {:.1f}, {:.1f}] to '{}'.",
+                character.getText(), pageNum, minX, minY, maxX, maxY, resolved);
+      }
+
+      character.setText(resolved);
     }
-    this.numProcessedCharacters++;
   }
 
   /**

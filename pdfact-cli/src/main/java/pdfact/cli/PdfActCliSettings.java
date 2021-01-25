@@ -3,7 +3,7 @@ package pdfact.cli;
 import java.util.HashSet;
 import java.util.Set;
 import pdfact.cli.model.ExtractionUnit;
-import pdfact.cli.model.SerializeFormat;
+import pdfact.cli.model.SerializationFormat;
 import pdfact.core.model.SemanticRole;
 
 /**
@@ -15,8 +15,8 @@ public class PdfActCliSettings {
   /**
    * The default serialization format.
    */
-  public static final SerializeFormat DEFAULT_SERIALIZE_FORMAT =
-      SerializeFormat.TXT;
+  public static final SerializationFormat DEFAULT_SERIALIZE_FORMAT =
+      SerializationFormat.TXT;
 
   /**
    * The default text unit to include on serialization and visualization.
