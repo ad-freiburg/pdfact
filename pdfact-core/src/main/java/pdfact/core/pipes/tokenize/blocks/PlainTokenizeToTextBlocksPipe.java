@@ -565,6 +565,13 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       return true;
     }
 
+    boolean prevLineBold = prevLineFontFace.getFont().isBold();
+    boolean lineBold = lineFontFace.getFont().isBold();
+
+    if (prevLineBold != lineBold) {
+      return true;
+    }
+
     return false;
   }
 
