@@ -23,7 +23,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
   /**
    * The logger.
    */
-  protected final Logger log = LogManager.getFormatterLogger("char-extraction");
+  protected final Logger log = LogManager.getFormatterLogger("merging-diacritics");
 
   /**
    * The number of processed characters.
@@ -110,8 +110,13 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       float minY = pos.getRectangle().getMinY();
       float maxX = pos.getRectangle().getMaxX();
       float maxY = pos.getRectangle().getMaxY();
-      log.debug("Merging diacritic '{}' (page: {}, box: [{:.1f}, {:.1f}, {:.1f}, {:.1f}] ...",
-              diacritic.getText(), pageNum, minX, minY, maxX, maxY);
+      log.debug("-----------------------------------------------------");
+      log.debug("Diacritic: '%s'", diacritic.getText());
+      log.debug("... page:                     %s", pageNum);
+      log.debug("... bounding box:             [%.1f, %.1f, %.1f, %.1f]", minX, minY, maxX, maxY);
+      log.debug("... prev. char:               \"%s\"", prev);
+      log.debug("... next char:                \"%s\"", next);
+      
     }
 
     // Choose the belonging base character:
@@ -122,7 +127,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       if (prevPosition != null) {
         Rectangle prevRect = prevPosition.getRectangle();
         prevOverlap = diacriticRect.getHorizontalOverlapLength(prevRect);
-        log.debug("... horizontal overlap with prev. char: {:.1f}pt", prevOverlap);
+        log.debug("... x-overlap with prev. char: %.1fpt", prevOverlap);
       }
     }
 
@@ -133,7 +138,7 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
       if (nextPosition != null) {
         Rectangle nextRect = nextPosition.getRectangle();
         nextOverlap = diacriticRect.getHorizontalOverlapLength(nextRect);
-        log.debug("... horizontal overlap with next char:  {:.1f}pt", nextOverlap);
+        log.debug("... x-overlap with next char:  %.1fpt", nextOverlap);
       }
     }
 
@@ -141,11 +146,11 @@ public class PlainMergeDiacriticsPipe implements MergeDiacriticsPipe {
     if (prevOverlap > 0 && prevOverlap >= nextOverlap) {
       prev.setText(mergeTexts(prev, diacritic));
       prev.getPosition().setRectangle(mergeRectangles(prev, diacritic));
-      log.debug("... merging with prev. character to '{}'.", prev.getText());
+      log.debug("Merged with prev. character to '%s'.", prev.getText());
     } else if (nextOverlap > 0 && nextOverlap > prevOverlap) {
       next.setText(mergeTexts(next, diacritic));
       next.getPosition().setRectangle(mergeRectangles(next, diacritic));
-      log.debug("... merging with next character to '{}'.", next.getText());
+      log.debug("Merged with next character to '%s'.", next.getText());
     }
   }
 

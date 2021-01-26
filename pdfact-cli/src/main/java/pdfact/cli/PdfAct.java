@@ -62,6 +62,16 @@ public class PdfAct {
   protected boolean isDebugCharacterExtraction;
 
   /**
+   * A boolean flag indicating whether or not to print debug info about splitting ligatures.
+   */
+  protected boolean isDebugSplittingLigatures;
+
+  /**
+   * A boolean flag indicating whether or not to print debug info about merging diacritics.
+   */
+  protected boolean isDebugMergingDiacritics;
+
+  /**
    * A boolean flag indicating whether or not to print debug info about the text line detection.
    */
   protected boolean isDebugTextLineDetection;
@@ -127,6 +137,8 @@ public class PdfAct {
     // Set the different debug levels according to the given debug flags.
     Configurator.setLevel("pdf-parsing", this.isDebugPdfParsing ? DEBUG : ERROR);
     Configurator.setLevel("char-extraction", this.isDebugCharacterExtraction ? DEBUG : ERROR);
+    Configurator.setLevel("splitting-ligatures", this.isDebugSplittingLigatures ? DEBUG : ERROR);
+    Configurator.setLevel("merging-diacritics", this.isDebugMergingDiacritics ? DEBUG : ERROR);
     Configurator.setLevel("line-detection", this.isDebugTextLineDetection ? DEBUG : ERROR);
     Configurator.setLevel("word-detection", this.isDebugWordDetection ? DEBUG : ERROR);
     Configurator.setLevel("block-detection", this.isDebugTextBlockDetection ? DEBUG : ERROR);
@@ -209,6 +221,40 @@ public class PdfAct {
    */
   public void setDebugCharacterExtraction(boolean debugCharacterExtraction) {
     this.isDebugCharacterExtraction = debugCharacterExtraction;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if debug info about the splitting ligatures step should be printed, false
+   * otherwise.
+   */
+  public boolean isDebugSplittingLigatures() {
+    return this.isDebugSplittingLigatures;
+  }
+
+  /**
+   * Sets whether or not debug info about the splitting ligatures step should be printed.
+   */
+  public void setDebugSplittingLigatures(boolean debugSplittingLigatures) {
+    this.isDebugSplittingLigatures = debugSplittingLigatures;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if debug info about the merging diacritics step should be printed, false
+   * otherwise.
+   */
+  public boolean isDebugMergingDiacritics() {
+    return isDebugMergingDiacritics;
+  }
+
+  /**
+   * Sets whether or not debug info about the merging diacritics step should be printed.
+   */
+  public void setDebugMergingDiacritics(boolean debugMergingDiacritics) {
+    this.isDebugMergingDiacritics = debugMergingDiacritics;
   }
 
   // ==============================================================================================

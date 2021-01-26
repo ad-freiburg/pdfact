@@ -22,7 +22,7 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
   /**
    * The logger.
    */
-  protected static Logger log = LogManager.getFormatterLogger("char-extraction");
+  protected static Logger log = LogManager.getFormatterLogger("splitting-ligatures");
 
   /**
    * A map with the unicodes of ligatures and its individual characters.
@@ -115,8 +115,11 @@ public class PlainSplitLigaturesPipe implements SplitLigaturesPipe {
         float minY = pos.getRectangle().getMinY();
         float maxX = pos.getRectangle().getMaxX();
         float maxY = pos.getRectangle().getMaxY();
-        log.debug("Translated '{}' (page: {}, box: [{:.1f}, {:.1f}, {:.1f}, {:.1f}] to '{}'.",
-                character.getText(), pageNum, minX, minY, maxX, maxY, resolved);
+        log.debug("-----------------------------------------------------");
+        log.debug("Ligature: '%s'", character.getText());
+        log.debug("... page:          %s", pageNum);
+        log.debug("... bounding box:  [%.1f, %.1f, %.1f, %.1f]", minX, minY, maxX, maxY);
+        log.debug("Translated to: \"%s\"", resolved);
       }
 
       character.setText(resolved);

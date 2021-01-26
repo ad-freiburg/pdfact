@@ -51,6 +51,8 @@ public class PdfActCli {
       // Pass the debugging flags.
       pdfAct.setDebugPdfParsing(parser.isDebugPdfParsing);
       pdfAct.setDebugCharacterExtraction(parser.isDebugCharExtraction);
+      pdfAct.setDebugSplittingLigatures(parser.isDebugSplittingLigatures);
+      pdfAct.setDebugMergingDiacritics(parser.isDebugMergingDiacritics);
       pdfAct.setDebugTextLineDetection(parser.isDebugLineDetection);
       pdfAct.setDebugWordDetection(parser.isDebugWordDetection);
       pdfAct.setDebugTextBlockDetection(parser.isDebugBlockDetection);
@@ -263,6 +265,32 @@ public class PdfActCli {
      */
     @Arg(dest = DEBUG_CHAR_EXTRACTION)
     public boolean isDebugCharExtraction = false;
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the printing of debug info about splitting ligatures.
+     */
+    public static final String DEBUG_SPLITTING_LIGATURES = "debug-splitting-ligatures";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about splitting ligatures.
+     */
+    @Arg(dest = DEBUG_SPLITTING_LIGATURES)
+    public boolean isDebugSplittingLigatures = false;
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the printing of debug info about merging diacritics.
+     */
+    public static final String DEBUG_MERGING_DIACRITICS = "debug-merging-diacritics";
+
+    /**
+     * The boolean flag indicating whether or not to print debug info about splitting ligatures.
+     */
+    @Arg(dest = DEBUG_MERGING_DIACRITICS)
+    public boolean isDebugMergingDiacritics = false;
 
     // ============================================================================================
 
@@ -481,6 +509,20 @@ public class PdfActCli {
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugCharExtraction)
         .help("Print debug info about the characters extraction step.");
+
+      // Add an option to enable the printing of debug info about splitting ligatures.
+      this.parser.addArgument("--" + DEBUG_SPLITTING_LIGATURES).dest(DEBUG_SPLITTING_LIGATURES)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isDebugSplittingLigatures)
+        .help("Print debug info about splitting ligatures.");
+
+      // Add an option to enable the printing of debug info about merging diacritics.
+      this.parser.addArgument("--" + DEBUG_MERGING_DIACRITICS).dest(DEBUG_MERGING_DIACRITICS)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isDebugMergingDiacritics)
+        .help("Print debug info about merging diacritics.");
 
       // Add an option to enable the printing of debug info about the text line detection.
       this.parser.addArgument("--" + DEBUG_LINE_DETECTION).dest(DEBUG_LINE_DETECTION)
