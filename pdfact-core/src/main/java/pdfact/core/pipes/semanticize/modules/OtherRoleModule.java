@@ -72,8 +72,8 @@ public class OtherRoleModule implements PdfTextSemanticizerModule {
 
         if (this.fontFaceComparator.compare(pdfFontFace, blockFontFace) < 0) {
           log.debug("... assigned role: %s", SemanticRole.HEADING);
-          log.debug("... role reason:   the block wasn't assigned to any role yet and its font face "
-                  + "is larger than the most common font face).");
+          log.debug("... role reason:   the block wasn't assigned to any role yet and its font "
+                  + "face is larger than the most common font face).");
           // The font face of the block is "larger" than the most common font face in the document.
           block.setSemanticRole(SemanticRole.HEADING);
         } else {

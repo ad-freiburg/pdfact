@@ -47,7 +47,7 @@ public class PdfAct {
   protected Set<ExtractionUnit> extractionUnits;
 
   /**
-   * The semantic roles of the text units to extract (e.g., "title", "author", etc.)
+   * The semantic roles of the text units to extract (e.g., "title", "author", etc.).
    */
   protected Set<SemanticRole> semanticRoles;
 

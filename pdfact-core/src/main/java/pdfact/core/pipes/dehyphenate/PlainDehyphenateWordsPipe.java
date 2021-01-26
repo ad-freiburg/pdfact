@@ -331,7 +331,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     } else {
       log.debug("... hyphen is mandatory:                       false");
       log.debug("... reason:                                    freq(\"%s\") == freq(\"%s\") and "
-      + "freq(\"%s\") < 0.", withHyphen, withoutHyphen, prefix);
+        + "freq(\"%s\") < 0.", withHyphen, withoutHyphen, prefix);
       return false;
     }
   }
