@@ -11,7 +11,7 @@ import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
 
 /**
- * A class that tests the extraction results of PdfAct for PDF file "PDF0005".
+ * A class that tests the extraction results of PdfAct for PDF file "PDF0006".
  */
 public class TestPdf0006 {
   /**
