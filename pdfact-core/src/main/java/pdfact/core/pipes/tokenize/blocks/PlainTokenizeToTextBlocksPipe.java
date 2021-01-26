@@ -245,79 +245,93 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    */
   protected boolean introducesNewTextBlock(Document pdf, Page page, TextBlock currentTextBlock,
           TextLine prevLine, TextLine line, TextLine nextLine) {
-    log.debug("Text line \"%s\" ...", line);
-
     // The line does *not* introduce a text block, if it is null.
     if (line == null) {
-      log.debug("... introduces *no* new text block because it is null.");
       return false;
     }
 
+    log.debug("-----------------------------------------------------");
+    log.debug("Text line: \"%s\" ...", line.getText());
+    log.debug("... page: %d", page.getPageNumber());
+
     // The line introduces a text block, if there is no previous line.
     if (prevLine == null) {
-      log.debug("... introduces a new text block because no previous line exists.");
+      log.debug("The line introduces a new text block because no previous line exists.");
       return true;
     }
 
     // The line introduces a text block, if there is no current text block.
     if (currentTextBlock == null) {
-      log.debug("... introduces a new text block because there is no current text block.");
+      log.debug("The line introduces a new text block because there is no current text block.");
       return true;
     }
 
     // The line does *not* introduce a text block, if the current text block is
     // empty.
     if (currentTextBlock.getTextLines().isEmpty()) {
-      log.debug("... introduces *no* new text block because the current text block is empty.");
+      log.debug("The line introduces *no* new text block because the current text block is empty.");
       return false;
     }
 
-    // The line introduces a text block, if it doesn't overlap the text
-    // block horizontally.
+    // The line introduces a text block, if it doesn't overlap the text block horizontally.
+    log.debug("Has the line a horizontal overlap with the current text block?");
     if (!overlapsHorizontally(currentTextBlock, line)) {
-      log.debug("... introduces a new text block because it doesn't have a horizontal overlap with "
-        + "the current text block.");
+      log.debug("--> no; the line introduces a new text block.");
       return true;
+    } else {
+      log.debug("--> yes.");
     }
 
     // The line introduces a new text block, if the line pitch between the
     // line and the previous line is larger than expected.
+    log.debug("Is the line pitch to the previous line larger than expected?");
     if (isLinepitchLargerThanExpected(pdf, page, prevLine, line)) {
-      log.debug("... introduces a new text block because the line pitch to the previous line is "
-        + "larger than expected.");
+      log.debug("--> yes; the line introduces a new text block.");
       return true;
+    } else {
+      log.debug("--> no.");
     }
 
     // The line introduces a new text block, if the line pitch between the
     // line and the previous line is larger than the line pitch between the
     // line and the next line.
+    log.debug("Is the line pitch to the previous line larger than to the next line?");
     if (isLinePitchLargerThanNextLinePitch(prevLine, line, nextLine)) {
-      log.debug("... introduces a new text block because the line pitch to the previous line is "
-        + "larger than the line pitch to the next line.");
+      log.debug("--> yes; the line introduces a new text block.");
       return true;
+    } else {
+      log.debug("--> no.");
     }
 
     // The line introduces a text block, if it is indented compared to the
     // previous and the next line.
+    log.debug("Is the line indented?");
     if (isIndented(prevLine, line, nextLine)) {
-      log.debug("... introduces a new text block because it is indented.");
+      log.debug("--> yes; the line introduces a new text block.");
       return true;
+    } else {
+      log.debug("--> no.");
     }
 
     // The line introduces a text block, if it has a special font face.
+    log.debug("Has the line a different font face than the previous line?");
     if (hasSignificantDifferentFontFace(prevLine, line)) {
-      log.debug("... introduces a new text block because it has a different font face than the "
-        + "previous line.");
+      log.debug("--> yes; the line introduces a new text block");
       return true;
+    } else {
+      log.debug("--> no");
     }
 
     // The line introduces a text block, if it is the start of a reference.
+    log.debug("Is the line a start of a reference?");
     if (isProbablyReferenceStart(prevLine, line, nextLine)) {
-      log.debug("... introduces a new text block because it is probably a reference start.");
+      log.debug("--> yes; the line introduces a new text block");
       return true;
+    } else {
+      log.debug("--> no");
     }
 
-    log.debug("... introduces *no* new text block because no rule applied.");
+    log.debug("The line introduces *no* new text block because no rule applied.");
     return false;
   }
 
@@ -340,12 +354,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       return false;
     }
 
-    boolean b = blockBox.overlapsHorizontally(lineBox);
-
-    if (!b) {
-      log.debug("... x-range of text block: [%.1f, %.1f]", blockBox.getMinX(), blockBox.getMaxX());
-      log.debug("... x-range of text line:  [%.1f, %.1f]", lineBox.getMinX(), lineBox.getMaxX());
-    }
+    log.debug("... x-interval of text block: [%.1f, %.1f]", blockBox.getMinX(), blockBox.getMaxX());
+    log.debug("... x-interval of text line:  [%.1f, %.1f]", lineBox.getMinX(), lineBox.getMaxX());
 
     return blockBox.overlapsHorizontally(lineBox);
   }
@@ -362,8 +372,8 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @return True, if the line pitch between the given text line and the given previous text line is
    *         larger than usual; False otherwise.
    */
-  protected static boolean isLinepitchLargerThanExpected(Document pdf, Page page,
-          TextLine prevLine, TextLine line) {
+  protected static boolean isLinepitchLargerThanExpected(Document pdf, Page page, TextLine prevLine,
+          TextLine line) {
     if (pdf == null) {
       return false;
     }
@@ -376,14 +386,10 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     float expectedLinePitch = textLineStats.getMostCommonLinePitch(fontFace);
     float actualLinePitch = computeLinePitch(prevLine, line);
 
-    boolean b = actualLinePitch - expectedLinePitch > 1.5f;
+    log.debug("... actual line pitch:   %.1fpt", actualLinePitch);
+    log.debug("... expected line pitch: %.1fpt", expectedLinePitch);
 
-    if (b) {
-      log.debug("... actual line pitch:   %.1fpt", actualLinePitch);
-      log.debug("... expected line pitch: %.1fpt", expectedLinePitch);
-    }
-
-    return b;
+    return actualLinePitch - expectedLinePitch > 1.5f;
   }
 
   /**
@@ -401,12 +407,10 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     float linePitch = computeLinePitch(prevLine, line);
     float nextLinePitch = computeLinePitch(line, nextLine);
 
-    boolean b = linePitch - nextLinePitch > 1;
-    if (b) {
-      log.debug("... line pitch to previous line: %.1f", linePitch);
-      log.debug("... line pitch to next line:     %.1f", nextLinePitch);
-    }
-    return b;
+    log.debug("... line pitch to previous line: %.1f", linePitch);
+    log.debug("... line pitch to next line:     %.1f", nextLinePitch);
+
+    return linePitch - nextLinePitch > 1;
   }
 
   /**
@@ -440,24 +444,23 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // Check if the minX values of the previous and the next lines are equal.
     boolean isMinXEqual = isMinXEqual(prevLine, nextLine);
 
-    boolean b = isIndentedToPrevLine && isIndentedToNextLine && isMinXEqual;
+    float prevMinX = prevLine.getPosition().getRectangle().getMinX();
+    float minX = line.getPosition().getRectangle().getMinX();
+    float nextMinX = nextLine.getPosition().getRectangle().getMinX();
+    log.debug("... minX of previous line: %.1f", prevMinX);
+    log.debug("... minX of current line:  %.1f", minX);
+    log.debug("... minX of next line:     %.1f", nextMinX);
 
-    if (b) {
-      float prevMinX = prevLine.getPosition().getRectangle().getMinX();
-      float minX = line.getPosition().getRectangle().getMinX();
-      float nextMinX = nextLine.getPosition().getRectangle().getMinX();
-      log.debug("... minX of previous line: %.1f", prevMinX);
-      log.debug("... minX of current line:  %.1f", minX);
-      log.debug("... minX of next line:     %.1f", nextMinX);
+    if (isMinXEqual) {
       if (isIndentedToPrevLine) {
-        log.debug("... current line is indented compared to previous line.");
+        log.debug("... (current line is indented compared to the previous line).");
       }
       if (isIndentedToNextLine) {
-        log.debug("... current line is indented compared to next line.");
+        log.debug("... (current line is indented compared to the next line).");
       }
     }
 
-    return b;
+    return isIndentedToPrevLine && isIndentedToNextLine && isMinXEqual;
   }
 
   /**
@@ -535,22 +538,19 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
       return false;
     }
 
+    log.debug("... font face of previous line: %s", prevLineFontFace);
+    log.debug("... font face of current line:  %s", lineFontFace);
+
     String prevLineFontFamilyName = prevLineFont.getFontFamilyName();
     String lineFontFamilyName = lineFont.getFontFamilyName();
 
     if (prevLineFontFamilyName == null && lineFontFamilyName != null) {
-      log.debug("... font family of previous line: %s", prevLineFontFamilyName);
-      log.debug("... font family of current line:  %s", lineFontFamilyName);
       return true;
     }
     if (prevLineFontFamilyName != null && lineFontFamilyName == null) {
-      log.debug("... font family of previous line: %s", prevLineFontFamilyName);
-      log.debug("... font family of current line:  %s", lineFontFamilyName);
       return true;
     }
     if (prevLineFontFamilyName != null && !prevLineFontFamilyName.equals(lineFontFamilyName)) {
-      log.debug("... font family of previous line: %s", prevLineFontFamilyName);
-      log.debug("... font family of current line:  %s", lineFontFamilyName);
       return true;
     }
 
@@ -560,8 +560,6 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
     if (prevLineFontsize != lineFontsize) {
-      log.debug("... font size of previous line: %s", prevLineFontsize);
-      log.debug("... font size of current line:  %s", lineFontsize);
       return true;
     }
 
