@@ -200,13 +200,13 @@ public class TestPdf0001 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage05Paragraph12() {
-    Paragraph paragraph = getParagraph(5, 12);
+  public void testExtractPage05Paragraph10() {
+    Paragraph paragraph = getParagraph(5, 10);
 
     String expectedText = "1. Overall word accuracy: Overall word accuracy is the percentage of "  
       + "words whose predicted labels equal their true labels. Word accuracy favors fields with "
       + "large number of words, such as the abstract.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());

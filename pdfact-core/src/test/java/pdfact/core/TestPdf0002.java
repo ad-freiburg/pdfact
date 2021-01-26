@@ -156,7 +156,7 @@ public class TestPdf0002 {
   public void testExtractPage08Paragraph02() {
     Paragraph paragraph = getParagraph(8, 2);
 
-    String expectedText = "5 Conclusions and Future Wo";
+    String expectedText = "5 Conclusions and Future Work";
     SemanticRole expectedRole = SemanticRole.HEADING;
 
     assertEquals(expectedText, paragraph.getText());

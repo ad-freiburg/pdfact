@@ -91,7 +91,7 @@ public class TestPdf0004 {
     Paragraph paragraph = getParagraph(2, 7);
 
     String expectedText = "Zu Punkt 3: Auswahlkriterien und deren Gewichtung";
-    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+    SemanticRole expectedRole = SemanticRole.HEADING;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());

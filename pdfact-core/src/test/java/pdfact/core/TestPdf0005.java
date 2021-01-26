@@ -78,7 +78,7 @@ public class TestPdf0005 {
       + "sonstigen nicht staatlichen Einrichtungen des Bildungswesens, die nach Maßgabe dieses "
       + "Gesetzes staatlich anerkannt sind. Unberührt bleiben die kirchlichen Hochschulen im Sinne "
       + "von Artikel 9 der Verfassung des Landes Baden-Württemberg.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -96,7 +96,7 @@ public class TestPdf0005 {
       + "Dualen Hochschule werden durch Rechtsverordnung des Wissenschaftsministeriums errichtet, "
       + "zusammengelegt oder aufgehoben. Die Errichtung, Änderung oder Aufhebung von Außenstellen "
       + "bedürfen eines Beschlusses der Landesregierung.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -130,7 +130,7 @@ public class TestPdf0005 {
       + "wissenschaftlicher Erkenntnisse und wissenschaftlicher Methoden oder die Fähigkeit zu "
       + "künstlerischer Gestaltung erfordern. Hierzu tragen die Hochschulen entsprechend ihrer "
       + "besonderen Aufgabenstellung wie folgt bei:";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -173,12 +173,12 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage17Paragraph01() {
-    Paragraph paragraph = getParagraph(17, 1);
+  public void testExtractPage17Paragraph00() {
+    Paragraph paragraph = getParagraph(17, 0);
 
     String expectedText = "(5) Sachen und Rechte, die allein oder überwiegend mit Mitteln des "
       + "Staatshaushaltsplans erworben werden, gehen in das Eigentum des Landes über.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -194,7 +194,7 @@ public class TestPdf0005 {
     String expectedText = "(2) Die Hochschulen dürfen im Rahmen der Aufgaben nach § 2 ungeachtet "
       + "der Rechtsform privatrechtliche Unternehmen nur errichten, übernehmen, wesentlich "
       + "erweitern oder sich daran beteiligen, wenn";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -210,7 +210,7 @@ public class TestPdf0005 {
     String expectedText = "1. die Aufgaben der Hochschulen, die das Unternehmen wahrnehmen soll, "
       + "nicht ebenso gut und wirtschaftlich von der Hochschule als eigene Aufgabe im Sinne des "
       + "Absatzes 1 erfüllt werden können,";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -225,7 +225,7 @@ public class TestPdf0005 {
 
     String expectedText = "2. das Unternehmen nach Art und Umfang in einem angemessenen Verhältnis "
       + " zur Leistungsfähigkeit der Hochschule und zum voraussichtlichen Bedarf steht,";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -235,8 +235,8 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage83Paragraph04() {
-    Paragraph paragraph = getParagraph(83, 4);
+  public void testExtractPage83Paragraph03() {
+    Paragraph paragraph = getParagraph(83, 3);
 
     String expectedText = "(9) Die Organisationssatzung der Studierendenschaft soll die "
       + "Einrichtung einer Schlichtungskommission vorsehen. Die Schlichtungskommission kann von " 
@@ -244,7 +244,7 @@ public class TestPdf0005 {
       + "Studierendenschaft habe in einem konkreten Einzelfall ihre Aufgaben nach § 65 Absätze 2 "
       + "bis 4 überschritten. Einzelheiten der Schlichtungskommission einschließlich ihrer "
       + "Besetzung regelt die Organisationssatzung der Studierendenschaft.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
