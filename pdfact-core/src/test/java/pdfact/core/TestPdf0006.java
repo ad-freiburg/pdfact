@@ -7,6 +7,7 @@ import pdfact.core.model.Document;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
+import pdfact.core.model.TextBlock;
 import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
 
@@ -29,8 +30,16 @@ public class TestPdf0006 {
   }
 
   /**
-   * Returns the text of the <blockNum>-th paragraph on the <pageNum>-th page as a string. Note that
-   * blockNum is 0-based and pageNum is 1-based.
+   * Returns the <blockNum>-th text block on the <pageNum>-th page. Note that blockNum is
+   * 0-based and pageNum is 1-based.
+   */
+  protected TextBlock getTextBlock(int pageNum, int blockNum) {
+    return doc.getPages().get(pageNum - 1).getTextBlocks().get(blockNum);
+  }
+
+  /**
+   * Returns the <paragraphNum>-th paragraph on the <pageNum>-th page. Note that paragraphNum is
+   * 0-based and pageNum is 1-based.
    */
   protected Paragraph getParagraph(int pageNum, int paragraphNum) {
     int prevParagraphPageNum = -1;
@@ -50,6 +59,34 @@ public class TestPdf0006 {
       currentParagraphIndex++;
     }
     return null;
+  }
+
+  /**
+   * The PDF contains non-breaking whitespaces. Make sure that they are not extracted.
+   */
+  @Test
+  public void testExtractPage02TextBlock02() {
+    TextBlock block = getTextBlock(2, 2);
+
+    String expectedText = "§ 8 Kosten der Amtshilfe";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+
+    assertEquals(expectedText, block.getText());
+    assertEquals(expectedRole, block.getSemanticRole());
+  }
+
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
+  public void testExtractPage02Paragraph02() {
+    Paragraph paragraph = getParagraph(2, 2);
+
+    String expectedText = "§8 Kosten der Amtshilfe";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
   }
 
   /**

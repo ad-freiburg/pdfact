@@ -496,6 +496,17 @@ public class PdfActCli {
             + "should be written to. The file doesn't have to be existent before. If not "
             + "specified, no such visualization will be created.");
 
+      // Add an option to define whether or not control characters (which identify headings and
+      // page breaks should be inserted into the TXT serialization output.
+      this.parser.addArgument("--" + WITH_CONTROL_CHARACTERS).dest(WITH_CONTROL_CHARACTERS)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.withControlCharacters)
+        .help("Add the following control characters to the TXT serialization output:\n"
+            + "- \"^L\" (\"form feed\") between two elements when a page break occurs between the "
+            + "two elements in the PDF.\n"
+            + "- \"^A\" (\"start of heading\") in front of headings.");
+
       // Add an option to enable the printing of debug info about the PDF parsing step.
       this.parser.addArgument("--" + DEBUG_PDF_PARSING).dest(DEBUG_PDF_PARSING)
         .required(false)
@@ -508,21 +519,21 @@ public class PdfActCli {
         .required(false)
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugCharExtraction)
-        .help("Print debug info about the characters extraction step.");
+        .help("Print debug info about the character extraction step.");
 
       // Add an option to enable the printing of debug info about splitting ligatures.
       this.parser.addArgument("--" + DEBUG_SPLITTING_LIGATURES).dest(DEBUG_SPLITTING_LIGATURES)
         .required(false)
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugSplittingLigatures)
-        .help("Print debug info about splitting ligatures.");
+        .help("Print debug info about the splitting ligatures step.");
 
       // Add an option to enable the printing of debug info about merging diacritics.
       this.parser.addArgument("--" + DEBUG_MERGING_DIACRITICS).dest(DEBUG_MERGING_DIACRITICS)
         .required(false)
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugMergingDiacritics)
-        .help("Print debug info about merging diacritics.");
+        .help("Print debug info about the merging diacritics step.");
 
       // Add an option to enable the printing of debug info about the text line detection.
       this.parser.addArgument("--" + DEBUG_LINE_DETECTION).dest(DEBUG_LINE_DETECTION)
@@ -565,18 +576,6 @@ public class PdfActCli {
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugWordDehyphenation)
         .help("Print debug info about the word dehyphenation step.");
-
-      // Add an option to define whether or not control characters (which identify headings and
-      // page breaks should be inserted into the TXT serialization output.
-      this.parser.addArgument("--" + WITH_CONTROL_CHARACTERS).dest(WITH_CONTROL_CHARACTERS)
-        .required(false)
-        .action(Arguments.storeTrue())
-        .setDefault(this.withControlCharacters)
-        .help("If enabled, the following control characters will be added to the TXT serialization "
-             + " output:\n"
-             + "- \"^L\" between two elements when a page break occurs between the two elements in "
-             + "the PDF.\n"
-             + "- \"^A\" in front of headings.");
     }
 
     /**

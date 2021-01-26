@@ -89,7 +89,7 @@ public class FootnoteModule implements PdfTextSemanticizerModule {
 
         log.debug("-----------------------------------------------------");
         log.debug("Text block: \"%s\" ...", block.getText());
-        log.debug("... page:                       %.1f", block.getPosition().getPageNumber());
+        log.debug("... page:                       %d", block.getPosition().getPageNumber());
         log.debug("... font face:                  %s", blockFontFace);
         log.debug("... min-y of 1st character:     %.1f", firstCharMinY);
         log.debug("... min-y of 1st text line:     %.1f", lineBaseLineY);

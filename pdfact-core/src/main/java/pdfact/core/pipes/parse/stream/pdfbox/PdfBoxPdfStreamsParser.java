@@ -446,8 +446,10 @@ public class PdfBoxPdfStreamsParser implements PdfStreamsParser {
           throws IOException {
     OperatorProcessor processor = this.operatorProcessors.get(op.getName());
 
+    log.debug("-----------------------------------------------------");
     log.debug("Operator: %s; Args: %s", op.getName(), args);
-    
+    log.debug("... page: %d", page.getPageNumber());
+
     if (processor != null) {
       log.debug("... handled by %s.class.", processor.getClass().getSimpleName());
       try {

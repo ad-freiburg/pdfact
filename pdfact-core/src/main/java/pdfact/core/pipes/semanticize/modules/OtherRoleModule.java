@@ -78,7 +78,7 @@ public class OtherRoleModule implements PdfTextSemanticizerModule {
           block.setSemanticRole(SemanticRole.HEADING);
         } else {
           log.debug("... assigned role: %s", SemanticRole.OTHER);
-          log.debug("... role reason:   the block wasn't assigned to any other role yet).");
+          log.debug("... role reason:   the block wasn't assigned to any other role yet.");
           block.setSemanticRole(SemanticRole.OTHER);
         }
       }

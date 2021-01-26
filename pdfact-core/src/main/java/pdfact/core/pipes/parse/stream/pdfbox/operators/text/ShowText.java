@@ -325,7 +325,7 @@ public class ShowText extends OperatorProcessor {
     character.setExtractionRank(this.sequenceNumber++);
 
     log.debug("---------------------------------------------");
-    log.debug("Extracted char:   %s", character.getText());
+    log.debug("Extracted char:   \"%s\"", character.getText());
 
     // Check if we have to normalize the character.
     String normalized = normalizeCharacter(unicode);
@@ -584,7 +584,17 @@ public class ShowText extends OperatorProcessor {
 
     // Ignore the the character, if it doesn't contain text.
     String text = character.getText();
-    if (text == null || text.trim().isEmpty()) {
+    if (text == null) {
+      log.debug("... ignore:       true (because it doesn't contain text)");
+      return true;
+    }
+
+    // Trim the text. But don't use Java's trim() method here, because it doesn't remove 
+    // non-breaking characters (Unicode \u00a0). PDF0006 contains such characters.
+    // Instead, remove all leading and trailing "horizontal whitespaces", see for example:
+    // https://stackoverflow.com/questions/28295504/how-to-trim-no-break-space-in-java.
+    String trimmed = text.replaceAll("(^\\h*)|(\\h*$)", "");
+    if (trimmed.isEmpty()) {
       log.debug("... ignore:       true (because it doesn't contain text)");
       return true;
     }
