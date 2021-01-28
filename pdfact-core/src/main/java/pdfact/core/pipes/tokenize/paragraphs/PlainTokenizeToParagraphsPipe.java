@@ -282,13 +282,13 @@ public class PlainTokenizeToParagraphsPipe implements TokenizeToParagraphsPipe {
     log.debug("... bounding box:                  %s", block.getPosition().getRectangle());
     log.debug("... last block of prev. paragraph: %s", lastParaBlock.getText());
 
-    // The block belongs to the paragraph, if the paragraph doesn't end with
-    // a punctuation mark.
+    // The block belongs to the paragraph, if the paragraph doesn't end with a terminating 
+    // punctuation mark.
     Word word = lastParaBlock.getLastTextLine().getLastWord();
     Character lastChar = word != null ? word.getLastCharacter() : null;
-    if (!CharacterLexicon.isPunctuationMark(lastChar)) {
+    if (!CharacterLexicon.isTerminatingPunctuationMark(lastChar)) {
       log.debug("... belongs to prev. paragraph:    true (the prev. paragraph doesn't end "
-         + "with an punctuation mark).");
+         + "with a terminating punctuation mark).");
       return true;
     }
 

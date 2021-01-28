@@ -2,7 +2,6 @@ package pdfact.core.util.lexicon;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
 import pdfact.core.model.Character;
@@ -180,6 +179,18 @@ public class CharacterLexicon {
   }
 
   /**
+   * The punctuation marks that terminate a sentence.
+   */
+  public static final TCharSet TERMINATING_PUNCTUATION_MARKS;
+
+  static {
+    TERMINATING_PUNCTUATION_MARKS = new TCharHashSet();
+    TERMINATING_PUNCTUATION_MARKS.add('.');
+    TERMINATING_PUNCTUATION_MARKS.add('?');
+    TERMINATING_PUNCTUATION_MARKS.add('!');
+  }
+
+  /**
    * The punctuation marks that are aligned to the mean line.
    */
   public static final TCharSet MEANLINE_PUNCTUATION_MARKS;
@@ -210,11 +221,10 @@ public class CharacterLexicon {
    * All punctuation marks.
    */
   public static final TCharSet PUNCTUATION_MARKS;
-
   static {
     PUNCTUATION_MARKS = new TCharHashSet();
-    PUNCTUATION_MARKS.addAll(BASELINE_CHARACTERS);
-    PUNCTUATION_MARKS.addAll(MEANLINE_CHARACTERS);
+    PUNCTUATION_MARKS.addAll(BASELINE_PUNCTUATION_MARKS);
+    PUNCTUATION_MARKS.addAll(MEANLINE_PUNCTUATION_MARKS);
     PUNCTUATION_MARKS.addAll(HYPHENS);
   }
 
@@ -507,6 +517,20 @@ public class CharacterLexicon {
     char ch = toChar(character);
     return BASELINE_PUNCTUATION_MARKS.contains(ch)
         || MEANLINE_PUNCTUATION_MARKS.contains(ch);
+  }
+
+  /**
+   * Returns true if the given character is a terminating punctuation mark (= a punctuation mark
+   * that terminates a sentence).
+   * 
+   * @param character
+   *        The character to process.
+   * 
+   * @return True if the given character is a terminating punctuation mark; false otherwise.
+   */
+  public static boolean isTerminatingPunctuationMark(Character character) {
+    char ch = toChar(character);
+    return TERMINATING_PUNCTUATION_MARKS.contains(ch);
   }
 
   /**

@@ -322,7 +322,6 @@ public class ShowText extends OperatorProcessor {
     character.setFontFace(fontFace);
     character.setColor(color);
     character.setPosition(position);
-    character.setExtractionRank(this.sequenceNumber++);
 
     log.debug("---------------------------------------------");
     log.debug("Extracted char:   \"%s\"", character.getText());
@@ -346,12 +345,15 @@ public class ShowText extends OperatorProcessor {
     log.debug("... is italic:    %s", character.getFontFace().getFont().isItalic());
     log.debug("... is type3:     %s", character.getFontFace().getFont().isType3Font());
     log.debug("... RGB color:    %s", Arrays.toString(character.getColor().getRGB()));
-    log.debug("... rank:         %s", character.getExtractionRank());        
     
     // Check if we have to ignore the character.
     if (ignoreCharacter(character)) {
       return;
     }
+
+    // Set the extraction rank only for non-ignored characters.
+    character.setExtractionRank(this.sequenceNumber++);
+    log.debug("... rank:         %s", character.getExtractionRank());    
 
     this.engine.handlePdfCharacter(pdf, page, character);
   }

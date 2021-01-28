@@ -79,10 +79,46 @@ public class TestPdf0006 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage02Paragraph02() {
-    Paragraph paragraph = getParagraph(2, 2);
+  public void testExtractPage04TextBlock03() {
+    Paragraph paragraph = getParagraph(4, 3);
 
-    String expectedText = "§8 Kosten der Amtshilfe";
+    String expectedText = "T e i l V";
+    SemanticRole expectedRole = SemanticRole.HEADING;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
+  }
+
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
+  public void testExtractPage04TextBlock04() {
+    Paragraph paragraph = getParagraph(4, 4);
+
+    String expectedText = "Besondere Verfahrensarten Abschnitt 1 Förmliches Verwaltungsverfahren "
+      + "§ 63 Anwendung der Vorschriften über das förmliche Verwaltungsverfahren "
+      + "§ 64 Form des Antrags "
+      + "§ 65 Mitwirkung von Zeugen und Sachverständigen "
+      + "§ 66 Verpflichtung zur Anhörung von Beteiligten "
+      + "§ 67 Erfordernis der mündlichen Verhandlung "
+      + "§ 68 Verlauf der mündlichen Verhandlung "
+      + "§ 69 Entscheidung "
+      + "§ 70 Anfechtung der Entscheidung "
+      + "§ 71 Besondere Vorschriften für das förmliche Verfahren vor Ausschüssen "
+      + "Abschnitt 1a Verfahren über eine einheitliche Stelle "
+      + "§ 71a Anwendbarkeit "
+      + "§ 71b Verfahren "
+      + "§ 71c Informationspflichten "
+      + "§ 71d Gegenseitige Unterstützung "
+      + "§ 71e Elektronisches Verfahren Abschnitt 2 Planfeststellungsverfahren "
+      + "§ 72 Anwendung der Vorschriften über das Planfeststellungsverfahren "
+      + "§ 73 Anhörungsverfahren "
+      + "§ 74 Planfeststellungsbeschluss, Plangenehmigung "
+      + "§ 75 Rechtswirkungen der Planfeststellung "
+      + "§ 76 Planänderungen vor Fertigstellung des Vorhabens "
+      + "§ 77 Aufhebung des Planfeststellungsbeschlusses "
+      + "§ 78 Zusammentreffen mehrerer Vorhaben";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
@@ -111,7 +147,7 @@ public class TestPdf0006 {
   public void testExtractPage08Paragraph01() {
     Paragraph paragraph = getParagraph(8, 1);
 
-    String expectedText = "§ 3a Elektronische Kommunikation";
+    String expectedText = "§ 3a Elektronische Kommunikation";
     SemanticRole expectedRole = SemanticRole.HEADING;
 
     assertEquals(expectedText, paragraph.getText());
@@ -127,7 +163,7 @@ public class TestPdf0006 {
 
     String expectedText = "(1) Die Übermittlung elektronischer Dokumente ist zulässig, soweit der "
       + "Empfänger hierfür einen Zugang eröffnet.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -145,24 +181,22 @@ public class TestPdf0006 {
       + "ersetzt werden. Der elektronischen Form genügt ein elektronisches Dokument, das mit einer "
       + "qualifizierten elektronischen Signatur versehen ist. Die Signierung mit einem Pseudonym, "
       + "das die Identifizierung der Person des Signaturschlüsselinhabers nicht unmittelbar durch "
-      + "die Behörde ermöglicht, ist nicht zulässig. Die Schriftform kann auch ersetzt werden";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
-
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
-  }
-
-/**
-   * Tests the extraction results on the level of paragraphs.
-   */
-  @Test
-  public void testExtractPage08Paragraph04() {
-    Paragraph paragraph = getParagraph(8, 4);
-
-    String expectedText = "1. durch unmittelbare Abgabe der Erklärung in einem elektronischen "
-     + "Formular, das von der Behörde in einem Eingabegerät oder über öffentlich zugängliche Netze "
-     + "zur Verfügung gestellt wird;";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+      + "die Behörde ermöglicht, ist nicht zulässig. Die Schriftform kann auch ersetzt werden "
+      + "1. durch unmittelbare Abgabe der Erklärung in einem elektronischen Formular, das von der "
+      + "Behörde in einem Eingabegerät oder über öffentlich zugängliche Netze zur Verfügung "
+      + "gestellt wird; "
+      + "2. bei Anträgen und Anzeigen durch Versendung eines elektronischen Dokuments an die "
+      + "Behörde mit der Versandart nach § 5 Absatz 5 des De-Mail-Gesetzes; "
+      + "3. bei elektronischen Verwaltungsakten oder sonstigen elektronischen Dokumenten der "
+      + "Behörden durch Versendung einer De-Mail-Nachricht nach § 5 Absatz 5 des De-Mail-Gesetzes, "
+      + "bei der die Bestätigung des akkreditierten Diensteanbieters die erlassende Behörde als "
+      + "Nutzer des De-Mail-Kontos erkennen lässt; "
+      + "4. durch sonstige sichere Verfahren, die durch Rechtsverordnung der Bundesregierung mit "
+      + "Zustimmung des Bundesrates festgelegt werden, welche den Datenübermittler (Absender der "
+      + "Daten) authentifizieren und die Integrität des elektronisch übermittelten Datensatzes "
+      + "sowie die Barrierefreiheit gewährleisten; der IT-Planungsrat gibt Empfehlungen zu "
+      + "geeigneten Verfahren ab.";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -172,17 +206,49 @@ public class TestPdf0006 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage31Paragraph13() {
-    Paragraph paragraph = getParagraph(31, 13);
+  public void testExtractPage08Paragraph04() {
+    Paragraph paragraph = getParagraph(8, 4);
 
-    String expectedText = "(3) Soll durch die Anzeige, den Antrag oder die Abgabe einer "
-      + "Willenserklärung eine Frist in Lauf gesetzt werden, innerhalb deren die zuständige "
-      + "Behörde tätig werden muss, stellt die zuständige Behörde eine Empfangsbestätigung aus. "
-      + "In der Empfangsbestätigung ist das Datum des Eingangs bei der einheitlichen Stelle "
-      + "mitzuteilen und auf die Frist, die Voraussetzungen für den Beginn des Fristlaufs und auf "
-      + "eine an den Fristablauf geknüpfte Rechtsfolge sowie auf die verfügbaren Rechtsbehelfe "
-      + "hinzuweisen.";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
+    String expectedText = "In den Fällen des Satzes 4 Nummer 1 muss bei einer Eingabe über "
+      + "öffentlich zugängliche Netze ein elektronischer Identitätsnachweis nach § 18 des " 
+      + "Personalausweisgesetzes, nach § 12 des eID-Karte-Gesetzes oder nach § 78 Absatz 5 des "
+      + "Aufenthaltsgesetzes erfolgen.";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
+  }
+
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
+  public void testExtractPage16Paragraph03() {
+    Paragraph paragraph = getParagraph(16, 3);
+
+    String expectedText = "§ 26 Beweismittel";
+    SemanticRole expectedRole = SemanticRole.HEADING;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
+  }
+
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
+  public void testExtractPage16Paragraph04() {
+    Paragraph paragraph = getParagraph(16, 4);
+
+    String expectedText = "(1) Die Behörde bedient sich der Beweismittel, die sie nach "
+      + "pflichtgemäßem Ermessen zur Ermittlung des Sachverhalts für erforderlich hält. Sie kann "
+      + "insbesondere "
+      + "1. Auskünfte jeder Art einholen, "
+      + "2. Beteiligte anhören, Zeugen und Sachverständige vernehmen oder die schriftliche oder "
+      + "elektronische Äußerung von Beteiligten, Sachverständigen und Zeugen einholen, "
+      + "3. Urkunden und Akten beiziehen, "
+      + "4. den Augenschein einnehmen.";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());
@@ -192,8 +258,28 @@ public class TestPdf0006 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage31Paragraph14() {
-    Paragraph paragraph = getParagraph(31, 14);
+  public void testExtractPage31Paragraph16() {
+    Paragraph paragraph = getParagraph(31, 16);
+
+    String expectedText = "(3) Soll durch die Anzeige, den Antrag oder die Abgabe einer "
+      + "Willenserklärung eine Frist in Lauf gesetzt werden, innerhalb deren die zuständige "
+      + "Behörde tätig werden muss, stellt die zuständige Behörde eine Empfangsbestätigung aus. "
+      + "In der Empfangsbestätigung ist das Datum des Eingangs bei der einheitlichen Stelle "
+      + "mitzuteilen und auf die Frist, die Voraussetzungen für den Beginn des Fristlaufs und auf "
+      + "eine an den Fristablauf geknüpfte Rechtsfolge sowie auf die verfügbaren Rechtsbehelfe "
+      + "hinzuweisen.";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
+  }
+  
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
+  public void testExtractPage31Paragraph17() {
+    Paragraph paragraph = getParagraph(31, 17);
 
     String expectedText = "- Seite 31 von 40 -";
     SemanticRole expectedRole = SemanticRole.PAGE_FOOTER;
@@ -220,8 +306,8 @@ public class TestPdf0006 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage39Paragraph05() {
-    Paragraph paragraph = getParagraph(39, 5);
+  public void testExtractPage39Paragraph01() {
+    Paragraph paragraph = getParagraph(39, 1);
 
     String expectedText = "Die Niederschrift ist von dem Vorsitzenden und, soweit ein "
       + "Schriftführer hinzugezogen worden ist, auch von diesem zu unterzeichnen.";
@@ -235,8 +321,8 @@ public class TestPdf0006 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage39Paragraph06() {
-    Paragraph paragraph = getParagraph(39, 6);
+  public void testExtractPage39Paragraph02() {
+    Paragraph paragraph = getParagraph(39, 2);
 
     String expectedText = "Teil VIII Schlussvorschriften";
     SemanticRole expectedRole = SemanticRole.HEADING;

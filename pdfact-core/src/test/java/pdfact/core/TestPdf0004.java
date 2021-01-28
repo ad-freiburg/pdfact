@@ -87,6 +87,23 @@ public class TestPdf0004 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
+  public void testExtractPage02Paragraph06() {
+    Paragraph paragraph = getParagraph(2, 6);
+
+    String expectedText = "Die Ausschreibung soll in der Zeit, Forschung & Lehre sowie auf der Job "
+      + "Site der IEEE geschaltet werden. Außerdem soll sie in der Stellenbörse der Universität "
+      + "erscheinen. Die Ausschreibung soll zum 01.03.2019 erfolgen. Als Bewerbungsfrist werden "
+      + "sechs Wochen nach erfolgter Ausschreibung genannt.";
+    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
+
+    assertEquals(expectedText, paragraph.getText());
+    assertEquals(expectedRole, paragraph.getSemanticRole());
+  }
+
+  /**
+   * Tests the extraction results on the level of paragraphs.
+   */
+  @Test
   public void testExtractPage02Paragraph07() {
     Paragraph paragraph = getParagraph(2, 7);
 
@@ -105,52 +122,18 @@ public class TestPdf0004 {
     Paragraph paragraph = getParagraph(2, 8);
 
     String expectedText = "Die Kommission einigt sich einstimmig auf den folgenden Kanon von "
-      + "Kriterien:";
+      + "Kriterien: "
+      + "1. Exzellenz in der Forschung mit Schwerpunkt wie in Ausschreibung genannt "
+      + "2. Lehrerfahrung bzw. Lehrbefähigung "
+      + "3. Fähigkeit zur Akquise und Leitung grundlagen- und anwendungsorientierter, öffentlich "
+      + "und industriell geförderter Projekte "
+      + "4. Führungserfahrung, Fähigkeit zu strategischer Planung, Aufbau sowie Leitung größerer "
+      + "Gruppen "
+      + "5. Kooperationsperspektiven mit Universitäten, Forschungsinstituten und Industrie, "
+      + "insbesondere innerhalb der Technischen Fakultät, der Universität Freiburg, sowie mit den "
+      + "lokalen Fraunhofer-Instituten " 
+      + "Alle Kriterien gleich gewichtet.";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
-
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
-  }
-
-  /**
-   * Tests the extraction results on the level of paragraphs.
-   */
-  @Test
-  public void testExtractPage02Paragraph09() {
-    Paragraph paragraph = getParagraph(2, 9);
-
-    String expectedText = "1. Exzellenz in der Forschung mit Schwerpunkt wie in Ausschreibung "  
-      + "genannt";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
-
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
-  }
-
-  /**
-   * Tests the extraction results on the level of paragraphs.
-   */
-  @Test
-  public void testExtractPage02Paragraph10() {
-    Paragraph paragraph = getParagraph(2, 10);
-
-    String expectedText = "2. Lehrerfahrung bzw. Lehrbefähigung ";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
-
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
-  }
-
-  /**
-   * Tests the extraction results on the level of paragraphs.
-   */
-  @Test
-  public void testExtractPage02Paragraph11() {
-    Paragraph paragraph = getParagraph(2, 11);
-
-    String expectedText = "3. Fähigkeit zur Akquise und Leitung grundlagen- und "  
-      + "anwendungsorientierter, öffentlich und industriell geförderter Projekte";
-    SemanticRole expectedRole = SemanticRole.ITEMIZE_ITEM;
 
     assertEquals(expectedText, paragraph.getText());
     assertEquals(expectedRole, paragraph.getSemanticRole());

@@ -7,6 +7,7 @@ import pdfact.core.model.Document;
 import pdfact.core.model.Paragraph;
 import pdfact.core.model.Position;
 import pdfact.core.model.SemanticRole;
+import pdfact.core.model.TextBlock;
 import pdfact.core.pipes.PlainPdfActCorePipe;
 import pdfact.core.util.exception.PdfActException;
 
@@ -26,6 +27,14 @@ public class TestPdf0005 {
   public static void setup() throws PdfActException {
     doc = new Document("src/test/resources/pdfs/PDF0005_landeshochschulgesetz_2005.pdf");
     doc = new PlainPdfActCorePipe().execute(doc);
+  }
+
+  /**
+   * Returns the <blockNum>-th text block on the <pageNum>-th page. Note that blockNum is
+   * 0-based and pageNum is 1-based.
+   */
+  protected TextBlock getTextBlock(int pageNum, int blockNum) {
+    return doc.getPages().get(pageNum - 1).getTextBlocks().get(blockNum);
   }
 
   /**
@@ -56,28 +65,13 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage05Paragraph02() {
-    Paragraph paragraph = getParagraph(5, 2);
-
-    String expectedText = "Die Hochschulen können durch Regelung in der Grundordnung ihrem Namen "
-            + "nach Satz 1 geeignete Zusätze voranstellen oder anfügen.";
-    SemanticRole expectedRole = SemanticRole.BODY_TEXT;
-
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
-  }
-
-  /**
-   * Tests the extraction results on the level of paragraphs.
-   */
-  @Test
-  public void testExtractPage05Paragraph03() {
-    Paragraph paragraph = getParagraph(5, 3);
+  public void testExtractPage05Paragraph01() {
+    Paragraph paragraph = getParagraph(5, 1);
 
     String expectedText = "(3) Hochschulen in freier Trägerschaft sind die kirchlichen und "
-      + "sonstigen nicht staatlichen Einrichtungen des Bildungswesens, die nach Maßgabe dieses "
-      + "Gesetzes staatlich anerkannt sind. Unberührt bleiben die kirchlichen Hochschulen im Sinne "
-      + "von Artikel 9 der Verfassung des Landes Baden-Württemberg.";
+     + "sonstigen nicht staatlichen Einrichtungen des Bildungswesens, die nach Maßgabe dieses "
+     + "Gesetzes staatlich anerkannt sind. Unberührt bleiben die kirchlichen Hochschulen im Sinne "
+     + "von Artikel 9 der Verfassung des Landes Baden-Württemberg.";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
@@ -88,8 +82,8 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage05Paragraph04() {
-    Paragraph paragraph = getParagraph(5, 4);
+  public void testExtractPage05Paragraph02() {
+    Paragraph paragraph = getParagraph(5, 2);
 
     String expectedText = "(4) Staatliche Hochschulen, ausgenommen die Hochschulen nach § 69, "
       + "werden durch Gesetz errichtet, zusammengelegt oder aufgehoben. Studienakademien der "
@@ -106,8 +100,8 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage05Paragraph05() {
-    Paragraph paragraph = getParagraph(5, 5);
+  public void testExtractPage05Paragraph03() {
+    Paragraph paragraph = getParagraph(5, 3);
 
     String expectedText = "§ 2 Aufgaben";
     SemanticRole expectedRole = SemanticRole.HEADING;
@@ -120,16 +114,39 @@ public class TestPdf0005 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage05Paragraph06() {
-    Paragraph paragraph = getParagraph(5, 6);
+  public void testExtractPage05Paragraph04() {
+    Paragraph paragraph = getParagraph(5, 4);
 
     String expectedText = "(1) Die Hochschulen dienen entsprechend ihrer Aufgabenstellung der "
       + "Pflege und der Entwicklung der Wissenschaften und der Künste durch Forschung, Lehre, "
-      + "Studium und Weiterbildung in einem freiheitlichen, demokratischen und sozialen Rechtsstaat. "
+      + "Studium und Weiterbildung in einem freiheitlichen, demokratischen und sozialen "
+      + "Rechtsstaat. "
       + "Die Hochschulen bereiten auf berufliche Tätigkeiten vor, welche die Anwendung "
       + "wissenschaftlicher Erkenntnisse und wissenschaftlicher Methoden oder die Fähigkeit zu "
       + "künstlerischer Gestaltung erfordern. Hierzu tragen die Hochschulen entsprechend ihrer "
-      + "besonderen Aufgabenstellung wie folgt bei:";
+      + "besonderen Aufgabenstellung wie folgt bei: "
+      + "1. Den Universitäten obliegt in der Verbindung von Forschung, Lehre, Studium und "
+      + "Weiterbildung die Pflege und Entwicklung der Wissenschaften, "
+      + "2. den Pädagogischen Hochschulen obliegen lehrerbildende und auf außerschulische "
+      + "Bildungsprozesse bezogene wissenschaftliche Studiengänge; im Rahmen dieser Aufgaben "
+      + "betreiben sie Forschung, "
+      + "3. den Kunsthochschulen obliegt vor allem die Pflege der Künste auf den Gebieten der "
+      + "Musik, der darstellenden und der bildenden Kunst, die Entwicklung künstlerischer Formen "
+      + "und Ausdrucksmittel und die Vermittlung künstlerischer Kenntnisse und Fähigkeiten; sie "
+      + "bereiten insbesondere auf kulturbezogene und künstlerische Berufe sowie auf diejenigen " 
+      + "kunstpädagogischen Berufe vor, deren Ausübung besondere künstlerische Fähigkeiten "
+      + "erfordert; im Rahmen dieser Aufgaben betreiben sie Forschung, "
+      + "4. die Hochschulen für angewandte Wissenschaften vermitteln durch anwendungsbezogene "
+      + "Lehre und Weiterbildung eine Ausbildung, die zu selbstständiger Anwendung "
+      + "wissenschaftlicher Erkenntnisse und Methoden oder zu künstlerischen Tätigkeiten in der "
+      + "Berufspraxis befähigt; sie betreiben anwendungsbezogene Forschung und Entwicklung, "
+      + "5. die Duale Hochschule vermittelt durch die Verbindung des Studiums an der "
+      + "Studienakademie mit der praxisorientierten Ausbildung in den beteiligten "
+      + "Ausbildungsstätten (duales System) die Fähigkeit zu selbstständiger Anwendung "
+      + "wissenschaftlicher Erkenntnisse und Methoden in der Berufspraxis; sie betreibt im "
+      + "Zusammenwirken mit den Ausbildungsstätten auf die Erfordernisse der dualen Ausbildung "
+      + "bezogene Forschung (kooperative Forschung); im Rahmen ihrer Aufgaben betreibt sie "
+      + "Weiterbildung.";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());
@@ -185,50 +202,53 @@ public class TestPdf0005 {
   }
 
   /**
-   * Tests the extraction results on the level of paragraphs.
+   * Tests the extraction results on the level of text blocks.
    */
   @Test
-  public void testExtractPage18Paragraph00() {
-    Paragraph paragraph = getParagraph(18, 0);
+  public void testExtractPage18TextBlock00() {
+    TextBlock block = getTextBlock(18, 0);
 
+    // Note: In text blocks, words are *not* dehyphenated (only in paragraphs).
     String expectedText = "(2) Die Hochschulen dürfen im Rahmen der Aufgaben nach § 2 ungeachtet "
-      + "der Rechtsform privatrechtliche Unternehmen nur errichten, übernehmen, wesentlich "
+      + "der Rechtsform privatrechtli- che Unternehmen nur errichten, übernehmen, wesentlich "
       + "erweitern oder sich daran beteiligen, wenn";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
+    assertEquals(expectedText, block.getText());
+    assertEquals(expectedRole, block.getSemanticRole());
   }
 
   /**
-   * Tests the extraction results on the level of paragraphs.
+   * Tests the extraction results on the level of text blocks.
    */
   @Test
-  public void testExtractPage18Paragraph01() {
-    Paragraph paragraph = getParagraph(18, 1);
+  public void testExtractPage18TextBlock01() {
+    TextBlock block = getTextBlock(18, 1);
 
+    // Note: In text blocks, words are *not* dehyphenated (only in paragraphs).
     String expectedText = "1. die Aufgaben der Hochschulen, die das Unternehmen wahrnehmen soll, "
       + "nicht ebenso gut und wirtschaftlich von der Hochschule als eigene Aufgabe im Sinne des "
-      + "Absatzes 1 erfüllt werden können,";
+      + "Absatzes 1 erfüllt werden kön- nen,";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
+    assertEquals(expectedText, block.getText());
+    assertEquals(expectedRole, block.getSemanticRole());
   }
 
   /**
-   * Tests the extraction results on the level of paragraphs.
+   * Tests the extraction results on the level of text blocks.
    */
   @Test
-  public void testExtractPage18Paragraph02() {
-    Paragraph paragraph = getParagraph(18, 2);
+  public void testExtractPage18TextBlock02() {
+    TextBlock block = getTextBlock(18, 2);
 
+    // Note: In text blocks, words are *not* dehyphenated (only in paragraphs).
     String expectedText = "2. das Unternehmen nach Art und Umfang in einem angemessenen Verhältnis "
-      + " zur Leistungsfähigkeit der Hochschule und zum voraussichtlichen Bedarf steht,";
+      + "zur Leistungsfähig- keit der Hochschule und zum voraussichtlichen Bedarf steht,";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
-    assertEquals(expectedText, paragraph.getText());
-    assertEquals(expectedRole, paragraph.getSemanticRole());
+    assertEquals(expectedText, block.getText());
+    assertEquals(expectedRole, block.getSemanticRole());
   }
 
   /**

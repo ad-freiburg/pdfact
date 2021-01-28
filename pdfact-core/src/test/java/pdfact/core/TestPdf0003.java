@@ -121,8 +121,8 @@ public class TestPdf0003 {
    * Tests the extraction results on the level of paragraphs.
    */
   @Test
-  public void testExtractPage07Paragraph15() {
-    Paragraph paragraph = getParagraph(7, 15);
+  public void testExtractPage07Paragraph14() {
+    Paragraph paragraph = getParagraph(7, 14);
 
     String expectedText = "Die Findungskommission habe die Aufgabe, einen Wahlvorschlag zu "
       + "beschließen. Der Wahlvorschlag bedürfe des Einvernehmens des Wissenschaftsministeriums. "
@@ -202,7 +202,11 @@ public class TestPdf0003 {
   public void testExtractPage16Paragraph10() {
     Paragraph paragraph = getParagraph(16, 10);
 
-    String expectedText = "Beschluss:";
+    String expectedText = "Beschluss: Auf Vorschlag der Rechtswissenschaftlichen Fakultät bestellt "
+      + "der Senat Herrn Prof. Dr. Ralf Poscher zum Honorarprofessor. Der Senat beschließt "
+      + "zugleich, dass Herrn Prof. Ralf Poscher für die Dauer dieser Tätigkeit auch die "
+      + "korporationsrechtliche Stellung eines beamteten Professors der Universität übertragen "
+      + "wird.";
     SemanticRole expectedRole = SemanticRole.BODY_TEXT;
 
     assertEquals(expectedText, paragraph.getText());

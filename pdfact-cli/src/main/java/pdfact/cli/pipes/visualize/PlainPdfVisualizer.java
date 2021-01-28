@@ -49,8 +49,8 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Creates a new PDF visualizer.
    * 
-   * @param units  The text units.
-   * @param roles  The semantic roles to include.
+   * @param units The text units.
+   * @param roles The semantic roles to include.
    */
   public PlainPdfVisualizer(Set<ExtractionUnit> extractionUnits, Set<SemanticRole> roles) {
     this.extractionUnits = extractionUnits;
@@ -404,8 +404,17 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       return;
     }
 
-    for (Position position : positions) {
+    for (int i = 0; i < positions.size(); i++) {
+      Position position = positions.get(i);
       visualizePosition(elem, position, drawer, color);
+
+      int page = position.getPageNumber();
+      Rectangle rect = position.getRectangle();
+      try {
+        drawer.drawText("[" + i + "]", page, new Point(rect.getMaxX() + 5, rect.getMinY()), color);
+      } catch (IOException e) {
+        throw new PdfActVisualizeException("Couldn't visualize the PDF document", e);
+      }
     }
   }
 
@@ -473,7 +482,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   // ==============================================================================================
 
   /**
-   * Checks if the semantic role of the given element is relevant, that is: if it is included in 
+   * Checks if the semantic role of the given element is relevant, that is: if it is included in
    * this.semanticRolesToInclude.
    * 
    * @param element The element to check.
