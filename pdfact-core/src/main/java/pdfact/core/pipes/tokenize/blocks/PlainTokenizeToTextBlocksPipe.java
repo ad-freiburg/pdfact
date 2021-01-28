@@ -389,7 +389,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
     log.debug("... actual line pitch:   %.1fpt", actualLinePitch);
     log.debug("... expected line pitch: %.1fpt", expectedLinePitch);
 
-    return actualLinePitch - expectedLinePitch > 1.5f;
+
+    if (actualLinePitch - expectedLinePitch > 1.5f) {
+      return true;
+    }
+
+    return actualLinePitch > 3 * line.getPosition().getRectangle().getHeight();
   }
 
   /**

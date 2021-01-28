@@ -88,21 +88,14 @@ public class PageHeaderFooterModule implements PdfTextSemanticizerModule {
       textCounter.add(getNormalizedText(block));
     }
 
-    int mostCommonTextFreq = textCounter.getMostCommonObjectFrequency();
-    if (mostCommonTextFreq < blocks.size() / 2) {
-      return;
-    }
-
-    String mostCommonText = textCounter.getMostCommonObject();
-
     for (TextBlock block : blocks) {
       String normalizedText = getNormalizedText(block);
-      if (normalizedText.equals(mostCommonText)) {
+      if (textCounter.getFrequency(normalizedText) >= blocks.size() / 3) {
         log.debug("-----------------------------------------------------");
         log.debug("Text block: \"%s\" ...", block.getText());
         log.debug("... page:          %d", block.getPosition().getPageNumber());
         log.debug("... assigned role: %s", role);
-        log.debug("... role reason:   the text occurs on more than half of the pages.");
+        log.debug("... role reason:   the text occurs on more than a third of the pages.");
         block.setSemanticRole(role);
       }
     }

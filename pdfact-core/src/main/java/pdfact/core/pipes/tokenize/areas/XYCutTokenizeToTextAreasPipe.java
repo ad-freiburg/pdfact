@@ -179,10 +179,12 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
     // Compute the statistics for the characters in the left half.
     ElementList<Character> left = halves.get(0);
     CharacterStatistic leftStats = this.characterStatistician.compute(left);
+    Rectangle leftRectangle = new Rectangle(left);
 
     // Compute the statistics for the characters in the right half.
     ElementList<Character> right = halves.get(1);
     CharacterStatistic rightStats = this.characterStatistician.compute(right);
+    Rectangle rightRectangle = new Rectangle(right);
 
     // Compute the (fictive) lane between the left and right half.
     float laneMinX = leftStats.getLargestMaxX();
@@ -196,6 +198,13 @@ public class XYCutTokenizeToTextAreasPipe extends XYCut implements TokenizeToTex
 
     // Don't allow the lane, if it is too narrow.
     if (laneWidth < Math.max(pdfCharWidth, pageCharWidth)) {
+      return -1;
+    }
+
+    // Don't allow the lane, if the resulting areas are too low. This should prevent to split 
+    // single text lines into multiple areas, for example the page headers in PDF0008.
+    if (leftRectangle.getHeight() < 2 * leftStats.getMostCommonHeight() 
+        || rightRectangle.getHeight() < 2 * rightStats.getMostCommonHeight()) {
       return -1;
     }
 
