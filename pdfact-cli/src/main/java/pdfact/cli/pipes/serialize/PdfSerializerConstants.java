@@ -2,7 +2,7 @@ package pdfact.cli.pipes.serialize;
 
 /**
  * Collection of some constants that are needed on serialization.
- * 
+ *
  * @author Claudius Korzen
  *
  */
@@ -77,6 +77,8 @@ public class PdfSerializerConstants {
   static final String TEXT = "text";
   /** The constant 'TEXT_BLOCK'. */
   static final String TEXT_BLOCK = "block";
+  /** The constant 'TEXT_BLOCK'. */
+  static final String TEXT_BLOCKS = "blocks";
   /** The constant 'TEXT_LINE'. */
   static final String TEXT_LINE = "textline";
   /** The constant 'WIDTH'. */

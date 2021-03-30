@@ -3,8 +3,10 @@ package pdfact.core.pipes.tokenize.blocks;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Color;
 import pdfact.core.model.Document;
@@ -25,7 +27,7 @@ import pdfact.core.util.statistician.TextLineStatistician;
 
 /**
  * A plain implementation of {@link TokenizeToTextBlocksPipe}.
- * 
+ *
  * @author Claudius Korzen
  */
 public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
@@ -103,9 +105,9 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Tokenizes the text lines in the pages of the given PDF document into text blocks.
-   * 
+   *
    * @param pdf The PDF document to process.
-   * 
+   *
    * @throws PdfActException If something went wrong while tokenization.
    */
   protected void tokenizeToTextBlocks(Document pdf) throws PdfActException {
@@ -132,12 +134,12 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Tokenizes the text lines in the given page into text lines.
-   * 
+   *
    * @param pdf  The PDF document to which the given page belongs to.
    * @param page The PDF page to process.
-   * 
+   *
    * @return The list of text blocks.
-   * 
+   *
    * @throws PdfActException If something went wrong while tokenization.
    */
   protected ElementList<TextBlock> tokenizeToTextBlocks(Document pdf, Page page)
@@ -188,7 +190,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Computes the character statistic for the given text block.
    *
    * @param block The text block to process.
-   * 
+   *
    * @return The character statistic for the given text block.
    */
   protected CharacterStatistic computeCharacterStatistic(TextBlock block) {
@@ -199,7 +201,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * Computes the text line statistic for the given text block.
    *
    * @param block The text block to process.
-   * 
+   *
    * @return The text line statistic for the given text block.
    */
   protected TextLineStatistic computeTextLineStatistic(TextBlock block) {
@@ -240,7 +242,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
    * @param prevLine         The previous text line.
    * @param line             The current text line to process.
    * @param nextLine         The next text line.
-   * 
+   *
    * @return True, if the given current text line introduces a new text block; false otherwise.
    */
   protected boolean introducesNewTextBlock(Document pdf, Page page, TextBlock currentTextBlock,
@@ -470,11 +472,11 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Checks if the line pitches between the line / previous line and the line / next line are equal.
-   * 
+   *
    * @param prevLine The previous text line.
    * @param line     The text line to process.
    * @param nextLine The next text line.
-   * 
+   *
    * @return True, if the line pitches between the line / previous line and the line / next line are
    *         equal, false otherwise.
    */
@@ -487,7 +489,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Computes the line pitch between the given lines. Both lines must share the same page.
-   * 
+   *
    * @param firstLine  The first text line.
    * @param secondLine The second text line.
    * @return The line pitch between the given lines or Float.NaN if the lines do not share the same
@@ -564,7 +566,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
     // If the font size of the previous line and the font size of the current
     // line are not equal, the line has a special font face.
-    if (prevLineFontsize != lineFontsize) {
+    if (Math.abs(prevLineFontsize - lineFontsize) > 0.5f) {
       return true;
     }
 
@@ -645,10 +647,10 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Checks if the given line is indented, compared to the given reference line.
-   * 
+   *
    * @param line    The text line to process.
    * @param refLine The reference text line.
-   * 
+   *
    * @return True, if the given line is indented compared to the given reference line.
    */
   public static boolean isIndented(TextLine line, TextLine refLine) {
@@ -668,7 +670,7 @@ public class PlainTokenizeToTextBlocksPipe implements TokenizeToTextBlocksPipe {
 
   /**
    * Checks, if the minX values for the given lines are equal.
-   * 
+   *
    * @param line1 The first text line.
    * @param line2 The second text line-
    * @return True, if the minX values for the given lines are equal, false otherwise.

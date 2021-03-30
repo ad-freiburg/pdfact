@@ -1,8 +1,10 @@
 package pdfact.core.pipes.semanticize.modules;
 
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import pdfact.core.model.CharacterStatistic;
 import pdfact.core.model.Document;
 import pdfact.core.model.FontFace;
@@ -12,7 +14,7 @@ import pdfact.core.model.TextBlock;
 
 /**
  * A module that identifies the text blocks with the semantic role "title".
- * 
+ *
  * @author Claudius Korzen
  */
 public class TitleModule implements PdfTextSemanticizerModule {
@@ -26,7 +28,7 @@ public class TitleModule implements PdfTextSemanticizerModule {
     log.debug("=====================================================");
     log.debug("Detecting text blocks of semantic role '%s' ...", SemanticRole.TITLE);
     log.debug("=====================================================");
-    
+
     if (pdf == null) {
       return;
     }
@@ -64,7 +66,7 @@ public class TitleModule implements PdfTextSemanticizerModule {
       }
     }
 
-    if (largestFontSizeBlock != null) {
+    if (largestFontSizeBlock != null && largestFontSizeBlock.getText().length() > 3) {
       log.debug("-----------------------------------------------------");
       log.debug("Text block: \"%s\" ...", largestFontSizeBlock.getText());
       log.debug("... page:          %d", largestFontSizeBlock.getPosition().getPageNumber());

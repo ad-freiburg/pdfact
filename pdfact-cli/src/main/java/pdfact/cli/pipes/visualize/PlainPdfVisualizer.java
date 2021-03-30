@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import pdfact.cli.model.ExtractionUnit;
 import pdfact.cli.pipes.visualize.pdfbox.PdfBoxDrawer;
 import pdfact.cli.util.exception.PdfActVisualizeException;
@@ -48,7 +49,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Creates a new PDF visualizer.
-   * 
+   *
    * @param units The text units.
    * @param roles The semantic roles to include.
    */
@@ -101,10 +102,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the characters of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeCharacters(Document pdf, PdfDrawer drawer)
@@ -139,10 +140,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given character.
-   * 
+   *
    * @param character The character to visualize.
    * @param drawer    The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeCharacter(Character character, PdfDrawer drawer)
@@ -154,10 +155,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the text areas of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextAreas(Document pdf, PdfDrawer drawer)
@@ -171,10 +172,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given text area.
-   * 
+   *
    * @param textArea The text area to visualize.
    * @param drawer   The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextArea(TextArea textArea, PdfDrawer drawer)
@@ -186,10 +187,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the text lines of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextLines(Document pdf, PdfDrawer drawer)
@@ -203,14 +204,15 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given text line.
-   * 
+   *
    * @param textLine The text line to visualize.
    * @param drawer   The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextLine(TextLine textLine, PdfDrawer drawer)
           throws PdfActVisualizeException {
+    // System.out.println(textLine.getText() + " " + textLine.getPosition().getRectangle());
     visualizePdfElement(textLine, drawer, Color.BLUE);
   }
 
@@ -218,10 +220,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the words of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeWords(Document pdf, PdfDrawer drawer) throws PdfActVisualizeException {
@@ -240,10 +242,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given word.
-   * 
+   *
    * @param word   The word to visualize.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeWord(Word word, PdfDrawer drawer) throws PdfActVisualizeException {
@@ -254,10 +256,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the text lines of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextBlocks(Document pdf, PdfDrawer drawer)
@@ -271,10 +273,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given text block.
-   * 
+   *
    * @param textBlock The text block to visualize.
    * @param drawer    The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeTextBlock(TextBlock textBlock, PdfDrawer drawer)
@@ -286,10 +288,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the paragraphs of the given PDF document.
-   * 
+   *
    * @param pdf    The PDF document to process.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeParagraphs(Document pdf, PdfDrawer drawer)
@@ -307,10 +309,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given paragraph.
-   * 
+   *
    * @param paragraph The paragraph to visualize.
    * @param drawer    The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeParagraph(Paragraph paragraph, PdfDrawer drawer)
@@ -322,10 +324,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given figure.
-   * 
+   *
    * @param figure The figure to visualize.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeFigure(Figure figure, PdfDrawer drawer) throws PdfActVisualizeException {
@@ -334,10 +336,10 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given shape.
-   * 
+   *
    * @param shape  The shape to visualize.
    * @param drawer The drawer to use.
-   * 
+   *
    * @throws PdfActVisualizeException If the drawing failed.
    */
   protected void visualizeShape(Shape shape, PdfDrawer drawer) throws PdfActVisualizeException {
@@ -348,7 +350,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given PDF element using the given drawer.
-   * 
+   *
    * @param element The element to visualize.
    * @param drawer  The drawer to use.
    * @param color   The color to use.
@@ -373,7 +375,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given PDF positions with the given color.
-   * 
+   *
    * @param drawer    The drawer to use.
    * @param color     The color to use.
    * @param element   The element to which the given positions belong to.
@@ -387,7 +389,7 @@ public class PlainPdfVisualizer implements PdfVisualizer {
 
   /**
    * Visualizes the given PDF positions with the given color.
-   * 
+   *
    * @param drawer    The drawer to use.
    * @param color     The color to use.
    * @param elem      The element to which the given positions belong to.
@@ -408,19 +410,19 @@ public class PlainPdfVisualizer implements PdfVisualizer {
       Position position = positions.get(i);
       visualizePosition(elem, position, drawer, color);
 
-      int page = position.getPageNumber();
-      Rectangle rect = position.getRectangle();
-      try {
-        drawer.drawText("[" + i + "]", page, new Point(rect.getMaxX() + 5, rect.getMinY()), color);
-      } catch (IOException e) {
-        throw new PdfActVisualizeException("Couldn't visualize the PDF document", e);
-      }
+      // int page = position.getPageNumber();
+      // Rectangle rect = position.getRectangle();
+      // try {
+      //   drawer.drawText("[" + i + "]", page, new Point(rect.getMaxX() + 5, rect.getMinY()), color);
+      // } catch (IOException e) {
+      //   throw new PdfActVisualizeException("Couldn't visualize the PDF document", e);
+      // }
     }
   }
 
   /**
    * Visualizes the given PDF position of the given element.
-   * 
+   *
    * @param element  The element to which the given position belongs to.
    * @param position The position to visualize.
    * @param drawer   The drawer to use.
@@ -484,9 +486,9 @@ public class PlainPdfVisualizer implements PdfVisualizer {
   /**
    * Checks if the semantic role of the given element is relevant, that is: if it is included in
    * this.semanticRolesToInclude.
-   * 
+   *
    * @param element The element to check.
-   * 
+   *
    * @return True, if the role of the given element is relevant.
    */
   protected boolean hasRelevantRole(HasSemanticRole element) {

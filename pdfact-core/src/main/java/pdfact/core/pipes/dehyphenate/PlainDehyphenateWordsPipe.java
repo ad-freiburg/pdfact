@@ -2,15 +2,22 @@ package pdfact.core.pipes.dehyphenate;
 
 import static pdfact.core.util.lexicon.CharacterLexicon.HYPHENS;
 import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import pdfact.core.model.Character;
 import pdfact.core.model.Document;
+import pdfact.core.model.Page;
 import pdfact.core.model.Paragraph;
+import pdfact.core.model.TextBlock;
+import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
 import pdfact.core.util.PdfActUtils;
 import pdfact.core.util.counter.ObjectCounter;
@@ -20,7 +27,7 @@ import pdfact.core.util.normalize.WordNormalizer;
 
 /**
  * A plain implementation of {@link DehyphenateWordsPipe}.
- * 
+ *
  * @author Claudius Korzen
  */
 public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
@@ -93,7 +100,10 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   @Override
   public Document execute(Document pdf) throws PdfActException {
     countWords(pdf);
-    dehyphenate(pdf);
+    // Also dehyphenate words in text blocks (this is, for example, needed by Robin for enhancing
+    // the search functionaliyt of pdf.js).
+    dehyphenateWordsInTextBlocks(pdf);
+    dehyphenateWordsInParagraphs(pdf);
     return pdf;
   }
 
@@ -101,7 +111,7 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
   /**
    * Counts single, compound and prefixes of compound words.
-   * 
+   *
    * @param pdf
    *        The PDF document to process.
    */
@@ -179,12 +189,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   // ==============================================================================================
 
   /**
-   * Dehyphenates the hyphenated words in the given PDF document.
-   * 
+   * Dehyphenates the hyphenated words in the paragraphs of the given PDF document.
+   *
    * @param pdf
    *        The PDF document to process.
    */
-  protected void dehyphenate(Document pdf) {
+  protected void dehyphenateWordsInParagraphs(Document pdf) {
     if (pdf == null) {
       return;
     }
@@ -236,13 +246,80 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   }
 
   /**
+   * Dehyphenates the hyphenated words in the text blocks of the given PDF document.
+   *
+   * @param pdf
+   *        The PDF document to process.
+   */
+  protected void dehyphenateWordsInTextBlocks(Document pdf) {
+    if (pdf == null) {
+      return;
+    }
+
+    List<Page> pages = pdf.getPages();
+    if (pages == null) {
+      return;
+    }
+
+    for (Page page : pages) {
+      if (page == null) {
+        continue;
+      }
+
+      List<TextBlock> textBlocks = page.getTextBlocks();
+      if (textBlocks == null) {
+        continue;
+      }
+
+      for (TextBlock block : textBlocks) {
+        if (block == null) {
+          continue;
+        }
+
+        // Collect all words in a single list.
+        ArrayList<Word> words = new ArrayList<>();
+        for (TextLine line : block.getTextLines()) {
+          words.addAll(line.getWords());
+        }
+
+        Iterator<Word> wordItr = words.iterator();
+        ElementList<Word> dehyphWords = new ElementList<>(words.size());
+
+        while (wordItr.hasNext()) {
+          Word word = wordItr.next();
+
+          this.numProcessedWords++;
+
+          if (word == null) {
+            continue;
+          }
+
+          if (!word.isHyphenated()) {
+            dehyphWords.add(word);
+            continue;
+          }
+
+          Word nextWord = wordItr.hasNext() ? wordItr.next() : null;
+          if (nextWord != null) {
+            dehyphWords.add(dehyphenate(word, nextWord));
+            this.numProcessedWords++;
+          } else {
+            dehyphWords.add(word);
+          }
+        }
+        block.setText(PdfActUtils.join(dehyphWords, " "));
+      }
+    }
+  }
+
+  /**
    * Dehyphenates the two given words.
-   * 
+   *
    * @param word1
    *        The first word to process.
    * @param word2
    *        The second word to process.
-   * 
+   *
    * @return The dehyphenated word.
    */
   public Word dehyphenate(Word word1, Word word2) {
@@ -280,12 +357,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
 
   /**
    * Returns true if the hyphen between the two given words is mandatory on.
-   * 
+   *
    * @param word1
    *        The first word (the part before the hyphen).
    * @param word2
    *        The second word (the part behind the hyphen).
-   * 
+   *
    * @return True if we have to ignore the hyphen between the two given words;
    *         False otherwise.
    */
@@ -312,12 +389,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     if (compoundWordFreq != singleWordFreq) {
       if (compoundWordFreq > singleWordFreq) {
         log.debug("... hyphen is mandatory:                       true");
-        log.debug("... reason:                                    freq(\"%s\") > freq(\"%s\")", 
+        log.debug("... reason:                                    freq(\"%s\") > freq(\"%s\")",
             withHyphen, withoutHyphen);
         return true;
       } else {
         log.debug("... hyphen is mandatory:                       false");
-        log.debug("... reason:                                    freq(\"%s\") < freq(\"%s\")", 
+        log.debug("... reason:                                    freq(\"%s\") < freq(\"%s\")",
             withHyphen, withoutHyphen);
         return false;
       }
