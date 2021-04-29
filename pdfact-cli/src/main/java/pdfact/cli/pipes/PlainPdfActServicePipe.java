@@ -25,7 +25,7 @@ import pdfact.core.util.pipeline.PlainPipeline;
 
 /**
  * A plain implementation of {@link PdfActServicePipe}.
- * 
+ *
  * @author Claudius Korzen
  */
 public class PlainPdfActServicePipe implements PdfActServicePipe {
@@ -82,6 +82,11 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   protected boolean withControlCharacters;
 
+  /**
+   * The boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  protected boolean isPdfJsMode;
+
   // ==============================================================================================
 
   /**
@@ -97,12 +102,12 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
 
   /**
    * Processes the given PDF document.
-   * 
+   *
    * @param pdf
    *        The PDF document to process.
-   * 
+   *
    * @return The PDF document after processing.
-   * 
+   *
    * @throws PdfActException
    *         If something went wrong on processing the PDF document.
    */
@@ -110,7 +115,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     log.debug("Start of pipe: " + getClass().getSimpleName() + ".");
 
     log.debug("Process: Processing the service pipeline.");
-    
+
     Pipeline pipeline = new PlainPipeline();
 
     // Parse the PDF document.
@@ -129,9 +134,10 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
       serializePipe.setSerializationFormat(this.serializationFormat);
       serializePipe.setExtractionUnits(this.extractionUnits);
       serializePipe.setSemanticRolesToInclude(this.roles);
-      serializePipe.setWithControlCharacters(this.withControlCharacters);
       serializePipe.setTargetPath(this.serializationPath);
       serializePipe.setTargetStream(this.serializationStream);
+      serializePipe.setWithControlCharacters(this.withControlCharacters);
+      serializePipe.setIsPdfJsMode(this.isPdfJsMode);
       pipeline.addPipe(serializePipe);
     }
 
@@ -162,7 +168,7 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
     log.debug("Time needed to process the service pipeline: " + length + "ms.");
 
     log.debug("End of pipe: " + getClass().getSimpleName() + ".");
-    
+
     return pdf;
   }
 
@@ -268,5 +274,21 @@ public class PlainPdfActServicePipe implements PdfActServicePipe {
    */
   public void setInsertControlCharacters(boolean withControlCharacters) {
     this.withControlCharacters = withControlCharacters;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public boolean isPdfJsMode() {
+    return this.isPdfJsMode;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public void setIsPdfJsMode(boolean isPdfJsMode) {
+    this.isPdfJsMode = isPdfJsMode;
   }
 }

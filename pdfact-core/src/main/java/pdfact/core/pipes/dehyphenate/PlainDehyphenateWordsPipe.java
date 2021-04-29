@@ -2,14 +2,11 @@ package pdfact.core.pipes.dehyphenate;
 
 import static pdfact.core.util.lexicon.CharacterLexicon.HYPHENS;
 import static pdfact.core.util.lexicon.CharacterLexicon.LETTERS;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import pdfact.core.model.Character;
@@ -100,9 +97,6 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
   @Override
   public Document execute(Document pdf) throws PdfActException {
     countWords(pdf);
-    // Also dehyphenate words in text blocks (this is, for example, needed by Robin for enhancing
-    // the search functionaliyt of pdf.js).
-    dehyphenateWordsInTextBlocks(pdf);
     dehyphenateWordsInParagraphs(pdf);
     return pdf;
   }
@@ -335,7 +329,8 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     ElementList<Character> chars2 = word2.getCharacters();
     ElementList<Character> mergedChars = new ElementList<>();
 
-    if (isHyphenMandatory(word1, word2)) {
+    boolean isHyphenMandatory = isHyphenMandatory(word1, word2);
+    if (isHyphenMandatory) {
       mergedChars.addAll(chars1);
       this.numCompoundWords++;
     } else {
@@ -345,11 +340,12 @@ public class PlainDehyphenateWordsPipe implements DehyphenateWordsPipe {
     this.numDehyphenatedWords++;
 
     mergedChars.addAll(chars2);
-    word1.setCharacters(chars2);
+    word1.setCharacters(mergedChars);
 
     word1.addPositions(word2.getPositions());
     word1.setIsHyphenated(false);
     word1.setIsDehyphenated(true);
+    word1.setIsHyphenMandatory(isHyphenMandatory);
     word1.setText(PdfActUtils.join(mergedChars, ""));
 
     return word1;

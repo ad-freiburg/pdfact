@@ -99,7 +99,10 @@ public class PdfActCli {
       pdfAct.setSemanticRoles(SemanticRole.fromStrings(roles));
 
       // Set the "with control characters"-flag.
-      pdfAct.setInsertControlCharacters(parser.withControlCharacters); 
+      pdfAct.setInsertControlCharacters(parser.withControlCharacters);
+
+      // Set the "pdf.js mode" flag.
+      pdfAct.setIsPdfJsMode(parser.isPdfJsMode);
 
       // Run PdfAct.
       pdfAct.parse(parser.pdfPath);
@@ -374,7 +377,7 @@ public class PdfActCli {
     @Arg(dest = DEBUG_WORD_DEHYPHENATION)
     public boolean isDebugWordDehyphenation = false;
 
-   // ============================================================================================
+    // ============================================================================================
 
     /**
      * The name of the option to define the "with control characters" flag.
@@ -382,12 +385,25 @@ public class PdfActCli {
     public static final String WITH_CONTROL_CHARACTERS = "with-control-characters";
 
     /**
-     * The flag indicating whether or not to add control characters to the TXT serialization 
+     * The flag indicating whether or not to add control characters to the TXT serialization
      * output.
      */
     @Arg(dest = WITH_CONTROL_CHARACTERS)
     public boolean withControlCharacters = false;
 
+
+    // ============================================================================================
+
+    /**
+     * The name of the option to enable the pdf.js mode.
+     */
+    public static final String PDFJS_MODE = "pdfjs_mode";
+
+    /**
+     * The boolean flag indicating whether or not the pdf.js mode is enabled.
+     */
+    @Arg(dest = PDFJS_MODE)
+    public boolean isPdfJsMode = false;
 
     // ============================================================================================
 
@@ -422,8 +438,8 @@ public class PdfActCli {
         .metavar("<format>")
         .choices(choices)
         .setDefault(this.serializationFormat)
-        .help("The output format.\n" 
-            + "- Available options: " + choicesStr + ".\n" 
+        .help("The output format.\n"
+            + "- Available options: " + choicesStr + ".\n"
             + "- Default: \"" + defaultStr + "\".\n"
             + "In case of txt, the text elements will be extracted as plain text, in the "
             + "format: one text element per line. In case of xml or json, the text elements "
@@ -439,8 +455,8 @@ public class PdfActCli {
         .action(new SplitAtDelimiterAction(","))
         .setDefault(this.extractionUnits)
         .help("The granularity in which the elements should be extracted in the output, "
-            + "separated by \",\".\n" 
-            + "- Available options: " + choicesStr + ".\n" 
+            + "separated by \",\".\n"
+            + "- Available options: " + choicesStr + ".\n"
             + "- Default: \"" + defaultStr + "\".\n"
             + "For example, when the script is called with the option \"--" + EXTRACTION_UNITS
             + " words\", the output will be broken down by words, that is: the text and layout "
@@ -513,7 +529,7 @@ public class PdfActCli {
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugPdfParsing)
         .help("Print debug info about the PDF parsing step.");
-      
+
       // Add an option to enable the printing of debug info about the characters extraction.
       this.parser.addArgument("--" + DEBUG_CHAR_EXTRACTION).dest(DEBUG_CHAR_EXTRACTION)
         .required(false)
@@ -576,6 +592,14 @@ public class PdfActCli {
         .action(Arguments.storeTrue())
         .setDefault(this.isDebugWordDehyphenation)
         .help("Print debug info about the word dehyphenation step.");
+
+      // Add an option to enable the pdf.js mode required by Robin.
+      this.parser.addArgument("--" + PDFJS_MODE).dest(PDFJS_MODE)
+        .required(false)
+        .action(Arguments.storeTrue())
+        .setDefault(this.isPdfJsMode)
+        .help("Enables the pdf.js mode, that is: a mode that outputs the text in a format as "
+              + "required by the tool from Robin that improves the search functionality of pdf.js");
     }
 
     /**

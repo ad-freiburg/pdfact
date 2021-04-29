@@ -10,20 +10,20 @@ import pdfact.core.util.pipeline.Pipe;
 
 /**
  * A pipe to serialize PDF documents.
- * 
+ *
  * @author Claudius Korzen
  */
 public interface SerializePdfPipe extends Pipe {
   /**
    * Returns the serialization format.
-   * 
+   *
    * @return The serialization format.
    */
   SerializationFormat getSerializationFormat();
 
   /**
    * Sets the serialization format.
-   * 
+   *
    * @param format The serialization format.
    */
   void setSerializationFormat(SerializationFormat format);
@@ -32,14 +32,14 @@ public interface SerializePdfPipe extends Pipe {
 
   /**
    * Returns the target stream.
-   * 
+   *
    * @return The target stream.
    */
   OutputStream getTargetStream();
 
   /**
    * Sets the target stream.
-   * 
+   *
    * @param stream The target stream.
    */
   void setTargetStream(OutputStream stream);
@@ -48,14 +48,14 @@ public interface SerializePdfPipe extends Pipe {
 
   /**
    * Returns the target path.
-   * 
+   *
    * @return The target path.
    */
   Path getTargetPath();
 
   /**
    * Sets the target path.
-   * 
+   *
    * @param path The target path.
    */
   void setTargetPath(Path path);
@@ -64,14 +64,14 @@ public interface SerializePdfPipe extends Pipe {
 
   /**
    * Returns the units to extract.
-   * 
+   *
    * @return The units to extract.
    */
   Set<ExtractionUnit> getExtractionUnits();
 
   /**
    * Sets the units to extract.
-   * 
+   *
    * @param units The units to extract.
    */
   void setExtractionUnits(Set<ExtractionUnit> units);
@@ -80,14 +80,14 @@ public interface SerializePdfPipe extends Pipe {
 
   /**
    * Returns the semantic roles to include.
-   * 
+   *
    * @return The semantic roles to include.
    */
   Set<SemanticRole> getSemanticRolesToInclude();
 
   /**
    * Sets the semantic roles to include.
-   * 
+   *
    * @param roles The semantic roles to include.
    */
   void setSemanticRolesToInclude(Set<SemanticRole> roles);
@@ -107,4 +107,16 @@ public interface SerializePdfPipe extends Pipe {
    * occurs in the PDF and "^A" in front of headings.
    */
   public void setWithControlCharacters(boolean withControlCharacters);
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public boolean isPdfJsMode();
+
+  /**
+   * Sets the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public void setIsPdfJsMode(boolean isPdfJsMode);
 }

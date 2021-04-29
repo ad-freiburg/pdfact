@@ -20,7 +20,7 @@ import pdfact.core.util.exception.PdfActException;
 
 /**
  * A plain implementation of {@link SerializePdfPipe}.
- * 
+ *
  * @author Claudius Korzen
  */
 public class PlainSerializePdfPipe implements SerializePdfPipe {
@@ -54,12 +54,17 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
    */
   protected Set<SemanticRole> semanticRolesToInclude;
 
- /**
+  /**
    * The boolean flag indicating whether or not this serializer should insert control
    * characters, i.e.: "^L" between two PDF elements in case a page break between the two elements
    * occurs in the PDF and "^A" in front of headings.
    */
   protected boolean withControlCharacters;
+
+  /**
+   * The boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  protected boolean isPdfJsMode;
 
   // ==============================================================================================
 
@@ -94,13 +99,14 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
   /**
    * Serializes the given PDF document.
-   * 
+   *
    * @param pdf The PDf document to serialize.
    * @throws PdfActException If something went wrong while serializing the PDF document.
    */
   protected void serialize(Document pdf) throws PdfActException {
     // Instantiate a serializer.
     PdfSerializer serializer;
+
     switch (this.format) {
       case XML:
         serializer = new PdfXmlSerializer(this.extractionUnits, this.semanticRolesToInclude);
@@ -115,6 +121,11 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
       default:
         throw new PdfActSerializeException(
                 "Couldn't find a serializer for the format '" + this.format + "'.");
+    }
+
+    // Use a specific serializer when the pdf.js mode is enabled.
+    if (this.isPdfJsMode()) {
+      serializer = new PdfJsSerializer();
     }
 
     // Serialize the PDF document.
@@ -133,7 +144,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
   /**
    * Writes the given bytes to the given output stream.
-   * 
+   *
    * @param bytes  The bytes to write.
    * @param stream The stream to write to.
    * @throws PdfActSerializeException If something went wrong while writing the bytes to the stream.
@@ -148,7 +159,7 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
 
   /**
    * Writes the given bytes to the given file.
-   * 
+   *
    * @param bytes The bytes to write.
    * @param path  The file to write to.
    * @throws PdfActSerializeException If something went wrong while writing the bytes to the stream.
@@ -231,5 +242,17 @@ public class PlainSerializePdfPipe implements SerializePdfPipe {
   @Override
   public void setWithControlCharacters(boolean withControlCharacters) {
     this.withControlCharacters = withControlCharacters;
+  }
+
+  // ==============================================================================================
+
+  @Override
+  public boolean isPdfJsMode() {
+    return this.isPdfJsMode;
+  }
+
+  @Override
+  public void setIsPdfJsMode(boolean isPdfJsMode) {
+    this.isPdfJsMode = isPdfJsMode;
   }
 }

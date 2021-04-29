@@ -1,15 +1,13 @@
 package pdfact.core.model;
 
 import java.util.List;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import pdfact.core.util.list.ElementList;
 
 /**
  * A word in a document.
- * 
+ *
  * @author Claudius Korzen
  */
 public class Word extends Element implements HasCharacters, HasText, HasPositions {
@@ -37,6 +35,12 @@ public class Word extends Element implements HasCharacters, HasText, HasPosition
    * The boolean flag that indicates whether this word is dehyphenated.
    */
   protected boolean isDehyphenated;
+
+  /**
+   * The boolean flag that indicates whether the word was dehyphenated because it was hyphenated and
+   * the hyphen between the this word and the next word is mandatory.
+   */
+  protected boolean isHyphenMandatory;
 
   /**
    * The statistic about the characters.
@@ -144,7 +148,7 @@ public class Word extends Element implements HasCharacters, HasText, HasPosition
 
   /**
    * Returns true if this word is hyphenated.
-   * 
+   *
    * @return True if this word is hyphenated; false otherwise.
    */
   public boolean isHyphenated() {
@@ -153,9 +157,8 @@ public class Word extends Element implements HasCharacters, HasText, HasPosition
 
   /**
    * Sets the boolean flag that indicates whether this word is hyphenated.
-   * 
-   * @param isHyphenated The boolean flag that indicates whether this word is
-   *                     hyphenated.
+   *
+   * @param isHyphenated The boolean flag that indicates whether this word is hyphenated.
    */
   public void setIsHyphenated(boolean isHyphenated) {
     this.isHyphenated = isHyphenated;
@@ -165,7 +168,7 @@ public class Word extends Element implements HasCharacters, HasText, HasPosition
 
   /**
    * Returns true if this word is dehyphenated.
-   * 
+   *
    * @return True if this word is dehyphenated; false otherwise.
    */
   public boolean isDehyphenated() {
@@ -174,13 +177,37 @@ public class Word extends Element implements HasCharacters, HasText, HasPosition
 
   /**
    * Sets the boolean flag that indicates whether this word is dehyphenated.
-   * 
-   * @param isDehyphenated The boolean flag that indicates whether this word is
-   *                       dehyphenated.
+   *
+   * @param isDehyphenated The boolean flag that indicates whether this word is dehyphenated.
    */
   public void setIsDehyphenated(boolean isDehyphenated) {
     this.isDehyphenated = isDehyphenated;
   }
+
+  // ==============================================================================================
+
+  /**
+   * Returns true if this word was dehyphenated because it was hyphenated and the hyphen between
+   * this word and the next word is mandatory.
+   *
+   * @return True if this word is dehyphenated; false otherwise.
+   */
+  public boolean isHyphenMandatory() {
+    return this.isHyphenMandatory;
+  }
+
+  /**
+   * Sets the boolean flag that indicates whether this word was dehyphenated because it was
+   * hyphenated and the hyphen between this word and the next word is mandatory.
+   *
+   * @param isHyphenMandatory The boolean flag that indicates whether the hyphen between this word
+   *        and the next word is mandatory
+   */
+  public void setIsHyphenMandatory(boolean isHyphenMandatory) {
+    this.isHyphenMandatory = isHyphenMandatory;
+  }
+
+  // ==============================================================================================
 
   @Override
   public CharacterStatistic getCharacterStatistic() {

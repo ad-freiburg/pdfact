@@ -109,6 +109,11 @@ public class PdfAct {
    */
   protected boolean insertControlCharacters;
 
+  /**
+   * A boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  protected boolean isPdfJsMode;
+
   // ==============================================================================================
 
   /**
@@ -180,6 +185,7 @@ public class PdfAct {
     }
 
     service.setInsertControlCharacters(this.insertControlCharacters);
+    service.setIsPdfJsMode(this.isPdfJsMode);
 
     // Create the PDF document from the given path.
     Document pdf = new Document(pdfPath);
@@ -474,6 +480,22 @@ public class PdfAct {
    */
   public void setInsertControlCharacters(boolean insertControlCharacters) {
     this.insertControlCharacters = insertControlCharacters;
+  }
+
+  // ==============================================================================================
+
+  /**
+   * Returns the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public boolean isPdfJsMode() {
+    return this.isPdfJsMode;
+  }
+
+  /**
+   * Sets the boolean flag indicating whether or not the pdf.js mode is enabled.
+   */
+  public void setIsPdfJsMode(boolean isPdfJsMode) {
+    this.isPdfJsMode = isPdfJsMode;
   }
 }
 
