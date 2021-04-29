@@ -397,7 +397,7 @@ public class PdfActCli {
     /**
      * The name of the option to enable the pdf.js mode.
      */
-    public static final String PDFJS_MODE = "pdfjs_mode";
+    public static final String PDFJS_MODE = "pdfjs-mode";
 
     /**
      * The boolean flag indicating whether or not the pdf.js mode is enabled.
