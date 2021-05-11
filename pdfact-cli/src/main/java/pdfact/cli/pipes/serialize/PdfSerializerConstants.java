@@ -80,7 +80,9 @@ public class PdfSerializerConstants {
   /** The constant 'TEXT_BLOCK'. */
   static final String TEXT_BLOCKS = "blocks";
   /** The constant 'TEXT_LINE'. */
-  static final String TEXT_LINE = "textline";
+  static final String TEXT_LINE = "text-line";
+  /** The constant 'TEXT_LINES'. */
+  static final String TEXT_LINES = "text-lines";
   /** The constant 'WIDTH'. */
   static final String WIDTH = "width";
   /** The constant 'WORD'. */

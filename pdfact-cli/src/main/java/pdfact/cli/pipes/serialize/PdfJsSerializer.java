@@ -21,8 +21,7 @@ import static pdfact.cli.pipes.serialize.PdfSerializerConstants.POSITIONS;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.R;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.ROLE;
 import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT;
-import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCK;
-import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_BLOCKS;
+import static pdfact.cli.pipes.serialize.PdfSerializerConstants.TEXT_LINES;
 import static pdfact.core.PdfActCoreSettings.DEFAULT_ENCODING;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,23 +50,22 @@ import pdfact.core.model.TextLine;
 import pdfact.core.model.Word;
 
 /**
- * A serializer that outputs a document in the format as required by Robin's tool that improves
+ * A serializer that outputs a PDF document in the format as required by Robin's tool that improves
  * the search of pdf.js. This format equals to the normal JSON format of Pdfact, broken down by
- * text blocks. The text of the text blocks is composed by joining the text lines of a text blocks
- * using the following line endings:
- * (1) If a line does not end with a hyphenated word, add the ending " \n". This is a space
- *     followed by "\n". This identifies both a word ending and a line ending.
- *  (2) If the line ends with a hyphenated word, add the ending "\n". This is a single "\n".
- *      This identifies a line ending but not a word ending (since the word continues in the
- *      next line). Remove the hyphen if it is not mandatory.
- *
- *  Here are some examples that illustrate how this format joins two consecutive lines:
- *  (a) The lines "We introduce an" and "efficient algorithm" are joined to
- *      "We introduce an \nefficient algorithm".
- *  (b) The lines "We introduce an effi-" and "cient algorithm" are joined to
- *      "We introduce an effi\ncient algorithm" (without space before \n and without hyphen).
- *  (c) The lines "We introduce an high-" and "efficient algorithm" are joined to
- *      "We introduce a high-\nefficient algorithm" (without space before \n and with hyphen).
+ * text lines, but with the following special line ending scheme:
+ * (1) If a line does not end with a hyphenated word, the line ending is " \n" (a whitespace plus a
+ *     newline character). This identifies both a word ending and a line ending.
+ * (2) If the line ends with a hyphenated word, the line ending is "\n" (a single newline
+ *     character). This identifies a line ending but not a word ending (since the word continues in
+ *     the next line). Additionally, if the hyphen at the end of the line is not mandatory, the
+ *     hyphen is removed.
+ * Here are some examples that illustrate how two consecutive lines are serialized:
+ * (a) The lines "We introduce an" and "efficient algorithm" are serialized to
+ *     "We introduce an " and "efficient algorithm".
+ * (b) The lines "We introduce an effi-" and "cient algorithm" are joined to
+ *     "We introduce an effi" and "cient algorithm" (without a space before \n and without hyphen).
+ * (c) The lines "We introduce an high-" and "efficient algorithm" are joined to
+ *     "We introduce a high-" and "efficient algorithm" (without space before \n and with hyphen).
  *
  * @author Claudius Korzen
  */
@@ -113,7 +111,7 @@ public class PdfJsSerializer implements PdfSerializer {
       JSONObject json = new JSONObject();
 
       // Create the section that contains all serialized PDF elements.
-      serializeTextBlocks(pdf, json);
+      serializeTextLines(pdf, json);
 
       // Create the section that contains the used fonts.
       JSONArray fontsJson = serializeFonts(this.usedFonts);
@@ -136,56 +134,52 @@ public class PdfJsSerializer implements PdfSerializer {
   // ==============================================================================================
 
   /**
-   * Serializes the text blocks of the given PDF document.
+   * Serializes the text lines of the given PDF document.
    *
    * @param pdf  The PDF document to process.
    * @param json The JSON object to which the serialization should be appended.
    */
-  protected void serializeTextBlocks(Document pdf, JSONObject json) {
+  protected void serializeTextLines(Document pdf, JSONObject json) {
     JSONArray result = new JSONArray();
 
     if (pdf != null) {
       for (Page page : pdf.getPages()) {
         for (TextBlock block : page.getTextBlocks()) {
-          JSONObject blockJson = serializeTextBlock(block);
-          if (blockJson != null) {
-            result.put(blockJson);
+          for (TextLine line : block.getTextLines()) {
+            JSONObject lineJson = serializeTextLine(line);
+            if (lineJson != null) {
+              result.put(lineJson);
+            }
           }
         }
       }
     }
 
-    json.put(TEXT_BLOCKS, result);
+    json.put(TEXT_LINES, result);
   }
 
   /**
-   * Serializes the given text block.
+   * Serializes the given text line.
    *
-   * @param block The text block to serialize.
+   * @param line The text line to serialize.
    *
    * @return A JSON object that represents the serialization.
    */
-  protected JSONObject serializeTextBlock(TextBlock block) {
+  protected JSONObject serializeTextLine(TextLine line) {
     JSONObject result = new JSONObject();
 
-    JSONObject blockJson = new JSONObject();
+    JSONObject lineJson = new JSONObject();
 
-    if (block != null) {
-      // Serialize the position of the block.
-      Position position = block.getPosition();
+    if (line != null) {
+      // Serialize the position of the line.
+      Position position = line.getPosition();
       JSONArray serialized = serializePositions(position);
       if (serialized != null && serialized.length() > 0) {
         result.put(POSITIONS, serialized);
       }
 
-      // Serialize the role of the block.
-      SemanticRole role = block.getSemanticRole();
-      if (role != null) {
-        result.put(ROLE, role.getName());
-      }
-
-      // Serialize the font face of the block.
-      FontFace fontFace = block.getCharacterStatistic().getMostCommonFontFace();
+      // Serialize the font face of the line.
+      FontFace fontFace = line.getCharacterStatistic().getMostCommonFontFace();
       if (fontFace != null) {
         Font font = fontFace.getFont();
         if (font != null) {
@@ -201,8 +195,8 @@ public class PdfJsSerializer implements PdfSerializer {
         }
       }
 
-      // Serialize the most common color of the characters in the block.
-      Color color = block.getCharacterStatistic().getMostCommonColor();
+      // Serialize the most common color of the characters in the line.
+      Color color = line.getCharacterStatistic().getMostCommonColor();
       if (color != null) {
         String colorId = color.getId();
         if (colorId != null) {
@@ -213,15 +207,11 @@ public class PdfJsSerializer implements PdfSerializer {
         }
       }
 
-      // Compose the text of the text blocks as describe in the very first comment of this class.
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < block.getTextLines().size(); i++) {
-        TextLine line = block.getTextLines().get(i);
+      // Compose the text of the text blocks as described in the very first comment of this class.
+      StringBuilder sb = new StringBuilder(line.getText().strip());
 
-        // Append the whole line.
-        sb.append(line.getText());
-
-        Word lastWord = line.getLastWord();
+      Word lastWord = line.getLastWord();
+      if (lastWord != null) {
         // Append a whitespace if the last word of the line is not hyphenated.
         if (!lastWord.isDehyphenated()) {
           sb.append(" ");
@@ -231,14 +221,7 @@ public class PdfJsSerializer implements PdfSerializer {
             sb.setLength(sb.length() - 1);
           }
         }
-
-        // Append a "\n", except when the line is the last text line.
-        if (i < block.getTextLines().size() - 1) {
-          sb.append("\n");
-        }
       }
-
-
       String text = sb.toString();
       if (!text.isEmpty()) {
         result.put(TEXT, text);
@@ -246,8 +229,8 @@ public class PdfJsSerializer implements PdfSerializer {
     }
 
     // Wrap the JSON object with a JSON object that describes a text block.
-    if (blockJson != null && blockJson.length() > 0) {
-      result.put(TEXT_BLOCK, blockJson);
+    if (lineJson != null && lineJson.length() > 0) {
+      result.put(TEXT_LINES, lineJson);
     }
     return result;
   }
